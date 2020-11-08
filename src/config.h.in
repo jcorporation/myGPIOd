@@ -29,6 +29,7 @@ struct t_config_line {
 struct t_config {
     struct t_config_line *head;
     struct t_config_line *tail;
+    unsigned length;
 };
 
 struct t_config_line *get_config_from_fd(struct t_config *c, int fd);

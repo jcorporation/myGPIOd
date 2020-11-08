@@ -20,7 +20,6 @@ static void signal_handler(int sig_num) {
     printf("Signal %d received, exiting", sig_num);
 }
 
-
 void consume_value(int fd) {
     char buf[8];
     lseek(fd, 0, SEEK_SET);
@@ -56,12 +55,14 @@ bool check_gpio_export(unsigned gpio) {
 }
 
 bool set_gpio_mode(unsigned gpio, const char *key, const char *value) {
+    printf("\tSetting %s to %s\n", key, value);
     char gpio_file[80];
     snprintf(gpio_file, 80, "/sys/class/gpio/gpio%u/%s", gpio, key);
     FILE *fp = fopen(gpio_file, "w");
     if (fputs(value, fp) > 0) {
         return true;
     }
+    printf("\tError setting %s\n", key);
     return false;
 }
 
@@ -82,6 +83,7 @@ int main(int argc, char **argv) {
     struct t_config *config = (struct t_config *) malloc(sizeof(struct t_config));
     config->head = NULL;
     config->tail = NULL;
+    config->length = 0;
     if (read_config(config) == false) {
         fprintf(stderr, "Error reading /etc/mymgpiod.conf\n");
         config_free(config);
@@ -107,16 +109,21 @@ int main(int argc, char **argv) {
                 set_gpio_mode(current->gpio, "edge", current->edge);
                 set_gpio_mode(current->gpio, "active_low", current->active_low);
                 //open file descriptor
-                char gpio_file[80];
-                snprintf(gpio_file, 80, "/sys/class/gpio/gpio%u/value", current->gpio);
-                ufds[fd_num].fd = open(gpio_file, O_RDONLY, S_IREAD);
-                ufds[fd_num].events = POLLPRI | POLLERR;
-                if (ufds[fd_num].fd > 0) {
-                    current->fd = ufds[fd_num].fd;
-                    fd_num++;
+                if (fd_num <= 40) {
+                    char gpio_file[80];
+                    snprintf(gpio_file, 80, "/sys/class/gpio/gpio%u/value", current->gpio);
+                    ufds[fd_num].fd = open(gpio_file, O_RDONLY, S_IREAD);
+                    ufds[fd_num].events = POLLPRI | POLLERR;
+                    if (ufds[fd_num].fd > 0) {
+                        current->fd = ufds[fd_num].fd;
+                        fd_num++;
+                    }
+                    else {
+                        fprintf(stderr, "\tError opening fd for GPIO %u\n", current->gpio);
+                    }
                 }
                 else {
-                    fprintf(stderr, "\tError opening fd for GPIO %u\n", current->gpio);
+                    fprintf(stderr, "\tSkipping GPIO - to many open fds (maximum of 40)\n");
                 }
             }
         }

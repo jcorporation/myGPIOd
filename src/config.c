@@ -34,6 +34,7 @@ bool config_line_push(struct t_config *c, struct t_config_line *cl) {
     }
 
     c->tail = cl;
+    c->length++;
     return true;
 }
 
