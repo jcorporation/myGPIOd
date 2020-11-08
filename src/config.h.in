@@ -1,0 +1,40 @@
+/*
+ SPDX-License-Identifier: GPL-2.0-or-later
+ myMPD (c) 2018-2020 Juergen Mang <mail@jcgames.de>
+ https://github.com/jcorporation/mympd
+*/
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+//Debug build
+#cmakedefine DEBUG
+
+//mygpiod version from cmake
+#define MYGPIOD_VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR}
+#define MYGPIOD_VERSION_MINOR ${CPACK_PACKAGE_VERSION_MINOR}
+#define MYGPIOD_VERSION_PATCH ${CPACK_PACKAGE_VERSION_PATCH}
+#define MYGPIOD_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
+
+struct t_config_line {
+    unsigned gpio;
+    char *direction;
+    char *edge;
+    char *active_low;
+    char *cmd;
+    int fd;
+    struct t_config_line *next;
+};
+
+struct t_config {
+    struct t_config_line *head;
+    struct t_config_line *tail;
+};
+
+struct t_config_line *get_config_from_fd(struct t_config *c, int fd);
+bool config_line_push(struct t_config *c, struct t_config_line *cl);
+void config_line_free(struct t_config_line *cl);
+bool config_free(struct t_config *c);
+bool read_config(struct t_config *config);
+
+#endif
