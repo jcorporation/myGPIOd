@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "myGPIOd installed"
+echo "Modify /etc/mygpiod.conf to suit your needs."
+exit 0

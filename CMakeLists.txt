@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
-# myMPD (c) 2018-2020 Juergen Mang <mail@jcgames.de>
-# https://github.com/jcorporation/mympd
+# myGPIOd (c) 2020 Juergen Mang <mail@jcgames.de>
+# https://github.com/jcorporation/myGPIOd
 #
 
 cmake_minimum_required(VERSION 3.4)
@@ -20,6 +20,7 @@ else()
 endif()
 
 configure_file(src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+configure_file(cmake/CopyConfig.cmake.in cmake/CopyConfig.cmake @ONLY)
 
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 include(CheckCSourceCompiles)
@@ -50,3 +51,4 @@ set(SOURCES
 
 add_executable(mygpiod ${SOURCES})
 install(TARGETS mygpiod DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/cmake/CopyConfig.cmake)

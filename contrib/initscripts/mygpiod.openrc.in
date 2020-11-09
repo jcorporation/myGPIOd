@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+# myGPIOd (c) 2020 Juergen Mang <mail@jcgames.de>
+# https://github.com/jcorporation/mygpiod
+
+name=myGPIOd
+command="@CMAKE_INSTALL_FULL_BINDIR@/mygpiod"
+command_args=""
+command_background="yes"
+
+start_stop_daemon_args=""
+pidfile="/run/$name.pid"
+
+output_logger="logger -t mygpiod -p daemon.info"
+error_logger="logger -t mygpiod -p daemon.error"
+
+depend() {
+	need net
+	after firewall
+}

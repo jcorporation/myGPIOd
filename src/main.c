@@ -1,3 +1,9 @@
+/*
+ SPDX-License-Identifier: GPL-2.0-or-later
+ myGPIOd (c)2020 Juergen Mang <mail@jcgames.de>
+ https://github.com/jcorporation/myGPIOd
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>

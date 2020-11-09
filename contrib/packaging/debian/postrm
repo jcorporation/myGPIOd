@@ -1,0 +1,9 @@
+#!/bin/sh
+
+ACTION=$1
+USERNAME="mygpiod"
+
+if [ "$ACTION" = "purge" ]
+then
+  echo "Please purge /var/lib/mygpiod manually"
+fi
