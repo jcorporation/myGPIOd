@@ -18,11 +18,14 @@ It uses the GPIO Sysfs interface from the linux kernel. myGPIOd has no dependenc
 
 ## Run
 
+myGPIOd needs rw access to the `/sys/class/gpio/` directory. The `./build.sh` script creates a mygpiod user with the group gpio. 
+The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
+
 Adapt the configuration file `/etc/mygpiod.conf` to your needs.
 
-``
-Usage: ./mygpiod
-``
+```
+runuser -u mygpiod -g gpio /usr/bin/mygpiod
+```
 
 The `./build.sh` script installs a startup script for systemd, openrc or sysVinit.
 

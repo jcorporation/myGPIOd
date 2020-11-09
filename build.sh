@@ -40,8 +40,8 @@ buildrelease() {
 
 addmygpioduser() {
   echo "Checking status of mygpiod system user and group"
-  getent group mygpiod > /dev/null || groupadd -r mygpiod
-  getent passwd mygpiod > /dev/null || useradd -r -g mygpiod -s /bin/false -d /var/lib/mygpiod mygpiod
+  getent group gpio > /dev/null || groupadd -r gpio
+  getent passwd mygpiod > /dev/null || useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
 }
 
 installrelease() {

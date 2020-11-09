@@ -5,11 +5,14 @@
 #
 [Unit]
 Description=myGPIOd server daemon
-Requires=network.target local-fs.target
+Requires=local-fs.target
 
 [Service]
 ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/mygpiod
 Type=simple
+
+User=mygpiod
+Group=gpio
 
 # disallow writing to /usr, /bin, /sbin, ...
 ProtectSystem=yes

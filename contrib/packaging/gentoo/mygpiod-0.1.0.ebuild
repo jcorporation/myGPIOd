@@ -46,8 +46,8 @@ src_install() {
 
 pkg_postinst() {
     elog "Checking status of mygpiod system user and group"
-    getent group mygpiod > /dev/null || enewgroup mygpiod
-    getent passwd mygpiod > /dev/null || enewuser mygpiod -1 -1 -1 audio
+    getent group gpio > /dev/null || enewgroup gpio
+    getent passwd mygpiod > /dev/null || enewuser mygpiod -1 -1 -1 gpio
 
     elog
     elog "myGPIOd installed"
