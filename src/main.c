@@ -163,6 +163,7 @@ int main(int argc, char **argv) {
     //Cleanup
     cleanup:
     config_free(config);
+    free(config);
     for (unsigned i = 0; i < fd_num; i++) {
         close(ufds[i].fd);    
     }

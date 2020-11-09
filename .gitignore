@@ -1,2 +1,7 @@
 *~
-build
+release
+debug
+package
+osc
+src/compile_commands.json
+

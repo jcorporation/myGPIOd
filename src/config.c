@@ -89,6 +89,17 @@ bool read_config(struct t_config *config) {
         cl->active_low = NULL;
         cl->cmd = NULL;
         
+        if (strlen(line) > 0) {
+            if (line[0] == '#' || line[0] == '\n' || 
+                line[0] == ' ' || line[0] == '\t')
+            {
+                continue;
+            }
+        }
+        else {
+            continue;
+        }
+
         char *line_c = strtok(line, "\n");
         
         char *token = strtok(line_c, ",");
