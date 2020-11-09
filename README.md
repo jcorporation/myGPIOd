@@ -24,7 +24,7 @@ The GPIO group has on many systems sufficient privileges, do not run myGPIOd as 
 Adapt the configuration file `/etc/mygpiod.conf` to your needs.
 
 ```
-runuser -u mygpiod -g gpio /usr/bin/mygpiod
+runuser -u mygpiod -g gpio /usr/bin/mygpiod [/etc/mygpiod.conf]
 ```
 
 The `./build.sh` script installs a startup script for systemd, openrc or sysVinit.

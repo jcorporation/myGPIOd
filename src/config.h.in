@@ -36,6 +36,6 @@ struct t_config_line *get_config_from_fd(struct t_config *c, int fd);
 bool config_line_push(struct t_config *c, struct t_config_line *cl);
 void config_line_free(struct t_config_line *cl);
 bool config_free(struct t_config *c);
-bool read_config(struct t_config *config);
+bool read_config(struct t_config *config, const char *config_file);
 
 #endif

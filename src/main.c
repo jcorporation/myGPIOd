@@ -15,13 +15,17 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <errno.h>
 
 #include "config.h"
+
+#define GPIO_PATH "/sys/class/gpio/"
 
 sig_atomic_t s_signal_received;
 
 static void signal_handler(int sig_num) {
-    signal(sig_num, signal_handler);  // Reinstantiate signal handler
+    //Reinstantiate signal handler
+    signal(sig_num, signal_handler);
     s_signal_received = sig_num;
     printf("Signal %d received, exiting", sig_num);
 }
@@ -37,7 +41,7 @@ void consume_value(int fd) {
 
 bool export_gpio(unsigned gpio) {
     printf("\tExporting GPIO %u\n", gpio);
-    FILE *fp = fopen("/sys/class/gpio/export", "w");
+    FILE *fp = fopen(GPIO_PATH"export", "w");
     if (fp == NULL) {
         return false;
     }
@@ -51,7 +55,7 @@ bool export_gpio(unsigned gpio) {
 
 bool check_gpio_export(unsigned gpio) {
     char gpio_file[80];
-    snprintf(gpio_file, 80, "/sys/class/gpio/gpio%u/value", gpio);
+    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/value", gpio);
     FILE *fp = fopen(gpio_file, "r");
     if (fp == NULL) {
         return false;
@@ -63,7 +67,7 @@ bool check_gpio_export(unsigned gpio) {
 bool set_gpio_mode(unsigned gpio, const char *key, const char *value) {
     printf("\tSetting %s to %s\n", key, value);
     char gpio_file[80];
-    snprintf(gpio_file, 80, "/sys/class/gpio/gpio%u/%s", gpio, key);
+    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/%s", gpio, key);
     FILE *fp = fopen(gpio_file, "w");
     if (fputs(value, fp) > 0) {
         return true;
@@ -72,27 +76,46 @@ bool set_gpio_mode(unsigned gpio, const char *key, const char *value) {
     return false;
 }
 
+void execute_action(const char *cmd) {
+    if (fork() == 0) {
+        //child process
+        int rc = system(cmd);
+        if (rc == -1) {
+            fprintf(stderr, "Error executing cmd \"%s\": %s", cmd, strerror(errno));
+        }
+        exit(0);
+    }
+    //parent process returns to main loop
+}
+
 int main(int argc, char **argv) {
+    printf("Starting myGPIOd %s\n", MYGPIOD_VERSION);
+
     //set signal handler
     s_signal_received = 0;
     signal(SIGTERM, signal_handler);
     signal(SIGINT, signal_handler);
 
+    //handle commandline parameter
+    char *config_file = NULL;
+    if (argc == 2 && strncmp(argv[1], "/", 1) == 0) {
+        config_file = strdup(argv[1]);
+    }
+    else {
+        config_file = strdup("/etc/mygpiod.conf");
+    }
 
-    printf("Starting myGPIOd %s\n", MYGPIOD_VERSION);
-    //todo: handle commandline parameters
-    (void) argc;
-    (void) argv;
-    
     //read configuration
-    printf("Reading /etc/mygpiod.conf\n");
+    printf("Reading %s\n", config_file);
     struct t_config *config = (struct t_config *) malloc(sizeof(struct t_config));
     config->head = NULL;
     config->tail = NULL;
     config->length = 0;
-    if (read_config(config) == false) {
-        fprintf(stderr, "Error reading /etc/mymgpiod.conf\n");
+    if (read_config(config, config_file) == false) {
+        fprintf(stderr, "Error reading %s\n", config_file);
         config_free(config);
+        free(config);
+        free(config_file);
         return 1;
     }
     
@@ -117,7 +140,7 @@ int main(int argc, char **argv) {
                 //open file descriptor
                 if (fd_num <= 40) {
                     char gpio_file[80];
-                    snprintf(gpio_file, 80, "/sys/class/gpio/gpio%u/value", current->gpio);
+                    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/value", current->gpio);
                     ufds[fd_num].fd = open(gpio_file, O_RDONLY, S_IREAD);
                     ufds[fd_num].events = POLLPRI | POLLERR;
                     if (ufds[fd_num].fd > 0) {
@@ -149,13 +172,14 @@ int main(int argc, char **argv) {
     while (s_signal_received == 0) {
         int read_fds = poll(ufds, 1, -1);
         if (read_fds < 0) {
-            printf("Error polling fds\n");
+            fprintf(stderr, "Error polling fds\n");
             break;
         }
         for (unsigned i = 0; i < fd_num; i++) {
             if (ufds[0].revents & POLLPRI) {
                 current = get_config_from_fd(config, ufds[0].fd);
                 printf("Event for GPIO %u detected\n", current->gpio);
+                execute_action(current->cmd);
                 consume_value(ufds[0].fd);        
             }
         }
@@ -164,6 +188,7 @@ int main(int argc, char **argv) {
     cleanup:
     config_free(config);
     free(config);
+    free(config_file);
     for (unsigned i = 0; i < fd_num; i++) {
         close(ufds[i].fd);    
     }

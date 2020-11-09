@@ -145,9 +145,8 @@ prepare() {
   for F in $SRC
   do
     [ "$F" = "$STARTPATH/osc" ] && continue
-    cp -a "$F" .
+    cp -av "$F" .
   done
-  rm -r dist/buildtools
 }
 
 pkgdebian() {

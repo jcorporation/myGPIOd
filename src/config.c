@@ -6,10 +6,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #include "config.h"
 
@@ -71,10 +71,10 @@ bool config_free(struct t_config *c) {
     return true;
 }
 
-bool read_config(struct t_config *config) {
-    FILE *fp = fopen("/etc/mygpiod.conf", "r");
+bool read_config(struct t_config *config, const char *config_file) {
+    FILE *fp = fopen(config_file, "r");
     if (fp == false) {
-        fprintf(stderr, "Can not open /etc/mygpiod.conf");
+        fprintf(stderr, "Can not open %s: %s", config_file, strerror(errno));
         return false;
     }
     
