@@ -10,14 +10,14 @@ ELSE()
 ENDIF()
 
 #Install startup script
-IF (EXISTS "/usr/lib/systemd/system")
-  #Install systemd unit
-  MESSAGE("-- Installing: $ENV{DESTDIR}/usr/lib/systemd/system/mygpiod.service")
-  EXECUTE_PROCESS (COMMAND @CMAKE_COMMAND@ -E copy "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod.service" "$ENV{DESTDIR}/usr/lib/systemd/system/mygpiod.service")
-ELSEIF (EXISTS "/lib/systemd/system")
+IF (EXISTS "/lib/systemd/system")
   #Install systemd unit
   MESSAGE("-- Installing: $ENV{DESTDIR}/lib/systemd/system/mygpiod.service")
   EXECUTE_PROCESS (COMMAND @CMAKE_COMMAND@ -E copy "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod.service" "$ENV{DESTDIR}/lib/systemd/system/mygpiod.service")
+ELSEIF (EXISTS "/usr/lib/systemd/system")
+  #Install systemd unit
+  MESSAGE("-- Installing: $ENV{DESTDIR}/usr/lib/systemd/system/mygpiod.service")
+  EXECUTE_PROCESS (COMMAND @CMAKE_COMMAND@ -E copy "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod.service" "$ENV{DESTDIR}/usr/lib/systemd/system/mygpiod.service")
 ELSEIF(EXISTS "/sbin/openrc-run")
   #Install openrc script
   MESSAGE("-- Installing: $ENV{DESTDIR}/etc/init.d/mygpiod")
