@@ -1,6 +1,9 @@
 #Example mygpiod.conf
 #
-#Comma separated list
+#myGPIOd @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@
+#https://github.com/jcorporation/myGPIOd
+#
+#Comma separated list of GPIOs to configure
 #
 #GPIO = GPIO number (broadcom numbers)
 #direction = in | out

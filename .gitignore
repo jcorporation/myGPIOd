@@ -4,4 +4,5 @@ debug
 package
 osc
 src/compile_commands.json
-
+.vscode
+clang-tidy.out

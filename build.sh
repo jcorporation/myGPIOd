@@ -98,10 +98,6 @@ check() {
   then
     echo "Running cppcheck"
     $CPPCHECKBIN $CPPCHECKOPTS src/*.c src/*.h
-    $CPPCHECKBIN $CPPCHECKOPTS src/mpd_client/*.c src/mpd_client/*.h
-    $CPPCHECKBIN $CPPCHECKOPTS src/mygpiod_api/*.c src/mygpiod_api/*.h
-    $CPPCHECKBIN $CPPCHECKOPTS src/web_server/*.c src/web_server/*.h
-    $CPPCHECKBIN $CPPCHECKOPTS cli_tools/*.c
   else
     echo "cppcheck not found"
   fi
@@ -377,17 +373,12 @@ case "$1" in
 	  buildrelease
 	;;
 	install)
-	  cleanupoldinstall
 	  installrelease
 	;;
 	releaseinstall)
 	  buildrelease
 	  cd .. || exit 1
-	  cleanupoldinstall
 	  installrelease
-	;;
-	cleanupoldinst)
-	  cleanupoldinstall
 	;;
 	debug)
 	  builddebug "FALSE"
@@ -456,9 +447,7 @@ case "$1" in
 	  echo "Cleanup options:"
 	  echo "  cleanup:          cleanup source tree"
 	  echo "  cleanupdist:      cleanup dist directory, forces release to build new assets"
-	  echo "  cleanupoldinst:   removes deprecated files"
-	  echo "  uninstall:        removes mygpiod files, leaves configuration and "
-	  echo "                    state files in place"
+	  echo "  uninstall:        removes mygpiod files, leaves configuration in place "
 	  echo "                    following environment variables are respected"
 	  echo "                      - DESTDIR=\"\""
 	  echo "  purge:            removes all mygpiod files, also your init scripts"

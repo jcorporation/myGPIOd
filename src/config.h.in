@@ -7,6 +7,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define MAX_GPIO 40
+#define GPIO_PATH "/sys/class/gpio/"
+
 //Debug build
 #cmakedefine DEBUG
 
