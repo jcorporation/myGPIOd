@@ -1,5 +1,5 @@
 Source: mygpiod
-Section: Electronics
+Section: misc
 Priority: optional
 Maintainer: Juergen Mang <mail@jcgames.de>
 Build-Depends: debhelper (>= 10), cmake
