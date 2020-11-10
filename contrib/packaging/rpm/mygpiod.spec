@@ -53,7 +53,7 @@ fi
 %defattr(-,root,root,-)
 %doc README.md LICENSE
 /usr/bin/mygpiod
-/usr/lib/systemd/system/mygpiod.service
+/lib/systemd/system/mygpiod.service
 %config(noreplace) /etc/mygpiod.conf
 
 %changelog
