@@ -252,7 +252,7 @@ pkgosc() {
   
   cleanup
   cleanuposc
-  [ "$OSC_REPO" = "" ] && OSC_REPO="home:jcorporation/mygpiod"
+  [ "$OSC_REPO" = "" ] && OSC_REPO="home:jcorporation/myGPIOd"
   
   mkdir osc
   cd osc || exit 1  
@@ -467,7 +467,7 @@ case "$1" in
 	  echo "  pkgrpm:           creates the rpm package"
 	  echo "  pkgosc:           updates the open build service repository"
 	  echo "                    following environment variables are respected"
-	  echo "                      - OSC_REPO=\"home:jcorporation/mygpiod\""
+	  echo "                      - OSC_REPO=\"home:jcorporation/myGPIOd\""
 	  echo ""
 	  echo "Misc options:"
 	  echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
