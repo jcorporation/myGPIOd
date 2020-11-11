@@ -36,7 +36,10 @@ void consume_value(int fd) {
     if (n < 0) {
         LOG_ERROR("Error reading fd");
     }
-    LOG_DEBUG("Consumed value %s", buf);
+    else {
+        char *token = strtok(buf, "\n");
+        LOG_DEBUG("Consumed value: %s", token);
+    }
 }
 
 bool export_gpio(unsigned gpio) {
@@ -186,7 +189,9 @@ int main(int argc, char **argv) {
     while (s_signal_received == 0) {
         int read_fds = poll(ufds, 1, -1);
         if (read_fds < 0) {
-            LOG_ERROR("Error polling fds");
+            if (s_signal_received == 0) {
+                LOG_ERROR("Error polling fds");
+            }
             break;
         }
         for (unsigned i = 0; i < fd_num; i++) {
