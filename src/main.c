@@ -16,6 +16,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <errno.h>
+#include <time.h>
 
 #include "config.h"
 #include "log.h"
@@ -27,6 +28,14 @@ static void signal_handler(int sig_num) {
     signal(sig_num, signal_handler);
     s_signal_received = sig_num;
     LOG_INFO("Signal %d received, exiting", sig_num);
+}
+
+void my_usleep(time_t usec) {
+    struct timespec ts = {
+        .tv_sec = (usec / 1000) / 1000,
+        .tv_nsec = (usec % 1000000000L) * 1000
+    };
+    nanosleep(&ts, NULL);
 }
 
 void consume_value(int fd) {
@@ -53,7 +62,24 @@ bool export_gpio(unsigned gpio) {
     if (n != 1) {
         return false;
     }
-    return true;
+    //wait for writeable direction file
+    char gpio_file[80];
+    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/direction", gpio);
+    n = 0;
+    fp = NULL;
+    while ((fp = fopen(gpio_file, "w")) == NULL) {
+        LOG_DEBUG("%d Waiting for rw access", n);
+        my_usleep(100000);
+        n++;
+        if (n > 100) {
+            break;
+        }
+    }
+    if (fp != NULL) {
+        fclose(fp);
+        return true;
+    }
+    return false;
 }
 
 bool check_gpio_export(unsigned gpio) {
