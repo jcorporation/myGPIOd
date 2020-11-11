@@ -157,6 +157,9 @@ bool read_config(struct t_config *config, const char *config_file) {
             continue;
         }
     }
+    if (line != NULL) {
+        free(line);
+    }
     fclose(fp);
     return true;
 }
