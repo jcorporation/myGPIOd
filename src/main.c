@@ -52,7 +52,7 @@ void consume_value(int fd) {
 }
 
 bool export_gpio(unsigned gpio) {
-    LOG_INFO("Exporting GPIO %u", gpio);
+    LOG_INFO("Exporting gpio %u", gpio);
     FILE *fp = fopen(GPIO_PATH"export", "w");
     if (fp == NULL) {
         return false;
@@ -68,7 +68,7 @@ bool export_gpio(unsigned gpio) {
     n = 0;
     fp = NULL;
     while ((fp = fopen(gpio_file, "w")) == NULL) {
-        LOG_DEBUG("%d Waiting for rw access", n);
+        LOG_DEBUG("Waiting for rw access, attempt %d", n);
         my_usleep(100000);
         n++;
         if (n > 100) {
@@ -168,11 +168,13 @@ int main(int argc, char **argv) {
     
     struct t_config_line *current = config->head;
     while (current != NULL) {
-        LOG_INFO("Setting GPIO %u:", current->gpio);
         if (check_gpio_export(current->gpio) == false) {
             if (export_gpio(current->gpio) == false) {
-                LOG_ERROR("Error exporting GPIO %u", current->gpio);        
+                LOG_ERROR("Error exporting gpio %u", current->gpio);        
             }
+        }
+        else {
+            LOG_INFO("Gpio %u already exported", current->gpio);
         }
         if (check_gpio_export(current->gpio) == true) {
             set_gpio_mode(current->gpio, "direction", current->direction);
