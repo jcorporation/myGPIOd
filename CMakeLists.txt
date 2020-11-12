@@ -55,6 +55,9 @@ set(SOURCES
   src/log.c
 )
 
+
 add_executable(mygpiod ${SOURCES})
+target_link_libraries(mygpiod gpiod)
+
 install(TARGETS mygpiod DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/cmake/CopyConfig.cmake)

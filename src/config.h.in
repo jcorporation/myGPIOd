@@ -7,9 +7,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define MAX_GPIO 40
-#define GPIO_PATH "/sys/class/gpio/"
-
 //Debug build
 #cmakedefine DEBUG
 
@@ -21,11 +18,8 @@
 
 struct t_config_line {
     unsigned gpio;
-    char *direction;
-    char *edge;
-    char *active_low;
     char *cmd;
-    int fd;
+    unsigned edge;
     struct t_config_line *next;
 };
 
@@ -33,9 +27,11 @@ struct t_config {
     struct t_config_line *head;
     struct t_config_line *tail;
     unsigned length;
+    unsigned edge;
+    bool active_low;
+    char *chip;
 };
 
-struct t_config_line *get_config_from_fd(struct t_config *c, int fd);
 bool config_line_push(struct t_config *c, struct t_config_line *cl);
 void config_line_free(struct t_config_line *cl);
 bool config_free(struct t_config *c);

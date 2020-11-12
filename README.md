@@ -1,11 +1,13 @@
 # myGPIOd
 
-myGPIOd is a small daemon to set modes of Raspberry Pi GPIOs and to call scripts on GPIO events. 
-It uses the GPIO Sysfs interface from the linux kernel. myGPIOd has no dependencies beside the standard c libraries.
+myGPIOd is a small daemon to call scripts on GPIO events. 
+
+It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/)
 
 ## Build Dependencies
 
 - cmake >= 3.4
+- libgpiod
 - libasan3: for debug builds only
 
 ## Quick Build Instructions
@@ -18,7 +20,8 @@ It uses the GPIO Sysfs interface from the linux kernel. myGPIOd has no dependenc
 
 ## Run
 
-myGPIOd needs rw access to the `/sys/class/gpio/` directory. The `./build.sh` script creates a mygpiod user with the group gpio. 
+myGPIOd needs rw access to the gpio chip device (e. g. /dev/gpiochip0)
+The `./build.sh` script creates a mygpiod user with the group gpio. 
 The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
 
 Adapt the configuration file `/etc/mygpiod.conf` to your needs.
@@ -34,8 +37,11 @@ The `./build.sh` script installs a startup script for systemd, openrc or sysVini
 This example configuration calls `poweroff` if GPIO 3 is falling from high (1) to low (0).
 
 ```
-#gpio,direction,edge,active_low,cmd
-3,in,falling,1,/usr/sbin/poweroff 
+chip=0
+edge=falling
+active_low=true
+#gpio,edge,cmd
+3,falling,sudo /usr/sbin/poweroff 
 ```
 
 ## Copyright

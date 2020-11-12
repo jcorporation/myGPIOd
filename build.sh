@@ -297,23 +297,23 @@ installdeps() {
   then
     #debian
     apt-get update
-    apt-get install -y --no-install-recommends gcc cmake build-essential
+    apt-get install -y --no-install-recommends gcc cmake build-essential libgpiod-dev
   elif [ -f /etc/arch-release ]
   then
     #arch
-    pacman -S gcc cmake
+    pacman -S gcc cmake libgpiod
   elif [ -f /etc/alpine-release ]
   then
     #alpine
-    apk add cmake alpine-sdk linux-headers
+    apk add cmake alpine-sdk linux-headers libgpiod-dev
   elif [ -f /etc/SuSE-release ]
   then
     #suse
-    zypper install gcc cmake unzip
+    zypper install gcc cmake unzip libgpiod-devel
   elif [ -f /etc/redhat-release ]
   then  
     #fedora 	
-    yum install gcc cmake unzip
+    yum install gcc cmake unzip libgpiod-devel
   else 
     echo "Unsupported distribution detected."
     echo "You should manually install:"

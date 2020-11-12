@@ -9,19 +9,28 @@
 #include <unistd.h>
 #include <poll.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <inttypes.h>
 #include <stdbool.h>
 #include <signal.h>
 #include <errno.h>
-#include <time.h>
+#include <limits.h>
+#include <gpiod.h>
+#include <sys/signalfd.h>
 
 #include "config.h"
 #include "log.h"
 
 sig_atomic_t s_signal_received;
+
+struct mon_ctx {
+	unsigned int offset;
+	unsigned int events_wanted;
+	unsigned int events_done;
+	bool silent;
+	char *fmt;
+	int sigfd;
+};
+
+struct t_config *config;
 
 static void signal_handler(int sig_num) {
     //Reinstantiate signal handler
@@ -30,89 +39,24 @@ static void signal_handler(int sig_num) {
     LOG_INFO("Signal %d received, exiting", sig_num);
 }
 
-void my_usleep(time_t usec) {
-    struct timespec ts = {
-        .tv_sec = (usec / 1000) / 1000,
-        .tv_nsec = (usec % 1000000000L) * 1000
-    };
-    nanosleep(&ts, NULL);
-}
+void execute_action(unsigned offset, unsigned event_type) {
+    //get cmd
+    char *cmd = NULL;
+    struct t_config_line *current = config->head;
+    while (current != NULL) {
+   	if (current->gpio == offset && 
+	    (current->edge == GPIOD_CTXLESS_EVENT_BOTH_EDGES || current->edge == event_type))
+	{
+	    cmd = current->cmd;
+	    break;
+	}
+   	current = current->next;
+    }
+       
+    if (cmd == NULL) {
+    	return;
+    }
 
-void consume_value(int fd) {
-    char buf[8];
-    lseek(fd, 0, SEEK_SET);
-    ssize_t n = read(fd, buf, sizeof buf);
-    if (n < 0) {
-        LOG_ERROR("Error reading fd");
-    }
-    else {
-        char *token = strtok(buf, "\n");
-        LOG_DEBUG("Consumed value: %s", token);
-    }
-}
-
-bool export_gpio(unsigned gpio) {
-    LOG_INFO("Exporting gpio %u", gpio);
-    FILE *fp = fopen(GPIO_PATH"export", "w");
-    if (fp == NULL) {
-        return false;
-    }
-    int n = fprintf(fp, "%u", gpio);
-    fclose(fp);
-    if (n != 1) {
-        return false;
-    }
-    //wait for writeable direction file
-    char gpio_file[80];
-    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/direction", gpio);
-    n = 0;
-    fp = NULL;
-    while ((fp = fopen(gpio_file, "w")) == NULL) {
-        LOG_DEBUG("Waiting for rw access, attempt %d", n);
-        my_usleep(100000);
-        n++;
-        if (n > 100) {
-            break;
-        }
-    }
-    if (fp != NULL) {
-        fclose(fp);
-        return true;
-    }
-    return false;
-}
-
-bool check_gpio_export(unsigned gpio) {
-    char gpio_file[80];
-    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/value", gpio);
-    FILE *fp = fopen(gpio_file, "r");
-    if (fp == NULL) {
-        return false;
-    }
-    fclose(fp);
-    return true;
-}
-
-bool set_gpio_mode(unsigned gpio, const char *key, const char *value) {
-    LOG_INFO("Setting gpio %u, %s to %s", gpio, key, value);
-    char gpio_file[80];
-    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/%s", gpio, key);
-    FILE *fp = fopen(gpio_file, "w");
-    if (fp != NULL) {
-        int rc = fputs(value, fp);
-        fclose(fp);
-        if (rc > 0) {
-            return true;
-        }
-    }
-    else {
-        LOG_ERROR("Error opening %s: %s", gpio_file, strerror(errno));
-    }
-    LOG_ERROR("Error setting gpio %u, %s", gpio, key);
-    return false;
-}
-
-void execute_action(const char *cmd) {
     if (fork() == 0) {
         //child process executes cmd
         int rc = system(cmd);
@@ -124,6 +68,121 @@ void execute_action(const char *cmd) {
     //parent process returns to main loop
 }
 
+static void event_print_human_readable(unsigned int offset,
+				       const struct timespec *ts,
+				       int event_type)
+{
+	char *evname;
+
+	if (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE)
+		evname = " RISING EDGE";
+	else
+		evname = "FALLING EDGE";
+
+	LOG_INFO("event: %s offset: %u timestamp: [%8ld.%09ld]",
+	       evname, offset, ts->tv_sec, ts->tv_nsec);
+	
+	execute_action(offset, event_type);
+}
+
+static int poll_callback(unsigned int num_lines,
+			 struct gpiod_ctxless_event_poll_fd *fds,
+			 const struct timespec *timeout, void *data)
+{
+	struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES + 1];
+	struct mon_ctx *ctx = data;
+	int cnt, ts, rv;
+	unsigned int i;
+
+	for (i = 0; i < num_lines; i++) {
+		pfds[i].fd = fds[i].fd;
+		pfds[i].events = POLLIN | POLLPRI;
+	}
+
+	pfds[i].fd = ctx->sigfd;
+	pfds[i].events = POLLIN | POLLPRI;
+
+	ts = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
+
+	cnt = poll(pfds, num_lines + 1, ts);
+	if (cnt < 0)
+		return GPIOD_CTXLESS_EVENT_POLL_RET_ERR;
+	else if (cnt == 0)
+		return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
+
+	rv = cnt;
+	for (i = 0; i < num_lines; i++) {
+		if (pfds[i].revents) {
+			fds[i].event = true;
+			if (!--cnt)
+				return rv;
+		}
+	}
+
+	/*
+	 * If we're here, then there's a signal pending. No need to read it,
+	 * we know we should quit now.
+	 */
+	close(ctx->sigfd);
+
+	return GPIOD_CTXLESS_EVENT_POLL_RET_STOP;
+}
+
+static void handle_event(struct mon_ctx *ctx, int event_type,
+			 unsigned int line_offset,
+			 const struct timespec *timestamp)
+{
+        event_print_human_readable(line_offset, timestamp, event_type);
+	ctx->events_done++;
+}
+
+static int event_callback(int event_type, unsigned int line_offset,
+			  const struct timespec *timestamp, void *data)
+{
+	struct mon_ctx *ctx = data;
+
+	switch (event_type) {
+	case GPIOD_CTXLESS_EVENT_CB_RISING_EDGE:
+	case GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE:
+		handle_event(ctx, event_type, line_offset, timestamp);
+		break;
+	default:
+		/*
+		 * REVISIT: This happening would indicate a problem in the
+		 * library.
+		 */
+		return GPIOD_CTXLESS_EVENT_CB_RET_OK;
+	}
+
+	if (ctx->events_wanted && ctx->events_done >= ctx->events_wanted)
+		return GPIOD_CTXLESS_EVENT_CB_RET_STOP;
+
+	return GPIOD_CTXLESS_EVENT_CB_RET_OK;
+}
+
+int make_signalfd(void) {
+	sigset_t sigmask;
+	int sigfd, rv;
+
+	sigemptyset(&sigmask);
+	sigaddset(&sigmask, SIGTERM);
+	sigaddset(&sigmask, SIGINT);
+
+	rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
+	if (rv < 0) {
+		LOG_ERROR("error masking signals: %s", strerror(errno));
+		return -1;
+	}
+
+	sigfd = signalfd(-1, &sigmask, 0);
+	if (sigfd < 0) {
+		LOG_ERROR("error creating signalfd: %s", strerror(errno));
+		return -1;
+	}
+
+	return sigfd;
+}
+
 int main(int argc, char **argv) {
     log_on_tty = isatty(fileno(stdout)) ? 1: 0;
     #ifdef DEBUG
@@ -131,7 +190,7 @@ int main(int argc, char **argv) {
     #else
     set_loglevel(2);
     #endif
-    
+
     LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
 
     //set signal handler
@@ -150,95 +209,49 @@ int main(int argc, char **argv) {
 
     //read configuration
     LOG_INFO("Reading %s", config_file);
-    struct t_config *config = (struct t_config *) malloc(sizeof(struct t_config));
+    config = (struct t_config *) malloc(sizeof(struct t_config));
     config->head = NULL;
     config->tail = NULL;
     config->length = 0;
+    config->chip = strdup("0");
+    config->active_low = true;
+    config->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
     if (read_config(config, config_file) == false) {
         config_free(config);
         free(config);
         free(config_file);
         return 1;
     }
-    
-    //Set GPIOs
-    struct pollfd ufds[MAX_GPIO] = {{0}};
-    memset(ufds, 0, sizeof(struct pollfd) * 40);
-    unsigned fd_num = 0;
-    
+
+    struct mon_ctx ctx;
+    memset(&ctx, 0, sizeof(ctx));
+    struct timespec timeout = { 10, 0 };
+    unsigned int offsets[GPIOD_LINE_BULK_MAX_LINES];
+
     struct t_config_line *current = config->head;
+    int i = 0;
     while (current != NULL) {
-        if (check_gpio_export(current->gpio) == false) {
-            if (export_gpio(current->gpio) == false) {
-                LOG_ERROR("Error exporting gpio %u", current->gpio);        
-            }
-        }
-        else {
-            LOG_INFO("Gpio %u already exported", current->gpio);
-        }
-        if (check_gpio_export(current->gpio) == true) {
-            set_gpio_mode(current->gpio, "direction", current->direction);
-            if (strcmp(current->direction, "in") == 0) {
-                set_gpio_mode(current->gpio, "edge", current->edge);
-                set_gpio_mode(current->gpio, "active_low", current->active_low);
-                //open file descriptor
-                if (fd_num < MAX_GPIO) {
-                    char gpio_file[80];
-                    snprintf(gpio_file, 80, GPIO_PATH"gpio%u/value", current->gpio);
-                    ufds[fd_num].fd = open(gpio_file, O_RDONLY, S_IREAD);
-                    ufds[fd_num].events = POLLPRI | POLLERR;
-                    if (ufds[fd_num].fd > 0) {
-                        current->fd = ufds[fd_num].fd;
-                        fd_num++;
-                    }
-                    else {
-                        LOG_ERROR("Error opening fd for GPIO %u", current->gpio);
-                    }
-                }
-                else {
-                    LOG_WARN("Skipping GPIO - to many open fds (maximum of 40)");
-                }
-            }
-        }
-        current = current->next;
-    }
-    
-    if (fd_num == 0) {
-        LOG_WARN("No GPIOs configures for direction in, exiting...");
-        goto cleanup;
+	offsets[i] = current->gpio;
+	current=current->next;
+	i++;
     }
 
-    //Read old values
-    for (unsigned i = 0; i < fd_num; i++) {
-        consume_value(ufds[i].fd);    
-    }
-    //Main loop    
-    LOG_INFO("Listening on GPIO events");
-    while (s_signal_received == 0) {
-        int read_fds = poll(ufds, 1, -1);
-        if (read_fds < 0) {
-            if (s_signal_received == 0) {
-                LOG_ERROR("Error polling fds");
-            }
-            break;
-        }
-        for (unsigned i = 0; i < fd_num; i++) {
-            if (ufds[0].revents & POLLPRI) {
-                current = get_config_from_fd(config, ufds[0].fd);
-                LOG_INFO("Event for GPIO %u detected", current->gpio);
-                execute_action(current->cmd);
-                consume_value(ufds[0].fd);        
-            }
-        }
-    }
+    ctx.sigfd = make_signalfd();
+    if (ctx.sigfd > 0) {
+    	int rv = gpiod_ctxless_event_monitor_multiple(
+    		config->chip, config->edge,
+		offsets, config->length,
+		config->active_low, "gpiomon",
+		&timeout, poll_callback,
+		event_callback, &ctx);
+        if (rv) {
+	    LOG_ERROR("Error waiting for events");
+	}
+    }    
     //Cleanup
-    cleanup:
     config_free(config);
     free(config);
     free(config_file);
-    for (unsigned i = 0; i < fd_num; i++) {
-        close(ufds[i].fd);    
-    }
     LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
     return 0;
 }

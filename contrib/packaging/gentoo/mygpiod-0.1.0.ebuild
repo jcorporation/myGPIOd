@@ -8,14 +8,14 @@ inherit eutils user cmake systemd
 MY_PN="myGPIOd"
 S="${WORKDIR}/${MY_PN}-${PV}"
 
-DESCRIPTION="A daemon for interacting with raspberry GPIOs."
+DESCRIPTION="A small daemon to call scripts on GPIO events. "
 HOMEPAGE="https://jcorporation.github.io/myGPIOd"
 SRC_URI="https://github.com/jcorporation/${MY_PN}/archive/v${PV}.tar.gz -> ${PN}-${PV}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86 ~arm ~arm64"
-IUSE="systemd"
+IUSE="systemd libgpiod"
 
 BDEPEND="
         >=dev-util/cmake-3.4
@@ -23,6 +23,7 @@ BDEPEND="
 
 RDEPEND="
         systemd? ( sys-apps/systemd )
+	libgpiod? ( dev-libs/libgpiod )
 "
 
 QA_PRESTRIPPED="
