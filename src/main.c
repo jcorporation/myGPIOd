@@ -6,7 +6,6 @@
  myGPIOd is based on the gpiomon tool from https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
 */
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <poll.h>
@@ -93,7 +92,6 @@ static void execute_action(unsigned int offset, const struct timespec *ts, int e
 static int poll_callback(unsigned int num_lines, struct gpiod_ctxless_event_poll_fd *fds, const struct timespec *timeout, void *data) {
 	struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES + 1];
 	struct mon_ctx *ctx = data;
-	int cnt, ts, rv;
 	unsigned int i;
 
 	for (i = 0; i < num_lines; i++) {
@@ -104,17 +102,17 @@ static int poll_callback(unsigned int num_lines, struct gpiod_ctxless_event_poll
 	pfds[i].fd = ctx->sigfd;
 	pfds[i].events = POLLIN | POLLPRI;
 
-	ts = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
+	long ts = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
 
-	cnt = poll(pfds, num_lines + 1, ts);
+	int cnt = poll(pfds, num_lines + 1, (int)ts);
 	if (cnt < 0) {
 		return GPIOD_CTXLESS_EVENT_POLL_RET_ERR;
 	}
-	else if (cnt == 0) {
+	if (cnt == 0) {
 		return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
 	}
 
-	rv = cnt;
+	int rv = cnt;
 	for (i = 0; i < num_lines; i++) {
 		if (pfds[i].revents) {
 			fds[i].event = true;

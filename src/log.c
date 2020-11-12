@@ -4,8 +4,6 @@
  https://github.com/jcorporation/myGPIOd
 */
 
-#define _GNU_SOURCE
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

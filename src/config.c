@@ -91,7 +91,7 @@ bool read_config(struct t_config *config, const char *config_file) {
             }
             continue;
         }
-        else if (strstr(line_c, "edge=") != NULL) {
+        if (strstr(line_c, "edge=") != NULL) {
             if (strstr(line, "falling") != NULL) {
                 config->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
             }
@@ -103,7 +103,7 @@ bool read_config(struct t_config *config, const char *config_file) {
             }
             continue;
         }
-        else if (strstr(line_c, "active_low=") != NULL) {
+        if (strstr(line_c, "active_low=") != NULL) {
             if (strstr(line, "true") != NULL) {
                 config->active_low = true;
             }
