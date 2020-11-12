@@ -8,19 +8,19 @@ Version:        0.1.0
 Release:        0 
 License:        GPL-2.0-or-later
 Group:          Hardware/Other
-Summary:        A daemon for interacting with raspberry GPIOs.
+Summary:        A small daemon to call scripts on GPIO events. 
 Url:            https://jcorporation.github.io/myGPIOd/
 Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
+BuildRequires:  libgpiod-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %global debug_package %{nil}
 
 %description 
-myGPIOd is a standalone daemon to set raspberry GPIOs modes,
- listens on GPIO events and executes scripts.
+myGPIOd is a small daemon to call scripts on GPIO events. 
 
 %prep 
 %setup -q -n %{name}-%{version}
@@ -37,8 +37,8 @@ make install DESTDIR=%{buildroot}
 
 %post
 echo "Checking status of mygpiod system user and group"
-getent group gpio > /dev/null || groupadd -r gpio
-getent passwd mygpiod > /dev/null || useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
+getent group mygpiod > /dev/null || groupadd -r mygpiod
+getent passwd mygpiod > /dev/null || useradd -r -g mygpiod -s /bin/false -d /var/lib/mygpiod mygpiod
 echo "myGPIOd installed"
 echo "Modify /etc/mygpiod.conf to suit your needs"
 true
@@ -57,5 +57,5 @@ fi
 %config(noreplace) /etc/mygpiod.conf
 
 %changelog
-* Mon Nov 09 2020 Juergen Mang <mail@jcgames.de> 0.1.0-0
+* Thu Nov 12 2020 Juergen Mang <mail@jcgames.de> 0.1.0-0
 - Version from master

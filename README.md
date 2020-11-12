@@ -7,7 +7,7 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 ## Build Dependencies
 
 - cmake >= 3.4
-- libgpiod
+- libgpiod-dev
 - libasan3: for debug builds only
 
 ## Quick Build Instructions
@@ -18,11 +18,15 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 4. Build: `./build.sh release`
 5. Install(as root): `./build.sh install`
 
+## Dependencies
+
+- libgpiod2
+
 ## Run
 
-myGPIOd needs rw access to the gpio chip device (e. g. /dev/gpiochip0)
-The `./build.sh` script creates a mygpiod user with the group gpio. 
-The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
+myGPIOd needs rw access to the gpio chip device (e. g. /dev/gpiochip0).
+
+The `./build.sh` script creates a mygpiod user with the group gpio. The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
 
 Adapt the configuration file `/etc/mygpiod.conf` to your needs.
 

@@ -141,7 +141,7 @@ bool read_config(struct t_config *config, const char *config_file) {
             cl->edge = GPIOD_CTXLESS_EVENT_BOTH_EDGES;
         }
         else {
-            LOG_WARN("Unknown edge valie in line %u", i);
+            LOG_WARN("Unknown edge value in line %u", i);
             config_line_free(cl);
             free(cl);
             continue;

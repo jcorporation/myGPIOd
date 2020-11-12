@@ -19,16 +19,16 @@
 struct t_config_line {
     unsigned gpio;
     char *cmd;
-    unsigned edge;
+    int edge;
     struct t_config_line *next;
-    unsigned long last_execution;
+    long last_execution;
 };
 
 struct t_config {
     struct t_config_line *head;
     struct t_config_line *tail;
     unsigned length;
-    unsigned edge;
+    int edge;
     bool active_low;
     char *chip;
 };

@@ -2,6 +2,8 @@
  SPDX-License-Identifier: GPL-2.0-or-later
  myGPIOd (c)2020 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
+
+ myGPIOd is based on the gpiomon tool from https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
 */
 
 #include <stdlib.h>
@@ -39,7 +41,11 @@ static void signal_handler(int sig_num) {
     LOG_INFO("Signal %d received, exiting", sig_num);
 }
 
-static void execute_action(unsigned offset, unsigned event_type, const struct timespec *ts) {
+static void execute_action(unsigned int offset, const struct timespec *ts, int event_type) {
+    LOG_INFO("Event: %s offset: %u timestamp: [%8ld.%09ld]",
+    	(event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? " RISING EDGE" : "FALLING EDGE"), 
+    	offset, ts->tv_sec, ts->tv_nsec);
+
     //map GPIOD_CTXLESS_EVENT_CB_* to GPIOD_CTXLESS_EVENT_*
     if (event_type == GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE) {
     	event_type = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
@@ -50,7 +56,7 @@ static void execute_action(unsigned offset, unsigned event_type, const struct ti
     
     //get cmd
     char *cmd = NULL;
-    unsigned long last_execution = 0;
+    long last_execution = 0;
     struct t_config_line *current = config->head;
     while (current != NULL) {
    	if (current->gpio == offset && 
@@ -84,29 +90,7 @@ static void execute_action(unsigned offset, unsigned event_type, const struct ti
     //parent process returns to main loop
 }
 
-static void event_print_human_readable(unsigned int offset,
-				       const struct timespec *ts,
-				       int event_type)
-{
-    char *evname;
-
-    if (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE) {
-	evname = " RISING EDGE";
-    }
-    else {
-	evname = "FALLING EDGE";
-    }
-
-    LOG_INFO("event: %s offset: %u timestamp: [%8ld.%09ld]",
-    	evname, offset, ts->tv_sec, ts->tv_nsec);
-	
-    execute_action(offset, event_type, ts);
-}
-
-static int poll_callback(unsigned int num_lines,
-			 struct gpiod_ctxless_event_poll_fd *fds,
-			 const struct timespec *timeout, void *data)
-{
+static int poll_callback(unsigned int num_lines, struct gpiod_ctxless_event_poll_fd *fds, const struct timespec *timeout, void *data) {
 	struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES + 1];
 	struct mon_ctx *ctx = data;
 	int cnt, ts, rv;
@@ -123,17 +107,20 @@ static int poll_callback(unsigned int num_lines,
 	ts = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
 
 	cnt = poll(pfds, num_lines + 1, ts);
-	if (cnt < 0)
+	if (cnt < 0) {
 		return GPIOD_CTXLESS_EVENT_POLL_RET_ERR;
-	else if (cnt == 0)
+	}
+	else if (cnt == 0) {
 		return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
+	}
 
 	rv = cnt;
 	for (i = 0; i < num_lines; i++) {
 		if (pfds[i].revents) {
 			fds[i].event = true;
-			if (!--cnt)
+			if (!--cnt) {
 				return rv;
+			}
 		}
 	}
 
@@ -146,34 +133,30 @@ static int poll_callback(unsigned int num_lines,
 	return GPIOD_CTXLESS_EVENT_POLL_RET_STOP;
 }
 
-static void handle_event(struct mon_ctx *ctx, int event_type,
-			 unsigned int line_offset,
-			 const struct timespec *timestamp)
-{
-        event_print_human_readable(line_offset, timestamp, event_type);
+static void handle_event(struct mon_ctx *ctx, int event_type, unsigned int line_offset, const struct timespec *timestamp) {
+    execute_action(line_offset, timestamp, event_type);
 	ctx->events_done++;
 }
 
-static int event_callback(int event_type, unsigned int line_offset,
-			  const struct timespec *timestamp, void *data)
-{
+static int event_callback(int event_type, unsigned int line_offset, const struct timespec *timestamp, void *data) {
 	struct mon_ctx *ctx = data;
 
 	switch (event_type) {
-	case GPIOD_CTXLESS_EVENT_CB_RISING_EDGE:
-	case GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE:
-		handle_event(ctx, event_type, line_offset, timestamp);
-		break;
-	default:
-		/*
-		 * REVISIT: This happening would indicate a problem in the
-		 * library.
-		 */
-		return GPIOD_CTXLESS_EVENT_CB_RET_OK;
+		case GPIOD_CTXLESS_EVENT_CB_RISING_EDGE:
+		case GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE:
+			handle_event(ctx, event_type, line_offset, timestamp);
+			break;
+		default:
+			/*
+			* REVISIT: This happening would indicate a problem in the
+			* library.
+			*/
+			return GPIOD_CTXLESS_EVENT_CB_RET_OK;
 	}
 
-	if (ctx->events_wanted && ctx->events_done >= ctx->events_wanted)
+	if (ctx->events_wanted && ctx->events_done >= ctx->events_wanted) {
 		return GPIOD_CTXLESS_EVENT_CB_RET_STOP;
+	}
 
 	return GPIOD_CTXLESS_EVENT_CB_RET_OK;
 }
@@ -249,22 +232,21 @@ int main(int argc, char **argv) {
     struct t_config_line *current = config->head;
     int i = 0;
     while (current != NULL) {
-	offsets[i] = current->gpio;
-	current=current->next;
-	i++;
+		offsets[i] = current->gpio;
+		current=current->next;
+		i++;
     }
 
     ctx.sigfd = make_signalfd();
     if (ctx.sigfd > 0) {
     	int rv = gpiod_ctxless_event_monitor_multiple(
-    		config->chip, config->edge,
-		offsets, config->length,
-		config->active_low, "gpiomon",
-		&timeout, poll_callback,
-		event_callback, &ctx);
+    		config->chip, config->edge, offsets, config->length,
+			config->active_low, "gpiomon", &timeout, poll_callback,
+			event_callback, &ctx
+		);
         if (rv) {
-	    LOG_ERROR("Error waiting for events");
-	}
+	    	LOG_ERROR("Error waiting for events");
+		}
     }    
     //Cleanup
     config_free(config);

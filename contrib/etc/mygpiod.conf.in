@@ -3,15 +3,12 @@
 #myGPIOd @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@
 #https://github.com/jcorporation/myGPIOd
 #
-#Comma separated list of GPIOs to configure
-#
-#GPIO = GPIO number (broadcom numbers)
-#direction = in | out
-#edge = both | falling | rising
-#active_low = 0 | 1
-#script = script to execute
-#
-#More details: https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
-#
-#GPIO,direction,edge,active_low,script
-#3,in,falling,1,/usr/bin/poweroff
+chip=0
+edge=falling
+#edge=rising
+#edge=both
+active_low=true
+#active_low=false
+
+#gpio,edge,script
+#3,falling,echo "test 3"

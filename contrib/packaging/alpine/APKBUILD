@@ -8,12 +8,12 @@
 pkgname=mygpiod
 pkgver=0.1.0
 pkgrel=0
-pkgdesc="myGPIOd is a daemon for interacting with raspberry GPIOs."
+pkgdesc="A small daemon to call scripts on GPIO events."
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
 license="GPL-2.0-or-later"
-depends=""
-makedepends="cmake"
+depends="libgpiod"
+makedepends="cmake libgpiod-dev"
 install="$pkgname.pre-install $pkgname.post-install"
 source="mygpiod_$pkgver.orig.tar.gz"
 builddir="$srcdir"
