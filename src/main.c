@@ -22,12 +22,12 @@
 sig_atomic_t s_signal_received;
 
 struct mon_ctx {
-	unsigned int offset;
-	unsigned int events_wanted;
-	unsigned int events_done;
-	bool silent;
-	char *fmt;
-	int sigfd;
+    unsigned int offset;
+    unsigned int events_wanted;
+    unsigned int events_done;
+    bool silent;
+    char *fmt;
+    int sigfd;
 };
 
 struct t_config *config;
@@ -39,24 +39,40 @@ static void signal_handler(int sig_num) {
     LOG_INFO("Signal %d received, exiting", sig_num);
 }
 
-void execute_action(unsigned offset, unsigned event_type) {
+static void execute_action(unsigned offset, unsigned event_type, const struct timespec *ts) {
+    //map GPIOD_CTXLESS_EVENT_CB_* to GPIOD_CTXLESS_EVENT_*
+    if (event_type == GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE) {
+    	event_type = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
+    }
+    else if (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE) {
+    	event_type = GPIOD_CTXLESS_EVENT_RISING_EDGE;
+    }
+    
     //get cmd
     char *cmd = NULL;
+    unsigned long last_execution = 0;
     struct t_config_line *current = config->head;
     while (current != NULL) {
    	if (current->gpio == offset && 
 	    (current->edge == GPIOD_CTXLESS_EVENT_BOTH_EDGES || current->edge == event_type))
 	{
 	    cmd = current->cmd;
+	    last_execution = current->last_execution;
+	    current->last_execution = ts->tv_sec;
 	    break;
 	}
    	current = current->next;
     }
        
-    if (cmd == NULL) {
+    if (current == NULL) {
+    	return;
+    }
+    //prevent multiple execution of cmds within two seconds
+    if (last_execution >= ts->tv_sec - 2) {
     	return;
     }
 
+    LOG_INFO("Executing %s", cmd);
     if (fork() == 0) {
         //child process executes cmd
         int rc = system(cmd);
@@ -72,17 +88,19 @@ static void event_print_human_readable(unsigned int offset,
 				       const struct timespec *ts,
 				       int event_type)
 {
-	char *evname;
+    char *evname;
 
-	if (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE)
-		evname = " RISING EDGE";
-	else
-		evname = "FALLING EDGE";
+    if (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE) {
+	evname = " RISING EDGE";
+    }
+    else {
+	evname = "FALLING EDGE";
+    }
 
-	LOG_INFO("event: %s offset: %u timestamp: [%8ld.%09ld]",
-	       evname, offset, ts->tv_sec, ts->tv_nsec);
+    LOG_INFO("event: %s offset: %u timestamp: [%8ld.%09ld]",
+    	evname, offset, ts->tv_sec, ts->tv_nsec);
 	
-	execute_action(offset, event_type);
+    execute_action(offset, event_type, ts);
 }
 
 static int poll_callback(unsigned int num_lines,

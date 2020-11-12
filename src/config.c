@@ -116,6 +116,7 @@ bool read_config(struct t_config *config, const char *config_file) {
         //gpio lines
         struct t_config_line *cl = (struct t_config_line *) malloc(sizeof(struct t_config_line));
         cl->cmd = NULL;
+        cl->last_execution = 0;
 
         char *token = strtok(line_c, ",");
         if (token == NULL) {

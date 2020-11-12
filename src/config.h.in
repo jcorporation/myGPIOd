@@ -21,6 +21,7 @@ struct t_config_line {
     char *cmd;
     unsigned edge;
     struct t_config_line *next;
+    unsigned long last_execution;
 };
 
 struct t_config {
