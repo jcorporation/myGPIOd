@@ -3,6 +3,7 @@
 #myGPIOd @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@
 #https://github.com/jcorporation/myGPIOd
 #
+loglevel=2
 chip=0
 edge=falling
 #edge=rising

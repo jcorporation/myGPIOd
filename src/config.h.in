@@ -7,6 +7,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stdbool.h>
+
 //Debug build
 #cmakedefine DEBUG
 
@@ -31,10 +33,9 @@ struct t_config {
     int edge;
     bool active_low;
     char *chip;
+    int loglevel;    
 };
 
-bool config_line_push(struct t_config *c, struct t_config_line *cl);
-void config_line_free(struct t_config_line *cl);
 bool config_free(struct t_config *c);
 bool read_config(struct t_config *config, const char *config_file);
 

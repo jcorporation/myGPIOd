@@ -4,13 +4,13 @@
  https://github.com/jcorporation/myGPIOd
 */
 
-#include <string.h>
+#include "log.h"
+
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
+#include <string.h>
 #include <time.h>
-
-#include "log.h"
 
 int loglevel;
 int log_on_tty;
@@ -24,6 +24,9 @@ static const char *loglevel_colors[] = {
 };
 
 void set_loglevel(int level) {
+    if (level == loglevel) {
+        return;
+    }
     if (level > 4) {
         level = 4;
     }

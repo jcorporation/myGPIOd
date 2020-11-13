@@ -6,19 +6,18 @@
  myGPIOd is based on the gpiomon tool from https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
 */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <poll.h>
-#include <string.h>
-#include <stdbool.h>
-#include <signal.h>
-#include <errno.h>
-#include <limits.h>
-#include <gpiod.h>
-#include <sys/signalfd.h>
-
 #include "config.h"
 #include "log.h"
+
+#include <errno.h>
+#include <gpiod.h>
+#include <limits.h>
+#include <poll.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/signalfd.h>
+#include <unistd.h>
 
 sig_atomic_t s_signal_received;
 
@@ -41,7 +40,7 @@ static void signal_handler(int sig_num) {
 }
 
 static void execute_action(unsigned int offset, const struct timespec *ts, int event_type) {
-    LOG_INFO("Event: %s offset: %u timestamp: [%8ld.%09ld]",
+    LOG_INFO("Event: \"%s\" offset: \"%u\" timestamp: \"[%8ld.%09ld]\"",
     	(event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? " RISING EDGE" : "FALLING EDGE"), 
     	offset, ts->tv_sec, ts->tv_nsec);
 
@@ -77,7 +76,7 @@ static void execute_action(unsigned int offset, const struct timespec *ts, int e
     	return;
     }
 
-    LOG_INFO("Executing %s", cmd);
+    LOG_INFO("Executing \"%s\"", cmd);
     if (fork() == 0) {
         //child process executes cmd
         int rc = system(cmd);
@@ -159,7 +158,7 @@ static int event_callback(int event_type, unsigned int line_offset, const struct
 	return GPIOD_CTXLESS_EVENT_CB_RET_OK;
 }
 
-int make_signalfd(void) {
+static int make_signalfd(void) {
 	sigset_t sigmask;
 	int sigfd, rv;
 
@@ -169,13 +168,13 @@ int make_signalfd(void) {
 
 	rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
 	if (rv < 0) {
-		LOG_ERROR("error masking signals: %s", strerror(errno));
+		LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
 		return -1;
 	}
 
 	sigfd = signalfd(-1, &sigmask, 0);
 	if (sigfd < 0) {
-		LOG_ERROR("error creating signalfd: %s", strerror(errno));
+		LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
 		return -1;
 	}
 
@@ -183,6 +182,7 @@ int make_signalfd(void) {
 }
 
 int main(int argc, char **argv) {
+	int rc = EXIT_SUCCESS;
     log_on_tty = isatty(fileno(stdout)) ? 1: 0;
     #ifdef DEBUG
     set_loglevel(4);
@@ -191,6 +191,7 @@ int main(int argc, char **argv) {
     #endif
 
     LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
+    LOG_INFO("https://github.com/jcorporation/myGPIOd");
 
     //set signal handler
     s_signal_received = 0;
@@ -207,7 +208,7 @@ int main(int argc, char **argv) {
     }
 
     //read configuration
-    LOG_INFO("Reading %s", config_file);
+    LOG_INFO("Reading \"%s\"", config_file);
     config = (struct t_config *) malloc(sizeof(struct t_config));
     config->head = NULL;
     config->tail = NULL;
@@ -215,6 +216,7 @@ int main(int argc, char **argv) {
     config->chip = strdup("0");
     config->active_low = true;
     config->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
+    config->loglevel = loglevel;
     if (read_config(config, config_file) == false) {
         config_free(config);
         free(config);
@@ -244,12 +246,15 @@ int main(int argc, char **argv) {
 		);
         if (rv) {
 	    	LOG_ERROR("Error waiting for events");
+	    	rc = EXIT_FAILURE;
 		}
     }    
     //Cleanup
     config_free(config);
     free(config);
     free(config_file);
-    LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
-    return 0;
+    if (rc == EXIT_SUCCESS) {
+	    LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
+	}
+    return rc;
 }
