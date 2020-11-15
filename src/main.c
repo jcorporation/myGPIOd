@@ -131,7 +131,7 @@ static int poll_callback(unsigned int num_lines, struct gpiod_ctxless_event_poll
 }
 
 static void handle_event(struct mon_ctx *ctx, int event_type, unsigned int line_offset, const struct timespec *timestamp) {
-    execute_action(line_offset, timestamp, event_type);
+  	execute_action(line_offset, timestamp, event_type);
 	ctx->events_done++;
 }
 
@@ -181,8 +181,47 @@ static int make_signalfd(void) {
 	return sigfd;
 }
 
+static int flush_events(void) {
+	LOG_INFO("Flushing gpio events");
+	struct gpiod_line_bulk input_bulk;
+	gpiod_line_bulk_init(&input_bulk);
+	struct timespec timeout = { 1, 0 };
+	struct t_config_line *current = config->head;
+    unsigned int i = 0;
+	struct gpiod_chip *chip = gpiod_chip_open(config->chip);
+	if (chip == NULL) {
+		return 1;
+	}
+    while (current != NULL) {
+		struct gpiod_line *line = gpiod_chip_get_line(chip, current->gpio);
+		gpiod_line_bulk_add(&input_bulk, line);
+		current=current->next;
+		i++;
+    }
+	input_bulk.num_lines = i;
+	int ret = 0;
+	do {
+		struct gpiod_line_bulk bulk_evt;
+		gpiod_line_bulk_init(&bulk_evt);
+		ret = gpiod_line_event_wait_bulk(&input_bulk, &timeout, &bulk_evt);
+		if (ret < 0) {
+			LOG_ERROR("Could not flush pending events: %s", strerror(errno));
+			return ret;
+		}
+		else if (ret == 1) {
+			struct gpiod_line *line;
+			struct gpiod_line **line_ptr;
+			struct gpiod_line_event evt;
+			gpiod_line_bulk_foreach_line(&bulk_evt, line, line_ptr) {
+				gpiod_line_event_read_multiple(line, &evt, 1);
+			}
+		}
+	} while (ret == 1);
+	return 0;
+}
+
 int main(int argc, char **argv) {
-	int rc = EXIT_SUCCESS;
+    int rc = EXIT_SUCCESS;
     log_on_tty = isatty(fileno(stdout)) ? 1: 0;
     #ifdef DEBUG
     set_loglevel(4);
@@ -227,23 +266,26 @@ int main(int argc, char **argv) {
     struct mon_ctx ctx;
     memset(&ctx, 0, sizeof(ctx));
     struct timespec timeout = { 10, 0 };
-    unsigned int offsets[GPIOD_LINE_BULK_MAX_LINES];
+	unsigned int offsets[GPIOD_LINE_BULK_MAX_LINES];
 
     struct t_config_line *current = config->head;
-    int i = 0;
+    unsigned int num_lines = 0;
     while (current != NULL) {
-		offsets[i] = current->gpio;
+		offsets[num_lines] = current->gpio;
 		current=current->next;
-		i++;
+		num_lines++;
     }
 
     ctx.sigfd = make_signalfd();
     if (ctx.sigfd > 0) {
+		//get pending events and ignore it
+		LOG_INFO
+		flush_events();
+		//main event handling loop
     	int rv = gpiod_ctxless_event_monitor_multiple(
-    		config->chip, config->edge, offsets, config->length,
+    		config->chip, config->edge, offsets, num_lines,
 			config->active_low, "gpiomon", &timeout, poll_callback,
-			event_callback, &ctx
-		);
+			event_callback, &ctx);
         if (rv) {
 	    	LOG_ERROR("Error waiting for events");
 	    	rc = EXIT_FAILURE;
