@@ -182,7 +182,6 @@ static int make_signalfd(void) {
 }
 
 static int flush_events(void) {
-	LOG_INFO("Flushing gpio events");
 	struct gpiod_line_bulk input_bulk;
 	gpiod_line_bulk_init(&input_bulk);
 	struct timespec timeout = { 1, 0 };
@@ -198,7 +197,6 @@ static int flush_events(void) {
 		current=current->next;
 		i++;
     }
-	input_bulk.num_lines = i;
 	int ret = 0;
 	do {
 		struct gpiod_line_bulk bulk_evt;
@@ -213,7 +211,7 @@ static int flush_events(void) {
 			struct gpiod_line **line_ptr;
 			struct gpiod_line_event evt;
 			gpiod_line_bulk_foreach_line(&bulk_evt, line, line_ptr) {
-				gpiod_line_event_read_multiple(line, &evt, 1);
+				gpiod_line_event_read(line, &evt);
 			}
 		}
 	} while (ret == 1);
@@ -279,9 +277,10 @@ int main(int argc, char **argv) {
     ctx.sigfd = make_signalfd();
     if (ctx.sigfd > 0) {
 		//get pending events and ignore it
-		LOG_INFO
+		LOG_INFO("Flushing gpio events");
 		flush_events();
 		//main event handling loop
+		LOG_INFO("Entering event handling loop");
     	int rv = gpiod_ctxless_event_monitor_multiple(
     		config->chip, config->edge, offsets, num_lines,
 			config->active_low, "gpiomon", &timeout, poll_callback,
