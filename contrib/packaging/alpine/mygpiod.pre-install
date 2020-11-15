@@ -1,6 +1,13 @@
 #!/bin/sh
 
-getent group gpio > /dev/null || addgroup -S gpio 2>/dev/null
+#add myGPIOd user to group gpio
+#group gpio is created by packe libgpiod2
 adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -g myGPIOd -G gpio mygpiod 2>/dev/null
+
+#add gpio to mdev to set devices to gpio group
+if ! grep -q "^gpio" /etc/mdev.conf
+then
+    sed -i '/# fallback/i # gpio\ngpiochip[0-9]\troot:gpio 0660\ngpiomem\t\troot:gpio 0660\n\n' /etc/mdev.conf
+fi
 
 exit 0
