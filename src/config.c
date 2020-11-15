@@ -57,6 +57,15 @@ static char *skip_chars(char *line, unsigned offset, char c) {
     return line;
 }
 
+static char *chomp(char *line) {
+    size_t i = strlen(line) - 1;
+    while (i > 0 && isspace(line[i])) {
+        i--;
+    }
+    line[i + 1] = '\0';
+    return line;
+}
+
 //public functions
 bool config_free(struct t_config *c) {
     struct t_config_line *current = c->head;
@@ -87,7 +96,8 @@ bool read_config(struct t_config *config, const char *config_file) {
     while (getline(&line, &n, fp) > 0) {
         i++;
         //strip whitespace characters
-        char *line_c = strtok(line, "\n");
+        char *line_c = chomp(line);
+
         if (line_c == NULL) {
             continue;
         }
