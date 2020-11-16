@@ -211,6 +211,7 @@ static int flush_events(void) {
 			struct gpiod_line **line_ptr;
 			struct gpiod_line_event evt;
 			gpiod_line_bulk_foreach_line(&bulk_evt, line, line_ptr) {
+				LOG_DEBUG("Read pending event from line %u", gpiod_line_offset(line));
 				gpiod_line_event_read(line, &evt);
 			}
 		}
