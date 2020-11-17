@@ -44,6 +44,7 @@ This example configuration calls `poweroff` if GPIO 3 is falling from high (1) t
 chip=0
 edge=falling
 active_low=true
+loglevel=2
 #gpio,edge,cmd
 3,falling,sudo /usr/sbin/poweroff 
 ```
