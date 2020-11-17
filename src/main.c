@@ -204,6 +204,7 @@ static int flush_events(void) {
 		ret = gpiod_line_event_wait_bulk(&input_bulk, &timeout, &bulk_evt);
 		if (ret < 0) {
 			LOG_ERROR("Could not flush pending events: %s", strerror(errno));
+			gpiod_chip_close(chip);
 			return ret;
 		}
 		else if (ret == 1) {
@@ -216,6 +217,7 @@ static int flush_events(void) {
 			}
 		}
 	} while (ret == 1);
+	gpiod_chip_close(chip);
 	return 0;
 }
 
