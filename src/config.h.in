@@ -8,6 +8,7 @@
 #define CONFIG_H
 
 #include <stdbool.h>
+#include <time.h>
 
 //Debug build
 #cmakedefine DEBUG
@@ -33,7 +34,8 @@ struct t_config {
     int edge;
     bool active_low;
     char *chip;
-    int loglevel;    
+    int loglevel;
+    time_t startup_time;
 };
 
 bool config_free(struct t_config *c);
