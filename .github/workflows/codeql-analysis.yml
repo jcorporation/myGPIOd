@@ -60,7 +60,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-       ./build.sh installdeps 
+       sudo ./build.sh installdeps 
        ./build.sh memcheck 
 
     - name: Perform CodeQL Analysis
