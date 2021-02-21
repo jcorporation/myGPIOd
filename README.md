@@ -45,6 +45,7 @@ chip=0
 edge=falling
 active_low=true
 loglevel=4
+syslog=0
 #gpio,edge,cmd
 3,falling,sudo /usr/sbin/poweroff 
 ```
