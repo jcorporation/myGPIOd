@@ -7,11 +7,41 @@
 
 STARTPATH=$(pwd)
 
+#exit on error
+set -e
+
+#exit on undefined variable
+set -u
+
 #set umask
 umask 0022
 
 #get mygpiod version
 VERSION=$(grep CPACK_PACKAGE_VERSION_ CMakeLists.txt | cut -d\" -f2 | tr '\n' '.' | sed 's/\.$//')
+
+#check for command
+check_cmd() {
+  for DEPENDENCY in "$@"
+  do
+    if ! check_cmd_silent "$@"
+    then
+      echo "ERROR: ${DEPENDENCY} not found"
+      return 1
+    fi
+  done
+  return 0
+}
+
+check_cmd_silent() {
+  for DEPENDENCY in "$@"
+  do
+    if ! command -v "${DEPENDENCY}" > /dev/null
+    then
+      return 1
+    fi
+  done
+  return 0
+}
 
 setversion() {
   echo "Setting version to ${VERSION}"
@@ -25,7 +55,6 @@ setversion() {
   DATE=$(date +"%a, %d %b %Y %H:%m:%S %z")
   sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE__/$DATE/g" \
   	contrib/packaging/debian/changelog.in > contrib/packaging/debian/changelog
-  mv contrib/packaging/gentoo/mygpiod-*.ebuild "contrib/packaging/gentoo/mygpiod-${VERSION}.ebuild"
 }
 
 buildrelease() {
@@ -39,14 +68,28 @@ buildrelease() {
 }
 
 addmygpioduser() {
-  echo "Checking status of mygpiod system user and group"
-  getent group gpio > /dev/null || groupadd -r gpio
-  getent passwd mygpiod > /dev/null || useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
+  echo "Checking status of mygpiod system user"
+  if ! getent passwd mympd > /dev/null
+  then
+    if check_cmd_silent useradd
+    then
+      useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
+    elif check_cmd_silent adduser
+    then
+      #alpine
+      adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -G gpio -g myGPIOd mygpiod
+    else
+      echo "Can not add user mygpiod"
+      return 1
+    fi
+  fi
+  return 0
 }
 
 installrelease() {
   echo "Installing myGPIOd"
   cd release || exit 1  
+  [ -z "${DESTDIR+x}" ] && DESTDIR=""
   make install DESTDIR="$DESTDIR"
   addmygpioduser
   echo "mygpiod installed"
@@ -63,13 +106,6 @@ builddebug() {
   make VERBOSE=1
   echo "Linking compilation database"
   sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' -e 's/-static-libasan//g' compile_commands.json > ../src/compile_commands.json
-}
-
-buildtest() {
-  install -d test/build
-  cd test/build || exit 1
-  cmake ..
-  make VERBOSE=1
 }
 
 cleanup() {
@@ -92,22 +128,20 @@ cleanuposc() {
 }
 
 check() {
-  CPPCHECKBIN=$(command -v cppcheck)
-  [ "$CPPCHECKOPTS" = "" ] && CPPCHECKOPTS="--enable=warning"
-  if [ "$CPPCHECKBIN" != "" ]
+  if check_cmd cppcheck
   then
     echo "Running cppcheck"
-    $CPPCHECKBIN $CPPCHECKOPTS src/*.c src/*.h
+    [ -z "${CPPCHECKOPTS+z}" ] && CPPCHECKOPTS="--enable=warning"
+    cppcheck $CPPCHECKOPTS src/*.c src/*.h
   else
     echo "cppcheck not found"
   fi
-  
-  FLAWFINDERBIN=$(command -v flawfinder)
-  [ "$FLAWFINDEROPTS" = "" ] && FLAWFINDEROPTS="-m3"
-  if [ "$FLAWFINDERBIN" != "" ]
+
+  if check_cmd flawfinder
   then
     echo "Running flawfinder"
-    $FLAWFINDERBIN $FLAWFINDEROPTS src
+    [ -z "${FLAWFINDEROPTS+z}" ] && FLAWFINDEROPTS="-m3"
+    flawfinder $FLAWFINDEROPTS src
   else
     echo "flawfinder not found"
   fi
@@ -118,14 +152,13 @@ check() {
     echo "run: ./build.sh debug"
     exit 1
   fi
-  
-  CLANGTIDYBIN=$(command -v clang-tidy)
-  if [ "$CLANGTIDYBIN" != "" ]
+
+  if check_cmd clang-tidy
   then
     echo "Running clang-tidy, output goes to clang-tidy.out"
     rm -f clang-tidy.out
     cd src || exit 1
-    find ./ -name '*.c' -exec clang-tidy \
+	find ./ -name '*.c' -exec clang-tidy \
     	--checks="*,-hicpp-signed-bitwise,-cert-env33-c,-clang-diagnostic-format-nonliteral,-llvm-header-guard" \
     	-header-filter='.*' {}  \; >> ../clang-tidy.out
   else
@@ -146,11 +179,21 @@ prepare() {
 }
 
 pkgdebian() {
+  check_cmd dpkg-buildpackage
   prepare
   cp -a contrib/packaging/debian .
   export LC_TIME="en_GB.UTF-8"
   tar -czf "../mygpiod_${VERSION}.orig.tar.gz" -- *
-  dpkg-buildpackage -rfakeroot
+  
+  SIGNOPT="--no-sign"
+  if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
+  then
+    SIGNOPT="--sign-key=$GPGKEYID"  
+  else
+    echo "Package would not be signed"
+  fi
+  #shellcheck disable=SC2086
+  dpkg-buildpackage -rfakeroot $SIGNOPT
 
   #get created package name
   PACKAGE=$(ls ../mygpiod_"${VERSION}"-1_*.deb)
@@ -159,43 +202,39 @@ pkgdebian() {
     echo "Can't find package"
   fi
 
-  if [ "$SIGN" = "TRUE" ]
-  then  
-    DPKGSIG=$(command -v dpkg-sig)
-    if [ "$DPKGSIG" != "" ]
-    then
-      if [ "$GPGKEYID" != "" ]
-      then
-        echo "Signing package with key $GPGKEYID"
-        dpkg-sig -k "$GPGKEYID" --sign builder "$PACKAGE"
-      else
-        echo "WARNING: GPGKEYID not set, can't sign package"
-      fi
-    else
-      echo "WARNING: dpkg-sig not found, can't sign package"
-    fi
-  fi
-  
-  LINTIAN=$(command -v lintian)
-  if [ "$LINTIAN" != "" ]
+  if check_cmd lintian
   then
     echo "Checking package with lintian"
-    $LINTIAN "$PACKAGE"
+    lintian "$PACKAGE"
   else
     echo "WARNING: lintian not found, can't check package"
   fi
 }
 
 pkgalpine() {
+  if [ -z "${1+x}" ]
+  then
+    TARONLY=""
+  else
+    TARONLY=$1
+  fi
+  check_cmd abuild
   prepare
   tar -czf "mygpiod_${VERSION}.orig.tar.gz" -- *
-  [ "$1" = "taronly" ] && return 0
+  [ "$TARONLY" = "taronly" ] && return 0
   cp contrib/packaging/alpine/* .
   abuild checksum
   abuild -r
 }
 
 pkgrpm() {
+  if [ -z "${1+x}" ]
+  then
+    TARONLY=""
+  else
+    TARONLY=$1
+  fi
+  check_cmd rpmbuild
   prepare
   SRC=$(ls)
   mkdir "mygpiod-${VERSION}"
@@ -204,55 +243,56 @@ pkgrpm() {
     mv "$F" "mygpiod-${VERSION}"
   done
   tar -czf "mygpiod-${VERSION}.tar.gz" "mygpiod-${VERSION}"
-  [ "$1" = "taronly" ] && return 0
+  [ "$TARONLY" = "taronly" ] && return 0
   install -d "$HOME/rpmbuild/SOURCES"
   mv "mygpiod-${VERSION}.tar.gz" ~/rpmbuild/SOURCES/
   cp ../../contrib/packaging/rpm/mygpiod.spec .
   rpmbuild -ba mygpiod.spec
-  RPMLINT=$(command -v rpmlint)
-  if [ "$RPMLINT" != "" ]
+  if check_cmd rpmlint
   then
     echo "Checking package with rpmlint"
     ARCH=$(uname -p)
-    $RPMLINT "$HOME/rpmbuild/RPMS/${ARCH}/mygpiod-${VERSION}-0.${ARCH}.rpm"
+    rpmlint "$HOME/rpmbuild/RPMS/${ARCH}/mygpiod-${VERSION}-0.${ARCH}.rpm"
   else
     echo "WARNING: rpmlint not found, can't check package"
   fi
 }
 
 pkgarch() {
+  check_cmd makepkg
   prepare
   tar -czf "mygpiod_${VERSION}.orig.tar.gz" -- *
   cp contrib/packaging/arch/* .
   makepkg
-  if [ "$SIGN" = "TRUE" ]
+  if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
   then
     KEYARG=""
-    [ "$GPGKEYID" != "" ] && KEYARG="--key $PGPGKEYID"
+    [ -z "${GPGKEYID+x}" ] || KEYARG="--key $PGPGKEYID"
     makepkg --sign "$KEYARG" mygpiod-*.pkg.tar.xz
   fi
-  NAMCAP=$(command -v namcap)
-  if [ "$NAMCAP" != "" ]
+  if check_cmd namcap
   then
     echo "Checking package with namcap"
-    $NAMCAP PKGBUILD
-    $NAMCAP mygpiod-*.pkg.tar.xz
+    namcap PKGBUILD
+    namcap mygpiod-*.pkg.tar.xz
   else
     echo "WARNING: namcap not found, can't check package"
   fi
 }
 
 pkgosc() {
-  OSCBIN=$(command -v osc)
-  if [ "$OSCBIN" = "" ]
-  then
-    echo "ERROR: osc not found"
-    exit 1
-  fi
-  
+  check_cmd osc  
   cleanup
   cleanuposc
-  [ "$OSC_REPO" = "" ] && OSC_REPO="home:jcorporation/myGPIOd"
+  if [ -z "${OSC_REPO+x}" ]
+  then
+    if [ -f .git/HEAD ] && grep -q "master" .git/HEAD
+    then
+      OSC_REPO="home:jcorporation/myGPIOd"
+    else
+      OSC_REPO="home:jcorporation/myGPIOd-devel"
+    fi
+  fi
   
   mkdir osc
   cd osc || exit 1  
@@ -364,11 +404,31 @@ purge() {
   rm -rf "$DESTDIR/var/opt/mygpiod"
   rm -rf "$DESTDIR/etc/opt/mygpiod"
   #remove user
-  getent passwd mygpiod > /dev/null && userdel mygpiod
-  getent group mygpiod > /dev/null && groupdel -f mygpiod
+  if getent passwd mygpiod > /dev/null
+  then
+  	if check_cmd_silent userdel
+    then
+	  userdel mygpiod
+	elif check_cmd_silent deluser
+	then
+	  deluser mygpiod
+	else
+	  echo "Can not del user mygpiod"
+	  return 1
+	fi
+  fi
+  return 0
 }
 
-case "$1" in
+#get action
+if [ -z "${1+x}" ]
+then
+  ACTION=""
+else
+  ACTION="$1"
+fi
+
+case "$ACTION" in
 	release)
 	  buildrelease
 	;;
@@ -476,5 +536,8 @@ case "$1" in
 	  echo "Environment variables for building"
 	  echo "  - MYGPIOD_INSTALL_PREFIX=\"/usr\""
 	  echo ""
+	  exit 1
 	;;
 esac
+
+exit 0
