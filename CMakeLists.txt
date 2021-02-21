@@ -1,6 +1,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
-# myGPIOd (c) 2020 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2021 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 
@@ -10,7 +10,7 @@ include(GNUInstallDirs)
 
 project (mygpiod C)
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "2")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 
 if(CMAKE_BUILD_TYPE MATCHES RELEASE)

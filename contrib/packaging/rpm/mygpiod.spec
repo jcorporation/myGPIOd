@@ -1,10 +1,13 @@
 #
-# spec file for package myGPIOd
+# SPDX-License-Identifier: GPL-2.0-or-later
+# myGPIOd (c) 2020-2021 Juergen Mang <mail@jcgames.de>
+# https://github.com/jcorporation/myGPIOd
 #
-# (c) 2020Juergen Mang <mail@jcgames.de>
+# Maintainer: Juergen Mang <mail@jcgames.de>
+#
 
 Name:           mygpiod
-Version:        0.1.0
+Version:        0.2.0
 Release:        0 
 License:        GPL-2.0-or-later
 Group:          Hardware/Other
@@ -57,5 +60,5 @@ fi
 %config(noreplace) /etc/mygpiod.conf
 
 %changelog
-* Thu Nov 12 2020 Juergen Mang <mail@jcgames.de> 0.1.0-0
+* Sun Feb 21 2021 Juergen Mang <mail@jcgames.de> 0.2.0-0
 - Version from master

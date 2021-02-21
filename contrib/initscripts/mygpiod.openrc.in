@@ -1,7 +1,7 @@
 #!/sbin/openrc-run
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
-# myGPIOd (c) 2020 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2021 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 
 name=myGPIOd
@@ -12,9 +12,6 @@ command_user="mygpiod:gpio"
 
 start_stop_daemon_args=""
 pidfile="/run/$name.pid"
-
-output_logger="logger -t mygpiod -p daemon.info"
-error_logger="logger -t mygpiod -p daemon.error"
 
 depend() {
 	after firewall
