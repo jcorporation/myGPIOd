@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-2.0-or-later
- myGPIOd (c)2020 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2021 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 
  myGPIOd is based on the gpiomon tool from https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
@@ -36,11 +36,11 @@ static void signal_handler(int sig_num) {
     //Reinstantiate signal handler
     signal(sig_num, signal_handler);
     s_signal_received = sig_num;
-    LOG_INFO("Signal %d received, exiting", sig_num);
+    MYGPIOD_LOG_INFO("Signal %d received, exiting", sig_num);
 }
 
 static void execute_action(unsigned int offset, const struct timespec *ts, int event_type) {
-    LOG_INFO("Event: \"%s\" offset: \"%u\" timestamp: \"[%8ld.%09ld]\"",
+    MYGPIOD_LOG_INFO("Event: \"%s\" offset: \"%u\" timestamp: \"[%8ld.%09ld]\"",
     	(event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? " RISING EDGE" : "FALLING EDGE"), 
     	offset, ts->tv_sec, ts->tv_nsec);
 
@@ -76,12 +76,12 @@ static void execute_action(unsigned int offset, const struct timespec *ts, int e
     	return;
     }
 
-    LOG_INFO("Executing \"%s\"", cmd);
+    MYGPIOD_LOG_INFO("Executing \"%s\"", cmd);
     if (fork() == 0) {
         //child process executes cmd
         int rc = system(cmd);
         if (rc == -1) {
-            LOG_ERROR("Error executing cmd \"%s\": %s", cmd, strerror(errno));
+            MYGPIOD_LOG_ERROR("Error executing cmd \"%s\": %s", cmd, strerror(errno));
         }
         exit(0);
     }
@@ -136,7 +136,7 @@ static void handle_event(struct mon_ctx *ctx, int event_type, unsigned int line_
   		execute_action(line_offset, timestamp, event_type);
 	}
 	else {
-		LOG_INFO("Ignoring events at startup");
+		MYGPIOD_LOG_INFO("Ignoring events at startup");
 	}
 	ctx->events_done++;
 }
@@ -174,13 +174,13 @@ static int make_signalfd(void) {
 
 	rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
 	if (rv < 0) {
-		LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
+		MYGPIOD_LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
 		return -1;
 	}
 
 	sigfd = signalfd(-1, &sigmask, 0);
 	if (sigfd < 0) {
-		LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
+		MYGPIOD_LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
 		return -1;
 	}
 
@@ -189,15 +189,17 @@ static int make_signalfd(void) {
 
 int main(int argc, char **argv) {
     int rc = EXIT_SUCCESS;
-    log_on_tty = isatty(fileno(stdout)) ? 1: 0;
+    log_on_tty = isatty(fileno(stdout)) ? true: false;
+    log_to_syslog = false;
+    
     #ifdef DEBUG
-    set_loglevel(4);
+    set_loglevel(LOG_DEBUG);
     #else
-    set_loglevel(2);
+    set_loglevel(LOG_NOTICE);
     #endif
 
-    LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
-    LOG_INFO("https://github.com/jcorporation/myGPIOd");
+    MYGPIOD_LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
+    MYGPIOD_LOG_INFO("https://github.com/jcorporation/myGPIOd");
 
     //set signal handler
     s_signal_received = 0;
@@ -213,8 +215,8 @@ int main(int argc, char **argv) {
         config_file = strdup("/etc/mygpiod.conf");
     }
 
-    //read configuration
-    LOG_INFO("Reading \"%s\"", config_file);
+    //read config
+    MYGPIOD_LOG_INFO("Reading \"%s\"", config_file);
     config = (struct t_config *) malloc(sizeof(struct t_config));
     config->head = NULL;
     config->tail = NULL;
@@ -224,11 +226,24 @@ int main(int argc, char **argv) {
     config->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
     config->loglevel = loglevel;
     config->startup_time = time(NULL);
+    config->syslog = false;
     if (read_config(config, config_file) == false) {
         config_free(config);
         free(config);
         free(config_file);
         return 1;
+    }
+    
+    //set loglevel
+    #ifdef DEBUG
+	set_loglevel(LOG_DEBUG);
+    #else
+	set_loglevel(config->loglevel);
+    #endif
+
+    if (config->syslog == true) {
+        openlog("mympd", LOG_CONS, LOG_DAEMON);
+        log_to_syslog = true;
     }
 
     struct mon_ctx ctx;
@@ -248,14 +263,14 @@ int main(int argc, char **argv) {
     if (ctx.sigfd > 0) {
 		
     //main event handling loop
-    LOG_INFO("Entering event handling loop");
+    MYGPIOD_LOG_INFO("Entering event handling loop");
     int rv = gpiod_ctxless_event_monitor_multiple(
     	config->chip, config->edge, offsets, config->length,
 	config->active_low, "myGPIOd", &timeout, poll_callback,
 	event_callback, &ctx);
 
 	if (rv) {
-	    	LOG_ERROR("Error waiting for events");
+	    	MYGPIOD_LOG_ERROR("Error waiting for events");
 	    	rc = EXIT_FAILURE;
 		}
     }    
@@ -264,7 +279,7 @@ int main(int argc, char **argv) {
     free(config);
     free(config_file);
     if (rc == EXIT_SUCCESS) {
-	    LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
+	    MYGPIOD_LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
 	}
     return rc;
 }

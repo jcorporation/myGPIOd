@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-2.0-or-later
- myGPIOd (c)2020 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2021 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -86,7 +86,7 @@ bool config_free(struct t_config *c) {
 bool read_config(struct t_config *config, const char *config_file) {
     FILE *fp = fopen(config_file, "re");
     if (fp == NULL) {
-        LOG_ERROR("Can not open \"%s\": %s", config_file, strerror(errno));
+        MYGPIOD_LOG_ERROR("Can not open \"%s\": %s", config_file, strerror(errno));
         return false;
     }
     
@@ -114,10 +114,10 @@ bool read_config(struct t_config *config, const char *config_file) {
             if (line_c[0] != '\0') {
                 free(config->chip);
                 config->chip = strdup(line_c);
-                LOG_VERBOSE("Setting chip to \"%s\"", line_c);
+                MYGPIOD_LOG_INFO("Setting chip to \"%s\"", line_c);
             }
             else {
-                LOG_WARN("Empty chip value in line %u", i);
+                MYGPIOD_LOG_WARN("Empty chip value in line %u", i);
             }
             continue;
         }
@@ -133,10 +133,10 @@ bool read_config(struct t_config *config, const char *config_file) {
                 config->edge = GPIOD_CTXLESS_EVENT_BOTH_EDGES;
             }
             else {
-                LOG_WARN("Invalid edge value \"%s\" in line %u", line_c, i);
+                MYGPIOD_LOG_WARN("Invalid edge value \"%s\" in line %u", line_c, i);
                 continue;
             }
-            LOG_VERBOSE("Setting edge to \"%s\"", line_c);
+            MYGPIOD_LOG_INFO("Setting edge to \"%s\"", line_c);
             continue;
         }
         if (strncmp(line_c, "active_low", 10) == 0) {
@@ -148,31 +148,41 @@ bool read_config(struct t_config *config, const char *config_file) {
                 config->active_low = false;
             }
             else {
-                LOG_WARN("Invalid active_low value \"%s\" in line %u", line_c, i);
+                MYGPIOD_LOG_WARN("Invalid active_low value \"%s\" in line %u", line_c, i);
                 continue;
             }
-            LOG_VERBOSE("Setting active_low to \"%s\"", line_c);
+            MYGPIOD_LOG_INFO("Setting active_low to \"%s\"", line_c);
             continue;
         }
         if (strncmp(line_c, "loglevel", 8) == 0) {
             line_c = skip_chars(line_c, 8, '=');
             config->loglevel = strtoimax(line_c, NULL, 10);
-            #ifdef DEBUG
-            LOG_DEBUG("Ignoring loglevel in debug mode");
-            #else
-            set_loglevel(config->loglevel);
-            #endif
             continue;
         }
-        
+        if (strncmp(line_c, "syslog", 6) == 0) {
+            line_c = skip_chars(line_c, 6, '=');
+            if (strcmp(line_c, "true") == 0) {
+                config->syslog = true;
+            }
+            else if (strcmp(line_c, "false") == 0) {
+                config->syslog = true;
+            }
+            else {
+                MYGPIOD_LOG_WARN("Invalid syslog value \"%s\" in line %u", line_c, i);
+                continue;
+            }
+            MYGPIOD_LOG_INFO("Setting syslog to \"%s\"", line_c);
+            continue;
+        }
+
         //gpio lines
         char *rest = NULL;
         unsigned gpio = strtoumax(line_c, &rest, 10);
         if (gpio == 0 || errno == ERANGE) {
-            LOG_WARN("First value is not a valid gpio number in line %u", i);
+            MYGPIOD_LOG_WARN("First value is not a valid gpio number in line %u", i);
             continue;
         }
-        LOG_DEBUG("Processing configuration line for gpio %u", gpio);
+        MYGPIOD_LOG_DEBUG("Processing configuration line for gpio %u", gpio);
         //line seems to be valid, create a struct for config_line
         struct t_config_line *cl = (struct t_config_line *) malloc(sizeof(struct t_config_line));
         cl->gpio = gpio;
@@ -197,7 +207,7 @@ bool read_config(struct t_config *config, const char *config_file) {
             line_c += 4;
         }
         else {
-            LOG_WARN("Unknown edge value \"%s\" in line %u", line_c, i);
+            MYGPIOD_LOG_WARN("Unknown edge value \"%s\" in line %u", line_c, i);
             config_line_free(cl);
             free(cl);
             continue;
@@ -208,7 +218,7 @@ bool read_config(struct t_config *config, const char *config_file) {
 
         //last value is cmd
         if (line_c[0] == '\0') {
-            LOG_WARN("No cmd specified in line %u", i);
+            MYGPIOD_LOG_WARN("No cmd specified in line %u", i);
             config_line_free(cl);
             free(cl);
             continue;
@@ -216,12 +226,12 @@ bool read_config(struct t_config *config, const char *config_file) {
         cl->cmd = strdup(line_c);
 
         if (config_line_push(config, cl) == false) {
-            LOG_WARN("Error adding configuration line %u", i);
+            MYGPIOD_LOG_WARN("Error adding configuration line %u", i);
             config_line_free(cl);
             free(cl);
             continue;
         }
-        LOG_VERBOSE("Added gpio: \"%u\", edge: \"%d\", cmd: \"%s\"", cl->gpio, cl->edge, cl->cmd);
+        MYGPIOD_LOG_INFO("Added gpio: \"%u\", edge: \"%d\", cmd: \"%s\"", cl->gpio, cl->edge, cl->cmd);
     }
     if (line != NULL) {
         free(line);

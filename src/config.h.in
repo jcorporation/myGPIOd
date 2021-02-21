@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-2.0-or-later
- myGPIOd (c)2020 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2021 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -36,6 +36,7 @@ struct t_config {
     char *chip;
     int loglevel;
     time_t startup_time;
+    bool syslog;
 };
 
 bool config_free(struct t_config *c);
