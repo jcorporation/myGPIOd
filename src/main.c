@@ -269,11 +269,12 @@ int main(int argc, char **argv) {
 	config->active_low, "myGPIOd", &timeout, poll_callback,
 	event_callback, &ctx);
 
-	if (rv) {
+	if (rv == -1) {
 	    	MYGPIOD_LOG_ERROR("Error waiting for events");
 	    	rc = EXIT_FAILURE;
 		}
     }    
+
     //Cleanup
     config_free(config);
     free(config);

@@ -34,7 +34,7 @@ void set_loglevel(int level) {
     else if (level < 0) {
         level = 0;
     }
-    MYGPIOD_LOG_INFO("Setting loglevel to %s", loglevel_names[level]);
+    MYGPIOD_LOG_NOTICE("Setting loglevel to %s", loglevel_names[level]);
     loglevel = level;
 }
 
@@ -62,7 +62,7 @@ void log_log(int level, const char *file, int line, const char *fmt, ...) {
         }
     }
     printf("%-8s", loglevel_names[level]);
-    if (loglevel == 4) {
+    if (loglevel == 7) {
         printf("%s:%d: ", file, line);
     }
     va_list args;

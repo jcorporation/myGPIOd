@@ -165,7 +165,7 @@ bool read_config(struct t_config *config, const char *config_file) {
                 config->syslog = true;
             }
             else if (strcmp(line_c, "false") == 0) {
-                config->syslog = true;
+                config->syslog = false;
             }
             else {
                 MYGPIOD_LOG_WARN("Invalid syslog value \"%s\" in line %u", line_c, i);
