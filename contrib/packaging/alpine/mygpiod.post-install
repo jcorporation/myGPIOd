@@ -1,4 +1,5 @@
 #!/bin/sh
 echo "myGPIOd installed"
 echo "Modify /etc/mygpiod.conf to suit your needs."
+sed -i 's/syslog=false/syslog=true/' /etc/mygpiod.conf
 exit 0
