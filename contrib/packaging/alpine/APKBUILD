@@ -7,7 +7,7 @@
 #
 pkgname=mygpiod
 pkgver=0.2.0
-pkgrel=0
+pkgrel=1
 pkgdesc="A small daemon to call scripts on GPIO events."
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
