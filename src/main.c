@@ -242,7 +242,7 @@ int main(int argc, char **argv) {
     #endif
 
     if (config->syslog == true) {
-        openlog("mympd", LOG_CONS, LOG_DAEMON);
+        openlog("mygpiod", LOG_CONS, LOG_DAEMON);
         log_to_syslog = true;
     }
 
