@@ -7,7 +7,7 @@
 #
 
 Name:           mygpiod
-Version:        0.2.0
+Version:        0.2.1
 Release:        0 
 License:        GPL-2.0-or-later
 Group:          Hardware/Other
@@ -60,5 +60,5 @@ fi
 %config(noreplace) /etc/mygpiod.conf
 
 %changelog
-* Sun Feb 21 2021 Juergen Mang <mail@jcgames.de> 0.2.0-0
+* Mon Mar 08 2021 Juergen Mang <mail@jcgames.de> 0.2.1-0
 - Version from master
