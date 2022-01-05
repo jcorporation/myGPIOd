@@ -1,6 +1,6 @@
 /*
- SPDX-License-Identifier: GPL-2.0-or-later
- myMPD (c) 2020-2021 Juergen Mang <mail@jcgames.de>
+ SPDX-License-Identifier: GPL-3.0-or-later
+ myGPIOd (c) 2020-2022 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 

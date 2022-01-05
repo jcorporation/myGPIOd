@@ -52,4 +52,4 @@ syslog=0
 
 ## Copyright
 
-2020-2021 Juergen Mang <mail@jcgames.de>
+2020-2022 Juergen Mang <mail@jcgames.de>

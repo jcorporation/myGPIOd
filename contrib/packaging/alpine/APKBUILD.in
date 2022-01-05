@@ -1,6 +1,6 @@
 #
-# SPDX-License-Identifier: GPL-2.0-or-later
-# myGPIOd (c) 2020-2021 Juergen Mang <mail@jcgames.de>
+# SPDX-License-Identifier: GPL-3.0-or-later
+# myGPIOd (c) 2020-2022 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 # Maintainer: Juergen Mang <mail@jcgames.de>
@@ -11,7 +11,7 @@ pkgrel=0
 pkgdesc="A small daemon to call scripts on GPIO events."
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
-license="GPL-2.0-or-later"
+license="GPL-3.0-or-later"
 depends="libgpiod"
 makedepends="cmake libgpiod-dev"
 install="$pkgname.pre-install $pkgname.post-install"
