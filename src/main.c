@@ -40,9 +40,9 @@ static void signal_handler(int sig_num) {
 }
 
 static void execute_action(unsigned int offset, const struct timespec *ts, int event_type) {
-    MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8ld.%09ld]\"",
+    MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\"",
         (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? " RISING EDGE" : "FALLING EDGE"), 
-        offset, ts->tv_sec, ts->tv_nsec);
+        offset, (long long)ts->tv_sec, ts->tv_nsec);
 
     //map GPIOD_CTXLESS_EVENT_CB_* to GPIOD_CTXLESS_EVENT_*
     if (event_type == GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE) {
