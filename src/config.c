@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2022 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -18,7 +18,7 @@
 //private definitions
 static bool config_line_push(struct t_config *c, struct t_config_line *cl);
 static void config_line_free(struct t_config_line *cl);
-static char *skip_chars(char *line, unsigned offset, char c);
+static char *skip_chars(char *line, size_t offset, char c);
 
 //private functions
 static bool config_line_push(struct t_config *c, struct t_config_line *cl) {
@@ -45,7 +45,7 @@ static void config_line_free(struct t_config_line *cl) {
     }
 }
 
-static char *skip_chars(char *line, unsigned offset, char c) {
+static char *skip_chars(char *line, size_t offset, char c) {
     if (strlen(line) < offset) {
         //offset should not be greater than string length
         offset = strlen(line);
@@ -107,7 +107,7 @@ bool read_config(struct t_config *config, const char *config_file) {
         if (line_c[0] == '#' || line_c[0] == '\0') {
             continue;
         }
-        
+
         //global values
         if (strncmp(line_c, "chip", 4) == 0) {
             line_c = skip_chars(line_c, 4, '=');
@@ -156,7 +156,7 @@ bool read_config(struct t_config *config, const char *config_file) {
         }
         if (strncmp(line_c, "loglevel", 8) == 0) {
             line_c = skip_chars(line_c, 8, '=');
-            config->loglevel = strtoimax(line_c, NULL, 10);
+            config->loglevel = (int)strtoimax(line_c, NULL, 10);
             continue;
         }
         if (strncmp(line_c, "syslog", 6) == 0) {
@@ -177,7 +177,7 @@ bool read_config(struct t_config *config, const char *config_file) {
 
         //gpio lines
         char *rest = NULL;
-        unsigned gpio = strtoumax(line_c, &rest, 10);
+        unsigned gpio = (unsigned)strtoumax(line_c, &rest, 10);
         if (gpio == 0 || errno == ERANGE) {
             MYGPIOD_LOG_WARN("First value is not a valid gpio number in line %u", i);
             continue;
@@ -188,7 +188,7 @@ bool read_config(struct t_config *config, const char *config_file) {
         cl->gpio = gpio;
         cl->cmd = NULL;
         cl->last_execution = 0;
-        
+
         //goto next value
         line_c = rest;
         line_c = skip_chars(line_c, 0, ',');
@@ -212,7 +212,7 @@ bool read_config(struct t_config *config, const char *config_file) {
             free(cl);
             continue;
         }
-        
+
         //goto next value
         line_c = skip_chars(line_c, 0, ',');
 

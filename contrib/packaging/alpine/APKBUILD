@@ -1,12 +1,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2022 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 # Maintainer: Juergen Mang <mail@jcgames.de>
 #
 pkgname=mygpiod
-pkgver=0.2.1
+pkgver=0.2.2
 pkgrel=0
 pkgdesc="A small daemon to call scripts on GPIO events."
 url="https://jcorporation.github.io/myGPIOd/"
@@ -21,14 +21,10 @@ options="!check"
 #no test suite
 
 build() {
-	cd "$builddir" || exit 1
-	mkdir release
-	cd release || exit 1
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RELEASE ..
-	make
+    cmake -B "$builddir/release" -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_STRIP_BINARY=OFF "$builddir"
+    make -C "$builddir/release"
 }
 
 package() {
-	cd "$builddir/release" || exit 1
-	make DESTDIR="$pkgdir" install
+    make -C "$builddir/release" DESTDIR="$pkgdir" install
 }

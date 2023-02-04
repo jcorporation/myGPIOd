@@ -1,13 +1,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2022 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 # Maintainer: Juergen Mang <mail@jcgames.de>
 #
 
 Name:           mygpiod
-Version:        0.2.1
+Version:        0.2.2
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
@@ -25,13 +25,18 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description 
 myGPIOd is a small daemon to call scripts on GPIO events. 
 
+%if 0%{?disturl:1}
+  # build debug package in obs
+  %debug_package
+%endif
+
 %prep 
 %setup -q -n %{name}-%{version}
 
 %build
 mkdir release
 cd release || exit 1
-cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RELEASE ..
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_STRIP_BINARY=OFF ..
 make
 
 %install
@@ -46,19 +51,14 @@ echo "myGPIOd installed"
 echo "Modify /etc/mygpiod.conf to suit your needs"
 true
 
-%postun
-if [ "$1" = "0" ]
-then
-  echo "Please purge /var/lib/mygpiod manually"
-fi
-
 %files 
 %defattr(-,root,root,-)
-%doc README.md LICENSE
+%doc README.md
 /usr/bin/mygpiod
 /usr/lib/systemd/system/mygpiod.service
 %config(noreplace) /etc/mygpiod.conf
+%license LICENSE.md
 
 %changelog
-* Mon Mar 08 2021 Juergen Mang <mail@jcgames.de> 0.2.1-0
+* Sat Feb 04 2023 Juergen Mang <mail@jcgames.de> 0.2.2-0
 - Version from master

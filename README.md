@@ -1,12 +1,12 @@
 # myGPIOd
 
-myGPIOd is a small daemon to call scripts on GPIO events. 
+myGPIOd is a small daemon to call scripts on GPIO events.
 
 It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/)
 
 ## Build Dependencies
 
-- cmake >= 3.4
+- cmake >= 3.13
 - libgpiod-dev
 - libasan3: for debug builds only
 
@@ -16,7 +16,7 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 2. Extract myGPIOd tarball and change path to this directory
 3. Install dependencies (as root): `./build.sh installdeps`
 4. Build: `./build.sh release`
-5. Install(as root): `./build.sh install`
+5. Install (as root): `./build.sh install`
 
 ## Dependencies
 
@@ -52,4 +52,4 @@ syslog=0
 
 ## Copyright
 
-2020-2022 Juergen Mang <mail@jcgames.de>
+2020-2023 Juergen Mang <mail@jcgames.de>

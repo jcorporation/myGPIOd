@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #add myGPIOd user to group gpio
-#group gpio is created by packe libgpiod2
+#group gpio is created by package libgpiod2
 adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -g myGPIOd -G gpio mygpiod 2>/dev/null
 
 #add gpio to mdev to set devices to gpio group

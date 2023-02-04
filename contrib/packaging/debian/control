@@ -9,4 +9,5 @@ Homepage: https://jcorporation.github.io/myGPIOd/
 Package: mygpiod
 Architecture: any
 Depends: libc6, libgpiod2
-Description: A small daemon to call scripts on GPIO events. 
+Description: Small daemon to call scripts on GPIO events.
+ myGPIOd is a small daemon to call scripts on GPIO events.

@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2022 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -10,14 +10,11 @@
 #include <stdbool.h>
 #include <time.h>
 
-//Debug build
-#cmakedefine DEBUG
+// Debug build
+#cmakedefine MYGPIOD_DEBUG
 
-//mygpiod version from cmake
-#define MYGPIOD_VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR}
-#define MYGPIOD_VERSION_MINOR ${CPACK_PACKAGE_VERSION_MINOR}
-#define MYGPIOD_VERSION_PATCH ${CPACK_PACKAGE_VERSION_PATCH}
-#define MYGPIOD_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
+// Version from cmake
+#define MYGPIOD_VERSION "${PROJECT_VERSION}"
 
 struct t_config_line {
     unsigned gpio;

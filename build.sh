@@ -1,11 +1,31 @@
 #!/bin/sh
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2022 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 
-STARTPATH=$(pwd)
+#save script path and change to it
+STARTPATH=$(dirname "$(realpath "$0")")
+cd "$STARTPATH" || exit 1
+
+#clang tidy options
+CLANG_TIDY_CHECKS="*"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-id-dependent-backward-branch"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-unroll-loops"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-struct-pack-align,-clang-analyzer-optin.performance.Padding"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-easily-swappable-parameters"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-signal-handler,-cert-sig30-c"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-assignment-in-if-condition"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-clang-diagnostic-invalid-command-line-argument"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-concurrency-mt-unsafe"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-cppcoreguidelines*"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-hicpp-*"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-llvmlibc-restrict-system-libc-headers"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-identifier-length"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-function-cognitive-complexity,-google-readability-function-size,-readability-function-size"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-magic-numbers"
+CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-non-const-parameter"
 
 #exit on error
 set -e
@@ -17,7 +37,7 @@ set -u
 umask 0022
 
 #get mygpiod version
-VERSION=$(grep CPACK_PACKAGE_VERSION_ CMakeLists.txt | cut -d\" -f2 | tr '\n' '.' | sed 's/\.$//')
+VERSION=$(grep "  VERSION" CMakeLists.txt | sed 's/  VERSION //')
 
 #check for command
 check_cmd() {
@@ -51,10 +71,10 @@ setversion() {
   sed -e "s/__VERSION__/${VERSION}/g" contrib/packaging/arch/PKGBUILD.in > contrib/packaging/arch/PKGBUILD
   DATE=$(date +"%a %b %d %Y")
   sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE__/$DATE/g" \
-  	contrib/packaging/rpm/mygpiod.spec.in > contrib/packaging/rpm/mygpiod.spec
+    contrib/packaging/rpm/mygpiod.spec.in > contrib/packaging/rpm/mygpiod.spec
   DATE=$(date +"%a, %d %b %Y %H:%m:%S %z")
   sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE__/$DATE/g" \
-  	contrib/packaging/debian/changelog.in > contrib/packaging/debian/changelog
+    contrib/packaging/debian/changelog.in > contrib/packaging/debian/changelog
 }
 
 buildrelease() {
@@ -63,7 +83,7 @@ buildrelease() {
   cd release || exit 1
   #set INSTALL_PREFIX and build mygpiod
   export INSTALL_PREFIX="${MYGPIOD_INSTALL_PREFIX:-/usr}"
-  cmake -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX" -DCMAKE_BUILD_TYPE=RELEASE ..
+  cmake -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX" -DCMAKE_BUILD_TYPE=Release ..
   make
 }
 
@@ -101,8 +121,8 @@ builddebug() {
   echo "Compiling myGPIOd"
   install -d debug
   cd debug || exit 1
-  cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=DEBUG -DMEMCHECK="$MEMCHECK" \
-  	-DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+  cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug -DMYGPIOD_ENABLE_LIBASAN="$MEMCHECK" \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
   make VERBOSE=1
   echo "Linking compilation database"
   sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' -e 's/-static-libasan//g' compile_commands.json > ../src/compile_commands.json
@@ -158,9 +178,8 @@ check() {
     echo "Running clang-tidy, output goes to clang-tidy.out"
     rm -f clang-tidy.out
     cd src || exit 1
-	find ./ -name '*.c' -exec clang-tidy \
-    	--checks="*,-hicpp-signed-bitwise,-cert-env33-c,-clang-diagnostic-format-nonliteral,-llvm-header-guard" \
-    	-header-filter='.*' {}  \; >> ../clang-tidy.out
+    find ./ -name '*.c' -exec clang-tidy \
+        --checks="$CLANG_TIDY_CHECKS" {} \; >> ../clang-tidy.out  2>/dev/null
   else
     echo "clang-tidy not found"  
   fi
@@ -184,7 +203,7 @@ pkgdebian() {
   cp -a contrib/packaging/debian .
   export LC_TIME="en_GB.UTF-8"
   tar -czf "../mygpiod_${VERSION}.orig.tar.gz" -- *
-  
+
   SIGNOPT="--no-sign"
   if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
   then
@@ -281,7 +300,7 @@ pkgarch() {
 }
 
 pkgosc() {
-  check_cmd osc  
+  check_cmd osc
   cleanup
   cleanuposc
   if [ -z "${OSC_REPO+x}" ]
@@ -327,8 +346,8 @@ pkgosc() {
   cd "$OSC_REPO" || exit 1
   osc addremove
   osc st
-  osc vc
-  osc commit
+  osc vc -m "Update"
+  osc commit -m "Update"
 }
 
 installdeps() {
@@ -351,8 +370,8 @@ installdeps() {
     #suse
     zypper install gcc cmake unzip libgpiod-devel
   elif [ -f /etc/redhat-release ]
-  then  
-    #fedora 	
+  then
+    #fedora
     yum install gcc cmake unzip libgpiod-devel
   else 
     echo "Unsupported distribution detected."
@@ -370,7 +389,7 @@ uninstall() {
   # the binaries
   if [ -f release/install_manifest.txt ]
   then
-    xargs rm < release/install_manifest.txt
+    xargs rm -f < release/install_manifest.txt
   fi
 
   #MYGPIOD_INSTALL_PREFIX="/usr"
@@ -406,16 +425,16 @@ purge() {
   #remove user
   if getent passwd mygpiod > /dev/null
   then
-  	if check_cmd_silent userdel
+    if check_cmd_silent userdel
     then
-	  userdel mygpiod
-	elif check_cmd_silent deluser
-	then
-	  deluser mygpiod
-	else
-	  echo "Can not del user mygpiod"
-	  return 1
-	fi
+    userdel mygpiod
+  elif check_cmd_silent deluser
+  then
+    deluser mygpiod
+  else
+    echo "Can not del user mygpiod"
+    return 1
+  fi
   fi
   return 0
 }
@@ -429,115 +448,115 @@ else
 fi
 
 case "$ACTION" in
-	release)
-	  buildrelease
-	;;
-	install)
-	  installrelease
-	;;
-	releaseinstall)
-	  buildrelease
-	  cd .. || exit 1
-	  installrelease
-	;;
-	debug)
-	  builddebug "FALSE"
-	;;
-	memcheck)
-	  builddebug "TRUE"
-	;;
-	installdeps)
-	  installdeps
-	;;
-	cleanup)
-	  cleanup
-	  cleanuposc
-	;;
-	check)
-	  check
-	;;
-	pkgdebian)
-	  pkgdebian
-	;;
-	pkgalpine)
-	  pkgalpine
-	;;
-	pkgrpm)
-	  pkgrpm
-	;;
-	pkgarch)
-	  pkgarch
-	;;
-	setversion)
-	  setversion
-	;;
-	pkgosc)
-	  pkgosc
-	;;
-	addmygpioduser)
-	  addmygpioduser
-	;;
-	uninstall)
-	  uninstall
-	;;
-	purge)
-	  uninstall
-	  purge
-	;;
-	*)
-	  echo "Usage: $0 <option>"
-	  echo "Version: ${VERSION}"
-	  echo ""
-	  echo "Build options:"
-	  echo "  release:          build release files in directory release"
-	  echo "  install:          installs release files from directory release"
-	  echo "                    following environment variables are respected"
-	  echo "                      - DESTDIR=\"\""
-	  echo "  releaseinstall:   calls release and install afterwards"
-	  echo "  debug:            builds debug files in directory debug,"
-	  echo "                    linked with libasan3, uses assets in htdocs"
-	  echo "  memcheck:         builds debug files in directory debug"
-	  echo "                    for use with valgrind, uses assets in htdocs"
-	  echo "  check:            runs cppcheck and flawfinder on source files"
-	  echo "                    following environment variables are respected"
-	  echo "                      - CPPCHECKOPTS=\"--enable=warning\""
-	  echo "                      - FLAWFINDEROPTS=\"-m3\""
-	  echo "  installdeps:      installs build and run dependencies"
-	  echo ""
-	  echo "Cleanup options:"
-	  echo "  cleanup:          cleanup source tree"
-	  echo "  cleanupdist:      cleanup dist directory, forces release to build new assets"
-	  echo "  uninstall:        removes mygpiod files, leaves configuration in place "
-	  echo "                    following environment variables are respected"
-	  echo "                      - DESTDIR=\"\""
-	  echo "  purge:            removes all mygpiod files, also your init scripts"
-	  echo "                    following environment variables are respected"
-	  echo "                      - DESTDIR=\"\""
-	  echo ""
-	  echo "Packaging options:"
-	  echo "  pkgalpine:        creates the alpine package"
-	  echo "  pkgarch:          creates the arch package"
-	  echo "                    following environment variables are respected"
-	  echo "                      - SIGN=\"FALSE\""
-	  echo "                      - GPGKEYID=\"\""
-	  echo "  pkgdebian:        creates the debian package"
-	  echo "                    following environment variables are respected"
-	  echo "                      - SIGN=\"FALSE\""
-	  echo "                      - GPGKEYID=\"\""
-	  echo "  pkgrpm:           creates the rpm package"
-	  echo "  pkgosc:           updates the open build service repository"
-	  echo "                    following environment variables are respected"
-	  echo "                      - OSC_REPO=\"home:jcorporation/myGPIOd\""
-	  echo ""
-	  echo "Misc options:"
-	  echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
-	  echo "  addmygpioduser:     adds mygpiod group and user"
-	  echo ""
-	  echo "Environment variables for building"
-	  echo "  - MYGPIOD_INSTALL_PREFIX=\"/usr\""
-	  echo ""
-	  exit 1
-	;;
+  release)
+    buildrelease
+  ;;
+  install)
+    installrelease
+  ;;
+  releaseinstall)
+    buildrelease
+    cd .. || exit 1
+    installrelease
+  ;;
+  debug)
+    builddebug "FALSE"
+  ;;
+  memcheck)
+    builddebug "TRUE"
+  ;;
+  installdeps)
+    installdeps
+  ;;
+  cleanup)
+    cleanup
+    cleanuposc
+  ;;
+  check)
+    check
+  ;;
+  pkgdebian)
+    pkgdebian
+  ;;
+  pkgalpine)
+    pkgalpine
+  ;;
+  pkgrpm)
+    pkgrpm
+  ;;
+  pkgarch)
+    pkgarch
+  ;;
+  setversion)
+    setversion
+  ;;
+  pkgosc)
+    pkgosc
+  ;;
+  addmygpioduser)
+    addmygpioduser
+  ;;
+  uninstall)
+    uninstall
+  ;;
+  purge)
+    uninstall
+    purge
+  ;;
+  *)
+    echo "Usage: $0 <option>"
+    echo "Version: ${VERSION}"
+    echo ""
+    echo "Build options:"
+    echo "  release:          build release files in directory release"
+    echo "  install:          installs release files from directory release"
+    echo "                    following environment variables are respected"
+    echo "                      - DESTDIR=\"\""
+    echo "  releaseinstall:   calls release and install afterwards"
+    echo "  debug:            builds debug files in directory debug,"
+    echo "                    linked with libasan3, uses assets in htdocs"
+    echo "  memcheck:         builds debug files in directory debug"
+    echo "                    for use with valgrind, uses assets in htdocs"
+    echo "  check:            runs cppcheck and flawfinder on source files"
+    echo "                    following environment variables are respected"
+    echo "                      - CPPCHECKOPTS=\"--enable=warning\""
+    echo "                      - FLAWFINDEROPTS=\"-m3\""
+    echo "  installdeps:      installs build and run dependencies"
+    echo ""
+    echo "Cleanup options:"
+    echo "  cleanup:          cleanup source tree"
+    echo "  cleanupdist:      cleanup dist directory, forces release to build new assets"
+    echo "  uninstall:        removes mygpiod files, leaves configuration in place "
+    echo "                    following environment variables are respected"
+    echo "                      - DESTDIR=\"\""
+    echo "  purge:            removes all mygpiod files, also your init scripts"
+    echo "                    following environment variables are respected"
+    echo "                      - DESTDIR=\"\""
+    echo ""
+    echo "Packaging options:"
+    echo "  pkgalpine:        creates the alpine package"
+    echo "  pkgarch:          creates the arch package"
+    echo "                    following environment variables are respected"
+    echo "                      - SIGN=\"FALSE\""
+    echo "                      - GPGKEYID=\"\""
+    echo "  pkgdebian:        creates the debian package"
+    echo "                    following environment variables are respected"
+    echo "                      - SIGN=\"FALSE\""
+    echo "                      - GPGKEYID=\"\""
+    echo "  pkgrpm:           creates the rpm package"
+    echo "  pkgosc:           updates the open build service repository"
+    echo "                    following environment variables are respected"
+    echo "                      - OSC_REPO=\"home:jcorporation/myGPIOd\""
+    echo ""
+    echo "Misc options:"
+    echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
+    echo "  addmygpioduser:     adds mygpiod group and user"
+    echo ""
+    echo "Environment variables for building"
+    echo "  - MYGPIOD_INSTALL_PREFIX=\"/usr\""
+    echo ""
+    exit 1
+  ;;
 esac
 
 exit 0
