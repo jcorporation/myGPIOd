@@ -20,6 +20,7 @@ struct t_config_line {
     unsigned gpio;
     char *cmd;
     int edge;
+    int value;
     struct t_config_line *next;
     long last_execution;
 };
@@ -30,6 +31,7 @@ struct t_config {
     unsigned length;
     int edge;
     bool active_low;
+    char *bias;
     char *chip;
     int loglevel;
     time_t startup_time;

@@ -154,6 +154,21 @@ bool read_config(struct t_config *config, const char *config_file) {
             MYGPIOD_LOG_INFO("Setting active_low to \"%s\"", line_c);
             continue;
         }
+        if (strncmp(line_c, "bias", 4) == 0) {
+            line_c = skip_chars(line_c, 4, '=');
+            if (strcmp(line_c, "as-is") == 0 ||
+                strcmp(line_c, "disable") == 0 ||
+                strcmp(line_c, "pull-down") == 0 ||
+                strcmp(line_c, "pull-up") == 0)
+            {
+                free(config->bias);
+                config->bias = strdup(line_c);
+            }
+            else {
+                MYGPIOD_LOG_WARN("Invalid bias value in line %u", i);
+            }
+            continue;
+        }
         if (strncmp(line_c, "loglevel", 8) == 0) {
             line_c = skip_chars(line_c, 8, '=');
             config->loglevel = (int)strtoimax(line_c, NULL, 10);

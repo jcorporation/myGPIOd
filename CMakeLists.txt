@@ -11,7 +11,7 @@ cmake_policy(SET CMP0003 NEW)
 # myGPIOd is written in C
 # supported compilers: gcc, clang
 project (mygpiod
-  VERSION 0.2.2
+  VERSION 0.3.0
   LANGUAGES C
 )
 

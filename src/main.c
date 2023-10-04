@@ -187,6 +187,20 @@ static int make_signalfd(void) {
     return sigfd;
 }
 
+static int bias_flags(const char *option) {
+    if (strcmp(option, "pull-down") == 0) {
+	return GPIOD_CTXLESS_FLAG_BIAS_PULL_DOWN;
+    }
+    if (strcmp(option, "pull-up") == 0) {
+	return GPIOD_CTXLESS_FLAG_BIAS_PULL_UP;
+    }
+    if (strcmp(option, "disable") == 0) {
+	return GPIOD_CTXLESS_FLAG_BIAS_DISABLE;
+    }
+    // Bias set to as-is
+    return 0;
+}
+
 int main(int argc, char **argv) {
     int rc = EXIT_SUCCESS;
     log_on_tty = isatty(fileno(stdout)) ? true: false;
@@ -201,12 +215,12 @@ int main(int argc, char **argv) {
     MYGPIOD_LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
     MYGPIOD_LOG_INFO("https://github.com/jcorporation/myGPIOd");
 
-    //set signal handler
+    // Set signal handler
     s_signal_received = 0;
     signal(SIGTERM, signal_handler);
     signal(SIGINT, signal_handler);
 
-    //handle commandline parameter
+    // Handle commandline parameter
     char *config_file = NULL;
     if (argc == 2 && strncmp(argv[1], "/", 1) == 0) {
         config_file = strdup(argv[1]);
@@ -215,7 +229,7 @@ int main(int argc, char **argv) {
         config_file = strdup("/etc/mygpiod.conf");
     }
 
-    //read config
+    // Read config
     MYGPIOD_LOG_INFO("Reading \"%s\"", config_file);
     config = malloc(sizeof(struct t_config));
     config->head = NULL;
@@ -223,6 +237,7 @@ int main(int argc, char **argv) {
     config->length = 0;
     config->chip = strdup("0");
     config->active_low = true;
+    config->bias = strdup("as-is");
     config->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
     config->loglevel = loglevel;
     config->startup_time = time(NULL);
@@ -234,7 +249,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     
-    //set loglevel
+    // Set loglevel
     #ifdef MYGPIOD_DEBUG
         set_loglevel(LOG_DEBUG);
     #else
@@ -249,33 +264,36 @@ int main(int argc, char **argv) {
     struct mon_ctx ctx;
     memset(&ctx, 0, sizeof(ctx));
     struct timespec timeout = { 10, 0 };
-    unsigned int offsets[GPIOD_LINE_BULK_MAX_LINES];
+    unsigned offsets[GPIOD_LINE_BULK_MAX_LINES];
 
     struct t_config_line *current = config->head;
-    unsigned int num_lines = 0;
+    unsigned num_lines = 0;
     while (current != NULL) {
         offsets[num_lines] = current->gpio;
-        current=current->next;
+        current = current->next;
         num_lines++;
     }
 
     ctx.sigfd = make_signalfd();
     if (ctx.sigfd > 0) {
+        // Set bias
+        int flags = 0;
+        flags |= bias_flags(config->bias);
 
-    //main event handling loop
-    MYGPIOD_LOG_INFO("Entering event handling loop");
-    int rv = gpiod_ctxless_event_monitor_multiple(
-        config->chip, config->edge, offsets, config->length,
-    config->active_low, "myGPIOd", &timeout, poll_callback,
-    event_callback, &ctx);
+        // Main event handling loop
+        MYGPIOD_LOG_INFO("Entering event handling loop");
+        int rv = gpiod_ctxless_event_monitor_multiple_ext(
+            config->chip, config->edge, offsets, config->length,
+            config->active_low, "myGPIOd", &timeout, poll_callback,
+            event_callback, &ctx, flags);
 
-    if (rv == -1) {
+        if (rv == -1) {
             MYGPIOD_LOG_ERROR("Error waiting for events");
             rc = EXIT_FAILURE;
         }
     }
 
-    //Cleanup
+    // Cleanup
     config_free(config);
     free(config);
     free(config_file);
