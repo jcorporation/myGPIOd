@@ -6,8 +6,7 @@ https://github.com/jcorporation/myGPIOd
 
 ## myGPIOd v0.3.0 (not yet released)
 
-This release adds bias support and setting an initial gpio value. The config
-file format has slighlty changed.
+This release adds bias support.
 
 ***
 
