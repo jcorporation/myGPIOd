@@ -7,7 +7,7 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 ## Build Dependencies
 
 - cmake >= 3.13
-- libgpiod-dev
+- libgpiod-dev >= 1.5.0
 - libasan3: for debug builds only
 
 ## Quick Build Instructions

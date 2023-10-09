@@ -214,6 +214,7 @@ int main(int argc, char **argv) {
 
     MYGPIOD_LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
     MYGPIOD_LOG_INFO("https://github.com/jcorporation/myGPIOd");
+    MYGPIOD_LOG_INFO("libgpiod %s", gpiod_version_string());
 
     // Set signal handler
     s_signal_received = 0;
