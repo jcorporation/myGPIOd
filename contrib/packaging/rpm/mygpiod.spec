@@ -7,7 +7,7 @@
 #
 
 Name:           mygpiod
-Version:        0.2.2
+Version:        0.3.0
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
@@ -53,12 +53,11 @@ true
 
 %files 
 %defattr(-,root,root,-)
-%doc README.md
+%doc README.md LICENSE.md
 /usr/bin/mygpiod
 /usr/lib/systemd/system/mygpiod.service
 %config(noreplace) /etc/mygpiod.conf
-%license LICENSE.md
 
 %changelog
-* Sat Feb 04 2023 Juergen Mang <mail@jcgames.de> 0.2.2-0
+* Wed Oct 04 2023 Juergen Mang <mail@jcgames.de> 0.3.0-0
 - Version from master

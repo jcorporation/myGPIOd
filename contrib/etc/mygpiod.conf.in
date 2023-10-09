@@ -17,6 +17,10 @@ edge=falling
 #edge=both
 active_low=true
 #active_low=false
+bias=as-is
+#bias=disable
+#bias=pull-down
+#bias=pull-up
 
 #gpio,edge,script
 #3,falling,echo "test 3"
