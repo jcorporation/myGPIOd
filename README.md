@@ -7,8 +7,7 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 ## Build Dependencies
 
 - cmake >= 3.13
-- libgpiod-dev >= 1.5.0
-- libasan3: for debug builds only
+- libgpiod-dev >= 1.5.0 and < 2.0.0
 
 ## Quick Build Instructions
 
@@ -17,10 +16,6 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 3. Install dependencies (as root): `./build.sh installdeps`
 4. Build: `./build.sh release`
 5. Install (as root): `./build.sh install`
-
-## Dependencies
-
-- libgpiod2
 
 ## Run
 
@@ -46,6 +41,7 @@ edge=falling
 active_low=true
 loglevel=4
 syslog=0
+bias=pull-up
 #gpio,edge,cmd
 3,falling,sudo /usr/sbin/poweroff 
 ```

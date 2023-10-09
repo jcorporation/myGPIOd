@@ -4,9 +4,9 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.3.0 (not yet released)
+## myGPIOd v0.3.0 (2023-10-09)
 
-This release adds bias support.
+This release adds bias support and requires therefor gpiod >= 1.5.0.
 
 ***
 
