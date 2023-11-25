@@ -70,12 +70,8 @@ int main(int argc, char **argv) {
         log_to_syslog = true;
     }
 
-    struct t_mon_ctx ctx;
-    memset(&ctx, 0, sizeof(ctx));
-
-    struct timespec timeout = { 10, 0 };
+    // create the array of gpios to monitor
     unsigned offsets[GPIOD_LINE_BULK_MAX_LINES];
-
     struct t_config_node *current = config->head;
     unsigned num_lines = 0;
     while (current != NULL) {
@@ -86,24 +82,34 @@ int main(int argc, char **argv) {
         current = current->next;
     }
 
+    // data structure
+    struct t_mon_ctx ctx;
+    memset(&ctx, 0, sizeof(ctx));
     ctx.config = config;
     ctx.sigfd = make_signalfd();
-    if (ctx.sigfd > 0) {
-        // Set bias
-        int flags = 0;
-        flags |= bias_flags(config->bias);
+    if (ctx.sigfd <= 0) {
+        config_clear(config);
+        free(config);
+        return EXIT_FAILURE;
+    }
+    
+    // set flags for bias support
+    int flags = 0;
+    flags |= bias_flags(config->bias);
 
-        // Main event handling loop
-        MYGPIOD_LOG_INFO("Entering event handling loop");
-        int rv = gpiod_ctxless_event_monitor_multiple_ext(
-            config->chip, config->edge, offsets, config->length,
-            config->active_low, MYGPIOD_NAME, &timeout, poll_callback,
-            event_callback, &ctx, flags);
+    // poll timeout
+    struct timespec timeout = { 10, 0 };
 
-        if (rv == -1) {
-            MYGPIOD_LOG_ERROR("Error waiting for events");
-            rc = EXIT_FAILURE;
-        }
+    // Main event handling loop
+    MYGPIOD_LOG_INFO("Entering event handling loop");
+    int rv = gpiod_ctxless_event_monitor_multiple_ext(
+        config->chip, config->edge, offsets, config->length,
+        config->active_low, MYGPIOD_NAME, &timeout, poll_callback,
+        event_callback, &ctx, flags);
+
+    if (rv == -1) {
+        MYGPIOD_LOG_ERROR("Error waiting for events");
+        rc = EXIT_FAILURE;
     }
 
     // Cleanup
