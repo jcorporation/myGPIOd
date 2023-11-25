@@ -20,6 +20,8 @@ target_include_directories(mygpiod
 
 target_sources(mygpiod PRIVATE
   main.c
+  action.c
   config.c
+  event.c
   log.c
 )

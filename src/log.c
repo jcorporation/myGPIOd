@@ -12,10 +12,14 @@
 #include <string.h>
 #include <time.h>
 
+//global variables
 int loglevel;
 bool log_on_tty;
 bool log_to_syslog;
 
+/**
+ * Maps loglevels to names
+ */
 static const char *loglevel_names[] = {
     "EMERG",
     "ALERT",
@@ -27,6 +31,9 @@ static const char *loglevel_names[] = {
     "DEBUG"
 };
 
+/**
+ * Maps loglevels to terminal colors
+ */
 static const char *loglevel_colors[] = {
     "\033[0;31m",
     "\033[0;31m",
@@ -38,6 +45,10 @@ static const char *loglevel_colors[] = {
     "\033[0;34m"
 };
 
+/**
+ * Sets the loglevel
+ * @param level loglevel to set
+ */
 void set_loglevel(int level) {
     if (level == loglevel) {
         return;
@@ -52,6 +63,16 @@ void set_loglevel(int level) {
     loglevel = level;
 }
 
+/**
+ * Logs the errno string
+ * This function should be called by the suitable macro
+ * @param level loglevel of the message
+ * @param file filename for debug logging
+ * @param line linenumber for debug logging
+ * @param partition mpd partition
+ * @param fmt format string to print
+ * @param ... arguments for the format string
+ */
 void log_log(int level, const char *file, int line, const char *fmt, ...) {
     if (level > loglevel) {
         return;

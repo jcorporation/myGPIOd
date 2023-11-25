@@ -1,162 +1,28 @@
 /*
- SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
- https://github.com/jcorporation/myGPIOd
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ * https://github.com/jcorporation/myGPIOd
+ *
+ * myGPIOd is based on the gpiomon tool from
+ * https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
+ */
 
- myGPIOd is based on the gpiomon tool from https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
-*/
-
+#include "compile_time.h"
 #include "config.h"
+#include "event.h"
 #include "log.h"
 
 #include <errno.h>
-#include <gpiod.h>
-#include <limits.h>
-#include <poll.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/signalfd.h>
 #include <unistd.h>
 
-sig_atomic_t s_signal_received;
-
-struct mon_ctx {
-    unsigned int offset;
-    unsigned int events_wanted;
-    unsigned int events_done;
-    bool silent;
-    char *fmt;
-    int sigfd;
-};
-
-struct t_config *config;
-
-static void execute_action(unsigned int offset, const struct timespec *ts, int event_type) {
-    MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\"",
-        (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? " RISING EDGE" : "FALLING EDGE"), 
-        offset, (long long)ts->tv_sec, ts->tv_nsec);
-
-    //map GPIOD_CTXLESS_EVENT_CB_* to GPIOD_CTXLESS_EVENT_*
-    if (event_type == GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE) {
-        event_type = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
-    }
-    else if (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE) {
-        event_type = GPIOD_CTXLESS_EVENT_RISING_EDGE;
-    }
-    
-    //get cmd
-    char *cmd = NULL;
-    long last_execution = 0;
-    struct t_config_line *current = config->head;
-    while (current != NULL) {
-       if (current->gpio == offset && 
-            (current->edge == GPIOD_CTXLESS_EVENT_BOTH_EDGES || current->edge == event_type))
-        {
-            cmd = current->cmd;
-            last_execution = current->last_execution;
-            current->last_execution = ts->tv_sec;
-            break;
-        }
-       current = current->next;
-    }
-
-    if (current == NULL) {
-        return;
-    }
-    //prevent multiple execution of cmds within two seconds
-    if (last_execution >= ts->tv_sec - 2) {
-        return;
-    }
-
-    MYGPIOD_LOG_INFO("Executing \"%s\"", cmd);
-    if (fork() == 0) {
-        //child process executes cmd
-        int rc = system(cmd); /* Flawfinder: ignore */
-        if (rc == -1) {
-            MYGPIOD_LOG_ERROR("Error executing cmd \"%s\": %s", cmd, strerror(errno));
-        }
-        exit(0);
-    }
-    //parent process returns to main loop
-}
-
-static int poll_callback(unsigned int num_lines, struct gpiod_ctxless_event_poll_fd *fds, const struct timespec *timeout, void *data) {
-    struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES + 1];
-    struct mon_ctx *ctx = data;
-    unsigned int i;
-
-    for (i = 0; i < num_lines; i++) {
-        pfds[i].fd = fds[i].fd;
-        pfds[i].events = POLLIN | POLLPRI;
-    }
-
-    pfds[i].fd = ctx->sigfd;
-    pfds[i].events = POLLIN | POLLPRI;
-
-    long ts = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
-
-    int cnt = poll(pfds, num_lines + 1, (int)ts);
-    if (cnt < 0) {
-        return GPIOD_CTXLESS_EVENT_POLL_RET_ERR;
-    }
-    if (cnt == 0) {
-        return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
-    }
-
-    int rv = cnt;
-    for (i = 0; i < num_lines; i++) {
-        if (pfds[i].revents) {
-            fds[i].event = true;
-            if (!--cnt) {
-                return rv;
-            }
-        }
-    }
-
-    /*
-     * If we're here, then there's a signal pending. No need to read it,
-     * we know we should quit now.
-     */
-    close(ctx->sigfd);
-
-    return GPIOD_CTXLESS_EVENT_POLL_RET_STOP;
-}
-
-static void handle_event(struct mon_ctx *ctx, int event_type, unsigned int line_offset, const struct timespec *timestamp) {
-    time_t now = time(NULL);
-    if (now > config->startup_time + 5) {
-          execute_action(line_offset, timestamp, event_type);
-    }
-    else {
-        MYGPIOD_LOG_INFO("Ignoring events at startup");
-    }
-    ctx->events_done++;
-}
-
-static int event_callback(int event_type, unsigned int line_offset, const struct timespec *timestamp, void *data) {
-    struct mon_ctx *ctx = data;
-
-    switch (event_type) {
-        case GPIOD_CTXLESS_EVENT_CB_RISING_EDGE:
-        case GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE:
-            handle_event(ctx, event_type, line_offset, timestamp);
-            break;
-        default:
-            /*
-            * REVISIT: This happening would indicate a problem in the
-            * library.
-            */
-            return GPIOD_CTXLESS_EVENT_CB_RET_OK;
-    }
-
-    if (ctx->events_wanted && ctx->events_done >= ctx->events_wanted) {
-        return GPIOD_CTXLESS_EVENT_CB_RET_STOP;
-    }
-
-    return GPIOD_CTXLESS_EVENT_CB_RET_OK;
-}
-
+/**
+ * Creates a signalfd to exit on SIGTERM and SIGINT
+ * @return the created signal fd
+ */
 static int make_signalfd(void) {
     sigset_t sigmask;
     int sigfd, rv;
@@ -165,12 +31,14 @@ static int make_signalfd(void) {
     sigaddset(&sigmask, SIGTERM);
     sigaddset(&sigmask, SIGINT);
 
+    errno = 0;
     rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
     if (rv < 0) {
         MYGPIOD_LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
         return -1;
     }
 
+    errno = 0;
     sigfd = signalfd(-1, &sigmask, 0);
     if (sigfd < 0) {
         MYGPIOD_LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
@@ -178,20 +46,6 @@ static int make_signalfd(void) {
     }
 
     return sigfd;
-}
-
-static int bias_flags(const char *option) {
-    if (strcmp(option, "pull-down") == 0) {
-        return GPIOD_CTXLESS_FLAG_BIAS_PULL_DOWN;
-    }
-    if (strcmp(option, "pull-up") == 0) {
-        return GPIOD_CTXLESS_FLAG_BIAS_PULL_UP;
-    }
-    if (strcmp(option, "disable") == 0) {
-        return GPIOD_CTXLESS_FLAG_BIAS_DISABLE;
-    }
-    // Bias set to as-is
-    return 0;
 }
 
 int main(int argc, char **argv) {
@@ -220,22 +74,17 @@ int main(int argc, char **argv) {
 
     // Read config
     MYGPIOD_LOG_INFO("Reading \"%s\"", config_file);
-    config = malloc(sizeof(struct t_config));
-    config->head = NULL;
-    config->tail = NULL;
-    config->length = 0;
-    config->chip = strdup("0");
-    config->active_low = true;
-    config->bias = strdup("as-is");
-    config->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
-    config->loglevel = loglevel;
-    config->startup_time = time(NULL);
-    config->syslog = false;
-    if (read_config(config, config_file) == false) {
-        config_free(config);
+    struct t_config *config = config_new();
+    if (config == NULL) {
+        MYGPIOD_LOG_EMERG("Out of memory");
+        free(config_file);
+        return EXIT_FAILURE;
+    }
+    if (config_read(config, config_file) == false) {
+        config_clear(config);
         free(config);
         free(config_file);
-        return 1;
+        return EXIT_FAILURE;
     }
     
     // Set loglevel
@@ -246,16 +95,17 @@ int main(int argc, char **argv) {
     #endif
 
     if (config->syslog == true) {
-        openlog("mygpiod", LOG_CONS, LOG_DAEMON);
+        openlog("myGPIOd", LOG_CONS, LOG_DAEMON);
         log_to_syslog = true;
     }
 
-    struct mon_ctx ctx;
+    struct t_mon_ctx ctx;
     memset(&ctx, 0, sizeof(ctx));
+
     struct timespec timeout = { 10, 0 };
     unsigned offsets[GPIOD_LINE_BULK_MAX_LINES];
 
-    struct t_config_line *current = config->head;
+    struct t_config_node *current = config->head;
     unsigned num_lines = 0;
     while (current != NULL) {
         offsets[num_lines] = current->gpio;
@@ -263,6 +113,7 @@ int main(int argc, char **argv) {
         num_lines++;
     }
 
+    ctx.config = config;
     ctx.sigfd = make_signalfd();
     if (ctx.sigfd > 0) {
         // Set bias
@@ -283,7 +134,7 @@ int main(int argc, char **argv) {
     }
 
     // Cleanup
-    config_free(config);
+    config_clear(config);
     free(config);
     free(config_file);
     if (rc == EXIT_SUCCESS) {

@@ -10,20 +10,17 @@
 #include <stdbool.h>
 #include <time.h>
 
-// Version from cmake
-#define MYGPIOD_VERSION "${PROJECT_VERSION}"
-
-struct t_config_line {
+struct t_config_node {
     unsigned gpio;
     char *cmd;
     int edge;
-    struct t_config_line *next;
+    struct t_config_node *next;
     long last_execution;
 };
 
 struct t_config {
-    struct t_config_line *head;
-    struct t_config_line *tail;
+    struct t_config_node *head;
+    struct t_config_node *tail;
     unsigned length;
     int edge;
     bool active_low;
@@ -34,7 +31,9 @@ struct t_config {
     bool syslog;
 };
 
-bool config_free(struct t_config *c);
-bool read_config(struct t_config *config, const char *config_file);
+int bias_flags(const char *option);
+void config_clear(struct t_config *config);
+bool config_read(struct t_config *config, const char *config_file);
+struct t_config *config_new(void);
 
 #endif

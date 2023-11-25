@@ -45,17 +45,8 @@ include(CheckCSourceCompiles)
 include(CheckIPOSupported)
 include(GNUInstallDirs)
 
-# set debug define for source
-if(NOT DEFINED MYGPIOD_DEBUG)
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(MYGPIOD_DEBUG "ON")
-  else()
-    set(MYGPIOD_DEBUG "OFF")
-  endif()
-endif()
-
 # configure some files - version and path information
-configure_file(src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+configure_file(src/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
 configure_file(contrib/initscripts/mygpiod.service.in contrib/initscripts/mygpiod.service @ONLY)
 configure_file(contrib/initscripts/mygpiod.sysVinit.in contrib/initscripts/mygpiod.sysVinit @ONLY)

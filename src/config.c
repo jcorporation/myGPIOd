@@ -16,74 +16,80 @@
 #include <string.h>
 
 //private definitions
-static bool config_line_push(struct t_config *c, struct t_config_line *cl);
-static void config_line_free(struct t_config_line *cl);
+static bool config_node_push(struct t_config *config, struct t_config_node *node);
+static void config_node_clear(struct t_config_node *node);
 static char *skip_chars(char *line, size_t offset, char c);
-
-//private functions
-static bool config_line_push(struct t_config *c, struct t_config_line *cl) {
-    cl->next = NULL;
-
-    if (c->head == NULL) {
-        c->head = cl;
-    }
-    else if (c->tail != NULL) {
-        c->tail->next = cl;
-    }
-    else {
-        return false;
-    }
-
-    c->tail = cl;
-    c->length++;
-    return true;
-}
-
-static void config_line_free(struct t_config_line *cl) {
-    if (cl->cmd != NULL) {
-        free(cl->cmd);
-    }
-}
-
-static char *skip_chars(char *line, size_t offset, char c) {
-    if (strlen(line) < offset) {
-        //offset should not be greater than string length
-        offset = strlen(line);
-    }
-    line += offset;
-    while ((isspace(line[0]) || line[0] == c) && line[0] != '\0') {
-        line++;
-    }
-    return line;
-}
-
-static char *chomp(char *line) {
-    size_t i = strlen(line) - 1;
-    while (i > 0 && isspace(line[i])) {
-        i--;
-    }
-    line[i + 1] = '\0';
-    return line;
-}
+static char *chomp(char *line);
 
 //public functions
-bool config_free(struct t_config *c) {
-    struct t_config_line *current = c->head;
-    struct t_config_line *tmp = NULL;
+
+/**
+ * Parses the bias flags
+ * @param option string to parse
+ * @return parsed bias flag
+ */
+int bias_flags(const char *option) {
+    if (strcmp(option, "pull-down") == 0) {
+        return GPIOD_CTXLESS_FLAG_BIAS_PULL_DOWN;
+    }
+    if (strcmp(option, "pull-up") == 0) {
+        return GPIOD_CTXLESS_FLAG_BIAS_PULL_UP;
+    }
+    if (strcmp(option, "disable") == 0) {
+        return GPIOD_CTXLESS_FLAG_BIAS_DISABLE;
+    }
+    // Bias set to as-is
+    return 0;
+}
+
+/**
+ * Allocates a new config struct and sets defaults
+ * @return allocated struct with default values assigned.
+ */
+struct t_config *config_new(void) {
+    struct t_config *config = malloc(sizeof(struct t_config));
+    if (config == NULL) {
+        return NULL;
+    }
+    config->head = NULL;
+    config->tail = NULL;
+    config->length = 0;
+    config->chip = strdup("0");
+    config->active_low = true;
+    config->bias = strdup("as-is");
+    config->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
+    config->loglevel = loglevel;
+    config->startup_time = time(NULL);
+    config->syslog = false;
+    return config;
+}
+
+/**
+ * Clears the config struct.
+ * @param config pointer to config to free
+ */
+void config_clear(struct t_config *config) {
+    struct t_config_node *current = config->head;
+    struct t_config_node *tmp = NULL;
     while (current != NULL) {
-        config_line_free(current);
+        config_node_clear(current);
         tmp = current;
         current = current->next;
         free(tmp);
     }
-    if (c->chip != NULL) {
-        free(c->chip);
-        c->chip = NULL;
+    if (config->chip != NULL) {
+        free(config->chip);
+        config->chip = NULL;
     }
-    return true;
 }
 
-bool read_config(struct t_config *config, const char *config_file) {
+/**
+ * Reads the mygpiod config file
+ * @param config config struct to populate
+ * @param config_file config filename to read
+ * @return true on success, else false
+ */
+bool config_read(struct t_config *config, const char *config_file) {
     FILE *fp = fopen(config_file, "re");
     if (fp == NULL) {
         MYGPIOD_LOG_ERROR("Can not open \"%s\": %s", config_file, strerror(errno));
@@ -104,7 +110,9 @@ bool read_config(struct t_config *config, const char *config_file) {
         line_c = skip_chars(line_c, 0, ' ');
         
         //ignore blank lines and comments
-        if (line_c[0] == '#' || line_c[0] == '\0') {
+        if (line_c[0] == '#' ||
+            line_c[0] == '\0')
+        {
             continue;
         }
 
@@ -198,11 +206,11 @@ bool read_config(struct t_config *config, const char *config_file) {
             continue;
         }
         MYGPIOD_LOG_DEBUG("Processing configuration line for gpio %u", gpio);
-        //line seems to be valid, create a struct for config_line
-        struct t_config_line *cl = (struct t_config_line *) malloc(sizeof(struct t_config_line));
-        cl->gpio = gpio;
-        cl->cmd = NULL;
-        cl->last_execution = 0;
+        //line seems to be valid, create a struct for config_node
+        struct t_config_node *node = (struct t_config_node *) malloc(sizeof(struct t_config_node));
+        node->gpio = gpio;
+        node->cmd = NULL;
+        node->last_execution = 0;
 
         //goto next value
         line_c = rest;
@@ -210,21 +218,21 @@ bool read_config(struct t_config *config, const char *config_file) {
 
         //edge value
         if (strncmp(line_c, "falling", 7) == 0) {
-            cl->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
+            node->edge = GPIOD_CTXLESS_EVENT_FALLING_EDGE;
             line_c += 7;
         }
         else if (strncmp(line_c, "rising", 6) == 0) {
-            cl->edge = GPIOD_CTXLESS_EVENT_RISING_EDGE;
+            node->edge = GPIOD_CTXLESS_EVENT_RISING_EDGE;
             line_c += 6;
         }
         else if (strncmp(line_c, "both", 4) == 0) {
-            cl->edge = GPIOD_CTXLESS_EVENT_BOTH_EDGES;
+            node->edge = GPIOD_CTXLESS_EVENT_BOTH_EDGES;
             line_c += 4;
         }
         else {
             MYGPIOD_LOG_WARN("Unknown edge value \"%s\" in line %u", line_c, i);
-            config_line_free(cl);
-            free(cl);
+            config_node_clear(node);
+            free(node);
             continue;
         }
 
@@ -234,23 +242,92 @@ bool read_config(struct t_config *config, const char *config_file) {
         //last value is cmd
         if (line_c[0] == '\0') {
             MYGPIOD_LOG_WARN("No cmd specified in line %u", i);
-            config_line_free(cl);
-            free(cl);
+            config_node_clear(node);
+            free(node);
             continue;
         }
-        cl->cmd = strdup(line_c);
+        node->cmd = strdup(line_c);
 
-        if (config_line_push(config, cl) == false) {
+        if (config_node_push(config, node) == false) {
             MYGPIOD_LOG_WARN("Error adding configuration line %u", i);
-            config_line_free(cl);
-            free(cl);
+            config_node_clear(node);
+            free(node);
             continue;
         }
-        MYGPIOD_LOG_INFO("Added gpio: \"%u\", edge: \"%d\", cmd: \"%s\"", cl->gpio, cl->edge, cl->cmd);
+        MYGPIOD_LOG_INFO("Added gpio: \"%u\", edge: \"%d\", cmd: \"%s\"", node->gpio, node->edge, node->cmd);
     }
     if (line != NULL) {
         free(line);
     }
     fclose(fp);
     return true;
+}
+
+//private functions
+
+/**
+ * Appends a config node
+ * @param config pointer to config struct
+ * @param node config line to append
+ * @return true on success, else false
+ */
+static bool config_node_push(struct t_config *config, struct t_config_node *node) {
+    node->next = NULL;
+
+    if (config->head == NULL) {
+        config->head = node;
+    }
+    else if (config->tail != NULL) {
+        config->tail->next = node;
+    }
+    else {
+        return false;
+    }
+
+    config->tail = node;
+    config->length++;
+    return true;
+}
+
+/**
+ * Clears the config node
+ * @param cl node to clear
+ */
+static void config_node_clear(struct t_config_node *node) {
+    if (node->cmd != NULL) {
+        free(node->cmd);
+    }
+}
+
+/**
+ * Skips chars and following whitespaces and defined char c
+ * @param line string
+ * @param offset number of chars to skip
+ * @param c char to skip
+ * @return pointer to new position in string
+ */
+static char *skip_chars(char *line, size_t offset, char c) {
+    if (strlen(line) < offset) {
+        //offset should not be greater than string length
+        offset = strlen(line);
+    }
+    line += offset;
+    while ((isspace(line[0]) || line[0] == c) && line[0] != '\0') {
+        line++;
+    }
+    return line;
+}
+
+/**
+ * Removes whitespace characters from end
+ * @param line string to chomp
+ * @return chomped string
+ */
+static char *chomp(char *line) {
+    size_t i = strlen(line) - 1;
+    while (i > 0 && isspace(line[i])) {
+        i--;
+    }
+    line[i + 1] = '\0';
+    return line;
 }
