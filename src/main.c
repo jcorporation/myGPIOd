@@ -12,42 +12,11 @@
 #include "config.h"
 #include "event.h"
 #include "log.h"
+#include "util.h"
 
-#include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/signalfd.h>
 #include <unistd.h>
-
-/**
- * Creates a signalfd to exit on SIGTERM and SIGINT
- * @return the created signal fd
- */
-static int make_signalfd(void) {
-    sigset_t sigmask;
-    int sigfd, rv;
-
-    sigemptyset(&sigmask);
-    sigaddset(&sigmask, SIGTERM);
-    sigaddset(&sigmask, SIGINT);
-
-    errno = 0;
-    rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
-    if (rv < 0) {
-        MYGPIOD_LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
-        return -1;
-    }
-
-    errno = 0;
-    sigfd = signalfd(-1, &sigmask, 0);
-    if (sigfd < 0) {
-        MYGPIOD_LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
-        return -1;
-    }
-
-    return sigfd;
-}
 
 int main(int argc, char **argv) {
     int rc = EXIT_SUCCESS;
@@ -110,9 +79,11 @@ int main(int argc, char **argv) {
     struct t_config_node *current = config->head;
     unsigned num_lines = 0;
     while (current != NULL) {
-        offsets[num_lines] = current->gpio;
+        if (value_in_array(current->gpio, offsets, num_lines) == false) {
+            offsets[num_lines] = current->gpio;
+            num_lines++;
+        }
         current = current->next;
-        num_lines++;
     }
 
     ctx.config = config;

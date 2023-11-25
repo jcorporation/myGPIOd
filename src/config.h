@@ -4,8 +4,8 @@
  https://github.com/jcorporation/myGPIOd
 */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef MYGPIOD_CONFIG_H
+#define MYGPIOD_CONFIG_H
 
 #include <stdbool.h>
 #include <time.h>

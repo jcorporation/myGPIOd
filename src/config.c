@@ -173,6 +173,7 @@ bool config_read(struct t_config *config, const char *config_file) {
             {
                 free(config->bias);
                 config->bias = strdup(line_c);
+                MYGPIOD_LOG_INFO("Setting bias to \"%s\"", line_c);
             }
             else {
                 MYGPIOD_LOG_WARN("Invalid bias value in line %u", i);
@@ -263,7 +264,7 @@ bool config_read(struct t_config *config, const char *config_file) {
             free(node);
             continue;
         }
-        MYGPIOD_LOG_INFO("Added gpio: \"%u\", edge: \"%d\", cmd: \"%s\"", node->gpio, node->edge, node->cmd);
+        MYGPIOD_LOG_INFO("Added gpio: \"%u\", edge: \"%d\", long_press: \"%d\", cmd: \"%s\"", node->gpio, node->edge, node->long_press, node->cmd);
     }
     if (line != NULL) {
         free(line);

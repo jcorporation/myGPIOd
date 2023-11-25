@@ -24,4 +24,5 @@ target_sources(mygpiod PRIVATE
   config.c
   event.c
   log.c
+  util.c
 )

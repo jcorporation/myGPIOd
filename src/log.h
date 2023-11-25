@@ -4,8 +4,8 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef MYGPIOD_LOG_H
+#define MYGPIOD_LOG_H
 
 #include <stdbool.h>
 #include <syslog.h>
