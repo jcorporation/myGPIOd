@@ -10,15 +10,17 @@
 #include "config.h"
 #include "event.h"
 #include "log.h"
+#include "util.h"
 
 #include <errno.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
 
 // private definitions
 static void action_delay(struct t_config *config, struct t_config_node *cn);
-static void action_execute(const char *cmd);
+static void action_execute(struct t_config_node *cn);
 
 // public functions
 
@@ -55,7 +57,7 @@ void action_handle(unsigned offset, const struct timespec *ts, int event_type, s
                 return;
             }
             if (current->long_press == 0) {
-                action_execute(current->cmd);
+                action_execute(current);
             }
             else {
                 action_delay(config, current);
@@ -78,7 +80,7 @@ void action_execute_delayed(struct t_mon_ctx *ctx) {
         return;
     }
     if (rv == 1) {
-        action_execute(ctx->config->delayed_event.cn->cmd);
+        action_execute(ctx->config->delayed_event.cn);
         ctx->config->delayed_event.cn->ignore_event = true;
     }
     // remove timerfd
@@ -131,18 +133,33 @@ static void action_delay(struct t_config *config, struct t_config_node *cn) {
 
 /**
  * Runs a system command in a new process
- * @param cmd command to execute
+ * @param cn pointer to gpio config
  */
-static void action_execute(const char *cmd) {
-    MYGPIOD_LOG_INFO("Executing \"%s\"", cmd);
-    if (fork() == 0) {
-        //child process executes cmd
-        errno = 0;
-        int rc = system(cmd); /* Flawfinder: ignore */
-        if (rc == -1) {
-            MYGPIOD_LOG_ERROR("Error executing cmd \"%s\": %s", cmd, strerror(errno));
-        }
-        exit(0);
+static void action_execute(struct t_config_node *cn) {
+    MYGPIOD_LOG_INFO("Executing \"%s\"", cn->cmd);
+    errno = 0;
+    int rc = fork();
+    if (rc == -1) {
+        MYGPIOD_LOG_ERROR("Could not fork: %s", strerror(errno));
     }
-    //parent process returns to main loop
+    else if (rc == 0) {
+        // this is the child process
+        char gpio[16];
+        snprintf(gpio, 16, "MYGPIOD_GPIO=%u", cn->gpio);
+        char edge[15];
+        snprintf(edge, 15, "MYGPIOD_EDGE=%d", cn->edge);
+        char long_press[22];
+        snprintf(long_press, 22, "MYGPIOD_LONG_PRESS=%d", cn->long_press);
+
+        char *exec_argv[2] = { cn->cmd, NULL };
+        char *exec_envp[4] = { gpio, edge, long_press, NULL };
+        errno = 0;
+        execve(cn->cmd, exec_argv, exec_envp);
+        // successful execve call does not return
+        MYGPIOD_LOG_ERROR("Error executing cmd \"%s\": %s", cn->cmd, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    else {
+        MYGPIOD_LOG_DEBUG("Forked process with id %d", rc);
+    }
 }
