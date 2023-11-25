@@ -98,9 +98,12 @@ void log_log(int level, const char *file, int line, const char *fmt, ...) {
         }
     }
     printf("%-8s", loglevel_names[level]);
-    if (loglevel == 7) {
+    #ifdef MYGPIOD_DEBUG
         printf("%s:%d: ", file, line);
-    }
+    #else
+        (void)file;
+        (void)line;
+    #endif
     va_list args;
     va_start(args, fmt);
     #pragma GCC diagnostic push
