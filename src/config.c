@@ -61,6 +61,8 @@ struct t_config *config_new(void) {
     config->loglevel = loglevel;
     config->startup_time = time(NULL);
     config->syslog = false;
+    config->delayed_event.timer_fd = -1;
+    config->delayed_event.cn = NULL;
     return config;
 }
 
@@ -210,7 +212,8 @@ bool config_read(struct t_config *config, const char *config_file) {
         struct t_config_node *node = (struct t_config_node *) malloc(sizeof(struct t_config_node));
         node->gpio = gpio;
         node->cmd = NULL;
-        node->last_execution = 0;
+        node->long_press = 0;
+        node->ignore_event = false;
 
         //goto next value
         line_c = rest;
@@ -235,6 +238,12 @@ bool config_read(struct t_config *config, const char *config_file) {
             free(node);
             continue;
         }
+
+        //goto next value
+        line_c = skip_chars(line_c, 0, ',');
+
+        //long press timeout
+        node->long_press = (int)strtoimax(line_c, &line_c, 10);
 
         //goto next value
         line_c = skip_chars(line_c, 0, ',');

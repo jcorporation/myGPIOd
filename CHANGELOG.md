@@ -4,6 +4,19 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.4.0 (not yet released)
+
+This is the first larger release after the initial release.
+
+### Changelog
+
+- Rework build process to support the standard cmake build types
+- Restructure and document the source code
+- Add support for multiple actions for gpio events
+- Add support for long press detection
+
+***
+
 ## myGPIOd v0.3.0 (2023-10-09)
 
 This release adds bias support and requires therefor gpiod >= 1.5.0.

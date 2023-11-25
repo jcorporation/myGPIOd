@@ -1,26 +1,52 @@
-#Example mygpiod.conf
+# Example mygpiod.conf
 #
-#myGPIOd @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@
-#https://github.com/jcorporation/myGPIOd
+# myGPIOd @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@
+# https://github.com/jcorporation/myGPIOd
 #
-#logging
-#0 = emerg, 1 = alert, 2 = crit, 3 = error, 4 = warn, 5 = notice, 6 = info, 7 = debug
+# Logging
+# Valid values:
+# 0 = emerg, 1 = alert, 2 = crit, 3 = error, 4 = warn, 5 = notice, 6 = info, 7 = debug
 loglevel=5
+
+# Log destination
+# Valid values: true, false
+# - false = log to stdout
+# - true = log to syslog
 syslog=false
 
-#gpio chip number
+# GPIO chip number
 chip=0
 
-#trigger events
+# Trigger events
+# Valid values: falling, rising or both
 edge=falling
 #edge=rising
 #edge=both
-active_low=true
-#active_low=false
+
+# Sets the GPIO active state
+# Valid values: true, false
+# - true = GPIO considered active if it is low
+# - false = GPIO considered active if it is high
+active_low=false
+#active_low=true
+
+# Sets the internal pull-up or pull-down resistor
+# Valid values: as-is, disable, pull-down, pull-up
+# - as-is = do not change it
+# - disable = disables the internal resistor
+# - pull-down = pulls the gpio down
+# - pull-up = pulls the gpio up
 bias=as-is
 #bias=disable
 #bias=pull-down
 #bias=pull-up
 
-#gpio,edge,script
-#3,falling,echo "test 3"
+# Configuration of gpio line events
+# Comma delimited list of:
+# - GPIO number
+# - event: falling or rising
+# - long_press: number of seconds for long press detection, set it 0 for short press.
+#               this supports one short press and one long press entry for each gpio.
+# - script to run
+# gpio,edge,long_press,script
+#3,falling,0,echo "test 3"

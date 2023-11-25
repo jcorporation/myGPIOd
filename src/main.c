@@ -8,6 +8,7 @@
  */
 
 #include "compile_time.h"
+#include "action.h"
 #include "config.h"
 #include "event.h"
 #include "log.h"
@@ -59,9 +60,9 @@ int main(int argc, char **argv) {
         set_loglevel(LOG_NOTICE);
     #endif
 
-    MYGPIOD_LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
-    MYGPIOD_LOG_INFO("https://github.com/jcorporation/myGPIOd");
-    MYGPIOD_LOG_INFO("libgpiod %s", gpiod_version_string());
+    MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
+    MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
+    MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_version_string());
 
     // Handle commandline parameter
     char *config_file = NULL;
@@ -86,6 +87,7 @@ int main(int argc, char **argv) {
         free(config_file);
         return EXIT_FAILURE;
     }
+    free(config_file);
     
     // Set loglevel
     #ifdef MYGPIOD_DEBUG
@@ -95,7 +97,7 @@ int main(int argc, char **argv) {
     #endif
 
     if (config->syslog == true) {
-        openlog("myGPIOd", LOG_CONS, LOG_DAEMON);
+        openlog(MYGPIOD_NAME, LOG_CONS, LOG_DAEMON);
         log_to_syslog = true;
     }
 
@@ -124,7 +126,7 @@ int main(int argc, char **argv) {
         MYGPIOD_LOG_INFO("Entering event handling loop");
         int rv = gpiod_ctxless_event_monitor_multiple_ext(
             config->chip, config->edge, offsets, config->length,
-            config->active_low, "myGPIOd", &timeout, poll_callback,
+            config->active_low, MYGPIOD_NAME, &timeout, poll_callback,
             event_callback, &ctx, flags);
 
         if (rv == -1) {
@@ -134,9 +136,9 @@ int main(int argc, char **argv) {
     }
 
     // Cleanup
+    action_delay_abort(config);
     config_clear(config);
     free(config);
-    free(config_file);
     if (rc == EXIT_SUCCESS) {
         MYGPIOD_LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
     }

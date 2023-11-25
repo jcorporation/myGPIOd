@@ -12,6 +12,7 @@
 #include "log.h"
 
 #include <poll.h>
+#include <stdint.h>
 #include <unistd.h>
 
 // private definitions
@@ -21,6 +22,11 @@ static void handle_event(int event_type, unsigned line_offset, const struct time
 
 /**
  * Poll callback for gpiod_ctxless_event_monitor_multiple_ext
+ * It polls for:
+ * - gpio events
+ * - timerfd events for delayed actions
+ * - signalfd
+ *
  * @param num_lines count of gpios to poll
  * @param fds poll fds
  * @param timeout poll timeout
@@ -28,20 +34,29 @@ static void handle_event(int event_type, unsigned line_offset, const struct time
  * @return int 
  */
 int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, const struct timespec *timeout, void *data) {
-    struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES + 1];
+    struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES + 2];
     struct t_mon_ctx *ctx = data;
     unsigned i;
 
+    // gpio events
     for (i = 0; i < num_lines; i++) {
         pfds[i].fd = fds[i].fd;
         pfds[i].events = POLLIN | POLLPRI;
     }
 
+    // timer events
+    if (ctx->config->delayed_event.timer_fd > -1) {
+        pfds[i].fd = ctx->config->delayed_event.timer_fd;
+        pfds[i].events = POLLIN;
+        i++;
+    }
+
+    // signal fd
     pfds[i].fd = ctx->sigfd;
     pfds[i].events = POLLIN | POLLPRI;
 
+    // poll
     long ts = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
-
     int cnt = poll(pfds, num_lines + 1, (int)ts);
     if (cnt < 0) {
         return GPIOD_CTXLESS_EVENT_POLL_RET_ERR;
@@ -50,20 +65,33 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
         return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
     }
 
+    // gpio event
     int rv = cnt;
     for (i = 0; i < num_lines; i++) {
         if (pfds[i].revents) {
             fds[i].event = true;
             if (!--cnt) {
+                // abort delayed action
+                action_delay_abort(ctx->config);
+                // return to gpiod_ctxless_event_monitor_multiple_ext for event handling
                 return rv;
             }
         }
     }
 
-    /*
-     * If we're here, then there's a signal pending. No need to read it,
-     * we know we should quit now.
-     */
+    // timerfd event
+    if (ctx->config->delayed_event.timer_fd > -1) {
+        if (pfds[i].revents & POLLIN) {
+            uint64_t exp;
+            ssize_t s = read(pfds[i].fd, &exp, sizeof(uint64_t));
+            if (s == sizeof(uint64_t) && exp > 1) {
+                action_execute_delayed(ctx);
+                return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
+            }
+        }
+    }
+
+    // signalfd event - exit myGPIOd
     close(ctx->sigfd);
 
     return GPIOD_CTXLESS_EVENT_POLL_RET_STOP;
@@ -114,10 +142,10 @@ static void handle_event(int event_type, unsigned line_offset, const struct time
     ctx->events_done++;
 
     time_t now = time(NULL);
-    if (now < ctx->config->startup_time + 5) {
-        MYGPIOD_LOG_INFO("Ignoring events at startup");
+    if (now < ctx->config->startup_time + 2) {
+        MYGPIOD_LOG_DEBUG("Ignoring events at startup");
         return;
     }
     
-    action_execute(line_offset, timestamp, event_type, ctx->config);
+    action_handle(line_offset, timestamp, event_type, ctx->config);
 }

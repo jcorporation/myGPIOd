@@ -9,5 +9,6 @@
 
 // Version from cmake
 #define MYGPIOD_VERSION "${PROJECT_VERSION}"
+#define MYGPIOD_NAME "myGPIOd"
 
 #endif

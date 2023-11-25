@@ -33,17 +33,22 @@ The `./build.sh` script installs a startup script for systemd, openrc or sysVini
 
 ## Example configuration
 
-This example configuration calls `poweroff` if GPIO 3 is falling from high (1) to low (0).
+This example configuration does the following:
+
+- Enables the pull-up resistor for gpio number 3 on start
+- Calls `sudo /usr/sbin/reboot` after a button press of 2 seconds length
+- Calls `sudo /usr/sbin/poweroff` on a short press
 
 ```
 chip=0
-edge=falling
+edge=both
 active_low=true
 loglevel=4
 syslog=0
 bias=pull-up
-#gpio,edge,cmd
-3,falling,sudo /usr/sbin/poweroff 
+#gpio,edge,long_press,cmd
+3,rising,0,sudo /usr/sbin/poweroff
+3,falling,2,sudo /usr/sbin/reboot
 ```
 
 ## Copyright

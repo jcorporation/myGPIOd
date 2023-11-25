@@ -14,8 +14,14 @@ struct t_config_node {
     unsigned gpio;
     char *cmd;
     int edge;
+    int long_press;
+    bool ignore_event;
     struct t_config_node *next;
-    long last_execution;
+};
+
+struct t_delayed {
+    int timer_fd;
+    struct t_config_node *cn;
 };
 
 struct t_config {
@@ -29,6 +35,7 @@ struct t_config {
     int loglevel;
     time_t startup_time;
     bool syslog;
+    struct t_delayed delayed_event;
 };
 
 int bias_flags(const char *option);
