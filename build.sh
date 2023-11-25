@@ -78,13 +78,13 @@ setversion() {
 }
 
 buildrelease() {
-  echo "Compiling myGPIOd"
-  install -d release
-  cd release || exit 1
-  #set INSTALL_PREFIX and build mygpiod
-  export INSTALL_PREFIX="${MYGPIOD_INSTALL_PREFIX:-/usr}"
-  cmake -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX" -DCMAKE_BUILD_TYPE=Release ..
-  make
+  BUILD_TYPE=$1
+  echo "Compiling myGPIOd v${VERSION}"
+  cmake -B release \
+    -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+    -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+    .
+  make -j4 -C release
 }
 
 addmygpioduser() {
@@ -117,15 +117,23 @@ installrelease() {
 }
 
 builddebug() {
-  MEMCHECK=$1
-  echo "Compiling myGPIOd"
-  install -d debug
-  cd debug || exit 1
-  cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug -DMYGPIOD_ENABLE_LIBASAN="$MEMCHECK" \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-  make VERBOSE=1
+  echo "Compiling myGPIOd v${VERSION}"
+  CMAKE_SANITIZER_OPTIONS=""
+  case "$ACTION" in
+    asan)  CMAKE_SANITIZER_OPTIONS="-DMYGPIOD_ENABLE_ASAN=ON" ;;
+    tsan)  CMAKE_SANITIZER_OPTIONS="-DMYGPIOD_ENABLE_TSAN=ON" ;;
+    ubsan) CMAKE_SANITIZER_OPTIONS="-DMYGPIOD_ENABLE_UBSAN=ON" ;;
+  esac
+
+  cmake -B debug \
+    -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    $CMAKE_SANITIZER_OPTIONS \
+    .
+  make -j4 -C debug VERBOSE=1
   echo "Linking compilation database"
-  sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' -e 's/-static-libasan//g' compile_commands.json > ../src/compile_commands.json
+  sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' -e 's/-static-libasan//g' debug/compile_commands.json > src/compile_commands.json
 }
 
 cleanup() {
@@ -193,7 +201,7 @@ prepare() {
   for F in $SRC
   do
     [ "$F" = "$STARTPATH/osc" ] && continue
-    cp -av "$F" .
+    cp -a "$F" .
   done
 }
 
@@ -392,11 +400,11 @@ uninstall() {
     xargs rm -f < release/install_manifest.txt
   fi
 
-  #MYGPIOD_INSTALL_PREFIX="/usr"
+  #CMAKE_INSTALL_PREFIX="/usr"
   rm -f "$DESTDIR/usr/bin/mygpiod"
-   #MYGPIOD_INSTALL_PREFIX="/usr/local"
+   #CMAKE_INSTALL_PREFIX="/usr/local"
   rm -f "$DESTDIR/usr/local/bin/mygpiod"
-   #MYGPIOD_INSTALL_PREFIX="/opt/mygpiod/"
+  #CMAKE_INSTALL_PREFIX="/opt/mygpiod/"
   rm -rf "$DESTDIR/opt/mygpiod"
   #systemd
   rm -f "$DESTDIR/usr/lib/systemd/system/mygpiod.service"
@@ -411,15 +419,15 @@ uninstall() {
 }
 
 purge() {
-  #MYGPIOD_INSTALL_PREFIX="/usr"
+  #CMAKE_INSTALL_PREFIX="/usr"
   rm -rf "$DESTDIR/var/lib/mygpiod"
   rm -f "$DESTDIR/etc/mygpiod.conf"
   rm -f "$DESTDIR/etc/mygpiod.conf.dist"
   rm -f "$DESTDIR/etc/init.d/mygpiod"
-  #MYGPIOD_INSTALL_PREFIX="/usr/local"
+  #CMAKE_INSTALL_PREFIX="/usr/local"
   rm -f "$DESTDIR/usr/local/etc/mygpiod.conf"
   rm -f "$DESTDIR/usr/local/etc/mygpiod.conf.dist"
-  #MYGPIOD_INSTALL_PREFIX="/opt/mygpiod/"
+  #CMAKE_INSTALL_PREFIX="/opt/mygpiod/"
   rm -rf "$DESTDIR/var/opt/mygpiod"
   rm -rf "$DESTDIR/etc/opt/mygpiod"
   #remove user
@@ -448,22 +456,21 @@ else
 fi
 
 case "$ACTION" in
-  release)
-    buildrelease
+  release|MinSizeRel)
+    buildrelease "Release"
+  ;;
+  RelWithDebInfo)
+    buildrelease "RelWithDebInfo"
   ;;
   install)
     installrelease
   ;;
   releaseinstall)
     buildrelease
-    cd .. || exit 1
     installrelease
   ;;
-  debug)
-    builddebug "FALSE"
-  ;;
-  memcheck)
-    builddebug "TRUE"
+  debug|asan|tsan|ubsan)
+    builddebug
   ;;
   installdeps)
     installdeps
@@ -508,15 +515,15 @@ case "$ACTION" in
     echo "Version: ${VERSION}"
     echo ""
     echo "Build options:"
-    echo "  release:          build release files in directory release"
+    echo "  release:          build release files in directory release (stripped)"
+    echo "  RelWithDebInfo:   build release files in directory release (with debug info)"
     echo "  install:          installs release files from directory release"
     echo "                    following environment variables are respected"
     echo "                      - DESTDIR=\"\""
     echo "  releaseinstall:   calls release and install afterwards"
     echo "  debug:            builds debug files in directory debug,"
-    echo "                    linked with libasan3, uses assets in htdocs"
-    echo "  memcheck:         builds debug files in directory debug"
-    echo "                    for use with valgrind, uses assets in htdocs"
+    echo "  asan|tsan|ubsan:  builds debug files in directory debug"
+    echo "                    linked with the sanitizer"
     echo "  check:            runs cppcheck and flawfinder on source files"
     echo "                    following environment variables are respected"
     echo "                      - CPPCHECKOPTS=\"--enable=warning\""
@@ -550,10 +557,7 @@ case "$ACTION" in
     echo ""
     echo "Misc options:"
     echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
-    echo "  addmygpioduser:     adds mygpiod group and user"
-    echo ""
-    echo "Environment variables for building"
-    echo "  - MYGPIOD_INSTALL_PREFIX=\"/usr\""
+    echo "  addmygpioduser:   adds mygpiod group and user"
     echo ""
     exit 1
   ;;

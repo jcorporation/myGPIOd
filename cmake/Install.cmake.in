@@ -1,28 +1,47 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myMPD (c) 2018-2022 Juergen Mang <mail@jcgames.de>
-# https://github.com/jcorporation/mympd
+# myMPD (c) 2018-2023 Juergen Mang <mail@jcgames.de>
+# https://github.com/jcorporation/mygpiod
 
-#Install startup script
-if(EXISTS "/lib/systemd/system" OR EXISTS "/usr/lib/systemd/system")
+# Install startup script
+function(install_systemd)
   file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod.service"
        DESTINATION "/usr/lib/systemd/system"
        FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
-elseif(EXISTS "/sbin/openrc-run")
-  #Install openrc script
+endfunction()
+
+function(install_openrc)
   file(RENAME "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod.openrc"
-              "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod")
+       "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod")
   file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod"
        DESTINATION "/etc/init.d"
        FILE_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-elseif(EXISTS "/etc/init.d")
-  #Install sysVinit script
+endfunction()
+
+function(install_sysvinit)
   file(RENAME "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod.sysVinit"
-              "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod")
+       "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod")
   file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/initscripts/mygpiod"
        DESTINATION "/etc/init.d"
        FILE_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-else()
-  message("No supported init system found, no startup script was installed")
+endfunction()
+
+if("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "ON")
+  # Try to detect installes init system
+  if(EXISTS "/lib/systemd/system" OR EXISTS "/usr/lib/systemd/system")
+    install_systemd()
+  elseif(EXISTS "/sbin/openrc-run")
+    install_openrc()
+  elseif(EXISTS "/etc/init.d")
+    install_sysvinit()
+  else()
+    message("No supported init system found, no startup script was installed")
+  endif()
+elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "SYSTEMD")
+  install_systemd()
+elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "OPENRC")
+  install_openrc()
+elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "SYSVINIT")
+  install_sysvinit()
 endif()
 
 #Install mygpiod.conf

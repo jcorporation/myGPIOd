@@ -7,7 +7,7 @@
 #
 
 Name:           mygpiod
-Version:        0.3.0
+Version:        0.4.0
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
@@ -34,10 +34,8 @@ myGPIOd is a small daemon to call scripts on GPIO events.
 %setup -q -n %{name}-%{version}
 
 %build
-mkdir release
-cd release || exit 1
-cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_STRIP_BINARY=OFF ..
-make
+cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo  ..
+make -c release
 
 %install
 cd release || exit 1
@@ -59,5 +57,5 @@ true
 %config(noreplace) /etc/mygpiod.conf
 
 %changelog
-* Wed Oct 04 2023 Juergen Mang <mail@jcgames.de> 0.3.0-0
+* Sat Nov 25 2023 Juergen Mang <mail@jcgames.de> 0.4.0-0
 - Version from master

@@ -34,10 +34,8 @@ myGPIOd is a small daemon to call scripts on GPIO events.
 %setup -q -n %{name}-%{version}
 
 %build
-mkdir release
-cd release || exit 1
-cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_STRIP_BINARY=OFF ..
-make
+cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo  ..
+make -c release
 
 %install
 cd release || exit 1

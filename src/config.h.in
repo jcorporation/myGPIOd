@@ -10,9 +10,6 @@
 #include <stdbool.h>
 #include <time.h>
 
-// Debug build
-#cmakedefine MYGPIOD_DEBUG
-
 // Version from cmake
 #define MYGPIOD_VERSION "${PROJECT_VERSION}"
 
