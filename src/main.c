@@ -32,13 +32,6 @@ struct mon_ctx {
 
 struct t_config *config;
 
-static void signal_handler(int sig_num) {
-    //Reinstantiate signal handler
-    signal(sig_num, signal_handler);
-    s_signal_received = sig_num;
-    MYGPIOD_LOG_INFO("Signal %d received, exiting", sig_num);
-}
-
 static void execute_action(unsigned int offset, const struct timespec *ts, int event_type) {
     MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\"",
         (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? " RISING EDGE" : "FALLING EDGE"), 
@@ -215,11 +208,6 @@ int main(int argc, char **argv) {
     MYGPIOD_LOG_INFO("Starting myGPIOd %s", MYGPIOD_VERSION);
     MYGPIOD_LOG_INFO("https://github.com/jcorporation/myGPIOd");
     MYGPIOD_LOG_INFO("libgpiod %s", gpiod_version_string());
-
-    // Set signal handler
-    s_signal_received = 0;
-    signal(SIGTERM, signal_handler);
-    signal(SIGINT, signal_handler);
 
     // Handle commandline parameter
     char *config_file = NULL;
