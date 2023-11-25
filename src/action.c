@@ -108,15 +108,21 @@ static void action_delay(struct t_config *config, struct t_config_node *cn) {
     if (config->delayed_event.timer_fd > -1) {
         action_delay_abort(config);
     }
+    errno = 0;
     config->delayed_event.timer_fd = timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK | TFD_CLOEXEC);
+    if (config->delayed_event.timer_fd == -1) {
+        MYGPIOD_LOG_ERROR("Can not create timer: \"%s\"", strerror(errno));
+        return;
+    }
     struct itimerspec its;
     its.it_value.tv_sec = cn->long_press;
     its.it_value.tv_nsec = 0;
     its.it_interval.tv_sec = 0;
     its.it_interval.tv_nsec = 0;
-    
+
+    errno = 0;
     if (timerfd_settime(config->delayed_event.timer_fd, 0, &its, NULL) == -1) {
-        MYGPIOD_LOG_ERROR("Can not set expiration for timer");
+        MYGPIOD_LOG_ERROR("Can not set expiration for timer: \"%s\"", strerror(errno));
         action_delay_abort(config);
         return;
     }
