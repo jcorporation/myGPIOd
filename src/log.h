@@ -45,5 +45,7 @@ extern bool log_to_syslog;
 void log_log(int level, const char *file, int line, const char *fmt, ...)
     __attribute__ ((format (printf, 4, 5))); /* Flawfinder: ignore */
 void set_loglevel(int level);
+int parse_loglevel(const char *name);
+const char *lookup_loglevel(int level);
 
 #endif

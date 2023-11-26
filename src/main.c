@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     #ifdef MYGPIOD_DEBUG
         set_loglevel(LOG_DEBUG);
     #else
-        set_loglevel(LOG_NOTICE);
+        set_loglevel(CFG_LOGLEVEL);
     #endif
 
     MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
@@ -71,13 +71,19 @@ int main(int argc, char **argv) {
     }
 
     // create the array of gpios to monitor
-    unsigned offsets[GPIOD_LINE_BULK_MAX_LINES];
-    struct t_config_node *current = config->head;
+    // set the state for output gpios
+    unsigned gpios[GPIOD_LINE_BULK_MAX_LINES];
+    struct t_gpio_node *current = config->gpios;
     unsigned num_lines = 0;
     while (current != NULL) {
-        if (value_in_array(current->gpio, offsets, num_lines) == false) {
-            offsets[num_lines] = current->gpio;
+        if (current->mode == GPIO_MODE_INPUT &&
+            value_in_array(current->gpio, gpios, num_lines) == false)
+        {
+            gpios[num_lines] = current->gpio;
             num_lines++;
+        }
+        if (current->mode == GPIO_MODE_OUTPUT) {
+            //TODO(): set gpio
         }
         current = current->next;
     }
@@ -95,7 +101,7 @@ int main(int argc, char **argv) {
     
     // set flags for bias support
     int flags = 0;
-    flags |= bias_flags(config->bias);
+    flags |= config->bias;
 
     // poll timeout
     struct timespec timeout = { 10, 0 };
@@ -103,7 +109,7 @@ int main(int argc, char **argv) {
     // Main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
     int rv = gpiod_ctxless_event_monitor_multiple_ext(
-        config->chip, config->edge, offsets, config->length,
+        config->chip, config->edge, gpios, config->length,
         config->active_low, MYGPIOD_NAME, &timeout, poll_callback,
         event_callback, &ctx, flags);
 

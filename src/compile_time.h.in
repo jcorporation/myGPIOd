@@ -7,8 +7,16 @@
 #ifndef COMPILE_TIME_H
 #define COMPILE_TIME_H
 
-// Version from cmake
+// Version and name from cmake
 #define MYGPIOD_VERSION "${PROJECT_VERSION}"
-#define MYGPIOD_NAME "myGPIOd"
+#define MYGPIOD_NAME "${PROJECT_NAME}"
+
+// Defaults
+#define CFG_CHIP "0"
+#define CFG_ACTIVE_LOW true
+#define CFG_BIAS 0
+#define CFG_EDGE GPIOD_CTXLESS_EVENT_FALLING_EDGE
+#define CFG_LOGLEVEL LOG_NOTICE
+#define CFG_SYSLOG false
 
 #endif

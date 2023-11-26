@@ -10,27 +10,43 @@
 #include <stdbool.h>
 #include <time.h>
 
-struct t_config_node {
+enum gpio_modes {
+    GPIO_MODE_INPUT = 0,
+    GPIO_MODE_OUTPUT
+};
+
+enum gpio_values {
+    GPIO_VALUE_UNSET = 0,
+    GPIO_VALUE_LOW,
+    GPIO_VALUE_HIGH
+};
+
+struct t_gpio_node {
     unsigned gpio;
+    enum gpio_modes mode;
+    // for inputs
     char *cmd;
     int edge;
     int long_press;
     bool ignore_event;
-    struct t_config_node *next;
+    // for outputs
+    enum gpio_values value;
+    // link to next
+    struct t_gpio_node *next;
 };
 
 struct t_delayed {
     int timer_fd;
-    struct t_config_node *cn;
+    struct t_gpio_node *cn;
 };
 
 struct t_config {
-    struct t_config_node *head;
-    struct t_config_node *tail;
+    struct t_gpio_node *gpios;
+    struct t_gpio_node *gpios_tail;
     unsigned length;
     int edge;
     bool active_low;
-    char *bias;
+    int bias;
     char *chip;
     int loglevel;
     time_t startup_time;
@@ -38,7 +54,6 @@ struct t_config {
     struct t_delayed delayed_event;
 };
 
-int bias_flags(const char *option);
 void config_clear(struct t_config *config);
 bool config_read(struct t_config *config, const char *config_file);
 struct t_config *config_new(void);

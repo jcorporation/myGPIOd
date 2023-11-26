@@ -5,8 +5,8 @@
 #
 # Logging
 # Valid values:
-# 0 = emerg, 1 = alert, 2 = crit, 3 = error, 4 = warn, 5 = notice, 6 = info, 7 = debug
-loglevel=5
+# emerg, alert, crit, error, warn, notice, info, debug
+loglevel=notice
 
 # Log destination
 # Valid values: true, false
@@ -41,12 +41,19 @@ bias=as-is
 #bias=pull-down
 #bias=pull-up
 
-# Configuration of gpio line events
+# Configuration of gpio modes, values and events
 # Comma delimited list of:
 # - GPIO number
-# - event: falling or rising
-# - long_press: number of seconds for long press detection, set it 0 for short press.
-#               this supports one short press and one long press entry for each gpio.
-# - script to run
+# - mode: in or out
+# For mode: in
+#   - event: falling or rising
+#   - long_press: number of seconds for long press detection, set it 0 for short press.
+#                 this supports one short press and one long press entry for each gpio.
+#   - script to run
+# For mode: out
+#   - value: high or low
 # gpio,edge,long_press,script
-#3,falling,0,echo "test 3"
+# Example for mode: in
+#3,in,falling,0,true
+# Example for mode: out
+#4,out,high

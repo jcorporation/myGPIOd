@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 // private definitions
-static void handle_event(int event_type, unsigned line_offset, const struct timespec *timestamp, void *data);
+static void handle_event(int event_type, unsigned gpio, const struct timespec *timestamp, void *data);
 
 // public functions
 
@@ -31,7 +31,7 @@ static void handle_event(int event_type, unsigned line_offset, const struct time
  * @param fds poll fds
  * @param timeout poll timeout
  * @param data void pointer to t_mon_ctx
- * @return int 
+ * @return int
  */
 int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, const struct timespec *timeout, void *data) {
     struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES + 2];
@@ -100,18 +100,18 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
 /**
  * Event callback for gpiod_ctxless_event_monitor_multiple_ext
  * @param event_type the event type: rising or falling
- * @param line_offset the gpio number
+ * @param gpio the gpio number
  * @param timestamp timestamp of the event
  * @param data void pointer to t_mon_ctx
  * @return 0 on success
  */
-int event_callback(int event_type, unsigned line_offset, const struct timespec *timestamp, void *data) {
+int event_callback(int event_type, unsigned gpio, const struct timespec *timestamp, void *data) {
     struct t_mon_ctx *ctx = data;
 
     switch (event_type) {
         case GPIOD_CTXLESS_EVENT_CB_RISING_EDGE:
         case GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE:
-            handle_event(event_type, line_offset, timestamp, ctx);
+            handle_event(event_type, gpio, timestamp, ctx);
             break;
         default:
             /*
@@ -121,7 +121,9 @@ int event_callback(int event_type, unsigned line_offset, const struct timespec *
             return GPIOD_CTXLESS_EVENT_CB_RET_OK;
     }
 
-    if (ctx->events_wanted && ctx->events_done >= ctx->events_wanted) {
+    if (ctx->events_wanted &&
+        ctx->events_done >= ctx->events_wanted)
+    {
         return GPIOD_CTXLESS_EVENT_CB_RET_STOP;
     }
 
@@ -133,11 +135,11 @@ int event_callback(int event_type, unsigned line_offset, const struct timespec *
 /**
  * Event handler
  * @param event_type the event type: rising or falling
- * @param line_offset the gpio number
+ * @param gpio the gpio number
  * @param timestamp timestamp of the event
  * @param data void pointer to t_mon_ctx
  */
-static void handle_event(int event_type, unsigned line_offset, const struct timespec *timestamp, void *data) {
+static void handle_event(int event_type, unsigned gpio, const struct timespec *timestamp, void *data) {
     struct t_mon_ctx *ctx = data;
     ctx->events_done++;
 
@@ -146,6 +148,6 @@ static void handle_event(int event_type, unsigned line_offset, const struct time
         MYGPIOD_LOG_DEBUG("Ignoring events at startup");
         return;
     }
-    
-    action_handle(line_offset, timestamp, event_type, ctx->config);
+
+    action_handle(gpio, timestamp, event_type, ctx->config);
 }

@@ -19,23 +19,23 @@
 #include <unistd.h>
 
 // private definitions
-static void action_delay(struct t_config *config, struct t_config_node *cn);
-static void action_execute(struct t_config_node *cn);
+static void action_delay(struct t_config *config, struct t_gpio_node *cn);
+static void action_execute(struct t_gpio_node *cn);
 
 // public functions
 
 /**
  * Handles the configured actions for an event.
  * It forks and executes the script via system() call
- * @param offset the gpio number
+ * @param gpio the gpio number
  * @param ts timestamp of the event
  * @param event_type the event type
  * @param config pointer to myGPIOd config
  */
-void action_handle(unsigned offset, const struct timespec *ts, int event_type, struct t_config *config) {
-    MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\"",
-        (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? " RISING EDGE" : "FALLING EDGE"), 
-        offset, (long long)ts->tv_sec, ts->tv_nsec);
+void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_config *config) {
+    MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\" ",
+        (event_type == GPIOD_CTXLESS_EVENT_CB_RISING_EDGE ? "RISING EDGE" : "FALLING EDGE"), 
+        gpio, (long long)ts->tv_sec, ts->tv_nsec);
 
     //map GPIOD_CTXLESS_EVENT_CB_* to GPIOD_CTXLESS_EVENT_*
     if (event_type == GPIOD_CTXLESS_EVENT_CB_FALLING_EDGE) {
@@ -45,11 +45,12 @@ void action_handle(unsigned offset, const struct timespec *ts, int event_type, s
         event_type = GPIOD_CTXLESS_EVENT_RISING_EDGE;
     }
     
-    //get cmd
-    struct t_config_node *current = config->head;
+    //find and execute actions
+    struct t_gpio_node *current = config->gpios;
     while (current != NULL) {
-       if (current->gpio == offset && 
-            (current->edge == GPIOD_CTXLESS_EVENT_BOTH_EDGES || current->edge == event_type))
+       if (current->mode == GPIO_MODE_INPUT &&
+           current->gpio == gpio && 
+           (current->edge == GPIOD_CTXLESS_EVENT_BOTH_EDGES || current->edge == event_type))
         {
             if (current->ignore_event == true) {
                 // ignore this event, it was a long press
@@ -106,7 +107,7 @@ void action_delay_abort(struct t_config *config) {
  * @param config pointer to config
  * @param cn pointer to gpio event config
  */
-static void action_delay(struct t_config *config, struct t_config_node *cn) {
+static void action_delay(struct t_config *config, struct t_gpio_node *cn) {
     if (config->delayed_event.timer_fd > -1) {
         action_delay_abort(config);
     }
@@ -135,7 +136,10 @@ static void action_delay(struct t_config *config, struct t_config_node *cn) {
  * Runs a system command in a new process
  * @param cn pointer to gpio config
  */
-static void action_execute(struct t_config_node *cn) {
+static void action_execute(struct t_gpio_node *cn) {
+    if (cn->cmd == NULL) {
+        MYGPIOD_LOG_INFO("Command for gpio %u is empty", cn->gpio);
+    }
     MYGPIOD_LOG_INFO("Executing \"%s\"", cn->cmd);
     errno = 0;
     int rc = fork();

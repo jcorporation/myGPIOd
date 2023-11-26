@@ -12,7 +12,7 @@
 
 #include <time.h>
 
-void action_handle(unsigned int offset, const struct timespec *ts, int event_type, struct t_config *config);
+void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_config *config);
 void action_delay_abort(struct t_config *config);
 void action_execute_delayed(struct t_mon_ctx *ctx);
 

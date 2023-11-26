@@ -4,6 +4,7 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+#include "compile_time.h"
 #include "log.h"
 
 #include <stdarg.h>
@@ -44,6 +45,38 @@ static const char *loglevel_colors[] = {
     "",
     "\033[0;34m"
 };
+
+/**
+ * Parses the loglevel name in its enum.
+ * Returns the default loglevel on error.
+ * @param name string to parse
+ * @return loglevel
+ */
+int parse_loglevel(const char *name) {
+    for (int i = 0; i < 8; i++) {
+        if (strcasecmp(name, loglevel_names[i]) == 0) {
+            return i;
+        }
+    }
+    // default loglevel is INFO
+    MYGPIOD_LOG_WARN("Could not parse loglevel, setting default");
+    return CFG_SYSLOG;
+}
+
+/**
+ * Lookups the loglevel name
+ * @param level the loglevel
+ * @return name
+ */
+const char *lookup_loglevel(int level) {
+    if (level > 0 &&
+        level < 8)
+    {
+        return loglevel_names[level];
+    }
+    MYGPIOD_LOG_WARN("Could not lookup loglevel");
+    return "";
+}
 
 /**
  * Sets the loglevel
