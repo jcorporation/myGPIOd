@@ -43,7 +43,7 @@ struct t_delayed {
 struct t_config {
     struct t_gpio_node *gpios;
     struct t_gpio_node *gpios_tail;
-    unsigned length;
+    unsigned gpio_count;
     int edge;
     bool active_low;
     int bias;

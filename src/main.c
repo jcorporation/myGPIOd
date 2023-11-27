@@ -72,20 +72,29 @@ int main(int argc, char **argv) {
 
     // create the array of gpios to monitor
     // set the state for output gpios
-    unsigned gpios[GPIOD_LINE_BULK_MAX_LINES];
+    unsigned gpios_in[GPIOD_LINE_BULK_MAX_LINES];
+    unsigned gpios_in_count = 0;
+    unsigned gpios_out_count = 0;
     struct t_gpio_node *current = config->gpios;
-    unsigned num_lines = 0;
     while (current != NULL) {
         if (current->mode == GPIO_MODE_INPUT &&
-            value_in_array(current->gpio, gpios, num_lines) == false)
+            value_in_array(current->gpio, gpios_in, gpios_in_count) == false)
         {
-            gpios[num_lines] = current->gpio;
-            num_lines++;
+            gpios_in[gpios_in_count] = current->gpio;
+            gpios_in_count++;
         }
         if (current->mode == GPIO_MODE_OUTPUT) {
-            //TODO(): set gpio
+            //TODO: set gpio
+            gpios_out_count++;
         }
         current = current->next;
+    }
+
+    if (gpios_in_count == 0) {
+        MYGPIOD_LOG_ERROR("No gpios for monitoring configured");
+        config_clear(config);
+        free(config);
+        return EXIT_FAILURE;
     }
 
     // data structure
@@ -108,8 +117,9 @@ int main(int argc, char **argv) {
 
     // Main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
+    MYGPIOD_LOG_INFO("Monitoring %u gpios", gpios_in_count);
     int rv = gpiod_ctxless_event_monitor_multiple_ext(
-        config->chip, config->edge, gpios, config->length,
+        config->chip, config->edge, gpios_in, gpios_in_count,
         config->active_low, MYGPIOD_NAME, &timeout, poll_callback,
         event_callback, &ctx, flags);
 

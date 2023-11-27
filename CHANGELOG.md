@@ -10,10 +10,11 @@ This is the first larger release after the initial release.
 
 ### Changelog
 
-- Rework build process to support the standard cmake build types
-- Restructure and document the source code
-- Add support for multiple actions for gpio events
-- Add support for long press detection
+- Feat: Rework build process to support the standard cmake build types
+- Feat: Multiple actions for gpio events
+- Feat: Long press detection
+- Feat: Set gpio output states
+- Upd: Restructure and document the source code
 
 ***
 

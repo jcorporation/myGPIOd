@@ -54,8 +54,8 @@ int make_signalfd(void) {
  * @return true if value is in array, else false
  */
 bool value_in_array(unsigned value, unsigned *array, size_t len) {
-    for(size_t i = 0; i < len; i++) {
-        if(array[i] == value)
+    for (size_t i = 0; i < len; i++) {
+        if (array[i] == value)
             return true;
     }
     return false;

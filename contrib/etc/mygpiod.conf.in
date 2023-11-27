@@ -1,6 +1,6 @@
 # Example mygpiod.conf
 #
-# myGPIOd @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@
+# myGPIOd ${PROJECT_VERSION}
 # https://github.com/jcorporation/myGPIOd
 #
 # Logging
@@ -27,8 +27,8 @@ edge=falling
 # Valid values: true, false
 # - true = GPIO considered active if it is low
 # - false = GPIO considered active if it is high
-active_low=false
-#active_low=true
+active_low=true
+#active_low=false
 
 # Sets the internal pull-up or pull-down resistor
 # Valid values: as-is, disable, pull-down, pull-up

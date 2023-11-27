@@ -40,7 +40,7 @@ struct t_config *config_new(void) {
     }
     config->gpios = NULL;
     config->gpios_tail = NULL;
-    config->length = 0;
+    config->gpio_count = 0;
     config->chip = strdup(CFG_CHIP);
     config->active_low = CFG_ACTIVE_LOW;
     config->bias = CFG_BIAS;
@@ -211,6 +211,7 @@ static bool parse_config_line(char *line, struct t_config *config) {
  * @return true on success, else false
  */
 static bool parse_gpio_input_line(struct t_gpio_node *node, char *line) {
+    node->mode = GPIO_MODE_INPUT;
     line = skip_chars(line, 2, ',');
     char edge[8] = { 0 };
     for (int i = 0; i < 8 && line[0] != ','; i++, line++) {
@@ -249,6 +250,7 @@ static bool parse_gpio_input_line(struct t_gpio_node *node, char *line) {
  * @return true on success, else false
  */
 static bool parse_gpio_output_line(struct t_gpio_node *node, char *line) {
+    node->mode = GPIO_MODE_OUTPUT;
     line = skip_chars(line, 3, ',');
     if (strcasecmp(line, "high") == 0) {
         node->value = GPIO_VALUE_HIGH;
@@ -281,7 +283,7 @@ static bool config_node_push(struct t_config *config, struct t_gpio_node *node) 
     }
 
     config->gpios_tail = node;
-    config->length++;
+    config->gpio_count++;
     return true;
 }
 

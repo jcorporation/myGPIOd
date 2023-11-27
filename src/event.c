@@ -38,6 +38,8 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
     struct t_mon_ctx *ctx = data;
     unsigned i;
 
+    MYGPIOD_LOG_DEBUG("Starting poll callback");
+
     // gpio events
     for (i = 0; i < num_lines; i++) {
         pfds[i].fd = fds[i].fd;
@@ -46,6 +48,7 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
 
     // timer events
     if (ctx->config->delayed_event.timer_fd > -1) {
+        MYGPIOD_LOG_DEBUG("Poll: Adding delayed event timer fd");
         pfds[i].fd = ctx->config->delayed_event.timer_fd;
         pfds[i].events = POLLIN;
         i++;
@@ -54,14 +57,17 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
     // signal fd
     pfds[i].fd = ctx->sigfd;
     pfds[i].events = POLLIN | POLLPRI;
+    i++;
 
     // poll
     long ts = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
-    int cnt = poll(pfds, num_lines + 1, (int)ts);
+    int cnt = poll(pfds, i, (int)ts);
     if (cnt < 0) {
+        MYGPIOD_LOG_ERROR("Failure polling fds");
         return GPIOD_CTXLESS_EVENT_POLL_RET_ERR;
     }
     if (cnt == 0) {
+        MYGPIOD_LOG_DEBUG("Poll timeout");
         return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
     }
 
@@ -71,6 +77,7 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
         if (pfds[i].revents) {
             fds[i].event = true;
             if (!--cnt) {
+                MYGPIOD_LOG_DEBUG("GPIO event detected");
                 // abort delayed action
                 action_delay_abort(ctx->config);
                 // return to gpiod_ctxless_event_monitor_multiple_ext for event handling
@@ -85,6 +92,7 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
             uint64_t exp;
             ssize_t s = read(pfds[i].fd, &exp, sizeof(uint64_t));
             if (s == sizeof(uint64_t) && exp > 1) {
+                MYGPIOD_LOG_DEBUG("Long press timer event detected");
                 action_execute_delayed(ctx);
                 return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
             }
@@ -92,6 +100,7 @@ int poll_callback(unsigned num_lines, struct gpiod_ctxless_event_poll_fd *fds, c
     }
 
     // signalfd event - exit myGPIOd
+    MYGPIOD_LOG_DEBUG("Pending signal detected");
     close(ctx->sigfd);
 
     return GPIOD_CTXLESS_EVENT_POLL_RET_STOP;
