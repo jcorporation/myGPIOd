@@ -17,21 +17,27 @@
 #include <string.h>
 #include <sys/signalfd.h>
 
-int flags_to_line_request_flags(bool active_low, int flags) {
+/**
+ * Sets the line requests flags from active_low and bias
+ * @param active_low active_low settings
+ * @param bias bias
+ * @return the line request flags
+ */
+int line_request_flags(bool active_low, int bias) {
     int req_flags = 0;
 
-    if (active_low)
+    if (active_low == true) {
         req_flags |= GPIOD_LINE_REQUEST_FLAG_ACTIVE_LOW;
-    if (flags & GPIOD_CTXLESS_FLAG_OPEN_DRAIN)
-        req_flags |= GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN;
-    if (flags & GPIOD_CTXLESS_FLAG_OPEN_SOURCE)
-        req_flags |= GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE;
-    if (flags & GPIOD_CTXLESS_FLAG_BIAS_DISABLE)
+    }
+    if (bias == GPIOD_LINE_BIAS_DISABLE) {
         req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_DISABLE;
-    if (flags & GPIOD_CTXLESS_FLAG_BIAS_PULL_UP)
-        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_UP;
-    if (flags & GPIOD_CTXLESS_FLAG_BIAS_PULL_DOWN)
+    }
+    else if (bias == GPIOD_LINE_BIAS_PULL_DOWN) {
         req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_DOWN;
+    }
+    else if (bias == GPIOD_LINE_BIAS_PULL_UP) {
+        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_UP;
+    }
 
     return req_flags;
 }
@@ -116,16 +122,16 @@ const char *bool_to_str(bool v) {
  */
 int parse_bias(const char *str) {
     if (strcasecmp(str, "pull-down") == 0) {
-        return GPIOD_CTXLESS_FLAG_BIAS_PULL_DOWN;
+        return GPIOD_LINE_BIAS_PULL_DOWN;
     }
     if (strcasecmp(str, "pull-up") == 0) {
-        return GPIOD_CTXLESS_FLAG_BIAS_PULL_UP;
+        return GPIOD_LINE_BIAS_PULL_UP;
     }
     if (strcasecmp(str, "disable") == 0) {
-        return GPIOD_CTXLESS_FLAG_BIAS_DISABLE;
+        return GPIOD_LINE_BIAS_DISABLE;
     }
     if (strcasecmp(str, "as-is") == 0) {
-        return 0;
+        return GPIOD_LINE_BIAS_AS_IS;
     }
     // Bias set to as-is
     MYGPIOD_LOG_WARN("Could not parse bias, setting default");
@@ -139,13 +145,13 @@ int parse_bias(const char *str) {
  */
 const char *lookup_bias(int bias) {
     switch(bias) {
-        case 0:
+        case GPIOD_LINE_BIAS_AS_IS:
             return "as-is";
-        case GPIOD_CTXLESS_FLAG_BIAS_PULL_DOWN:
+        case GPIOD_LINE_BIAS_PULL_DOWN:
             return "pull-down";
-        case GPIOD_CTXLESS_FLAG_BIAS_PULL_UP:
+        case GPIOD_LINE_BIAS_PULL_UP:
             return "pull-up";
-        case GPIOD_CTXLESS_FLAG_BIAS_DISABLE:
+        case GPIOD_LINE_BIAS_DISABLE:
             return "disable";
     }
     MYGPIOD_LOG_WARN("Could not lookup bias");
@@ -172,9 +178,9 @@ int parse_event_request(const char *str) {
 }
 
 /**
- * Lookups the string for CTXLESS_EVENT_*
- * @param event the CTXLESS_EVENT enum
- * @return name
+ * Lookups the string for the event request
+ * @param event events to request
+ * @return the name of the event request
  */
 const char *lookup_event_request(int event) {
     switch(event) {
@@ -190,37 +196,16 @@ const char *lookup_event_request(int event) {
 }
 
 /**
- * Parses the event setting for a gpio
- * @param str string to parse
- * @return GPIOD_CTXLESS_EVENT enum or GPIOD_CTXLESS_EVENT_FALLING_EDGE on error
- */
-int parse_event(const char *str) {
-    if (strcasecmp(str, "falling") == 0) {
-        return GPIOD_CTXLESS_EVENT_FALLING_EDGE;
-    }
-    if (strcasecmp(str, "rising") == 0) {
-        return GPIOD_CTXLESS_EVENT_RISING_EDGE;
-    }
-    if (strcasecmp(str, "both") == 0) {
-        return GPIOD_CTXLESS_EVENT_BOTH_EDGES;
-    }
-    MYGPIOD_LOG_WARN("Could not parse event, setting default");
-    return GPIOD_CTXLESS_EVENT_FALLING_EDGE;
-}
-
-/**
- * Lookups the string for CTXLESS_EVENT_*
- * @param event the CTXLESS_EVENT enum
- * @return name
+ * Lookups the string for a gpio event
+ * @param event the event
+ * @return name of the event
  */
 const char *lookup_event(int event) {
     switch(event) {
-        case GPIOD_CTXLESS_EVENT_FALLING_EDGE:
+        case GPIOD_LINE_EVENT_FALLING_EDGE:
             return "falling";
-        case GPIOD_CTXLESS_EVENT_RISING_EDGE:
+        case GPIOD_LINE_EVENT_RISING_EDGE:
             return "rising";
-        case GPIOD_CTXLESS_EVENT_BOTH_EDGES:
-            return "both";
     }
     MYGPIOD_LOG_WARN("Could not lookup event");
     return "";

@@ -12,19 +12,15 @@
 #include <stdbool.h>
 #include <time.h>
 
-enum gpio_modes {
-    GPIO_MODE_INPUT = 0,
-    GPIO_MODE_OUTPUT
-};
-
 enum gpio_values {
     GPIO_VALUE_LOW = 0,
     GPIO_VALUE_HIGH
 };
 
 struct t_gpio_node_in {
-    char *cmd;
-    int event;
+    char *cmd_rising;
+    char *cmd_falling;
+    int request_event;
     int fd;
     int long_press_timeout;
     char *long_press_cmd;
@@ -43,7 +39,8 @@ struct t_config {
     int event_request;
     bool active_low;
     int bias;
-    char *chip;
+    char *chip_name;
+    struct gpiod_chip *chip;
     int loglevel;
     bool syslog;
     int signal_fd;

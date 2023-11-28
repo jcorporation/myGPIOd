@@ -20,7 +20,7 @@
 
 // private definitions
 static void action_delay(struct t_gpio_node_in *node);
-static void action_execute(unsigned gpio, struct t_gpio_node_in *node, bool long_press);
+static void action_execute(const char *cmd);
 
 // public functions
 
@@ -30,44 +30,75 @@ static void action_execute(unsigned gpio, struct t_gpio_node_in *node, bool long
  * @param gpio the gpio number
  * @param ts timestamp of the event
  * @param event_type the event type
- * @param config pointer to myGPIOd config
+ * @param node gpio config data
  */
 void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_gpio_node_in *node) {
     MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\" ",
-        (event_type == GPIOD_CTXLESS_EVENT_RISING_EDGE ? "RISING" : "FALLING"), 
+        lookup_event(event_type),
         gpio, (long long)ts->tv_sec, ts->tv_nsec);
 
     if (node->ignore_event == true) {
         node->ignore_event = false;
         return;
     }
-    if (node->event == event_type ||
-        node->event == GPIOD_CTXLESS_EVENT_BOTH_EDGES)
-    {
-        action_execute(gpio, node, false);
+    if (event_type == GPIOD_LINE_EVENT_FALLING_EDGE) {
+        if (node->cmd_falling != NULL) {
+            if (node->request_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE ||
+                node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
+            {
+                action_execute(node->cmd_falling);
+            }
+        }
+        if (node->long_press_event == GPIOD_LINE_EVENT_FALLING_EDGE &&
+            node->long_press_cmd != NULL &&
+            node->long_press_timeout > 0)
+        {
+            action_delay(node);
+        }
     }
-    else if (node->long_press_timeout > 0 &&
-             node->long_press_event == event_type)
-    {
-        action_delay(node);
+    else {
+        if (node->cmd_rising != NULL) {
+            if (node->request_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE ||
+                node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
+            {
+                action_execute(node->cmd_rising);
+            }
+        }
+        if (node->long_press_event == GPIOD_LINE_EVENT_RISING_EDGE &&
+            node->long_press_cmd != NULL &&
+            node->long_press_timeout > 0)
+        {
+            action_delay(node);
+        }
     }
 }
 
 /**
  * Checks if the gpio value has not changed since the initial event 
  * and executes the defined action
- * @param ctx 
+ * @param gpio the gpio number
+ * @param node gpio config data
+ * @param config config
  */
 void action_execute_delayed(unsigned gpio, struct t_gpio_node_in *node, struct t_config *config) {
     // check if gpio value has not changed
-    int rv = gpiod_ctxless_get_value(config->chip, gpio, config->active_low, MYGPIOD_NAME);
+    struct gpiod_line *line = gpiod_chip_get_line(config->chip, gpio);
+    if (line == NULL) {
+        MYGPIOD_LOG_ERROR("Error getting gpio %u", gpio);
+        return;
+    }
+    errno = 0;
+    int rv = gpiod_line_get_value(line);
     if (rv < 0) {
-        MYGPIOD_LOG_ERROR("Error reading value from gpio %u", gpio);
+        MYGPIOD_LOG_ERROR("Error reading value from gpio %u: %s", gpio, strerror(errno));
         return;
     }
     if (rv == 1) {
-        action_execute(gpio, node, true);
-        node->ignore_event = true;
+        action_execute(node->long_press_cmd);
+        if (node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES) {
+            // ignore the release event
+            node->ignore_event = true;
+        }
     }
     // remove timerfd
     action_delay_abort(node);
@@ -88,8 +119,8 @@ void action_delay_abort(struct t_gpio_node_in *node) {
 
 /**
  * Creates a timerfd for the long press action
- * @param config pointer to config
- * @param cn pointer to gpio event config
+ * @param node gpio config data
+ * @param event_type the event type
  */
 static void action_delay(struct t_gpio_node_in *node) {
     if (node->timer_fd > -1) {
@@ -117,18 +148,9 @@ static void action_delay(struct t_gpio_node_in *node) {
 
 /**
  * Runs a system command in a new process
- * @param cn pointer to gpio config
+ * @param cmd command to execute
  */
-static void action_execute(unsigned gpio, struct t_gpio_node_in *node, bool long_press) {
-    char *cmd = long_press == false
-        ? node->cmd
-        : node->long_press_cmd;
-    int event = long_press == false
-        ? node->event
-        : node->long_press_event;
-    if (cmd == NULL) {
-        MYGPIOD_LOG_INFO("Command for gpio %u is empty", gpio);
-    }
+static void action_execute(const char *cmd) {
     MYGPIOD_LOG_INFO("Executing \"%s\"", cmd);
     errno = 0;
     int rc = fork();
@@ -137,16 +159,9 @@ static void action_execute(unsigned gpio, struct t_gpio_node_in *node, bool long
     }
     else if (rc == 0) {
         // this is the child process
-        char gpio_str[16];
-        snprintf(gpio_str, 16, "MYGPIOD_GPIO=%u", gpio);
-        char event_str[16];
-        snprintf(event_str, 16, "MYGPIOD_EVENT=%d", event);
-
-        char *exec_argv[2] = { cmd, NULL };
-        char *exec_envp[4] = { gpio_str, event_str, NULL };
         errno = 0;
-        execve(cmd, exec_argv, exec_envp);
-        // successful execve call does not return
+        execl(cmd, cmd, (char *)NULL);
+        // successful execl call does not return
         MYGPIOD_LOG_ERROR("Error executing cmd \"%s\": %s", cmd, strerror(errno));
         exit(EXIT_FAILURE);
     }

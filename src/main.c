@@ -42,9 +42,7 @@ const char *__asan_default_options(void) {
 int main(int argc, char **argv) {
     int rc = EXIT_SUCCESS;
     unsigned i;
-    struct gpiod_chip *chip = NULL;
     struct gpiod_line *line;
-    struct gpiod_line_event event;
 
     log_on_tty = isatty(fileno(stdout))
         ? true
@@ -105,9 +103,9 @@ int main(int argc, char **argv) {
     }
 
     // open the chip
-    MYGPIOD_LOG_INFO("Opening chip \"%s\"", config->chip);
-    chip = gpiod_chip_open_lookup(config->chip);
-    if (chip == NULL) {
+    MYGPIOD_LOG_INFO("Opening chip \"%s\"", config->chip_name);
+    config->chip = gpiod_chip_open_lookup(config->chip_name);
+    if (config->chip == NULL) {
         MYGPIOD_LOG_ERROR("Error opening chip");
         rc = EXIT_FAILURE;
         goto out;
@@ -121,7 +119,7 @@ int main(int argc, char **argv) {
         struct t_list_node *current = config->gpios_out.head;
         i = 0;
         while (current != NULL) {
-            line = gpiod_chip_get_line(chip, current->gpio);
+            line = gpiod_chip_get_line(config->chip, current->gpio);
             if (line == NULL) {
                 MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->gpio);
                 rc = EXIT_FAILURE;
@@ -136,7 +134,7 @@ int main(int argc, char **argv) {
         }
 
         // set values
-        int req_flags = flags_to_line_request_flags(config->active_low, 0);
+        int req_flags = line_request_flags(config->active_low, 0);
         errno = 0;
         int rv = gpiod_line_request_bulk_output_flags(&bulk_out, MYGPIOD_NAME,
             req_flags, gpios_out_values);
@@ -152,26 +150,21 @@ int main(int argc, char **argv) {
     gpiod_line_bulk_init(&bulk_in);
     struct t_list_node *current = config->gpios_in.head;
     while (current != NULL) {
-        line = gpiod_chip_get_line(chip, current->gpio);
+        line = gpiod_chip_get_line(config->chip, current->gpio);
         if (line == NULL) {
             MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->gpio);
             rc = EXIT_FAILURE;
             goto out;
         }
         struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
-        MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s", current->gpio, lookup_event(data->event));
-        if (data->long_press_timeout > 0) {
-            MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring long press event: %s", current->gpio, lookup_event(data->long_press_event));
-        }
+        MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s", current->gpio, lookup_event_request(data->request_event));
         gpiod_line_bulk_add(&bulk_in, line);
         current = current->next;
     }
 
-    // set flags for bias support
+    // set request flags
     struct gpiod_line_request_config conf;
-    int flags = 0;
-    flags |= config->bias;
-    conf.flags = flags_to_line_request_flags(config->active_low, flags);
+    conf.flags = line_request_flags(config->active_low, config->bias);
     conf.consumer = MYGPIOD_NAME;
     conf.request_type = config->event_request;
 
@@ -234,11 +227,12 @@ int main(int argc, char **argv) {
         int cnt = poll(pfds, pfd_count, -1);
         if (cnt < 0) {
             MYGPIOD_LOG_ERROR("Failure polling fds");
-            return GPIOD_CTXLESS_EVENT_POLL_RET_ERR;
+            rc = EXIT_FAILURE;
+            goto out;
         }
         if (cnt == 0) {
             MYGPIOD_LOG_DEBUG("Poll timeout");
-            return GPIOD_CTXLESS_EVENT_POLL_RET_TIMEOUT;
+            continue;
         }
 
         // gpio event
@@ -246,6 +240,7 @@ int main(int argc, char **argv) {
             if (pfds[i].revents) {
                 MYGPIOD_LOG_DEBUG("%u: Gpio event detected", i);
                 line = gpiod_line_bulk_get_line(&bulk_in, i);
+                struct gpiod_line_event event;
                 rv = gpiod_line_event_read(line, &event);
                 if (rv < 0) {
                     rc = EXIT_FAILURE;
@@ -268,7 +263,6 @@ int main(int argc, char **argv) {
                 if (s == sizeof(uint64_t) && exp > 1) {
                     struct t_list_node *node = list_node_at(&config->gpios_in, i);
                     struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
-                    // abort pending long press event
                     action_execute_delayed(node->gpio, data, config);
                 }
             }
@@ -283,8 +277,8 @@ int main(int argc, char **argv) {
     }
 
 out:
-    if (chip != NULL) {
-        gpiod_chip_close(chip);
+    if (config->chip != NULL) {
+        gpiod_chip_close(config->chip);
     }
     config_clear(config);
     free(config);

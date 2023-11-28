@@ -1,6 +1,6 @@
 # Example mygpiod.conf
 #
-# myGPIOd ${PROJECT_VERSION}
+# myGPIOd @PROJECT_VERSION@
 # https://github.com/jcorporation/myGPIOd
 #
 # Logging
@@ -19,9 +19,9 @@ chip = 0
 
 # Trigger events
 # Valid values: falling, rising or both
-event = falling
-#event = rising
-#event = both
+request_event = falling
+#request_event = rising
+#request_event = both
 
 # Sets the GPIO active state
 # Valid values: true, false
