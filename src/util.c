@@ -72,6 +72,21 @@ int make_signalfd(void) {
 }
 
 /**
+ * Parses a string to a gpio value.
+ * @param str string to parse
+ * @return gpio value or GPIO_VALUE_LOW on error
+ */
+int parse_gpio_value(const char *str) {
+    if (strcasecmp(str, "high") == 0) {
+        return GPIO_VALUE_HIGH;
+    }
+    if (strcasecmp(str, "low") == 0) {
+        return GPIO_VALUE_LOW;
+    }
+    return GPIO_VALUE_LOW;
+}
+
+/**
  * Lookups the name for a gpio value
  * @param value value
  * @return name
