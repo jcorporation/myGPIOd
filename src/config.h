@@ -24,15 +24,15 @@ enum gpio_values {
  * Config and state data for an input gpio
  */
 struct t_gpio_node_in {
-    char *cmd_rising;        //!< command for rising event
-    char *cmd_falling;       //!< command for falling event
-    int request_event;       //!< events to request for this gpio
-    int fd;                  //!< gpio file descriptor
-    int long_press_timeout;  //!< timeout for the long press handler
-    char *long_press_cmd;    //!< long press command
-    int long_press_event;    //!< event for the long press handler
-    bool ignore_event;       //!< internal state for long press handler
-    int timer_fd;            //!< timer file descriptor for long press handler
+    char *action_rising;      //!< command for rising event
+    char *action_falling;     //!< command for falling event
+    int request_event;        //!< events to request for this gpio
+    int fd;                   //!< gpio file descriptor
+    int long_press_timeout;   //!< timeout for the long press handler
+    char *long_press_action;  //!< long press command
+    int long_press_event;     //!< event for the long press handler
+    bool ignore_event;        //!< internal state for long press handler
+    int timer_fd;             //!< timer file descriptor for long press handler
 };
 
 /**

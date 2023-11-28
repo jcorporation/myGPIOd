@@ -29,7 +29,7 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 The `build.sh` script is only a wrapper for cmake. You can use the default cmake workflow to compile myGPIOd.
 
 ```
-cmake -B build -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo .
+cmake -B build -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .
 make -C build
 ```
 
@@ -47,15 +47,11 @@ runuser -u mygpiod -g gpio -- /usr/bin/mygpiod [/etc/mygpiod.conf]
 
 The `./build.sh` script installs a startup script for systemd, openrc or sysVinit.
 
-## Scripts
+## Actions
 
-Scripts are executed in a separate process with the `execve` function.
+The actions are executed in a separate child process. It must be an absolute path to an executable or a script.
 
-myGPIOd sets following environment variables:
-
-- MYGPIOD_GPIO
-- MYGPIOD_EDGE
-- MYGPIOD_LONG_PRESS
+Some more actions will be added in future versions through plugins.
 
 ## Example configuration
 
@@ -85,17 +81,17 @@ gpio_dir = /etc/mygpiod.d
 **/etc/mygpiod.d/3.in**
 ```
 request_event = both
-cmd_rising = /usr/local/bin/poweroff.sh
+action_rising = /usr/local/bin/poweroff.sh
 
 long_press_event = falling
 long_press_timeout = 2
-long_press_cmd = /usr/local/bin/reboot.sh
+long_press_action = /usr/local/bin/reboot.sh
 ```
 
 **/etc/mygpiod.d/4.in**
 ```
 request_event = falling
-cmd_falling = /usr/local/bin/poweroff.sh
+action_falling = /usr/local/bin/poweroff.sh
 ```
 
 **/etc/mygpiod.d/5.out**

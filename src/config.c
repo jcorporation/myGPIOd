@@ -296,9 +296,7 @@ static bool parse_gpio_config_file(int mode, void *node, const char *dirname, co
 static bool parse_gpio_config_file_out_line(unsigned line_num, char *line, struct t_gpio_node_out *node) {
     if (strncmp(line, "value", 5) == 0) {
         line = skip_chars(line, 5, '=');
-        if (parse_int(line, &node->value, NULL, 0, 1) == true) {
-            return true;
-        }
+        node->value = parse_gpio_value(line);
     }
 
     //invalid
@@ -319,14 +317,14 @@ static bool parse_gpio_config_file_in_line(unsigned line_num, char *line, struct
         node->request_event = parse_event_request(line);
         return true;
     }
-    if (strncmp(line, "cmd_falling", 3) == 0) {
-        line = skip_chars(line, 3, '=');
-        node->cmd_falling = strdup(line);
+    if (strncmp(line, "action_falling", 14) == 0) {
+        line = skip_chars(line, 14, '=');
+        node->action_falling = strdup(line);
         return true;
     }
-    if (strncmp(line, "cmd_rising", 3) == 0) {
-        line = skip_chars(line, 3, '=');
-        node->cmd_rising = strdup(line);
+    if (strncmp(line, "action_rising", 13) == 0) {
+        line = skip_chars(line, 13, '=');
+        node->action_rising = strdup(line);
         return true;
     }
     if (strncmp(line, "long_press_timeout", 18) == 0) {
@@ -340,10 +338,10 @@ static bool parse_gpio_config_file_in_line(unsigned line_num, char *line, struct
         node->long_press_event = parse_event_request(line);
         return true;
     }
-    if (strncmp(line, "long_press_cmd", 14) == 0) {
-        line = skip_chars(line, 14, '=');
-        free(node->long_press_cmd);
-        node->long_press_cmd = strdup(line);
+    if (strncmp(line, "long_press_action", 17) == 0) {
+        line = skip_chars(line, 17, '=');
+        free(node->long_press_action);
+        node->long_press_action = strdup(line);
         return true;
     }
 
@@ -363,10 +361,10 @@ static struct t_gpio_node_in *gpio_node_in_new(void) {
         return NULL;
     }
     node->request_event = GPIOD_LINE_REQUEST_EVENT_RISING_EDGE;
-    node->cmd_rising = NULL;
-    node->cmd_falling = NULL;
+    node->action_rising = NULL;
+    node->action_falling = NULL;
     node->long_press_timeout = 0;
-    node->long_press_cmd = NULL;
+    node->long_press_action = NULL;
     node->long_press_event = GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE;
     node->ignore_event = false;
     node->timer_fd = -1;
@@ -400,14 +398,14 @@ static void gpio_node_in_clear(void *node) {
     if (data->timer_fd > -1) {
         close(data->timer_fd);
     }
-    if (data->cmd_falling != NULL) {
-        free(data->cmd_falling);
+    if (data->action_falling != NULL) {
+        free(data->action_falling);
     }
-    if (data->cmd_rising != NULL) {
-        free(data->cmd_rising);
+    if (data->action_rising != NULL) {
+        free(data->action_rising);
     }
-    if (data->long_press_cmd != NULL) {
-        free(data->long_press_cmd);
+    if (data->long_press_action != NULL) {
+        free(data->long_press_action);
     }
 }
 

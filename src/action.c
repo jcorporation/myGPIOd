@@ -20,7 +20,8 @@
 
 // private definitions
 static void action_delay(struct t_gpio_node_in *node);
-static void action_execute(const char *cmd);
+static void action_execute(const char *action);
+static void action_execute_command(const char *cmd);
 
 // public functions
 
@@ -42,30 +43,30 @@ void action_handle(unsigned gpio, const struct timespec *ts, int event_type, str
         return;
     }
     if (event_type == GPIOD_LINE_EVENT_FALLING_EDGE) {
-        if (node->cmd_falling != NULL) {
+        if (node->action_falling != NULL) {
             if (node->request_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE ||
                 node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
             {
-                action_execute(node->cmd_falling);
+                action_execute(node->action_falling);
             }
         }
         if (node->long_press_event == GPIOD_LINE_EVENT_FALLING_EDGE &&
-            node->long_press_cmd != NULL &&
+            node->long_press_action != NULL &&
             node->long_press_timeout > 0)
         {
             action_delay(node);
         }
     }
     else {
-        if (node->cmd_rising != NULL) {
+        if (node->action_rising != NULL) {
             if (node->request_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE ||
                 node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
             {
-                action_execute(node->cmd_rising);
+                action_execute(node->action_rising);
             }
         }
         if (node->long_press_event == GPIOD_LINE_EVENT_RISING_EDGE &&
-            node->long_press_cmd != NULL &&
+            node->long_press_action != NULL &&
             node->long_press_timeout > 0)
         {
             action_delay(node);
@@ -96,7 +97,7 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_node_in *node, struct t
     if ((rv == GPIO_VALUE_HIGH && node->long_press_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE) ||
         (rv == GPIO_VALUE_LOW && node->long_press_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE))
     {
-        action_execute(node->long_press_cmd);
+        action_execute(node->long_press_action);
         if (node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES) {
             // ignore the release event
             node->ignore_event = true;
@@ -149,11 +150,11 @@ static void action_delay(struct t_gpio_node_in *node) {
 }
 
 /**
- * Runs a system command in a new process
- * @param cmd command to execute
+ * Executes the action in a new process
+ * @param action action to execute
  */
-static void action_execute(const char *cmd) {
-    MYGPIOD_LOG_INFO("Executing \"%s\"", cmd);
+static void action_execute(const char *action) {
+    MYGPIOD_LOG_INFO("Executing \"%s\"", action);
     errno = 0;
     int rc = fork();
     if (rc == -1) {
@@ -161,13 +162,27 @@ static void action_execute(const char *cmd) {
     }
     else if (rc == 0) {
         // this is the child process
-        errno = 0;
-        execl(cmd, cmd, (char *)NULL);
-        // successful execl call does not return
-        MYGPIOD_LOG_ERROR("Error executing cmd \"%s\": %s", cmd, strerror(errno));
-        exit(EXIT_FAILURE);
+        if (action[0] == '/') {
+            action_execute_command(action);
+        }
+        else {
+            MYGPIOD_LOG_ERROR("Invalid action \"%s\"", action);
+            exit(EXIT_FAILURE);
+        }
     }
     else {
         MYGPIOD_LOG_DEBUG("Forked process with id %d", rc);
     }
+}
+
+/**
+ * Runs an executable or script
+ * @param cmd command to execute
+ */
+static void action_execute_command(const char *cmd) {
+    errno = 0;
+    execl(cmd, cmd, (char *)NULL);
+    // successful execl call does not return
+    MYGPIOD_LOG_ERROR("Error executing action \"%s\": %s", cmd, strerror(errno));
+    exit(EXIT_FAILURE);
 }
