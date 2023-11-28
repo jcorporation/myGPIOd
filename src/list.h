@@ -32,7 +32,7 @@ typedef void (*list_data_clear)(void *node);
 void list_init(struct t_list *list);
 void list_clear(struct t_list *list, list_data_clear clear_data_callback);
 bool list_push(struct t_list *list, unsigned gpio, void *data);
-struct t_list_node *list_node_at(struct t_list *list, unsigned pos);
+struct t_list_node *list_node_at(struct t_list *list, unsigned idx);
 struct t_list_node *list_node_by_gpio(struct t_list *list, unsigned gpio);
 
 #endif

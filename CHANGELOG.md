@@ -8,13 +8,18 @@ https://github.com/jcorporation/myGPIOd
 
 This is the first larger release after the initial release.
 
+### Notes
+
+- The configuration file format has changes significantly.
+
 ### Changelog
 
 - Feat: Rework build process to support the standard cmake build types
-- Feat: Multiple actions for gpio events
+- Feat: Distinct actions for gpio events
 - Feat: Long press detection
 - Feat: Set gpio output states
 - Upd: Restructure and document the source code
+- Upd: Improved documentation
 
 ***
 

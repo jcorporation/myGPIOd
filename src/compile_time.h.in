@@ -25,4 +25,6 @@
 #define CFG_SYSLOG false
 #define CFG_GPIO_DIR "/etc/mygpiod.d"
 
+#define OPEN_FLAGS_READ "re"
+
 #endif

@@ -48,21 +48,19 @@ int line_request_flags(bool active_low, int bias) {
  */
 int make_signalfd(void) {
     sigset_t sigmask;
-    int sigfd, rv;
-
     sigemptyset(&sigmask);
     sigaddset(&sigmask, SIGTERM);
     sigaddset(&sigmask, SIGINT);
 
     errno = 0;
-    rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
+    int rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
     if (rv < 0) {
         MYGPIOD_LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
         return -1;
     }
 
     errno = 0;
-    sigfd = signalfd(-1, &sigmask, 0);
+    int sigfd = signalfd(-1, &sigmask, 0);
     if (sigfd < 0) {
         MYGPIOD_LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
         return -1;

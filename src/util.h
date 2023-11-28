@@ -18,7 +18,7 @@ const char *lookup_gpio_value(int value);
 int parse_gpio_value(const char *str);
 bool parse_bool(const char *str);
 const char *bool_to_str(bool v);
-int parse_bias(const char *option);
+int parse_bias(const char *str);
 const char *lookup_bias(int bias);
 int parse_event_request(const char *str);
 const char *lookup_event_request(int event);

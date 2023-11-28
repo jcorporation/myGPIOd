@@ -66,6 +66,9 @@ struct t_config *config_new(void) {
  * @param config pointer to config to free
  */
 void config_clear(struct t_config *config) {
+    if (config->chip != NULL) {
+        gpiod_chip_close(config->chip);
+    }
     list_clear(&config->gpios_in, gpio_node_in_clear);
     list_clear(&config->gpios_out, gpio_node_out_clear);
     if (config->signal_fd > 0) {
@@ -82,7 +85,7 @@ void config_clear(struct t_config *config) {
  * @return true on success, else false
  */
 bool config_read(struct t_config *config, const char *config_file) {
-    FILE *fp = fopen(config_file, "re");
+    FILE *fp = fopen(config_file, OPEN_FLAGS_READ);
     if (fp == NULL) {
         MYGPIOD_LOG_ERROR("Can not open \"%s\": %s", config_file, strerror(errno));
         return false;
@@ -115,7 +118,7 @@ bool config_read(struct t_config *config, const char *config_file) {
     if (line != NULL) {
         free(line);
     }
-    fclose(fp);
+    (void)fclose(fp);
 
     //gpio config
     errno = 0;
@@ -152,7 +155,7 @@ bool config_read(struct t_config *config, const char *config_file) {
                         i++;
                         continue;
                     }
-                    gpio_node_in_clear(node);
+                    gpio_node_out_clear(node);
                     free(node);
                 }
             }
@@ -240,7 +243,7 @@ static bool parse_gpio_config_file(int mode, void *node, const char *dirname, co
     size_t filepath_len = strlen(dirname) + 1 + strlen(filename) + 1;
     char *filepath = malloc(filepath_len);
     snprintf(filepath, filepath_len, "%s/%s", dirname, filename);
-    FILE *fp = fopen(filepath, "ro");
+    FILE *fp = fopen(filepath, OPEN_FLAGS_READ);
     if (fp == NULL) {
         MYGPIOD_LOG_ERROR("Error opening \"%s\"", filepath);
         free(filepath);
@@ -282,7 +285,7 @@ static bool parse_gpio_config_file(int mode, void *node, const char *dirname, co
     if (line != NULL) {
         free(line);
     }
-    fclose(fp);
+    (void)fclose(fp);
     return rc;
 }
 
@@ -415,7 +418,6 @@ static void gpio_node_in_clear(void *node) {
  */
 static void gpio_node_out_clear(void *node) {
     (void)node;
-    return;
 }
 
 /**

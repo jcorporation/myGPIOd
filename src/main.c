@@ -277,11 +277,10 @@ int main(int argc, char **argv) {
     }
 
 out:
-    if (config->chip != NULL) {
-        gpiod_chip_close(config->chip);
+    if (config != NULL) {
+        config_clear(config);
+        free(config);
     }
-    config_clear(config);
-    free(config);
     if (rc == EXIT_SUCCESS) {
         MYGPIOD_LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
     }
