@@ -7,6 +7,8 @@
 #ifndef MYGPIOD_CONFIG_H
 #define MYGPIOD_CONFIG_H
 
+#include "list.h"
+
 #include <stdbool.h>
 #include <time.h>
 
@@ -16,42 +18,36 @@ enum gpio_modes {
 };
 
 enum gpio_values {
-    GPIO_VALUE_UNSET = 0,
-    GPIO_VALUE_LOW,
+    GPIO_VALUE_LOW = 0,
     GPIO_VALUE_HIGH
 };
 
-struct t_gpio_node {
-    unsigned gpio;
-    enum gpio_modes mode;
-    // for inputs
+struct t_gpio_node_in {
     char *cmd;
-    int edge;
-    int long_press;
+    int event;
+    int fd;
+    int long_press_timeout;
+    char *long_press_cmd;
+    int long_press_event;
     bool ignore_event;
-    // for outputs
-    enum gpio_values value;
-    // link to next
-    struct t_gpio_node *next;
+    int timer_fd;
 };
 
-struct t_delayed {
-    int timer_fd;
-    struct t_gpio_node *cn;
+struct t_gpio_node_out {
+    int value;
 };
 
 struct t_config {
-    struct t_gpio_node *gpios;
-    struct t_gpio_node *gpios_tail;
-    unsigned gpio_count;
-    int edge;
+    struct t_list gpios_in;
+    struct t_list gpios_out;
+    int event_request;
     bool active_low;
     int bias;
     char *chip;
     int loglevel;
-    time_t startup_time;
     bool syslog;
-    struct t_delayed delayed_event;
+    int signal_fd;
+    char *dir_gpio;
 };
 
 void config_clear(struct t_config *config);

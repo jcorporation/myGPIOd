@@ -22,7 +22,7 @@ target_sources(mygpiod PRIVATE
   main.c
   action.c
   config.c
-  event.c
+  list.c
   log.c
   util.c
 )

@@ -8,12 +8,11 @@
 #define MYGPIOD_ACTION_H
 
 #include "config.h"
-#include "event.h"
 
 #include <time.h>
 
-void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_config *config);
-void action_delay_abort(struct t_config *config);
-void action_execute_delayed(struct t_mon_ctx *ctx);
+void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_gpio_node_in *node);
+void action_delay_abort(struct t_gpio_node_in *node);
+void action_execute_delayed(unsigned gpio, struct t_gpio_node_in *node, struct t_config *config);
 
 #endif

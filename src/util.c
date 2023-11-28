@@ -17,6 +17,25 @@
 #include <string.h>
 #include <sys/signalfd.h>
 
+int flags_to_line_request_flags(bool active_low, int flags) {
+    int req_flags = 0;
+
+    if (active_low)
+        req_flags |= GPIOD_LINE_REQUEST_FLAG_ACTIVE_LOW;
+    if (flags & GPIOD_CTXLESS_FLAG_OPEN_DRAIN)
+        req_flags |= GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN;
+    if (flags & GPIOD_CTXLESS_FLAG_OPEN_SOURCE)
+        req_flags |= GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE;
+    if (flags & GPIOD_CTXLESS_FLAG_BIAS_DISABLE)
+        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_DISABLE;
+    if (flags & GPIOD_CTXLESS_FLAG_BIAS_PULL_UP)
+        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_UP;
+    if (flags & GPIOD_CTXLESS_FLAG_BIAS_PULL_DOWN)
+        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_DOWN;
+
+    return req_flags;
+}
+
 /**
  * Creates a signalfd to exit on SIGTERM and SIGINT
  * @return the created signal fd
@@ -47,29 +66,12 @@ int make_signalfd(void) {
 }
 
 /**
- * Checks if the value is in the array
- * @param value value to match
- * @param array array to check
- * @param len length of array
- * @return true if value is in array, else false
- */
-bool value_in_array(unsigned value, unsigned *array, size_t len) {
-    for (size_t i = 0; i < len; i++) {
-        if (array[i] == value)
-            return true;
-    }
-    return false;
-}
-
-/**
  * Lookups the name for a gpio value
  * @param value value
  * @return name
  */
-const char *lookup_gpio_value(enum gpio_values value) {
+const char *lookup_gpio_value(int value) {
     switch(value) {
-        case GPIO_VALUE_UNSET:
-            return "unset";
         case GPIO_VALUE_HIGH:
             return "high";
         case GPIO_VALUE_LOW:
@@ -77,24 +79,6 @@ const char *lookup_gpio_value(enum gpio_values value) {
     }
     MYGPIOD_LOG_WARN("Could not lookup gpio value");
     return "";
-}
-
-/**
- * Parses the chip value
- * @param str string to parse
- * @param config pointer to config
- * @return true on success, else false
- */
-bool parse_chip(char *str, struct t_config *config) {
-    unsigned chip;
-    if (parse_uint(str, &chip, NULL, 0, 9) == false) {
-        return false;
-    }
-    if (snprintf(config->chip, 2, "%u", chip) == 1) {
-        return true;
-    }
-    MYGPIOD_LOG_WARN("Invalid value");
-    return false;
 }
 
 /**
@@ -169,11 +153,48 @@ const char *lookup_bias(int bias) {
 }
 
 /**
- * Parses the edge setting.
+ * Parses the request event setting for the chip.
+ * @param str string to parse
+ * @return GPIOD_LINE_REQUEST_EVENT enum or GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE on error
+ */
+int parse_event_request(const char *str) {
+    if (strcasecmp(str, "falling") == 0) {
+        return GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE;
+    }
+    if (strcasecmp(str, "rising") == 0) {
+        return GPIOD_LINE_REQUEST_EVENT_RISING_EDGE;
+    }
+    if (strcasecmp(str, "both") == 0) {
+        return GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES;
+    }
+    MYGPIOD_LOG_WARN("Could not parse event request, setting default");
+    return GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE;
+}
+
+/**
+ * Lookups the string for CTXLESS_EVENT_*
+ * @param event the CTXLESS_EVENT enum
+ * @return name
+ */
+const char *lookup_event_request(int event) {
+    switch(event) {
+        case GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE:
+            return "falling";
+        case GPIOD_LINE_REQUEST_EVENT_RISING_EDGE:
+            return "rising";
+        case GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES:
+            return "both";
+    }
+    MYGPIOD_LOG_WARN("Could not lookup event request");
+    return "";
+}
+
+/**
+ * Parses the event setting for a gpio
  * @param str string to parse
  * @return GPIOD_CTXLESS_EVENT enum or GPIOD_CTXLESS_EVENT_FALLING_EDGE on error
  */
-int parse_edge(const char *str) {
+int parse_event(const char *str) {
     if (strcasecmp(str, "falling") == 0) {
         return GPIOD_CTXLESS_EVENT_FALLING_EDGE;
     }
@@ -183,7 +204,7 @@ int parse_edge(const char *str) {
     if (strcasecmp(str, "both") == 0) {
         return GPIOD_CTXLESS_EVENT_BOTH_EDGES;
     }
-    MYGPIOD_LOG_WARN("Could not parse edge, setting default");
+    MYGPIOD_LOG_WARN("Could not parse event, setting default");
     return GPIOD_CTXLESS_EVENT_FALLING_EDGE;
 }
 
@@ -192,7 +213,7 @@ int parse_edge(const char *str) {
  * @param event the CTXLESS_EVENT enum
  * @return name
  */
-const char *lookup_ctxless_event(int event) {
+const char *lookup_event(int event) {
     switch(event) {
         case GPIOD_CTXLESS_EVENT_FALLING_EDGE:
             return "falling";
@@ -201,7 +222,7 @@ const char *lookup_ctxless_event(int event) {
         case GPIOD_CTXLESS_EVENT_BOTH_EDGES:
             return "both";
     }
-    MYGPIOD_LOG_WARN("Could not lookup ctxless event");
+    MYGPIOD_LOG_WARN("Could not lookup event");
     return "";
 }
 

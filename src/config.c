@@ -7,23 +7,28 @@
 #include "compile_time.h"
 #include "config.h"
 
+#include "list.h"
 #include "log.h"
 #include "util.h"
 
 #include <ctype.h>
+#include <dirent.h>
 #include <errno.h>
 #include <gpiod.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 //private definitions
-static bool parse_config_line(char *line, struct t_config *config);
-static bool parse_gpio_input_line(struct t_gpio_node *node, char *line);
-static bool parse_gpio_output_line(struct t_gpio_node *node, char *line);
-static bool config_node_push(struct t_config *config, struct t_gpio_node *node);
-static struct t_gpio_node *config_node_new(unsigned gpio);
-static void config_node_clear(struct t_gpio_node *node);
+static bool parse_config_line(unsigned line_num, char *line, struct t_config *config);
+static bool parse_gpio_config_file(enum gpio_modes mode, void *node, const char *dirname, const char *filename);
+static bool parse_gpio_config_file_in_line(unsigned line_num, char *line, struct t_gpio_node_in *node);
+static bool parse_gpio_config_file_out_line(unsigned line_num, char *line, struct t_gpio_node_out *node);
+static struct t_gpio_node_in *gpio_node_in_new(void);
+static struct t_gpio_node_out *gpio_node_out_new(void);
+static void gpio_node_in_clear(void *node);
+static void gpio_node_out_clear(void *node);
 static char *skip_chars(char *line, size_t skip, char c);
 static char *chomp(char *line);
 
@@ -38,18 +43,20 @@ struct t_config *config_new(void) {
     if (config == NULL) {
         return NULL;
     }
-    config->gpios = NULL;
-    config->gpios_tail = NULL;
-    config->gpio_count = 0;
+    config->signal_fd = make_signalfd();
+    if (config->signal_fd == -1) {
+        free(config);
+        return NULL;
+    }
+    list_init(&config->gpios_in);
+    list_init(&config->gpios_out);
     config->chip = strdup(CFG_CHIP);
     config->active_low = CFG_ACTIVE_LOW;
     config->bias = CFG_BIAS;
-    config->edge = CFG_EDGE;
+    config->event_request = CFG_EVENT_CHIP;
     config->loglevel = loglevel;
     config->syslog = CFG_SYSLOG;
-    config->startup_time = time(NULL);
-    config->delayed_event.timer_fd = -1;
-    config->delayed_event.cn = NULL;
+    config->dir_gpio = strdup(CFG_GPIO_DIR);
     return config;
 }
 
@@ -58,17 +65,13 @@ struct t_config *config_new(void) {
  * @param config pointer to config to free
  */
 void config_clear(struct t_config *config) {
-    struct t_gpio_node *current = config->gpios;
-    struct t_gpio_node *tmp = NULL;
-    while (current != NULL) {
-        config_node_clear(current);
-        tmp = current;
-        current = current->next;
-        free(tmp);
+    list_clear(&config->gpios_in, gpio_node_in_clear);
+    list_clear(&config->gpios_out, gpio_node_out_clear);
+    if (config->signal_fd > 0) {
+        close(config->signal_fd);
     }
-    if (config->chip != NULL) {
-        free(config->chip);
-    }
+    free(config->chip);
+    free(config->dir_gpio);
 }
 
 /**
@@ -87,7 +90,9 @@ bool config_read(struct t_config *config, const char *config_file) {
     char *line = NULL;
     size_t n = 0;
     bool rc = true;
+    unsigned line_num = 0;
     while (getline(&line, &n, fp) > 0) {
+        line_num++;
         //strip whitespace characters
         char *line_c = chomp(line);
         if (line_c == NULL) {
@@ -101,7 +106,7 @@ bool config_read(struct t_config *config, const char *config_file) {
         {
             continue;
         }
-        if (parse_config_line(line_c, config) == false) {
+        if (parse_config_line(line_num, line_c, config) == false) {
             rc = false;
             break;
         }
@@ -110,6 +115,55 @@ bool config_read(struct t_config *config, const char *config_file) {
         free(line);
     }
     fclose(fp);
+
+    //gpio config
+    errno = 0;
+    DIR *dir = opendir(config->dir_gpio);
+    if (dir == NULL) {
+        MYGPIOD_LOG_ERROR("Error opening directory \"%s\"", config->dir_gpio);
+        return false;
+    }
+    unsigned i = 0;
+    struct dirent *next_file;
+    while ((next_file = readdir(dir)) != NULL ) {
+        if (next_file->d_type != DT_REG) {
+            continue;
+        }
+        unsigned gpio; 
+        char *rest;
+        if (parse_uint(next_file->d_name, &gpio, &rest, 0, 99) == true) {
+            if (rest[0] == '.') {
+                rest++;
+                if (strcmp(rest, "in") == 0) {
+                    struct t_gpio_node_in *node = gpio_node_in_new();
+                    rc = parse_gpio_config_file(GPIO_MODE_INPUT, node, config->dir_gpio, next_file->d_name);
+                    if (rc == true && list_push(&config->gpios_in, gpio, node) == true) {
+                        i++;
+                        continue;
+                    }
+                    gpio_node_in_clear(node);
+                    free(node);
+                }
+                else if (strcmp(rest, "out") == 0) {
+                    struct t_gpio_node_out *node = gpio_node_out_new();
+                    rc = parse_gpio_config_file(GPIO_MODE_OUTPUT, node, config->dir_gpio, next_file->d_name);
+                    if (rc == true && list_push(&config->gpios_out, gpio, node) == true) {
+                        i++;
+                        continue;
+                    }
+                    gpio_node_in_clear(node);
+                    free(node);
+                }
+            }
+        }
+        MYGPIOD_LOG_WARN("Skipping file %s/%s", config->dir_gpio, next_file->d_name);
+        if (i == GPIOD_LINE_BULK_MAX_LINES) {
+            MYGPIOD_LOG_WARN("Too many gpios configured");
+            break;
+        }
+    }
+    closedir(dir);
+    MYGPIOD_LOG_INFO("Parsed %u gpio config files", i);
     return rc;
 }
 
@@ -121,21 +175,18 @@ bool config_read(struct t_config *config, const char *config_file) {
  * @param config already allocated config struct to populate
  * @return true on success, else false
  */
-static bool parse_config_line(char *line, struct t_config *config) {
-    //global values
+static bool parse_config_line(unsigned line_num, char *line, struct t_config *config) {
     if (strncmp(line, "chip", 4) == 0) {
         line = skip_chars(line, 4, '=');
-        if (parse_chip(line, config) == false) {
-            MYGPIOD_LOG_ERROR("Invalid chip number");
-            return false;
-        }
+        free(config->chip);
+        config->chip = strdup(line);
         MYGPIOD_LOG_INFO("Setting chip to \"%s\"", config->chip);
         return true;
     }
-    if (strncmp(line, "edge", 4) == 0) {
-        line = skip_chars(line, 4, '=');
-        config->edge = parse_edge(line);
-        MYGPIOD_LOG_INFO("Setting edge to \"%s\"", lookup_ctxless_event(config->edge));
+    if (strncmp(line, "event", 5) == 0) {
+        line = skip_chars(line, 5, '=');
+        config->event_request = parse_event_request(line);
+        MYGPIOD_LOG_INFO("Setting event to \"%s\"", lookup_event_request(config->event_request));
         return true;
     }
     if (strncmp(line, "active_low", 10) == 0) {
@@ -162,129 +213,115 @@ static bool parse_config_line(char *line, struct t_config *config) {
         MYGPIOD_LOG_INFO("Setting syslog to \"%s\"", bool_to_str(config->syslog));
         return true;
     }
+    if (strncmp(line, "gpio_dir", 8) == 0) {
+        line = skip_chars(line, 8, '=');
+        free(config->dir_gpio);
+        config->dir_gpio = strdup(line);
+        MYGPIOD_LOG_INFO("Setting gpio_dir to \"%s\"", config->dir_gpio);
+        return true;
+    }
 
-    //gpio lines
-    char *rest = NULL;
-    unsigned gpio;
-    if (parse_uint(line, &gpio, &rest, 1, 99) == false) {
-        MYGPIOD_LOG_ERROR("First value is not a valid gpio number");
+    //invalid
+    MYGPIOD_LOG_ERROR("Invalid configuration line #%u", line_num);
+    return false;
+}
+
+static bool parse_gpio_config_file(enum gpio_modes mode, void *node, const char *dirname, const char *filename) {
+    size_t filepath_len = strlen(dirname) + 1 + strlen(filename) + 1;
+    char *filepath = malloc(filepath_len);
+    snprintf(filepath, filepath_len, "%s/%s", dirname, filename);
+    FILE *fp = fopen(filepath, "ro");
+    if (fp == NULL) {
+        MYGPIOD_LOG_ERROR("Error opening %s", filepath);
+        free(filepath);
         return false;
     }
-    MYGPIOD_LOG_DEBUG("Processing configuration line for gpio %u", gpio);
-    //line seems to be valid, create a struct for config_node
-    struct t_gpio_node *node = config_node_new(gpio);
-    if (node == NULL) {
-        return false;
-    }
-    line = rest;
-    line = skip_chars(line, 0, ',');
-    if (strncmp(line, "in", 2) == 0) {
-        if (parse_gpio_input_line(node, line) == true &&
-            config_node_push(config, node) == true)
+    free(filepath);
+    char *line = NULL;
+    size_t n = 0;
+    bool rc = true;
+    unsigned line_num = 0;
+    while (getline(&line, &n, fp) > 0) {
+        line_num++;
+        //strip whitespace characters
+        char *line_c = chomp(line);
+        if (line_c == NULL) {
+            continue;
+        }
+        line_c = skip_chars(line_c, 0, ' ');
+        
+        //ignore blank lines and comments
+        if (line_c[0] == '#' ||
+            line_c[0] == '\0')
         {
-            MYGPIOD_LOG_INFO("Added gpio: \"%u\", mode: \"input\", edge: \"%s\", long_press: \"%d\", cmd: \"%s\"",
-                node->gpio, lookup_ctxless_event(node->edge), node->long_press, node->cmd);
-            return true;
+            continue;
+        }
+        if (mode == GPIO_MODE_OUTPUT) {
+            if (parse_gpio_config_file_out_line(line_num, line_c, node) == false) {
+                rc = false;
+                break;
+            }
+            continue;
+        }
+
+        if (parse_gpio_config_file_in_line(line_num, line_c, node) == false) {
+            rc = false;
+            break;
         }
     }
-    else if (strncmp(line, "out", 3) == 0) {
-        if (parse_gpio_output_line(node, line) == true &&
-            config_node_push(config, node) == true)
-        {
-            MYGPIOD_LOG_INFO("Added gpio: \"%u\", mode: \"output\", value: \"%s\"",
-                node->gpio, lookup_gpio_value(node->value));
+    if (line != NULL) {
+        free(line);
+    }
+    fclose(fp);
+    return rc;
+}
+
+static bool parse_gpio_config_file_out_line(unsigned line_num, char *line, struct t_gpio_node_out *node) {
+    if (strncmp(line, "value", 5) == 0) {
+        line = skip_chars(line, 5, '=');
+        if (parse_int(line, &node->value, NULL, 0, 1) == true) {
             return true;
         }
     }
 
     //invalid
-    MYGPIOD_LOG_ERROR("Invalid configuration line");
-    config_node_clear(node);
-    free(node);
+    MYGPIOD_LOG_ERROR("Invalid configuration line #%u", line_num);
     return false;
 }
 
-/**
- * Parses a gpio config input line
- * @param node already allocated config node to populate
- * @param line line to parse
- * @return true on success, else false
- */
-static bool parse_gpio_input_line(struct t_gpio_node *node, char *line) {
-    node->mode = GPIO_MODE_INPUT;
-    line = skip_chars(line, 2, ',');
-    char edge[8] = { 0 };
-    for (int i = 0; i < 8 && line[0] != ','; i++, line++) {
-        if (line[0] == '\0') {
-            return false;
-        }
-        edge[i] = line[0];
+static bool parse_gpio_config_file_in_line(unsigned line_num, char *line, struct t_gpio_node_in *node) {
+    if (strncmp(line, "event", 5) == 0) {
+        line = skip_chars(line, 5, '=');
+        node->event = parse_event(line);
+        return true;
     }
-    node->edge = parse_edge(edge);
-
-    //goto next value
-    line = skip_chars(line, 0, ',');
-
-    //long press timeout
-    char *rest;
-    if (parse_int(line, &node->long_press, &rest, 0, 99) == false) {
-        MYGPIOD_LOG_ERROR("Long press value is invalid");
-        return false;
-    }
-    line = rest;
-
-    //goto next value
-    line = skip_chars(line, 0, ',');
-
-    //last value is cmd
-    if (line[0] != '\0') {
+    if (strncmp(line, "cmd", 3) == 0) {
+        line = skip_chars(line, 3, '=');
+        free(node->cmd);
         node->cmd = strdup(line);
+        return true;
     }
-    return true;
-}
+    if (strncmp(line, "long_press_timeout", 18) == 0) {
+        line = skip_chars(line, 18, '=');
+        if (parse_int(line, &node->long_press_timeout, NULL, 0, 9) == true) {
+            return true;
+        }
+    }
+    if (strncmp(line, "long_press_event", 16) == 0) {
+        line = skip_chars(line, 16, '=');
+        node->long_press_event = parse_event(line);
+        return true;
+    }
+    if (strncmp(line, "long_press_cmd", 14) == 0) {
+        line = skip_chars(line, 14, '=');
+        free(node->long_press_cmd);
+        node->long_press_cmd = strdup(line);
+        return true;
+    }
 
-/**
- * Parses a gpio config output line
- * @param node already allocated config node to populate
- * @param line line to parse
- * @return true on success, else false
- */
-static bool parse_gpio_output_line(struct t_gpio_node *node, char *line) {
-    node->mode = GPIO_MODE_OUTPUT;
-    line = skip_chars(line, 3, ',');
-    if (strcasecmp(line, "high") == 0) {
-        node->value = GPIO_VALUE_HIGH;
-        return true;
-    }
-    if (strcasecmp(line, "low") == 0) {
-        node->value = GPIO_VALUE_LOW;
-        return true;
-    }
+    //invalid
+    MYGPIOD_LOG_ERROR("Invalid configuration line #%u", line_num);
     return false;
-}
-
-/**
- * Appends a config node
- * @param config pointer to config struct
- * @param node config line to append
- * @return true on success, else false
- */
-static bool config_node_push(struct t_config *config, struct t_gpio_node *node) {
-    node->next = NULL;
-
-    if (config->gpios == NULL) {
-        config->gpios = node;
-    }
-    else if (config->gpios_tail != NULL) {
-        config->gpios_tail->next = node;
-    }
-    else {
-        return false;
-    }
-
-    config->gpios_tail = node;
-    config->gpio_count++;
-    return true;
 }
 
 /**
@@ -292,28 +329,51 @@ static bool config_node_push(struct t_config *config, struct t_gpio_node *node) 
  * @param gpio gpio number
  * @return newly allocated struct t_gpio_node
  */
-static struct t_gpio_node *config_node_new(unsigned gpio) {
-    struct t_gpio_node *node = malloc(sizeof(struct t_gpio_node));
+static struct t_gpio_node_in *gpio_node_in_new(void) {
+    struct t_gpio_node_in *node = malloc(sizeof(struct t_gpio_node_in));
     if (node == NULL) {
         MYGPIOD_LOG_ERROR("Out of memory");
         return NULL;
     }
-    node->gpio = gpio;
     node->cmd = NULL;
-    node->long_press = 0;
+    node->long_press_timeout = 0;
+    node->long_press_cmd = NULL;
+    node->long_press_event = 0;
     node->ignore_event = false;
-    node->value = GPIO_VALUE_UNSET;
+    node->timer_fd = -1;
+    node->fd = -1;
     return node;
 }
 
-/**
- * Clears the config node
- * @param cl node to clear
- */
-static void config_node_clear(struct t_gpio_node *node) {
-    if (node->cmd != NULL) {
-        free(node->cmd);
+static struct t_gpio_node_out *gpio_node_out_new(void) {
+    struct t_gpio_node_out *node = malloc(sizeof(struct t_gpio_node_out));
+    if (node == NULL) {
+        MYGPIOD_LOG_ERROR("Out of memory");
+        return NULL;
     }
+    node->value = 0;
+    return node;
+}
+
+static void gpio_node_in_clear(void *node) {
+    struct t_gpio_node_in *data = (struct t_gpio_node_in *)node;
+    if (data->fd > -1) {
+        close(data->fd);
+    }
+    if (data->timer_fd > -1) {
+        close(data->timer_fd);
+    }
+    if (data->cmd != NULL) {
+        free(data->cmd);
+    }
+    if (data->long_press_cmd != NULL) {
+        free(data->long_press_cmd);
+    }
+}
+
+static void gpio_node_out_clear(void *node) {
+    (void)node;
+    return;
 }
 
 /**

@@ -6,29 +6,29 @@
 # Logging
 # Valid values:
 # emerg, alert, crit, error, warn, notice, info, debug
-loglevel=notice
+loglevel = notice
 
 # Log destination
 # Valid values: true, false
 # - false = log to stdout
 # - true = log to syslog
-syslog=false
+syslog = false
 
 # GPIO chip number
-chip=0
+chip = 0
 
 # Trigger events
 # Valid values: falling, rising or both
-edge=falling
-#edge=rising
-#edge=both
+event = falling
+#event = rising
+#event = both
 
 # Sets the GPIO active state
 # Valid values: true, false
 # - true = GPIO considered active if it is low
 # - false = GPIO considered active if it is high
-active_low=true
-#active_low=false
+active_low = true
+#active_low = false
 
 # Sets the internal pull-up or pull-down resistor
 # Valid values: as-is, disable, pull-down, pull-up
@@ -36,24 +36,10 @@ active_low=true
 # - disable = disables the internal resistor
 # - pull-down = pulls the gpio down
 # - pull-up = pulls the gpio up
-bias=as-is
-#bias=disable
-#bias=pull-down
-#bias=pull-up
+bias = as-is
+#bias = disable
+#bias = pull-down
+#bias = pull-up
 
-# Configuration of gpio modes, values and events
-# Comma delimited list of:
-# - GPIO number
-# - mode: in or out
-# For mode: in
-#   - event: falling or rising
-#   - long_press: number of seconds for long press detection, set it 0 for short press.
-#                 this supports one short press and one long press entry for each gpio.
-#   - script to run
-# For mode: out
-#   - value: high or low
-# gpio,edge,long_press,script
-# Example for mode: in
-#3,in,falling,0,true
-# Example for mode: out
-#4,out,high
+# Directory for single gpio configuration files
+gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d

@@ -6,11 +6,12 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 
 ## Features
 
-- Calls scripts on GPIO events
-  - raising
+- Call executables on GPIO events
+  - rising
   - falling
   - long press
-- Supports pull-up and pull-down bias
+- Control the pull-up and pull-down bias
+- Set the output value of gpios
 
 ## Build Dependencies
 
@@ -60,20 +61,37 @@ myGPIOd sets following environment variables:
 
 This example configuration does the following:
 
-- Enables the pull-up resistor for gpio number 3 on start
-- Calls `/usr/local/bin/reboot.sh` after a button press of 2 seconds length
-- Calls `/usr/local/bin/poweroff.sh` on a short press
+- Configures gpio 3 as input:
+  - Enables the pull-up resistor on start
+  - Calls `/usr/local/bin/reboot.sh` after a button press of 2 seconds length
+  - Calls `/usr/local/bin/poweroff.sh` on a short press
+- Configures gpio 4 as output:
+  - Sets the value to high on start
 
+**/etc/mygpiod.conf**
 ```
-chip=0
-edge=both
-active_low=true
-loglevel=4
-syslog=0
-bias=pull-up
-#gpio,edge,long_press,cmd
-3,rising,0,/usr/local/bin/poweroff.sh
-3,falling,2,/usr/local/bin/reboot.sh
+chip = 0
+event = both
+active_low = true
+loglevel = notice
+syslog = 0
+bias = pull-up
+gpio_dir = /etc/mygpiod.d
+```
+
+**/etc/mygpiod.d/3.in**
+```
+event = rising
+cmd = /usr/local/bin/poweroff.sh
+
+long_press_event = falling
+long_press_timeout = 2
+long_press_cmd = /usr/local/bin/reboot.sh
+```
+
+**/etc/mygpiod.d/4.out**
+```
+value = high
 ```
 
 ## Copyright
