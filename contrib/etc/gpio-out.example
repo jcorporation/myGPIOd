@@ -1,0 +1,6 @@
+# Configuration for an input gpio
+# Copy it to <gpio number>.out
+
+# Value to set
+#value = high
+#value = low

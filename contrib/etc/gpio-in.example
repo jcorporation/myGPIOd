@@ -1,0 +1,24 @@
+# Configuration for an input gpio
+# Copy it to <gpio number>.in
+
+# The events to request
+#request_event = both
+#request_event = falling
+#request_event = rising
+
+# Action for rising event
+#action_rising = /usr/local/bin/poweroff.sh
+
+# Action for falling event
+#action_falling = /usr/local/bin/poweroff.sh
+
+# Long press support
+# Event for the long press handler
+#long_press_event = falling
+#long_press_event = raising
+
+# Timeout in seconds after long press action is executed
+#long_press_timeout = 2
+
+# The long press action
+#long_press_action = /usr/local/bin/reboot.sh
