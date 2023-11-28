@@ -9,16 +9,22 @@
 
 #include <stdbool.h>
 
+/**
+ * A linked list node
+ */
 struct t_list_node {
-    unsigned gpio;
-    void *data;
-    struct t_list_node *next;
+    unsigned gpio;             //!< gpio number
+    void *data;                //!< data pointer
+    struct t_list_node *next;  //!< pointer to next node in the list
 };
 
+/**
+ * Holds the linked list data
+ */
 struct t_list {
-    struct t_list_node *head;
-    struct t_list_node *tail;
-    unsigned length;
+    struct t_list_node *head;  //!< pointer to the head of the list
+    struct t_list_node *tail;  //!< pointer to the tail of the list
+    unsigned length;           //!< list length
 };
 
 typedef void (*list_data_clear)(void *node);

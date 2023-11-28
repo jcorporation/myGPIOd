@@ -93,7 +93,9 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_node_in *node, struct t
         MYGPIOD_LOG_ERROR("Error reading value from gpio %u: %s", gpio, strerror(errno));
         return;
     }
-    if (rv == 1) {
+    if ((rv == GPIO_VALUE_HIGH && node->long_press_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE) ||
+        (rv == GPIO_VALUE_LOW && node->long_press_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE))
+    {
         action_execute(node->long_press_cmd);
         if (node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES) {
             // ignore the release event

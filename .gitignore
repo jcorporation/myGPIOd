@@ -7,3 +7,4 @@ src/compile_commands.json
 .vscode
 clang-tidy.out
 src/.cache
+docs/doxygen
