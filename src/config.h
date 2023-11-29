@@ -52,15 +52,16 @@ struct t_config {
     bool active_low;          //!< active state is low?
     int bias;                 //!< bias value for all the gpios in gpios_in
     char *chip_name;          //!< name / path of the gpio chip
-    struct gpiod_chip *chip;  //!< gpio chip object
     int loglevel;             //!< the loglevel
     bool syslog;              //!< enable syslog?
     int signal_fd;            //!< file descriptor for the signal handler
     char *dir_gpio;           //!< directory for the gpio config files
+
+    struct gpiod_chip *chip;          //!< gpiod chip object
+    struct gpiod_line_bulk *bulk_in;  //!< gpiod requested in gpios
 };
 
 void config_clear(struct t_config *config);
-bool config_read(struct t_config *config, const char *config_file);
-struct t_config *config_new(void);
+struct t_config *get_config(const char *config_file);
 
 #endif

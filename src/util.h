@@ -7,13 +7,9 @@
 #ifndef MYGPIOD_UTIL_H
 #define MYGPIOD_UTIL_H
 
-#include "config.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 
-int line_request_flags(bool active_low, int bias);
-int make_signalfd(void);
 const char *lookup_gpio_value(int value);
 int parse_gpio_value(const char *str);
 bool parse_bool(const char *str);

@@ -9,24 +9,6 @@
 STARTPATH=$(dirname "$(realpath "$0")")
 cd "$STARTPATH" || exit 1
 
-#clang tidy options
-CLANG_TIDY_CHECKS="*"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-id-dependent-backward-branch"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-unroll-loops"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-struct-pack-align,-clang-analyzer-optin.performance.Padding"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-easily-swappable-parameters"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-signal-handler,-cert-sig30-c"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-assignment-in-if-condition"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-clang-diagnostic-invalid-command-line-argument"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-concurrency-mt-unsafe"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-cppcoreguidelines*"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-hicpp-*"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-llvmlibc-restrict-system-libc-headers"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-identifier-length"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-function-cognitive-complexity,-google-readability-function-size,-readability-function-size"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-magic-numbers"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-non-const-parameter"
-
 #exit on error
 set -e
 
@@ -156,24 +138,6 @@ cleanuposc() {
 }
 
 check() {
-  if check_cmd cppcheck
-  then
-    echo "Running cppcheck"
-    [ -z "${CPPCHECKOPTS+z}" ] && CPPCHECKOPTS="--enable=warning"
-    cppcheck $CPPCHECKOPTS src/*.c src/*.h
-  else
-    echo "cppcheck not found"
-  fi
-
-  if check_cmd flawfinder
-  then
-    echo "Running flawfinder"
-    [ -z "${FLAWFINDEROPTS+z}" ] && FLAWFINDEROPTS="-m3"
-    flawfinder $FLAWFINDEROPTS src
-  else
-    echo "flawfinder not found"
-  fi
-
   if [ ! -f src/compile_commands.json ]
   then
     echo "src/compile_commands.json not found"
@@ -183,11 +147,12 @@ check() {
 
   if check_cmd clang-tidy
   then
-    echo "Running clang-tidy, output goes to clang-tidy.out"
+    echo "Running clang-tidy"
     rm -f clang-tidy.out
     cd src || exit 1
     find ./ -name '*.c' -exec clang-tidy \
-        --checks="$CLANG_TIDY_CHECKS" {} \; >> ../clang-tidy.out  2>/dev/null
+        --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
+    cat ../clang-tidy.out
   else
     echo "clang-tidy not found"  
   fi

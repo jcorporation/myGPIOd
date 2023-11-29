@@ -8,10 +8,11 @@
  */
 
 #include "compile_time.h"
-#include "action.h"
 #include "config.h"
+#include "event.h"
+#include "gpio.h"
 #include "log.h"
-#include "util.h"
+#include "timer.h"
 
 #include <errno.h>
 #include <gpiod.h>
@@ -41,25 +42,23 @@ const char *__asan_default_options(void) {
 
 int main(int argc, char **argv) {
     int rc = EXIT_SUCCESS;
-    unsigned i;
-    struct gpiod_line *line;
 
     log_on_tty = isatty(fileno(stdout))
         ? true
         : false;
     log_to_syslog = false;
-    
+
+    MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
+    MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
+    MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_version_string());
+
     #ifdef MYGPIOD_DEBUG
         set_loglevel(LOG_DEBUG);
     #else
         set_loglevel(CFG_LOGLEVEL);
     #endif
 
-    MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
-    MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
-    MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_version_string());
-
-    // Handle commandline parameter
+    // Handle command line parameter
     char *config_file = NULL;
     if (argc == 2 && strncmp(argv[1], "/", 1) == 0) {
         config_file = strdup(argv[1]);
@@ -69,27 +68,19 @@ int main(int argc, char **argv) {
     }
 
     // Read config
-    MYGPIOD_LOG_INFO("Reading \"%s\"", config_file);
-    struct t_config *config = config_new();
-    if (config == NULL) {
-        MYGPIOD_LOG_EMERG("Out of memory");
-        free(config_file);
-        rc = EXIT_FAILURE;
-        goto out;
-    }
-    if (config_read(config, config_file) == false) {
-        free(config_file);
-        rc = EXIT_FAILURE;
-        goto out;
-    }
+    struct t_config *config = get_config(config_file);
     free(config_file);
+    if (config == NULL) {
+        rc = EXIT_FAILURE;
+        goto out;
+    }
 
     if (config->gpios_in.length == 0) {
         MYGPIOD_LOG_ERROR("No gpios for monitoring configured");
         rc = EXIT_FAILURE;
         goto out;
     }
-    
+
     // Set loglevel
     #ifdef MYGPIOD_DEBUG
         set_loglevel(LOG_DEBUG);
@@ -112,97 +103,32 @@ int main(int argc, char **argv) {
     }
 
     // output gpios
-    if (config->gpios_out.length > 0) {
-        int gpios_out_values[GPIOD_LINE_BULK_MAX_LINES];
-        struct gpiod_line_bulk bulk_out;
-        gpiod_line_bulk_init(&bulk_out);
-        struct t_list_node *current = config->gpios_out.head;
-        i = 0;
-        while (current != NULL) {
-            line = gpiod_chip_get_line(config->chip, current->gpio);
-            if (line == NULL) {
-                MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->gpio);
-                rc = EXIT_FAILURE;
-                goto out;
-            }
-            struct t_gpio_node_out *data = (struct t_gpio_node_out *)current->data;
-            MYGPIOD_LOG_INFO("Setting gpio \"%u\" as output to value \"%s\"", current->gpio, lookup_gpio_value(data->value));
-            gpiod_line_bulk_add(&bulk_out, line);
-            gpios_out_values[i] = data->value;
-            current = current->next;
-            i++;
-        }
-
-        // set values
-        int req_flags = line_request_flags(config->active_low, 0);
-        errno = 0;
-        int rv = gpiod_line_request_bulk_output_flags(&bulk_out, MYGPIOD_NAME,
-            req_flags, gpios_out_values);
-        if (rv == -1) {
-            MYGPIOD_LOG_ERROR("Error setting gpios: %s", strerror(errno));
-            rc = EXIT_FAILURE;
-            goto out;
-        }
-    }
-
-    // input gpios
-    struct gpiod_line_bulk bulk_in;
-    gpiod_line_bulk_init(&bulk_in);
-    struct t_list_node *current = config->gpios_in.head;
-    while (current != NULL) {
-        line = gpiod_chip_get_line(config->chip, current->gpio);
-        if (line == NULL) {
-            MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->gpio);
-            rc = EXIT_FAILURE;
-            goto out;
-        }
-        struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
-        MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s", current->gpio, lookup_event_request(data->request_event));
-        gpiod_line_bulk_add(&bulk_in, line);
-        current = current->next;
-    }
-
-    // set request flags
-    struct gpiod_line_request_config conf;
-    conf.flags = line_request_flags(config->active_low, config->bias);
-    conf.consumer = MYGPIOD_NAME;
-    conf.request_type = config->event_request;
-
-    // request the gpios
-    errno = 0;
-    int rv = gpiod_line_request_bulk(&bulk_in, &conf, NULL);
-    if (rv == -1) {
-        MYGPIOD_LOG_ERROR("Error requesting gpios: %s", strerror(errno));
-        rc = EXIT_FAILURE;
+    if (gpio_set_outputs(config) == false) {
         goto out;
     }
 
-    // get fds
-    current= config->gpios_in.head;
-    i = 0;
-    while (current != NULL) {
-        struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
-        line = gpiod_line_bulk_get_line(&bulk_in, i);
-        data->fd = gpiod_line_event_get_fd(line);
-        current = current->next;
-        i++;
+    // input gpios
+    if (gpio_request_inputs(config) == false) {
+        goto out;
     }
 
     // Main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
     MYGPIOD_LOG_INFO("Monitoring %u gpios", config->gpios_in.length);
 
+    #define MAX_FDS (GPIOD_LINE_BULK_MAX_LINES * 2 + 1)
+    struct t_list_node *current;
     while (true) {
-        struct pollfd pfds[GPIOD_LINE_BULK_MAX_LINES * 2 + 1];
+        struct pollfd pfds[MAX_FDS];
+        int pfds_type[MAX_FDS];
         unsigned pfd_count = 0;
 
         // add gpio fds
         current = config->gpios_in.head;
         while (current != NULL) {
             struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
-            pfds[pfd_count].fd = data->fd;
-            pfds[pfd_count].events = POLLIN | POLLPRI;
-            pfd_count++;
+            pfd_count = poll_fd_add(&pfds[pfd_count], &pfds_type[pfd_count], pfd_count,
+                data->fd, POLLIN | POLLPRI, PFD_TYPE_GPIO);
             current = current->next;
         }
 
@@ -211,17 +137,15 @@ int main(int argc, char **argv) {
         while (current != NULL) {
             struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
             if (data->timer_fd > 0) {
-                pfds[pfd_count].fd = data->timer_fd;
-                pfds[pfd_count].events = POLLIN;
-                pfd_count++;
+                pfd_count = poll_fd_add(&pfds[pfd_count], &pfds_type[pfd_count], pfd_count,
+                    data->timer_fd, POLLIN, PFD_TYPE_TIMER);
             }
             current = current->next;
         }
 
-        // add signal fds
-        pfds[pfd_count].fd = config->signal_fd;
-        pfds[pfd_count].events = POLLIN | POLLPRI;
-        pfd_count++;
+        // add signal fd
+        pfd_count = poll_fd_add(&pfds[pfd_count], &pfds_type[pfd_count], pfd_count,
+            config->signal_fd, POLLIN | POLLPRI, PFD_TYPE_SIGNAL);
 
         // poll
         int cnt = poll(pfds, pfd_count, -1);
@@ -235,44 +159,26 @@ int main(int argc, char **argv) {
             continue;
         }
 
-        // gpio event
-        for (i = 0; i < config->gpios_in.length; i++) {
+        // get event
+        for (unsigned i = 0; i < pfd_count; i++) {
             if (pfds[i].revents) {
-                MYGPIOD_LOG_DEBUG("%u: Gpio event detected", i);
-                line = gpiod_line_bulk_get_line(&bulk_in, i);
-                struct gpiod_line_event event;
-                rv = gpiod_line_event_read(line, &event);
-                if (rv < 0) {
-                    rc = EXIT_FAILURE;
+                bool rv = false;
+                switch(pfds_type[i]) {
+                    case PFD_TYPE_GPIO:
+                        rv = gpio_handle_event(config, i);
+                        break;
+                    case PFD_TYPE_TIMER:
+                        rv = timer_handle_event(&pfds[i].fd, config, i);
+                        break;
+                    case PFD_TYPE_SIGNAL:
+                        MYGPIOD_LOG_DEBUG("%u: Signal event detected", i);
+                        rc = EXIT_SUCCESS;
+                        break;
+                }
+                if (rv == false) {
                     goto out;
                 }
-                struct t_list_node *node = list_node_at(&config->gpios_in, i);
-                struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
-                // abort pending long press event
-                action_delay_abort(data);
-                action_handle(node->gpio, &event.ts, event.event_type, data);
             }
-        }
-
-        // timerfd event
-        for (; i < pfd_count - 1; i++) {
-            if (pfds[i].revents & POLLIN) {
-                MYGPIOD_LOG_DEBUG("%u: Long press timer event detected", i);
-                uint64_t exp;
-                ssize_t s = read(pfds[i].fd, &exp, sizeof(uint64_t));
-                if (s == sizeof(uint64_t) && exp > 1) {
-                    struct t_list_node *node = list_node_at(&config->gpios_in, i);
-                    struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
-                    action_execute_delayed(node->gpio, data, config);
-                }
-            }
-        }
-
-        // signalfd event
-        if (pfds[i].revents) {
-            MYGPIOD_LOG_DEBUG("%u: Signal event detected", i);
-            rc = EXIT_SUCCESS;
-            goto out;
         }
     }
 

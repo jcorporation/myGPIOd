@@ -7,67 +7,14 @@
 #include "compile_time.h"
 #include "util.h"
 
+#include "config.h"
 #include "log.h"
 
 #include <errno.h>
 #include <gpiod.h>
 #include <inttypes.h>
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/signalfd.h>
-
-/**
- * Sets the line requests flags from active_low and bias
- * @param active_low active_low settings
- * @param bias bias
- * @return the line request flags
- */
-int line_request_flags(bool active_low, int bias) {
-    int req_flags = 0;
-
-    if (active_low == true) {
-        req_flags |= GPIOD_LINE_REQUEST_FLAG_ACTIVE_LOW;
-    }
-    if (bias == GPIOD_LINE_BIAS_DISABLE) {
-        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_DISABLE;
-    }
-    else if (bias == GPIOD_LINE_BIAS_PULL_DOWN) {
-        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_DOWN;
-    }
-    else if (bias == GPIOD_LINE_BIAS_PULL_UP) {
-        req_flags |= GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_UP;
-    }
-
-    return req_flags;
-}
-
-/**
- * Creates a signalfd to exit on SIGTERM and SIGINT
- * @return the created signal fd
- */
-int make_signalfd(void) {
-    sigset_t sigmask;
-    sigemptyset(&sigmask);
-    sigaddset(&sigmask, SIGTERM);
-    sigaddset(&sigmask, SIGINT);
-
-    errno = 0;
-    int rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
-    if (rv < 0) {
-        MYGPIOD_LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
-        return -1;
-    }
-
-    errno = 0;
-    int sigfd = signalfd(-1, &sigmask, 0);
-    if (sigfd < 0) {
-        MYGPIOD_LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
-        return -1;
-    }
-
-    return sigfd;
-}
 
 /**
  * Parses a string to a gpio value.

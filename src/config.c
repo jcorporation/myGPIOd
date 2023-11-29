@@ -9,6 +9,7 @@
 
 #include "list.h"
 #include "log.h"
+#include "signal_handler.h"
 #include "util.h"
 
 #include <ctype.h>
@@ -21,6 +22,8 @@
 #include <unistd.h>
 
 //private definitions
+static bool config_read(struct t_config *config, const char *config_file);
+static struct t_config *config_new(void);
 static bool parse_config_line(unsigned line_num, char *line, struct t_config *config);
 static bool parse_gpio_config_file(int mode, void *node, const char *dirname, const char *filename);
 static bool parse_gpio_config_file_in_line(unsigned line_num, char *line, struct t_gpio_node_in *node);
@@ -35,29 +38,22 @@ static char *chomp(char *line);
 //public functions
 
 /**
- * Allocates a new config struct and sets defaults
- * @return allocated struct with default values assigned.
+ * Allocates a config struct and reads the configuration file
+ * @param config_file configuration file name
+ * @return populated config struct or NULL on error
  */
-struct t_config *config_new(void) {
-    struct t_config *config = malloc(sizeof(struct t_config));
+struct t_config *get_config(const char *config_file) {
+    MYGPIOD_LOG_INFO("Reading \"%s\"", config_file);
+    struct t_config *config = config_new();
     if (config == NULL) {
+        MYGPIOD_LOG_EMERG("Out of memory");
         return NULL;
     }
-    config->signal_fd = make_signalfd();
-    if (config->signal_fd == -1) {
+    if (config_read(config, config_file) == false) {
+        config_clear(config);
         free(config);
         return NULL;
     }
-    list_init(&config->gpios_in);
-    list_init(&config->gpios_out);
-    config->chip_name = strdup(CFG_CHIP);
-    config->chip = NULL;
-    config->active_low = CFG_ACTIVE_LOW;
-    config->bias = CFG_BIAS;
-    config->event_request = CFG_REQUEST_EVENT_CHIP;
-    config->loglevel = loglevel;
-    config->syslog = CFG_SYSLOG;
-    config->dir_gpio = strdup(CFG_GPIO_DIR);
     return config;
 }
 
@@ -78,13 +74,43 @@ void config_clear(struct t_config *config) {
     free(config->dir_gpio);
 }
 
+//private functions
+
+/**
+ * Allocates a new config struct and sets defaults
+ * @return allocated struct with default values assigned.
+ */
+static struct t_config *config_new(void) {
+    struct t_config *config = malloc(sizeof(struct t_config));
+    if (config == NULL) {
+        return NULL;
+    }
+    config->signal_fd = make_signalfd();
+    if (config->signal_fd == -1) {
+        free(config);
+        return NULL;
+    }
+    list_init(&config->gpios_in);
+    list_init(&config->gpios_out);
+    config->chip_name = strdup(CFG_CHIP);
+    config->chip = NULL;
+    config->bulk_in = NULL;
+    config->active_low = CFG_ACTIVE_LOW;
+    config->bias = CFG_BIAS;
+    config->event_request = CFG_REQUEST_EVENT_CHIP;
+    config->loglevel = loglevel;
+    config->syslog = CFG_SYSLOG;
+    config->dir_gpio = strdup(CFG_GPIO_DIR);
+    return config;
+}
+
 /**
  * Reads the mygpiod config file
  * @param config config struct to populate
  * @param config_file config filename to read
  * @return true on success, else false
  */
-bool config_read(struct t_config *config, const char *config_file) {
+static bool config_read(struct t_config *config, const char *config_file) {
     FILE *fp = fopen(config_file, OPEN_FLAGS_READ);
     if (fp == NULL) {
         MYGPIOD_LOG_ERROR("Can not open \"%s\": %s", config_file, strerror(errno));
@@ -170,8 +196,6 @@ bool config_read(struct t_config *config, const char *config_file) {
     MYGPIOD_LOG_INFO("Parsed %u gpio config files", i);
     return rc;
 }
-
-//private functions
 
 /**
  * Parses a configuration line
