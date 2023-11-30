@@ -10,6 +10,7 @@
 #include "config.h"
 #include "log.h"
 
+#include <ctype.h>
 #include <errno.h>
 #include <gpiod.h>
 #include <inttypes.h>
@@ -209,4 +210,18 @@ bool parse_int(char *str, int *result, char **rest, unsigned min, unsigned max) 
     }
     MYGPIOD_LOG_WARN("Invalid value");
     return false;
+}
+
+/**
+ * Removes whitespace characters from end
+ * @param line string to chomp
+ * @return chomped string
+ */
+char *chomp(char *line, size_t len) {
+    size_t i = len - 1;
+    while (i > 0 && isspace(line[i])) {
+        i--;
+    }
+    line[i + 1] = '\0';
+    return line;
 }

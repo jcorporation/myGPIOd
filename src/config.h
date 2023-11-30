@@ -57,6 +57,10 @@ struct t_config {
     int signal_fd;            //!< file descriptor for the signal handler
     char *dir_gpio;           //!< directory for the gpio config files
 
+    char *socket_path;        //!< server socket
+    struct t_list clients;    //!< list of connected clients
+    unsigned client_id;       //!< uniq client id
+
     struct gpiod_chip *chip;          //!< gpiod chip object
     struct gpiod_line_bulk *bulk_in;  //!< gpiod requested in gpios
 };

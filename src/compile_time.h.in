@@ -24,7 +24,8 @@
 #define CFG_LOGLEVEL LOG_NOTICE
 #define CFG_SYSLOG false
 #define CFG_GPIO_DIR "/etc/mygpiod.d"
-
+#define CFG_SOCKET_PATH "/run/mygpiod/socket"
+#define MAX_CLIENT_CONNECTIONS 10
 #define OPEN_FLAGS_READ "re"
 
 #endif

@@ -53,7 +53,7 @@ bool gpio_handle_event(struct t_config *config, unsigned idx) {
     struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
     // abort pending long press event
     action_delay_abort(data);
-    action_handle(node->gpio, &event.ts, event.event_type, data);
+    action_handle(node->id, &event.ts, event.event_type, data);
     return true;
 }
 
@@ -75,14 +75,14 @@ bool gpio_set_outputs(struct t_config *config) {
     unsigned i = 0;
     struct gpiod_line *line;
     while (current != NULL) {
-        line = gpiod_chip_get_line(config->chip, current->gpio);
+        line = gpiod_chip_get_line(config->chip, current->id);
         if (line == NULL) {
-            MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->gpio);
+            MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->id);
             return false;
         }
         struct t_gpio_node_out *data = (struct t_gpio_node_out *)current->data;
         MYGPIOD_LOG_INFO("Setting gpio \"%u\" as output to value \"%s\"",
-            current->gpio, lookup_gpio_value(data->value));
+            current->id, lookup_gpio_value(data->value));
         gpiod_line_bulk_add(&bulk_out, line);
         gpios_out_values[i] = data->value;
         current = current->next;
@@ -118,14 +118,14 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
     struct gpiod_line *line;
     struct t_list_node *current = config->gpios_in.head;
     while (current != NULL) {
-        line = gpiod_chip_get_line(config->chip, current->gpio);
+        line = gpiod_chip_get_line(config->chip, current->id);
         if (line == NULL) {
-            MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->gpio);
+            MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->id);
             return false;
         }
         struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
         MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s",
-            current->gpio, lookup_event_request(data->request_event));
+            current->id, lookup_event_request(data->request_event));
         gpiod_line_bulk_add(&bulk_in, line);
         current = current->next;
     }
@@ -151,7 +151,7 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
         struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
         line = gpiod_line_bulk_get_line(&bulk_in, i);
         data->fd = gpiod_line_event_get_fd(line);
-        event_poll_fd_add(poll_fds, data->fd, PFD_TYPE_GPIO);
+        event_poll_fd_add(poll_fds, data->fd, PFD_TYPE_GPIO, POLLIN | POLLPRI);
         current = current->next;
         i++;
     }

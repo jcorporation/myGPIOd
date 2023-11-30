@@ -46,14 +46,14 @@ void list_clear(struct t_list *list, list_data_clear clear_data_callback) {
 /**
  * Creates a new node and appends it to the list
  * @param list list to append the new node
- * @param gpio the gpio number
+ * @param id the node id
  * @param data already allocated data pointer for the new list node
  * @return true on success, else false
  */
-bool list_push(struct t_list *list, unsigned gpio, void *data) {
+bool list_push(struct t_list *list, unsigned id, void *data) {
     //create new node
     struct t_list_node *node = malloc(sizeof(struct t_list_node));
-    node->gpio = gpio;
+    node->id = id;
     node->data = data;
     node->next = NULL;
 
@@ -94,15 +94,57 @@ struct t_list_node *list_node_at(struct t_list *list, unsigned idx) {
 /**
  * Gets a list node by its gpio number
  * @param list pointer to the list
- * @param gpio gpio number
+ * @param id node id
  * @return found list node or NULL on error
  */
-struct t_list_node *list_node_by_gpio(struct t_list *list, unsigned gpio) {
+struct t_list_node *list_node_by_id(struct t_list *list, unsigned id) {
     struct t_list_node *current = list->head;
     while (current != NULL) {
-        if (current->gpio == gpio) {
+        if (current->id == id) {
             return current;
         }
     }
     return NULL;
+}
+
+bool list_remove_node(struct t_list *list, struct t_list_node *node) {
+    if (list->head == NULL) {
+        return false;
+    }
+
+    //get the node at idx and the previous node
+    struct t_list_node *previous = NULL;
+    struct t_list_node *current = list->head;
+    while (current != NULL) {
+        if (current == node) {
+            break;
+        }
+        previous = current;
+        current = current->next;
+    }
+
+    if (current == NULL) {
+        return false;
+    }
+
+    if (previous == NULL) {
+        //Fix head
+        list->head = current->next;
+    }
+    else {
+        //Fix previous nodes next to skip over the removed node
+        previous->next = current->next;
+    }
+
+    //Fix tail
+    if (list->tail == current) {
+        list->tail = previous;
+    }
+    list->length--;
+
+    //null out this node's next value since it's not part of a list anymore
+    current->next = NULL;
+
+    //return the node
+    return true;
 }

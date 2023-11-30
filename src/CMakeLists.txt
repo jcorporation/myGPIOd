@@ -22,10 +22,11 @@ target_sources(mygpiod PRIVATE
   main.c
   action.c
   config.c
-  event.c
+  event_loop.c
   gpio.c
   list.c
   log.c
+  server_socket.c
   signal_handler.c
   timer.c
   util.c

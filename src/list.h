@@ -13,7 +13,7 @@
  * A linked list node
  */
 struct t_list_node {
-    unsigned gpio;             //!< gpio number
+    unsigned id;             //!< gpio number
     void *data;                //!< data pointer
     struct t_list_node *next;  //!< pointer to next node in the list
 };
@@ -31,8 +31,9 @@ typedef void (*list_data_clear)(void *node);
 
 void list_init(struct t_list *list);
 void list_clear(struct t_list *list, list_data_clear clear_data_callback);
-bool list_push(struct t_list *list, unsigned gpio, void *data);
+bool list_push(struct t_list *list, unsigned id, void *data);
 struct t_list_node *list_node_at(struct t_list *list, unsigned idx);
-struct t_list_node *list_node_by_gpio(struct t_list *list, unsigned gpio);
+struct t_list_node *list_node_by_id(struct t_list *list, unsigned id);
+bool list_remove_node(struct t_list *list, struct t_list_node *node);
 
 #endif

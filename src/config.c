@@ -33,7 +33,6 @@ static struct t_gpio_node_out *gpio_node_out_new(void);
 static void gpio_node_in_clear(void *node);
 static void gpio_node_out_clear(void *node);
 static char *skip_chars(char *line, size_t skip, char c);
-static char *chomp(char *line);
 
 //public functions
 
@@ -101,6 +100,9 @@ static struct t_config *config_new(void) {
     config->loglevel = loglevel;
     config->syslog = CFG_SYSLOG;
     config->dir_gpio = strdup(CFG_GPIO_DIR);
+    config->socket_path = strdup(CFG_SOCKET_PATH);
+    config->client_id = 0;
+    list_init(&config->clients);
     return config;
 }
 
@@ -124,7 +126,7 @@ static bool config_read(struct t_config *config, const char *config_file) {
     while (getline(&line, &n, fp) > 0) {
         line_num++;
         //strip whitespace characters
-        char *line_c = chomp(line);
+        char *line_c = chomp(line, strlen(line));
         if (line_c == NULL) {
             continue;
         }
@@ -281,7 +283,7 @@ static bool parse_gpio_config_file(int mode, void *node, const char *dirname, co
     while (getline(&line, &n, fp) > 0) {
         line_num++;
         //strip whitespace characters
-        char *line_c = chomp(line);
+        char *line_c = chomp(line, strlen(line));
         if (line_c == NULL) {
             continue;
         }
@@ -460,19 +462,5 @@ static char *skip_chars(char *line, size_t skip, char c) {
     while ((isspace(line[0]) || line[0] == c) && line[0] != '\0') {
         line++;
     }
-    return line;
-}
-
-/**
- * Removes whitespace characters from end
- * @param line string to chomp
- * @return chomped string
- */
-static char *chomp(char *line) {
-    size_t i = strlen(line) - 1;
-    while (i > 0 && isspace(line[i])) {
-        i--;
-    }
-    line[i + 1] = '\0';
     return line;
 }

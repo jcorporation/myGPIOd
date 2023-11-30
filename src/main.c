@@ -9,9 +9,10 @@
 
 #include "compile_time.h"
 #include "config.h"
-#include "event.h"
+#include "event_loop.h"
 #include "gpio.h"
 #include "log.h"
+#include "server_socket.h"
 
 #include <poll.h>
 #include <stdio.h>
@@ -83,15 +84,24 @@ int main(int argc, char **argv) {
     memset(&poll_fds, 0, sizeof(poll_fds));
 
     // open the chip, set output gpios and request input gpios
-    if (gpio_open_chip(config) == false ||
-        gpio_set_outputs(config) == false ||
-        gpio_request_inputs(config, &poll_fds) == false)
-    {
-        goto out;
+    if (config->chip_name[0] != '\0') {
+        if (gpio_open_chip(config) == false ||
+            gpio_set_outputs(config) == false ||
+            gpio_request_inputs(config, &poll_fds) == false)
+        {
+            goto out;
+        }
     }
 
     // add signal fd
-    event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL);
+    event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL, POLLIN | POLLPRI);
+
+    // create server socket
+    int server_fd = socket_create(config);
+    if (server_fd == -1) {
+        goto out;
+    }
+    event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI);
 
     // main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
@@ -103,6 +113,7 @@ int main(int argc, char **argv) {
         // reset poll_fds length and re-add the timer fds
         poll_fds.len = pfd_len_init;
         event_add_timer_fds(config, &poll_fds);
+        event_add_client_fds(config, &poll_fds);
 
         // poll
         int cnt = poll(poll_fds.fd, poll_fds.len, -1);

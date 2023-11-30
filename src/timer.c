@@ -36,7 +36,7 @@ bool timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
             return false;
         }
         struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
-        action_execute_delayed(node->gpio, data, config);
+        action_execute_delayed(node->id, data, config);
         return true;
     }
     return false;

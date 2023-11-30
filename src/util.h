@@ -21,5 +21,6 @@ const char *lookup_event_request(int event);
 const char *lookup_event(int event);
 bool parse_uint(char *str, unsigned *result, char **rest, unsigned min, unsigned max);
 bool parse_int(char *str, int *result, char **rest, unsigned min, unsigned max);
+char *chomp(char *line, size_t len);
 
 #endif
