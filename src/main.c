@@ -44,15 +44,15 @@ int main(int argc, char **argv) {
         : false;
     log_to_syslog = false;
 
-    MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
-    MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
-    MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_version_string());
-
     #ifdef MYGPIOD_DEBUG
         set_loglevel(LOG_DEBUG);
     #else
         set_loglevel(CFG_LOGLEVEL);
     #endif
+
+    MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
+    MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
+    MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_version_string());
 
     // Handle command line parameter
     char *config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
@@ -68,9 +68,7 @@ int main(int argc, char **argv) {
     }
 
     // set loglevel
-    #ifdef MYGPIOD_DEBUG
-        set_loglevel(LOG_DEBUG);
-    #else
+    #ifndef MYGPIOD_DEBUG
         set_loglevel(config->loglevel);
     #endif
 

@@ -63,11 +63,11 @@ bool gpio_handle_event(struct t_config *config, unsigned idx) {
  * @return true on success, else false
  */
 bool gpio_set_outputs(struct t_config *config) {
-    MYGPIOD_LOG_INFO("Setting output gpios");
     if (config->gpios_out.length == 0) {
         MYGPIOD_LOG_INFO("No output gpios configured");
         return true;
     }
+    MYGPIOD_LOG_INFO("Setting output gpios");
     int gpios_out_values[GPIOD_LINE_BULK_MAX_LINES];
     struct gpiod_line_bulk bulk_out;
     gpiod_line_bulk_init(&bulk_out);
