@@ -7,6 +7,7 @@
 #ifndef MYGPIOD_EVENT_H
 #define MYGPIOD_EVENT_H
 
+#include <gpiod.h>
 #include <poll.h>
 
 /**
@@ -18,6 +19,13 @@ enum pfd_types {
     PFD_TYPE_SIGNAL
 };
 
-unsigned poll_fd_add(struct pollfd *pfds, int *pfds_type, unsigned pfd_count, int fd, short events, int pfd_type);
+#define MAX_FDS (GPIOD_LINE_BULK_MAX_LINES * 2 + 1)
+struct t_poll_fds {
+    struct pollfd fd[MAX_FDS];
+    int type[MAX_FDS];
+    unsigned len;
+};
+
+bool poll_fd_add(struct t_poll_fds *poll_fds, int fd, short events, int pfd_type);
 
 #endif

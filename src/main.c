@@ -108,47 +108,36 @@ int main(int argc, char **argv) {
     }
 
     // input gpios
-    if (gpio_request_inputs(config) == false) {
+    struct t_poll_fds poll_fds;
+    memset(&poll_fds, 0, sizeof(poll_fds));
+    if (gpio_request_inputs(config, &poll_fds) == false) {
         goto out;
     }
+
+    // add signal fd
+    poll_fd_add(&poll_fds, config->signal_fd, POLLIN | POLLPRI, PFD_TYPE_SIGNAL);
 
     // Main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
     MYGPIOD_LOG_INFO("Monitoring %u gpios", config->gpios_in.length);
 
-    #define MAX_FDS (GPIOD_LINE_BULK_MAX_LINES * 2 + 1)
     struct t_list_node *current;
+    // save initial number of fds to poll
+    unsigned pfd_len_init = poll_fds.len;
     while (true) {
-        struct pollfd pfds[MAX_FDS];
-        int pfds_type[MAX_FDS];
-        unsigned pfd_count = 0;
-
-        // add gpio fds
-        current = config->gpios_in.head;
-        while (current != NULL) {
-            struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
-            pfd_count = poll_fd_add(&pfds[pfd_count], &pfds_type[pfd_count], pfd_count,
-                data->fd, POLLIN | POLLPRI, PFD_TYPE_GPIO);
-            current = current->next;
-        }
-
-        // add timer fds
+        // reset poll_fds length and re-add the timer fds
+        poll_fds.len = pfd_len_init;
         current = config->gpios_in.head;
         while (current != NULL) {
             struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
             if (data->timer_fd > 0) {
-                pfd_count = poll_fd_add(&pfds[pfd_count], &pfds_type[pfd_count], pfd_count,
-                    data->timer_fd, POLLIN, PFD_TYPE_TIMER);
+                poll_fd_add(&poll_fds, data->timer_fd, POLLIN, PFD_TYPE_TIMER);
             }
             current = current->next;
         }
 
-        // add signal fd
-        pfd_count = poll_fd_add(&pfds[pfd_count], &pfds_type[pfd_count], pfd_count,
-            config->signal_fd, POLLIN | POLLPRI, PFD_TYPE_SIGNAL);
-
         // poll
-        int cnt = poll(pfds, pfd_count, -1);
+        int cnt = poll(poll_fds.fd, poll_fds.len, -1);
         if (cnt < 0) {
             MYGPIOD_LOG_ERROR("Failure polling fds");
             rc = EXIT_FAILURE;
@@ -160,15 +149,15 @@ int main(int argc, char **argv) {
         }
 
         // get event
-        for (unsigned i = 0; i < pfd_count; i++) {
-            if (pfds[i].revents) {
+        for (unsigned i = 0; i < poll_fds.len; i++) {
+            if (poll_fds.fd[i].revents) {
                 bool rv = false;
-                switch(pfds_type[i]) {
+                switch(poll_fds.type[i]) {
                     case PFD_TYPE_GPIO:
                         rv = gpio_handle_event(config, i);
                         break;
                     case PFD_TYPE_TIMER:
-                        rv = timer_handle_event(&pfds[i].fd, config, i);
+                        rv = timer_handle_event(&poll_fds.fd[i].fd, config, i);
                         break;
                     case PFD_TYPE_SIGNAL:
                         MYGPIOD_LOG_DEBUG("%u: Signal event detected", i);

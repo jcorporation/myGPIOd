@@ -7,9 +7,24 @@
 #include "compile_time.h"
 #include "event.h"
 
-unsigned poll_fd_add(struct pollfd *pfds, int *pfds_type, unsigned pfd_count, int fd, short events, int pfd_type) {
-    pfds->fd = fd;
-    pfds->events = events;
-    *pfds_type = pfd_type;
-    return ++pfd_count;
+#include "log.h"
+
+/**
+ * Adds a fd to the list of fds to poll
+ * @param poll_fds struct to add the new fd
+ * @param fd fd to add
+ * @param events events to poll
+ * @param pfd_type type of poll fd
+ * @return true on success, else false
+ */
+bool poll_fd_add(struct t_poll_fds *poll_fds, int fd, short events, int pfd_type) {
+    if (poll_fds->len == MAX_FDS) {
+        MYGPIOD_LOG_ERROR("Maximum number of poll fds reached");
+        return false;
+    }
+    poll_fds->fd[poll_fds->len].fd = fd;
+    poll_fds->fd[poll_fds->len].events = events;
+    poll_fds->type[poll_fds->len] = pfd_type;
+    poll_fds->len++;
+    return true;
 }

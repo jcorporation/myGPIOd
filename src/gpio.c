@@ -66,7 +66,8 @@ bool gpio_set_outputs(struct t_config *config) {
             return false;
         }
         struct t_gpio_node_out *data = (struct t_gpio_node_out *)current->data;
-        MYGPIOD_LOG_INFO("Setting gpio \"%u\" as output to value \"%s\"", current->gpio, lookup_gpio_value(data->value));
+        MYGPIOD_LOG_INFO("Setting gpio \"%u\" as output to value \"%s\"",
+            current->gpio, lookup_gpio_value(data->value));
         gpiod_line_bulk_add(&bulk_out, line);
         gpios_out_values[i] = data->value;
         current = current->next;
@@ -90,7 +91,7 @@ bool gpio_set_outputs(struct t_config *config) {
  * @param config pointer to config
  * @return true on success, else false
  */
-bool gpio_request_inputs(struct t_config *config) {
+bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
     MYGPIOD_LOG_INFO("Requesting input gpios");
     struct gpiod_line_bulk bulk_in;
     gpiod_line_bulk_init(&bulk_in);
@@ -104,7 +105,8 @@ bool gpio_request_inputs(struct t_config *config) {
             return false;
         }
         struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
-        MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s", current->gpio, lookup_event_request(data->request_event));
+        MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s",
+            current->gpio, lookup_event_request(data->request_event));
         gpiod_line_bulk_add(&bulk_in, line);
         current = current->next;
     }
@@ -130,6 +132,7 @@ bool gpio_request_inputs(struct t_config *config) {
         struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
         line = gpiod_line_bulk_get_line(&bulk_in, i);
         data->fd = gpiod_line_event_get_fd(line);
+        poll_fd_add(poll_fds, data->fd, POLLIN | POLLPRI, PFD_TYPE_GPIO);
         current = current->next;
         i++;
     }
