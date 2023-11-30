@@ -10,6 +10,7 @@
 #include "config.h"
 #include "event.h"
 
+bool gpio_open_chip(struct t_config *config);
 bool gpio_handle_event(struct t_config *config, unsigned idx);
 bool gpio_set_outputs(struct t_config *config);
 bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds);

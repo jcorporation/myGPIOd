@@ -21,7 +21,22 @@ static int line_request_flags(bool active_low, int bias);
 // public functions
 
 /**
- * Handles a gpio event
+ * Opens the gpio chip.
+ * @param config pointer to config
+ * @return true on success, else false
+ */
+bool gpio_open_chip(struct t_config *config) {
+    MYGPIOD_LOG_INFO("Opening chip \"%s\"", config->chip_name);
+    config->chip = gpiod_chip_open_lookup(config->chip_name);
+    if (config->chip == NULL) {
+        MYGPIOD_LOG_ERROR("Error opening chip");
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Handles a gpio event.
  * @param config pointer to config
  * @param idx offset for bulk_in
  * @return true on success, else false
@@ -43,7 +58,7 @@ bool gpio_handle_event(struct t_config *config, unsigned idx) {
 }
 
 /**
- * Sets the output gpios in bulk
+ * Sets the output gpios in bulk.
  * @param config pointer to config
  * @return true on success, else false
  */
@@ -87,11 +102,15 @@ bool gpio_set_outputs(struct t_config *config) {
 }
 
 /**
- * Request the input gpios
+ * Request the input gpios.
  * @param config pointer to config
  * @return true on success, else false
  */
 bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
+    if (config->gpios_in.length == 0) {
+        MYGPIOD_LOG_INFO("No gpios for monitoring configured");
+        return true;
+    }
     MYGPIOD_LOG_INFO("Requesting input gpios");
     struct gpiod_line_bulk bulk_in;
     gpiod_line_bulk_init(&bulk_in);
@@ -132,7 +151,7 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
         struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
         line = gpiod_line_bulk_get_line(&bulk_in, i);
         data->fd = gpiod_line_event_get_fd(line);
-        poll_fd_add(poll_fds, data->fd, POLLIN | POLLPRI, PFD_TYPE_GPIO);
+        event_poll_fd_add(poll_fds, data->fd, PFD_TYPE_GPIO);
         current = current->next;
         i++;
     }
@@ -142,7 +161,7 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
 // private functions
 
 /**
- * Sets the line requests flags from active_low and bias
+ * Sets the line requests flags from active_low and bias.
  * @param active_low active_low settings
  * @param bias bias
  * @return the line request flags

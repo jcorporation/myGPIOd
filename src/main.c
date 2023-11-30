@@ -12,12 +12,8 @@
 #include "event.h"
 #include "gpio.h"
 #include "log.h"
-#include "timer.h"
 
-#include <errno.h>
-#include <gpiod.h>
 #include <poll.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -59,13 +55,9 @@ int main(int argc, char **argv) {
     #endif
 
     // Handle command line parameter
-    char *config_file = NULL;
-    if (argc == 2 && strncmp(argv[1], "/", 1) == 0) {
-        config_file = strdup(argv[1]);
-    }
-    else {
-        config_file = strdup("/etc/mygpiod.conf");
-    }
+    char *config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
+        ? strdup(argv[1])
+        : strdup("/etc/mygpiod.conf");
 
     // Read config
     struct t_config *config = get_config(config_file);
@@ -75,66 +67,44 @@ int main(int argc, char **argv) {
         goto out;
     }
 
-    if (config->gpios_in.length == 0) {
-        MYGPIOD_LOG_ERROR("No gpios for monitoring configured");
-        rc = EXIT_FAILURE;
-        goto out;
-    }
-
-    // Set loglevel
+    // set loglevel
     #ifdef MYGPIOD_DEBUG
         set_loglevel(LOG_DEBUG);
     #else
         set_loglevel(config->loglevel);
     #endif
 
+    // open syslog connection
     if (config->syslog == true) {
         openlog(MYGPIOD_NAME, LOG_CONS, LOG_DAEMON);
         log_to_syslog = true;
     }
 
-    // open the chip
-    MYGPIOD_LOG_INFO("Opening chip \"%s\"", config->chip_name);
-    config->chip = gpiod_chip_open_lookup(config->chip_name);
-    if (config->chip == NULL) {
-        MYGPIOD_LOG_ERROR("Error opening chip");
-        rc = EXIT_FAILURE;
-        goto out;
-    }
-
-    // output gpios
-    if (gpio_set_outputs(config) == false) {
-        goto out;
-    }
-
-    // input gpios
+    // init struct for event polling
     struct t_poll_fds poll_fds;
     memset(&poll_fds, 0, sizeof(poll_fds));
-    if (gpio_request_inputs(config, &poll_fds) == false) {
+
+    // open the chip, set output gpios and request input gpios
+    if (gpio_open_chip(config) == false ||
+        gpio_set_outputs(config) == false ||
+        gpio_request_inputs(config, &poll_fds) == false)
+    {
         goto out;
     }
 
     // add signal fd
-    poll_fd_add(&poll_fds, config->signal_fd, POLLIN | POLLPRI, PFD_TYPE_SIGNAL);
+    event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL);
 
-    // Main event handling loop
+    // main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
     MYGPIOD_LOG_INFO("Monitoring %u gpios", config->gpios_in.length);
 
-    struct t_list_node *current;
     // save initial number of fds to poll
     unsigned pfd_len_init = poll_fds.len;
     while (true) {
         // reset poll_fds length and re-add the timer fds
         poll_fds.len = pfd_len_init;
-        current = config->gpios_in.head;
-        while (current != NULL) {
-            struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
-            if (data->timer_fd > 0) {
-                poll_fd_add(&poll_fds, data->timer_fd, POLLIN, PFD_TYPE_TIMER);
-            }
-            current = current->next;
-        }
+        event_add_timer_fds(config, &poll_fds);
 
         // poll
         int cnt = poll(poll_fds.fd, poll_fds.len, -1);
@@ -148,26 +118,9 @@ int main(int argc, char **argv) {
             continue;
         }
 
-        // get event
-        for (unsigned i = 0; i < poll_fds.len; i++) {
-            if (poll_fds.fd[i].revents) {
-                bool rv = false;
-                switch(poll_fds.type[i]) {
-                    case PFD_TYPE_GPIO:
-                        rv = gpio_handle_event(config, i);
-                        break;
-                    case PFD_TYPE_TIMER:
-                        rv = timer_handle_event(&poll_fds.fd[i].fd, config, i);
-                        break;
-                    case PFD_TYPE_SIGNAL:
-                        MYGPIOD_LOG_DEBUG("%u: Signal event detected", i);
-                        rc = EXIT_SUCCESS;
-                        break;
-                }
-                if (rv == false) {
-                    goto out;
-                }
-            }
+        // read and delegate events
+        if (event_read_delegate(config, &poll_fds) == false) {
+            break;
         }
     }
 

@@ -7,6 +7,8 @@
 #ifndef MYGPIOD_EVENT_H
 #define MYGPIOD_EVENT_H
 
+#include "config.h"
+
 #include <gpiod.h>
 #include <poll.h>
 
@@ -33,6 +35,8 @@ struct t_poll_fds {
     unsigned len;               //!< number of file descriptors
 };
 
-bool poll_fd_add(struct t_poll_fds *poll_fds, int fd, short events, int pfd_type);
+bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, int pfd_type);
+void event_add_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds);
+bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds);
 
 #endif
