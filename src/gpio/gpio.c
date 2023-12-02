@@ -5,11 +5,11 @@
 */
 
 #include "compile_time.h"
-#include "gpio.h"
+#include "src/gpio/gpio.h"
 
-#include "action.h"
-#include "log.h"
-#include "util.h"
+#include "src/gpio/action.h"
+#include "src/lib/log.h"
+#include "src/lib/util.h"
 
 #include <errno.h>
 #include <gpiod.h>

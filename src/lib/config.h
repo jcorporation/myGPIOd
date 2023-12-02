@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_CONFIG_H
 #define MYGPIOD_CONFIG_H
 
-#include "list.h"
+#include "src/lib/list.h"
 
 #include <stdbool.h>
 #include <time.h>
@@ -58,6 +58,7 @@ struct t_config {
     char *dir_gpio;           //!< directory for the gpio config files
 
     char *socket_path;        //!< server socket
+    int socket_timeout;       //!< socket timeout
     struct t_list clients;    //!< list of connected clients
     unsigned client_id;       //!< uniq client id
 

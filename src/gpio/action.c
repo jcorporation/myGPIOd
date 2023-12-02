@@ -5,11 +5,12 @@
 */
 
 #include "compile_time.h"
-#include "action.h"
+#include "src/gpio/action.h"
 
-#include "config.h"
-#include "log.h"
-#include "util.h"
+#include "src/lib/config.h"
+#include "src/lib/log.h"
+#include "src/lib/timer.h"
+#include "src/lib/util.h"
 
 #include <errno.h>
 #include <gpiod.h>
@@ -129,24 +130,7 @@ static void action_delay(struct t_gpio_node_in *node) {
     if (node->timer_fd > -1) {
         action_delay_abort(node);
     }
-    errno = 0;
-    node->timer_fd = timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK | TFD_CLOEXEC);
-    if (node->timer_fd == -1) {
-        MYGPIOD_LOG_ERROR("Can not create timer: \"%s\"", strerror(errno));
-        return;
-    }
-    struct itimerspec its;
-    its.it_value.tv_sec = node->long_press_timeout;
-    its.it_value.tv_nsec = 0;
-    its.it_interval.tv_sec = 0;
-    its.it_interval.tv_nsec = 0;
-
-    errno = 0;
-    if (timerfd_settime(node->timer_fd, 0, &its, NULL) == -1) {
-        MYGPIOD_LOG_ERROR("Can not set expiration for timer: \"%s\"", strerror(errno));
-        action_delay_abort(node);
-        return;
-    }
+    node->timer_fd = timer_new(node->long_press_timeout);
 }
 
 /**

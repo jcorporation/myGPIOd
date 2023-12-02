@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_SERVER_PROTOCOL_H
 #define MYGPIOD_SERVER_PROTOCOL_H
 
-#include "config.h"
+#include "src/lib/config.h"
 
 #include <stdbool.h>
 

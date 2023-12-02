@@ -7,8 +7,8 @@
 #ifndef MYGPIOD_GPIO_H
 #define MYGPIOD_GPIO_H
 
-#include "config.h"
-#include "event_loop.h"
+#include "src/lib/config.h"
+#include "src/event_loop/event_loop.h"
 
 bool gpio_open_chip(struct t_config *config);
 bool gpio_handle_event(struct t_config *config, unsigned idx);

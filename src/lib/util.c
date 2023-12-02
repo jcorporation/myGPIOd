@@ -5,10 +5,10 @@
 */
 
 #include "compile_time.h"
-#include "util.h"
+#include "src/lib/util.h"
 
-#include "config.h"
-#include "log.h"
+#include "src/lib/config.h"
+#include "src/lib/log.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -218,10 +218,10 @@ bool parse_int(char *str, int *result, char **rest, unsigned min, unsigned max) 
  * @return chomped string
  */
 char *chomp(char *line, size_t len) {
-    size_t i = len - 1;
-    while (i > 0 && isspace(line[i])) {
-        i--;
+    int offset = (int)len - 1;
+    while (offset >= 0 && isspace(line[offset])) {
+        offset--;
     }
-    line[i + 1] = '\0';
+    line[offset + 1] = '\0';
     return line;
 }

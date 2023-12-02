@@ -5,7 +5,7 @@
 */
 
 #include "compile_time.h"
-#include "log.h"
+#include "src/lib/log.h"
 
 #include <stdarg.h>
 #include <stdio.h>

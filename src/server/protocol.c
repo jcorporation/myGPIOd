@@ -5,11 +5,11 @@
 */
 
 #include "compile_time.h"
-#include "server_protocol.h"
+#include "src/server/protocol.h"
 
-#include "log.h"
-#include "server_idle.h"
-#include "server_socket.h"
+#include "src/lib/log.h"
+#include "src/server/idle.h"
+#include "src/server/socket.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -51,7 +51,7 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *node) 
         case CMD_IDLE:
             return handle_idle(node);
         case CMD_NOIDLE:
-            return handle_noidle(node);
+            return handle_noidle(config, node);
         case CMD_INVALID:
         case CMD_COUNT:
             server_send_response(node, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n");

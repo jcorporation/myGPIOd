@@ -8,11 +8,11 @@
  */
 
 #include "compile_time.h"
-#include "config.h"
-#include "event_loop.h"
-#include "gpio.h"
-#include "log.h"
-#include "server_socket.h"
+#include "src/lib/config.h"
+#include "src/event_loop/event_loop.h"
+#include "src/gpio/gpio.h"
+#include "src/lib/log.h"
+#include "src/server/socket.h"
 
 #include <poll.h>
 #include <stdio.h>
@@ -112,10 +112,11 @@ int main(int argc, char **argv) {
     while (true) {
         // reset poll_fds length and re-add the timer fds
         poll_fds.len = pfd_len_init;
-        event_add_timer_fds(config, &poll_fds);
+        event_add_gpio_timer_fds(config, &poll_fds);
         event_add_client_fds(config, &poll_fds);
 
         // poll
+        MYGPIOD_LOG_DEBUG("Polling %u fds", poll_fds.len);
         int cnt = poll(poll_fds.fd, poll_fds.len, -1);
         if (cnt < 0) {
             MYGPIOD_LOG_ERROR("Failure polling fds");

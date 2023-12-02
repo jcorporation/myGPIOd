@@ -7,11 +7,11 @@
 #include "compile_time.h"
 #include "config.h"
 
-#include "list.h"
-#include "log.h"
-#include "server_socket.h"
-#include "signal_handler.h"
-#include "util.h"
+#include "src/event_loop/signal_handler.h"
+#include "src/lib/list.h"
+#include "src/lib/log.h"
+#include "src/lib/util.h"
+#include "src/server/socket.h"
 
 #include <ctype.h>
 #include <dirent.h>
@@ -106,6 +106,7 @@ static struct t_config *config_new(void) {
     config->syslog = CFG_SYSLOG;
     config->dir_gpio = strdup(CFG_GPIO_DIR);
     config->socket_path = strdup(CFG_SOCKET_PATH);
+    config->socket_timeout = CFG_SOCKET_TIMEOUT;
     config->client_id = 0;
     list_init(&config->clients);
     return config;
@@ -263,7 +264,12 @@ static bool parse_config_line(unsigned line_num, char *line, struct t_config *co
         MYGPIOD_LOG_DEBUG("Setting socket to \"%s\"", config->dir_gpio);
         return true;
     }
-
+    if (strncmp(line, "timeout", 7) == 0) {
+        line = skip_chars(line, 7, '=');
+        parse_int(line, &config->socket_timeout, NULL, 10, 120);
+        MYGPIOD_LOG_DEBUG("Setting socket to \"%s\"", config->dir_gpio);
+        return true;
+    }
     //invalid
     MYGPIOD_LOG_ERROR("Invalid configuration line #%u", line_num);
     return false;

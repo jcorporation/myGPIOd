@@ -4,10 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef MYGPIOD_ACTION_H
-#define MYGPIOD_ACTION_H
+#ifndef MYGPIOD_GPIO_ACTION_H
+#define MYGPIOD_GPIO_ACTION_H
 
-#include "config.h"
+#include "src/lib/config.h"
 
 #include <time.h>
 

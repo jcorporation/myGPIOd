@@ -10,7 +10,7 @@
  */
 
 #include "compile_time.h"
-#include "list.h"
+#include "src/lib/list.h"
 
 #include <stddef.h>
 #include <stdlib.h>

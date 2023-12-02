@@ -5,26 +5,31 @@
 */
 
 #include "compile_time.h"
-#include "server_socket.h"
+#include "src/server/socket.h"
 
-#include "list.h"
-#include "log.h"
-#include "server_protocol.h"
-#include "util.h"
+#include "src/lib/list.h"
+#include "src/lib/log.h"
+#include "src/lib/timer.h"
+#include "src/lib/util.h"
+#include "src/server/protocol.h"
 
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <time.h>
 #include <unistd.h>
 
 // private definitions
 
-#define WELCOME_MESSAGE DEFAULT_OK_MSG_PREFIX "version:" MYGPIOD_VERSION
+#define WELCOME_MESSAGE DEFAULT_OK_MSG_PREFIX "version:" MYGPIOD_VERSION "\n"
 
 static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd);
+static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd);
 
 // public functions
 
@@ -92,6 +97,7 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd) {
         close(client_fd);
         return false;
     }
+
     struct t_client_data *data = malloc(sizeof(struct t_client_data));
     if (data == NULL) {
         MYGPIOD_LOG_ERROR("Out of memory");
@@ -109,6 +115,8 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd) {
     list_push(&config->clients, config->client_id, data);
     MYGPIOD_LOG_DEBUG("Accepted new client connection: %u", config->clients.length);
     server_send_response(config->clients.tail, WELCOME_MESSAGE);
+    data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
+    timer_next_expire(data->timeout_fd);
     return true;
 }
 
@@ -146,11 +154,10 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
             if (buf_end != NULL) {
                 chomp(data->buf_in, (size_t)data->bytes_in);
                 MYGPIOD_LOG_DEBUG("Client#%u: Read line \"%s\"", node->id, data->buf_in);
-                data->state = CLIENT_SOCKET_STATE_WRITING;
-                data->bytes_in = 0;
-                data->events = POLLOUT;
+                data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
+                timer_next_expire(data->timeout_fd);
+                server_protocol_handler(config, node);
             }
-            server_protocol_handler(config, node);
             return true;
         }
         case CLIENT_SOCKET_STATE_WRITING: {
@@ -181,6 +188,7 @@ void server_client_connection_clear(struct t_list_node *node) {
     if (data->fd > 0) {
         close(data->fd);
     }
+    list_clear(&data->waiting_events, NULL);
 }
 
 /**
@@ -210,9 +218,50 @@ void server_send_response(struct t_list_node *node, const char *message) {
     }
     struct t_client_data *data = (struct t_client_data *)node->data;
     data->state = CLIENT_SOCKET_STATE_WRITING;
+    data->bytes_in = 0;
     data->bytes_out = 0;
     data->events = POLLOUT;
     strcpy(data->buf_out, message);
+}
+
+/**
+ * Adds/replaces a socket timeout handler
+ * @param timeout_fd socket
+ * @param timeout timeout in seconds
+ */
+int server_client_connection_set_timeout(int timeout_fd, int timeout) {
+    if (timeout_fd > 0) {
+        close(timeout_fd);
+    }
+    return timer_new(timeout);
+}
+
+/**
+ * Removes a socket timeout handler
+ * @param data client data
+ */
+void server_client_connection_remove_timeout(struct t_client_data *data) {
+    if (data->timeout_fd > 0) {
+        close(data->timeout_fd);
+    }
+    data->timeout_fd = -1;
+}
+
+/**
+ * Disconnects a client after timeout expired
+ * @param clients pointer to client list
+ * @param fd timeout timer fd
+ */
+bool server_client_timeout(struct t_list *clients, int *timeout_fd) {
+    timer_next_expire(*timeout_fd);
+    struct t_list_node *node = get_node_by_timeoutfd(clients, timeout_fd);
+    if (node == NULL) {
+        MYGPIOD_LOG_ERROR("No timeout fd found");
+        return false;
+    }
+    MYGPIOD_LOG_INFO("Timeout for client %u", node->id);
+    server_client_disconnect(clients, node);
+    return true;
 }
 
 // private functions
@@ -220,7 +269,7 @@ void server_send_response(struct t_list_node *node, const char *message) {
 /**
  * Gets the gpio in node by timerfd
  * @param gpios_in list of in gpios
- * @param fd timer_fd
+ * @param fd client fd
  * @return the list node or NULL on error
  */
 static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd) {
@@ -228,6 +277,24 @@ static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd)
     while (current != NULL) {
         struct t_client_data *data = (struct t_client_data *)current->data;
         if (data->fd == *fd) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+/**
+ * Gets the gpio in node by timerfd
+ * @param gpios_in list of in gpios
+ * @param fd timeout fd
+ * @return the list node or NULL on error
+ */
+static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd) {
+    struct t_list_node *current = clients->head;
+    while (current != NULL) {
+        struct t_client_data *data = (struct t_client_data *)current->data;
+        if (data->timeout_fd == *fd) {
             return current;
         }
         current = current->next;

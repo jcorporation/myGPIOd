@@ -5,9 +5,9 @@
 */
 
 #include "compile_time.h"
-#include "signal_handler.h"
+#include "src/event_loop/signal_handler.h"
 
-#include "log.h"
+#include "src/lib/log.h"
 
 #include <errno.h>
 #include <signal.h>

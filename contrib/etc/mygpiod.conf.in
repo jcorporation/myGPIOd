@@ -14,8 +14,11 @@ loglevel = notice
 # - true = log to syslog
 syslog = false
 
-# Server socket
+# Path to the server socket
 socket = /run/mygpiod/socket
+
+# Timeout for client connections in seconds
+timeout = 10
 
 # GPIO chip number
 chip = 0

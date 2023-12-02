@@ -20,15 +20,17 @@ target_include_directories(mygpiod
 
 target_sources(mygpiod PRIVATE
   main.c
-  action.c
-  config.c
-  event_loop.c
-  gpio.c
-  list.c
-  log.c
-  server_protocol.c
-  server_socket.c
-  signal_handler.c
-  timer.c
-  util.c
+  event_loop/event_loop.c
+  event_loop/signal_handler.c
+  gpio/action.c
+  gpio/gpio.c
+  gpio/timer.c
+  lib/config.c 
+  lib/list.c
+  lib/log.c
+  lib/timer.c
+  lib/util.c
+  server/idle.c
+  server/protocol.c
+  server/socket.c
 )

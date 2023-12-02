@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_SERVER_SOCKET_H
 #define MYGPIOD_SERVER_SOCKET_H
 
-#include "config.h"
+#include "src/lib/config.h"
 
 #include <poll.h>
 #include <sys/types.h>
@@ -37,6 +37,7 @@ struct t_client_data {
     ssize_t bytes_out;                        //!< bytes already written
     short events;                             //!< events to poll
     struct t_list waiting_events;             //!< waiting events
+    int timeout_fd;                           //!< timer fd for socket timeout
 };
 
 int server_socket_create(struct t_config *config);
@@ -44,6 +45,9 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd);
 bool server_client_connection_handle(struct t_config *config, struct pollfd *client_fd);
 void server_client_disconnect(struct t_list *clients, struct t_list_node *node);
 void server_client_connection_clear(struct t_list_node *node);
-
+int server_client_connection_set_timeout(int timeout_fd, int timeout);
+void server_client_connection_remove_timeout(struct t_client_data *data);
+bool server_client_timeout(struct t_list *clients, int *timeout_fd);
 void server_send_response(struct t_list_node *node, const char *message);
+
 #endif

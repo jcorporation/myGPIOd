@@ -5,10 +5,11 @@
 */
 
 #include "compile_time.h"
-#include "timer.h"
+#include "src/gpio/timer.h"
 
-#include "action.h"
-#include "log.h"
+#include "src/gpio/action.h"
+#include "src/lib/log.h"
+#include "src/lib/timer.h"
 
 #include <stdint.h>
 #include <unistd.h>
@@ -25,21 +26,17 @@ static struct t_list_node *get_node_by_timerfd(struct t_list *gpios_in, int *fd)
  * @param idx 
  * @return true on success, else false
  */
-bool timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
+bool gpio_timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
+    timer_next_expire(*fd);
     MYGPIOD_LOG_DEBUG("%u: Long press timer event detected", idx);
-    uint64_t exp;
-    ssize_t s = read(*fd, &exp, sizeof(uint64_t));
-    if (s == sizeof(uint64_t) && exp > 1) {
-        struct t_list_node *node = get_node_by_timerfd(&config->gpios_in, fd);
-        if (fd == NULL) {
-            MYGPIOD_LOG_ERROR("Error getting node for timer_fd");
-            return false;
-        }
-        struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
-        action_execute_delayed(node->id, data, config);
-        return true;
+    struct t_list_node *node = get_node_by_timerfd(&config->gpios_in, fd);
+    if (fd == NULL) {
+        MYGPIOD_LOG_ERROR("Error getting node for timer_fd");
+        return false;
     }
-    return false;
+    struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
+    action_execute_delayed(node->id, data, config);
+    return true;
 }
 
 // private functions
