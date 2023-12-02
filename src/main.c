@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL, POLLIN | POLLPRI);
 
     // create server socket
-    int server_fd = socket_create(config);
+    int server_fd = server_socket_create(config);
     if (server_fd == -1) {
         goto out;
     }

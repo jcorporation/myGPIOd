@@ -77,22 +77,22 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
         if (poll_fds->fd[i].revents) {
             switch(poll_fds->type[i]) {
                 case PFD_TYPE_GPIO:
-                    return gpio_handle_event(config, i);
+                    gpio_handle_event(config, i);
+                    return true;
                 case PFD_TYPE_TIMER:
-                    return timer_handle_event(&poll_fds->fd[i].fd, config, i);
+                    timer_handle_event(&poll_fds->fd[i].fd, config, i);
+                    return true;
                 case PFD_TYPE_SIGNAL:
                     MYGPIOD_LOG_DEBUG("%u: Signal event detected", i);
                     return false;
-                case PFD_TYPE_CONNECT: {
-                    server_accept_client_connection(config, &poll_fds->fd[i].fd);
+                case PFD_TYPE_CONNECT:
+                    server_client_connection_accept(config, &poll_fds->fd[i].fd);
                     return true;
-                }
-                case PFD_TYPE_CLIENT: {
-                    server_handle_client_connection(config, &poll_fds->fd[i]);
+                case PFD_TYPE_CLIENT:
+                    server_client_connection_handle(config, &poll_fds->fd[i]);
                     return true;
-                }
             }
         }
     }
-    return false;
+    return true;
 }

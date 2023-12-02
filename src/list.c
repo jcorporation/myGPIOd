@@ -36,8 +36,10 @@ void list_clear(struct t_list *list, list_data_clear clear_data_callback) {
     while (current != NULL) {
         tmp = current;
         current = current->next;
-        clear_data_callback(tmp->data);
-        free(tmp->data);
+        if (clear_data_callback != NULL) {
+            clear_data_callback(tmp);
+            free(tmp->data);
+        }
         free(tmp);
     }
     list_init(list);

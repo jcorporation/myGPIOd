@@ -27,7 +27,7 @@ struct t_list {
     unsigned length;           //!< list length
 };
 
-typedef void (*list_data_clear)(void *node);
+typedef void (*list_data_clear)(struct t_list_node *node);
 
 void list_init(struct t_list *list);
 void list_clear(struct t_list *list, list_data_clear clear_data_callback);

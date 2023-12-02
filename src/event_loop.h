@@ -7,6 +7,7 @@
 #ifndef MYGPIOD_EVENT_LOOP_H
 #define MYGPIOD_EVENT_LOOP_H
 
+#include "compile_time.h"
 #include "config.h"
 
 #include <gpiod.h>

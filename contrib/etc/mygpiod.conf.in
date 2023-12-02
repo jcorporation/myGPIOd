@@ -14,6 +14,9 @@ loglevel = notice
 # - true = log to syslog
 syslog = false
 
+# Server socket
+socket = /run/mygpiod/socket
+
 # GPIO chip number
 chip = 0
 

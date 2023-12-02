@@ -9,6 +9,7 @@
 
 #include "list.h"
 #include "log.h"
+#include "server_socket.h"
 #include "signal_handler.h"
 #include "util.h"
 
@@ -30,8 +31,10 @@ static bool parse_gpio_config_file_in_line(unsigned line_num, char *line, struct
 static bool parse_gpio_config_file_out_line(unsigned line_num, char *line, struct t_gpio_node_out *node);
 static struct t_gpio_node_in *gpio_node_in_new(void);
 static struct t_gpio_node_out *gpio_node_out_new(void);
-static void gpio_node_in_clear(void *node);
-static void gpio_node_out_clear(void *node);
+static void gpio_node_in_data_clear(struct t_gpio_node_in *data);
+static void gpio_node_in_clear(struct t_list_node *node);
+static void gpio_node_out_data_clear(struct t_gpio_node_out *data);
+static void gpio_node_out_clear(struct t_list_node *node);
 static char *skip_chars(char *line, size_t skip, char c);
 
 //public functions
@@ -66,11 +69,13 @@ void config_clear(struct t_config *config) {
     }
     list_clear(&config->gpios_in, gpio_node_in_clear);
     list_clear(&config->gpios_out, gpio_node_out_clear);
+    list_clear(&config->clients, server_client_connection_clear);
     if (config->signal_fd > 0) {
         close(config->signal_fd);
     }
     free(config->chip_name);
     free(config->dir_gpio);
+    free(config->socket_path);
 }
 
 //private functions
@@ -173,7 +178,7 @@ static bool config_read(struct t_config *config, const char *config_file) {
                         i++;
                         continue;
                     }
-                    gpio_node_in_clear(node);
+                    gpio_node_in_data_clear(node);
                     free(node);
                 }
                 else if (strcmp(rest, "out") == 0) {
@@ -183,7 +188,7 @@ static bool config_read(struct t_config *config, const char *config_file) {
                         i++;
                         continue;
                     }
-                    gpio_node_out_clear(node);
+                    gpio_node_out_data_clear(node);
                     free(node);
                 }
             }
@@ -211,44 +216,51 @@ static bool parse_config_line(unsigned line_num, char *line, struct t_config *co
         line = skip_chars(line, 4, '=');
         free(config->chip_name);
         config->chip_name = strdup(line);
-        MYGPIOD_LOG_INFO("Setting chip to \"%s\"", config->chip_name);
+        MYGPIOD_LOG_DEBUG("Setting chip to \"%s\"", config->chip_name);
         return true;
     }
     if (strncmp(line, "request_event", 13) == 0) {
         line = skip_chars(line, 13, '=');
         config->event_request = parse_event_request(line);
-        MYGPIOD_LOG_INFO("Setting event to \"%s\"", lookup_event_request(config->event_request));
+        MYGPIOD_LOG_DEBUG("Setting event to \"%s\"", lookup_event_request(config->event_request));
         return true;
     }
     if (strncmp(line, "active_low", 10) == 0) {
         line = skip_chars(line, 10, '=');
         config->active_low = parse_bool(line);
-        MYGPIOD_LOG_INFO("Setting active_low to \"%s\"", bool_to_str(config->active_low));
+        MYGPIOD_LOG_DEBUG("Setting active_low to \"%s\"", bool_to_str(config->active_low));
         return true;
     }
     if (strncmp(line, "bias", 4) == 0) {
         line = skip_chars(line, 4, '=');
         config->bias = parse_bias(line);
-        MYGPIOD_LOG_INFO("Setting bias to \"%s\"", lookup_bias(config->bias));
+        MYGPIOD_LOG_DEBUG("Setting bias to \"%s\"", lookup_bias(config->bias));
         return true;
     }
     if (strncmp(line, "loglevel", 8) == 0) {
         line = skip_chars(line, 8, '=');
         config->loglevel = parse_loglevel(line);
-        MYGPIOD_LOG_INFO("Setting loglevel to \"%s\"", lookup_loglevel(config->loglevel));
+        MYGPIOD_LOG_DEBUG("Setting loglevel to \"%s\"", lookup_loglevel(config->loglevel));
         return true;
     }
     if (strncmp(line, "syslog", 6) == 0) {
         line = skip_chars(line, 6, '=');
         config->syslog = parse_bool(line);
-        MYGPIOD_LOG_INFO("Setting syslog to \"%s\"", bool_to_str(config->syslog));
+        MYGPIOD_LOG_DEBUG("Setting syslog to \"%s\"", bool_to_str(config->syslog));
         return true;
     }
     if (strncmp(line, "gpio_dir", 8) == 0) {
         line = skip_chars(line, 8, '=');
         free(config->dir_gpio);
         config->dir_gpio = strdup(line);
-        MYGPIOD_LOG_INFO("Setting gpio_dir to \"%s\"", config->dir_gpio);
+        MYGPIOD_LOG_DEBUG("Setting gpio_dir to \"%s\"", config->dir_gpio);
+        return true;
+    }
+    if (strncmp(line, "socket", 6) == 0) {
+        line = skip_chars(line, 6, '=');
+        free(config->socket_path);
+        config->socket_path = strdup(line);
+        MYGPIOD_LOG_DEBUG("Setting socket to \"%s\"", config->dir_gpio);
         return true;
     }
 
@@ -417,10 +429,9 @@ static struct t_gpio_node_out *gpio_node_out_new(void) {
 
 /**
  * Frees pointers and closes file descriptors from this node.
- * @param node gpio in config node to clear
+ * @param data gpio in config node to clear
  */
-static void gpio_node_in_clear(void *node) {
-    struct t_gpio_node_in *data = (struct t_gpio_node_in *)node;
+static void gpio_node_in_data_clear(struct t_gpio_node_in *data) {
     if (data->fd > -1) {
         close(data->fd);
     }
@@ -440,10 +451,28 @@ static void gpio_node_in_clear(void *node) {
 
 /**
  * Frees pointers and closes file descriptors from this node.
+ * @param node gpio in config node to clear
+ */
+static void gpio_node_in_clear(struct t_list_node *node) {
+    struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
+    gpio_node_in_data_clear(data);
+}
+
+/**
+ * Frees pointers and closes file descriptors from this node.
+ * @param data gpio out data to clear
+ */
+static void gpio_node_out_data_clear(struct t_gpio_node_out *data) {
+    (void)data;
+}
+
+/**
+ * Frees pointers and closes file descriptors from this node.
  * @param node gpio out config node to clear
  */
-static void gpio_node_out_clear(void *node) {
-    (void)node;
+static void gpio_node_out_clear(struct t_list_node *node) {
+    struct t_gpio_node_out *data = (struct t_gpio_node_out *)node->data;
+    gpio_node_out_data_clear(data);
 }
 
 /**

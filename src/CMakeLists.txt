@@ -26,6 +26,7 @@ target_sources(mygpiod PRIVATE
   gpio.c
   list.c
   log.c
+  server_protocol.c
   server_socket.c
   signal_handler.c
   timer.c

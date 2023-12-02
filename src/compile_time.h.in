@@ -16,7 +16,7 @@
 #cmakedefine MYGPIOD_ENABLE_TSAN
 #cmakedefine MYGPIOD_ENABLE_UBSAN
 
-// Defaults
+// Default configuration
 #define CFG_CHIP "0"
 #define CFG_ACTIVE_LOW true
 #define CFG_BIAS 0
@@ -25,6 +25,8 @@
 #define CFG_SYSLOG false
 #define CFG_GPIO_DIR "/etc/mygpiod.d"
 #define CFG_SOCKET_PATH "/run/mygpiod/socket"
+
+// Other defaults
 #define MAX_CLIENT_CONNECTIONS 10
 #define OPEN_FLAGS_READ "re"
 
