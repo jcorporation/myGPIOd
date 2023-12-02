@@ -268,7 +268,7 @@ bool server_client_timeout(struct t_list *clients, int *timeout_fd) {
 
 /**
  * Gets the gpio in node by timerfd
- * @param gpios_in list of in gpios
+ * @param clients list of clients
  * @param fd client fd
  * @return the list node or NULL on error
  */
@@ -285,8 +285,8 @@ static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd)
 }
 
 /**
- * Gets the gpio in node by timerfd
- * @param gpios_in list of in gpios
+ * Gets the client node by timeout fd
+ * @param clients list of clients
  * @param fd timeout fd
  * @return the list node or NULL on error
  */

@@ -8,9 +8,9 @@
  */
 
 #include "compile_time.h"
-#include "src/lib/config.h"
 #include "src/event_loop/event_loop.h"
 #include "src/gpio/gpio.h"
+#include "src/lib/config.h"
 #include "src/lib/log.h"
 #include "src/server/socket.h"
 

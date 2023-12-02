@@ -42,7 +42,7 @@ bool gpio_timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
 // private functions
 
 /**
- * Gets the gpio in node by timerfd
+ * Gets the gpio in node by timer fd
  * @param gpios_in list of in gpios
  * @param fd timer_fd
  * @return the list node or NULL on error
