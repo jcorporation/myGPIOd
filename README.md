@@ -12,6 +12,9 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
   - long press
 - Control the pull-up and pull-down bias
 - Set the output value of gpios
+- Simple socket server
+  - Set and get GPIO values
+  - Get notifications of GPIO events
 
 ## Build Dependencies
 

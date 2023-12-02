@@ -7,7 +7,10 @@
 #ifndef MYGPIOD_TIMER_H
 #define MYGPIOD_TIMER_H
 
+#include <stdbool.h>
+
 int timer_new(int timeout);
-void timer_next_expire(int timer_fd);
+bool timer_set(int timer_fd, int timeout);
+void timer_log_next_expire(int timer_fd);
 
 #endif

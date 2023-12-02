@@ -40,10 +40,10 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *node) 
     if (data->state == CLIENT_SOCKET_STATE_IDLE &&
         cmd_id != CMD_NOIDLE)
     {
-        server_send_response(node, DEFAULT_ERROR_MSG_PREFIX "In idle state, only the noidle command is allowed\n");
+        server_send_response(node, DEFAULT_ERROR_MSG_PREFIX "In idle state, only the noidle command is allowed\n" DEFAULT_END_MSG);
         return false;
     }
-    MYGPIOD_LOG_INFO("Command: \"%s\", options: \"%s\"", get_cmd_name(cmd_id), options);
+    MYGPIOD_LOG_INFO("Client#%u: command: \"%s\", options: \"%s\"", node->id, get_cmd_name(cmd_id), options);
     switch(cmd_id) {
         case CMD_CLOSE:
             server_client_disconnect(&config->clients, node);
@@ -54,7 +54,7 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *node) 
             return handle_noidle(config, node);
         case CMD_INVALID:
         case CMD_COUNT:
-            server_send_response(node, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n");
+            server_send_response(node, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n" DEFAULT_END_MSG);
             MYGPIOD_LOG_ERROR("Invalid command \"%s\"", data->buf_in);
     }
     return false;

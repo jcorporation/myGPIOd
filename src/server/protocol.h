@@ -14,6 +14,7 @@
 // Socket server default responses
 #define DEFAULT_ERROR_MSG_PREFIX "ERROR\nmessage:"
 #define DEFAULT_OK_MSG_PREFIX "OK\n"
+#define DEFAULT_END_MSG "END\n"
 
 #define CMDS(X) \
     X(CMD_CLOSE) \

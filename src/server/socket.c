@@ -26,7 +26,7 @@
 
 // private definitions
 
-#define WELCOME_MESSAGE DEFAULT_OK_MSG_PREFIX "version:" MYGPIOD_VERSION "\n"
+#define WELCOME_MESSAGE DEFAULT_OK_MSG_PREFIX "version:" MYGPIOD_VERSION "\n" DEFAULT_END_MSG
 
 static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd);
 static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd);
@@ -113,10 +113,10 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd) {
     list_init(&data->waiting_events);
     config->client_id++;
     list_push(&config->clients, config->client_id, data);
-    MYGPIOD_LOG_DEBUG("Accepted new client connection: %u", config->clients.length);
+    MYGPIOD_LOG_DEBUG("Client#%u: Accepted new connection", config->client_id);
     server_send_response(config->clients.tail, WELCOME_MESSAGE);
     data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
-    timer_next_expire(data->timeout_fd);
+    timer_log_next_expire(data->timeout_fd);
     return true;
 }
 
@@ -155,8 +155,10 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
                 chomp(data->buf_in, (size_t)data->bytes_in);
                 MYGPIOD_LOG_DEBUG("Client#%u: Read line \"%s\"", node->id, data->buf_in);
                 data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
-                timer_next_expire(data->timeout_fd);
+                timer_log_next_expire(data->timeout_fd);
                 server_protocol_handler(config, node);
+                data->bytes_in = 0;
+                data->buf_in[0] = '\0';
             }
             return true;
         }
@@ -213,12 +215,11 @@ void server_client_disconnect(struct t_list *clients, struct t_list_node *node) 
 void server_send_response(struct t_list_node *node, const char *message) {
     size_t len = strlen(message);
     if (len >= SERVER_OUTPUT_BUFFER_SIZE - 1) {
-        MYGPIOD_LOG_ERROR("Response message too long");
+        MYGPIOD_LOG_ERROR("Client#%u: Response message too long", node->id);
         return;
     }
     struct t_client_data *data = (struct t_client_data *)node->data;
     data->state = CLIENT_SOCKET_STATE_WRITING;
-    data->bytes_in = 0;
     data->bytes_out = 0;
     data->events = POLLOUT;
     strcpy(data->buf_out, message);
@@ -231,7 +232,7 @@ void server_send_response(struct t_list_node *node, const char *message) {
  */
 int server_client_connection_set_timeout(int timeout_fd, int timeout) {
     if (timeout_fd > 0) {
-        close(timeout_fd);
+        timer_set(timeout_fd, timeout);
     }
     return timer_new(timeout);
 }
@@ -253,13 +254,13 @@ void server_client_connection_remove_timeout(struct t_client_data *data) {
  * @param fd timeout timer fd
  */
 bool server_client_timeout(struct t_list *clients, int *timeout_fd) {
-    timer_next_expire(*timeout_fd);
+    timer_log_next_expire(*timeout_fd);
     struct t_list_node *node = get_node_by_timeoutfd(clients, timeout_fd);
     if (node == NULL) {
         MYGPIOD_LOG_ERROR("No timeout fd found");
         return false;
     }
-    MYGPIOD_LOG_INFO("Timeout for client %u", node->id);
+    MYGPIOD_LOG_INFO("Client#%u: Timeout", node->id);
     server_client_disconnect(clients, node);
     return true;
 }
