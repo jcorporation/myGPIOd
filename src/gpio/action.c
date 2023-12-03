@@ -8,6 +8,7 @@
 #include "src/gpio/action.h"
 
 #include "src/lib/config.h"
+#include "src/lib/events.h"
 #include "src/lib/log.h"
 #include "src/lib/timer.h"
 #include "src/lib/util.h"
@@ -29,12 +30,15 @@ static void action_execute_command(const char *cmd);
 /**
  * Handles the configured actions for an event.
  * It forks and executes the script via system() call
+ * @param config pointer to config
  * @param gpio the gpio number
  * @param ts timestamp of the event
  * @param event_type the event type
  * @param data gpio config data
  */
-void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_gpio_in_data *data) {
+void action_handle(struct t_config *config, unsigned gpio, const struct timespec *ts,
+        int event_type, struct t_gpio_in_data *data)
+{
     MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\" ",
         lookup_event(event_type),
         gpio, (long long)ts->tv_sec, ts->tv_nsec);
@@ -44,6 +48,7 @@ void action_handle(unsigned gpio, const struct timespec *ts, int event_type, str
         return;
     }
     if (event_type == GPIOD_LINE_EVENT_FALLING_EDGE) {
+        event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, ts);
         if (sdslen(data->action_falling) > 0) {
             if (data->request_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE ||
                 data->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
@@ -59,6 +64,7 @@ void action_handle(unsigned gpio, const struct timespec *ts, int event_type, str
         }
     }
     else {
+        event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, ts);
         if (sdslen(data->action_rising) > 0) {
             if (data->request_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE ||
                 data->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
@@ -98,6 +104,9 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
     if ((rv == GPIO_VALUE_HIGH && data->long_press_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE) ||
         (rv == GPIO_VALUE_LOW && data->long_press_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE))
     {
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, &ts);
         action_execute(data->long_press_action);
         if (data->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES) {
             // ignore the release event

@@ -4,13 +4,9 @@
  https://github.com/jcorporation/myGPIOd
 */
 
-/**
- * This file implements some functions for a simply linked list.
- * This list is designed to hold gpio config data.
- */
-
 #include "compile_time.h"
 #include "src/lib/list.h"
+
 #include "src/lib/mem.h"
 
 #include <stddef.h>
@@ -37,13 +33,22 @@ void list_clear(struct t_list *list, list_data_clear clear_data_callback) {
     while (current != NULL) {
         tmp = current;
         current = current->next;
-        if (clear_data_callback != NULL) {
-            clear_data_callback(tmp);
-            FREE_PTR(tmp->data);
-        }
-        FREE_PTR(tmp);
+        list_node_free(tmp, clear_data_callback);
     }
     list_init(list);
+}
+
+/**
+ * Frees a node.
+ * @param node node to clear
+ * @param clear_data_callback callback function to clear the nodes data pointer
+ */
+void list_node_free(struct t_list_node *node, list_data_clear clear_data_callback) {
+    if (clear_data_callback != NULL) {
+        clear_data_callback(node);
+        FREE_PTR(node->data);
+    }
+    FREE_PTR(node);
 }
 
 /**
@@ -156,4 +161,28 @@ bool list_remove_node(struct t_list *list, struct t_list_node *node) {
 
     //return the node
     return true;
+}
+
+/**
+ * Removes the first list node and returns it
+ * @param list list to shift
+ * @return removed list node
+ */
+struct t_list_node *list_shift(struct t_list *list) {
+    if (list->head == NULL) {
+        return NULL;
+    }
+    struct t_list_node *first = list->head;
+    list->head = first->next;
+    list->length--;
+
+    //Fix tail
+    if (list->tail == first) {
+        list->tail = NULL;
+    }
+
+    //null out this node's next value since it's not part of a list anymore
+    first->next = NULL;
+
+    return first;
 }

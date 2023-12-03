@@ -25,12 +25,14 @@ target_sources(mygpiod PRIVATE
   gpio/action.c
   gpio/gpio.c
   gpio/timer.c
-  lib/config.c 
+  lib/config.c
+  lib/events.c 
   lib/list.c
   lib/log.c
   lib/timer.c
   lib/util.c
   server/idle.c
   server/protocol.c
+  server/response.c
   server/socket.c
 )

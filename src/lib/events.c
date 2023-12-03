@@ -1,0 +1,86 @@
+/*
+ SPDX-License-Identifier: GPL-3.0-or-later
+ myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ https://github.com/jcorporation/myGPIOd
+*/
+
+#include "compile_time.h"
+#include "src/lib/events.h"
+
+#include "src/lib/config.h"
+#include "src/lib/mem.h"
+#include "src/server/idle.h"
+#include "src/server/socket.h"
+
+// private functions
+
+static struct t_event_data *event_data_new(enum mygpiod_event_types mygpiod_event_type,
+        const struct timespec *ts);
+
+// public functions
+
+/**
+ * Enqueues a gpio event for all client connections
+ * @param config pointer to config
+ * @param gpio gpio number of the event
+ * @param event_type the mygpiod event type
+ */
+void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_types event_type,
+        const struct timespec *ts)
+{
+    struct t_list_node *current = config->clients.head;
+    while (current != NULL) {
+        struct t_client_data *data = (struct t_client_data *)current->data;
+        struct t_event_data *event_data = event_data_new(event_type, ts);
+        list_push(&data->waiting_events, gpio, event_data);
+        if (data->state == CLIENT_SOCKET_STATE_IDLE) {
+            send_idle_events(current);
+        }
+        else if (data->waiting_events.length > WAITING_EVENTS_MAX) {
+            struct t_list_node *first = list_shift(&data->waiting_events);
+            list_node_free(first, event_data_clear);
+        }
+        current = current->next;
+    }
+}
+
+/**
+ * Clears the event data
+ * @param node pointer to node holding the data to clear
+ */
+void event_data_clear(struct t_list_node *node) {
+    struct t_event_data *data = (struct t_event_data *)node->data;
+    (void)data;
+}
+
+/**
+ * Returns the mygpiod event type as string
+ * @param event_type the event type
+ * @return Event type name
+ */
+const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
+    switch(event_type) {
+        case MYGPIOD_EVENT_FALLING: return "falling";
+        case MYGPIOD_EVENT_RISING: return "rising";
+        case MYGPIOD_EVENT_LONG_PRESS: return "long_press";
+    }
+    return "";
+}
+
+// private functions
+
+/**
+ * Creates the event data
+ * @param mygpiod_event_type event data type
+ * @param ts event timestamp
+ * @return Newly allocated struct
+ */
+static struct t_event_data *event_data_new(enum mygpiod_event_types mygpiod_event_type,
+        const struct timespec *ts)
+{
+    struct t_event_data *event_data = malloc_assert(sizeof(struct t_event_data));
+    event_data->mygpiod_event_type = mygpiod_event_type;
+    event_data->ts.tv_sec = ts->tv_sec;
+    event_data->ts.tv_nsec = ts->tv_nsec;
+    return event_data;
+}

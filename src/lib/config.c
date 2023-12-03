@@ -5,7 +5,7 @@
 */
 
 #include "compile_time.h"
-#include "config.h"
+#include "src/lib/config.h"
 
 #include "src/event_loop/signal_handler.h"
 #include "src/lib/list.h"

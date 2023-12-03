@@ -8,12 +8,14 @@
 #include "src/server/socket.h"
 
 #include "dist/sds/sds.h"
+#include "src/lib/events.h"
 #include "src/lib/list.h"
 #include "src/lib/log.h"
 #include "src/lib/mem.h"
 #include "src/lib/timer.h"
 #include "src/lib/util.h"
 #include "src/server/protocol.h"
+#include "src/server/response.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -202,7 +204,7 @@ void server_client_connection_clear(struct t_list_node *node) {
     close_fd(&data->timeout_fd);
     FREE_SDS(data->buf_in);
     FREE_SDS(data->buf_out);
-    list_clear(&data->waiting_events, NULL);
+    list_clear(&data->waiting_events, event_data_clear);
 }
 
 /**
@@ -222,46 +224,6 @@ bool server_client_disconnect(struct t_list *clients, struct t_list_node *node) 
     FREE_PTR(node->data);
     FREE_PTR(node);
     return true;
-}
-
-/**
- * Starts a new response by clearing the output buffer.
- * It sends the response from buf_out to the client.
- * @param data pointer to client data
- */
-void server_response_start(struct t_client_data *data) {
-    sdsclear(data->buf_out);
-}
-
-/**
- * Appends the message to the output buffer
- * @param data pointer to client data
- * @param message message to append
- */
-void server_response_append(struct t_client_data *data, const char *message) {
-    data->buf_out = sdscat(data->buf_out, message);
-}
-
-/**
- * Sets the client state to writing.
- * It sends the response from buf_out to the client.
- * @param data pointer to client data
- */
-void server_response_end(struct t_client_data *data) {
-    data->state = CLIENT_SOCKET_STATE_WRITING;
-    data->bytes_out = 0;
-    data->events = POLLOUT;
-}
-
-/**
- * Shortcut for server_response_start, server_response_append and server_response_end.
- * @param data pointer to client data
- * @param message message to send
- */
-void server_response_send(struct t_client_data *data, const char *message) {
-    server_response_start(data);
-    server_response_append(data, message);
-    server_response_end(data);
 }
 
 /**

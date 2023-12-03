@@ -7,18 +7,14 @@
 #include "compile_time.h"
 #include "src/server/idle.h"
 
+#include "src/lib/events.h"
 #include "src/lib/log.h"
 #include "src/server/protocol.h"
+#include "src/server/response.h"
 #include "src/server/socket.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-
-// private definitions
-
-bool send_idle_events(struct t_list_node *node);
-
-// public functions
 
 /**
  * Enters the idle mode and disabled the timeout.
@@ -54,8 +50,6 @@ bool handle_noidle(struct t_config *config, struct t_list_node *node) {
     return send_idle_events(node->data);
 }
 
-// private functions
-
 /**
  * Sends the waiting idle events to the client
  * @param node list node holding the client data
@@ -66,14 +60,17 @@ bool send_idle_events(struct t_list_node *node) {
     struct t_client_data *data = (struct t_client_data *)node->data;
 
     server_response_start(data);
-    server_response_append(data, DEFAULT_OK_MSG_PREFIX);
+    server_response_append(data, "%s", DEFAULT_OK_MSG_PREFIX);
     struct t_list_node *current = data->waiting_events.head;
     while (current != NULL) {
-        server_response_append(data, "event:\n");
+        struct t_event_data *event_data = (struct t_event_data *)current->data;
+        server_response_append(data, "gpio:%u\n", current->id);
+        server_response_append(data, "event:%s\n", mygpiod_event_name(event_data->mygpiod_event_type));
+        server_response_append(data, "time:%lld.%ld\n", (long long)event_data->ts.tv_sec, (event_data->ts.tv_nsec / 1000000));
         current = current -> next;
     }
-    list_clear(&data->waiting_events, NULL);
-    server_response_append(data, DEFAULT_END_MSG);
+    list_clear(&data->waiting_events, event_data_clear);
+    server_response_append(data, "%s", DEFAULT_END_MSG);
     server_response_end(data);
     return true;
 }

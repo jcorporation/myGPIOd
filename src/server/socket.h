@@ -49,9 +49,4 @@ int server_client_connection_set_timeout(int timeout_fd, int timeout);
 void server_client_connection_remove_timeout(struct t_client_data *data);
 bool server_client_timeout(struct t_list *clients, int *timeout_fd);
 
-void server_response_send(struct t_client_data *data, const char *message);
-void server_response_start(struct t_client_data *data);
-void server_response_append(struct t_client_data *data, const char *message);
-void server_response_end(struct t_client_data *data);
-
 #endif

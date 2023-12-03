@@ -53,7 +53,7 @@ bool gpio_handle_event(struct t_config *config, unsigned idx) {
     struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
     // abort pending long press event
     action_delay_abort(data);
-    action_handle(node->id, &event.ts, event.event_type, data);
+    action_handle(config, node->id, &event.ts, event.event_type, data);
     return true;
 }
 

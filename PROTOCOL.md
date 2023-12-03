@@ -42,14 +42,18 @@ Only the `noidle` command is allowed while the client is in idle mode.
 OK
 gpio:{gpio number}
 event:{event1}
+time:{seconds}.{milliseconds}
 gpio:{gpio number}
 event:{event2}
+time:{seconds}.{milliseconds}
 END
 ```
 
 ### noidle
 
 Exits the idle mode and allows the client to send commands. It responds with the accumulated events.
+
+myGPIOD stores only the last 10 events while not in idle mode.
 
 ## Events
 

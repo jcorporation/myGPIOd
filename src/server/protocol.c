@@ -10,6 +10,7 @@
 #include "src/lib/log.h"
 #include "src/lib/util.h"
 #include "src/server/idle.h"
+#include "src/server/response.h"
 #include "src/server/socket.h"
 
 #include <ctype.h>
