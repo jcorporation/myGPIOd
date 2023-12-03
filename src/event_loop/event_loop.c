@@ -45,7 +45,7 @@ bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, int pfd_type, short 
 void event_add_gpio_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds) {
     struct t_list_node *current = config->gpios_in.head;
     while (current != NULL) {
-        struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
+        struct t_gpio_in_data *data = (struct t_gpio_in_data *)current->data;
         if (data->timer_fd > 0) {
             event_poll_fd_add(poll_fds, data->timer_fd, PFD_TYPE_GPIO_TIMER, POLLIN | POLLPRI);
         }

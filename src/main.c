@@ -8,10 +8,13 @@
  */
 
 #include "compile_time.h"
+#include "dist/sds/sds.h"
 #include "src/event_loop/event_loop.h"
 #include "src/gpio/gpio.h"
 #include "src/lib/config.h"
 #include "src/lib/log.h"
+#include "src/lib/mem.h"
+#include "src/lib/util.h"
 #include "src/server/socket.h"
 
 #include <poll.h>
@@ -57,12 +60,12 @@ int main(int argc, char **argv) {
 
     // Handle command line parameter
     char *config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
-        ? strdup(argv[1])
-        : strdup("/etc/mygpiod.conf");
+        ? sdsnew(argv[1])
+        : sdsnew("/etc/mygpiod.conf");
 
     // Read config
     struct t_config *config = get_config(config_file);
-    free(config_file);
+    FREE_SDS(config_file);
     if (config == NULL) {
         rc = EXIT_FAILURE;
         goto out;
@@ -84,7 +87,7 @@ int main(int argc, char **argv) {
     memset(&poll_fds, 0, sizeof(poll_fds));
 
     // open the chip, set output gpios and request input gpios
-    if (config->chip_name[0] != '\0') {
+    if (sdslen(config->chip_name) > 0) {
         if (gpio_open_chip(config) == false ||
             gpio_set_outputs(config) == false ||
             gpio_request_inputs(config, &poll_fds) == false)
@@ -137,7 +140,7 @@ int main(int argc, char **argv) {
 out:
     if (config != NULL) {
         config_clear(config);
-        free(config);
+        FREE_PTR(config);
     }
     if (rc == EXIT_SUCCESS) {
         MYGPIOD_LOG_INFO("Exiting gracefully, thank you for using myGPIOd");

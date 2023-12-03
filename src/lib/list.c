@@ -11,6 +11,7 @@
 
 #include "compile_time.h"
 #include "src/lib/list.h"
+#include "src/lib/mem.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -38,9 +39,9 @@ void list_clear(struct t_list *list, list_data_clear clear_data_callback) {
         current = current->next;
         if (clear_data_callback != NULL) {
             clear_data_callback(tmp);
-            free(tmp->data);
+            FREE_PTR(tmp->data);
         }
-        free(tmp);
+        FREE_PTR(tmp);
     }
     list_init(list);
 }
@@ -54,7 +55,7 @@ void list_clear(struct t_list *list, list_data_clear clear_data_callback) {
  */
 bool list_push(struct t_list *list, unsigned id, void *data) {
     //create new node
-    struct t_list_node *node = malloc(sizeof(struct t_list_node));
+    struct t_list_node *node = malloc_assert(sizeof(struct t_list_node));
     node->id = id;
     node->data = data;
     node->next = NULL;
@@ -109,6 +110,12 @@ struct t_list_node *list_node_by_id(struct t_list *list, unsigned id) {
     return NULL;
 }
 
+/**
+ * Removes the node from the list
+ * @param list list to remove the node
+ * @param node node to remove
+ * @return true on success, else false
+ */
 bool list_remove_node(struct t_list *list, struct t_list_node *node) {
     if (list->head == NULL) {
         return false;

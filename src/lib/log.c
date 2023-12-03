@@ -141,7 +141,7 @@ void log_log(int level, const char *file, int line, const char *fmt, ...) {
     va_start(args, fmt);
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wformat-nonliteral"
-    vprintf(fmt, args); /* Flawfinder: ignore */
+    vprintf(fmt, args);
     va_end(args);
     #pragma GCC diagnostic pop
     printf("\n");

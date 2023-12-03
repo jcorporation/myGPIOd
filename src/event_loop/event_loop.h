@@ -28,7 +28,7 @@ enum pfd_types {
 /**
  * Maximum number off fds to poll
  */
-#define MAX_FDS (GPIOD_LINE_BULK_MAX_LINES * 2 + MAX_CLIENT_CONNECTIONS + 1)
+#define MAX_FDS (GPIOD_LINE_BULK_MAX_LINES * 2 + MAX_CLIENT_CONNECTIONS * 2 + 1)
 
 /**
  * Struct to hold poll fd data

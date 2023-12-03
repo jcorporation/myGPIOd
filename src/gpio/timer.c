@@ -34,7 +34,7 @@ bool gpio_timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
         MYGPIOD_LOG_ERROR("Error getting node for timer_fd");
         return false;
     }
-    struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
+    struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
     action_execute_delayed(node->id, data, config);
     return true;
 }
@@ -50,7 +50,7 @@ bool gpio_timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
 static struct t_list_node *get_node_by_timerfd(struct t_list *gpios_in, int *fd) {
     struct t_list_node *current = gpios_in->head;
     while (current != NULL) {
-        struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
+        struct t_gpio_in_data *data = (struct t_gpio_in_data *)current->data;
         if (data->timer_fd == *fd) {
             return current;
         }

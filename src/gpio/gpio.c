@@ -50,7 +50,7 @@ bool gpio_handle_event(struct t_config *config, unsigned idx) {
         return false;
     }
     struct t_list_node *node = list_node_at(&config->gpios_in, idx);
-    struct t_gpio_node_in *data = (struct t_gpio_node_in *)node->data;
+    struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
     // abort pending long press event
     action_delay_abort(data);
     action_handle(node->id, &event.ts, event.event_type, data);
@@ -80,7 +80,7 @@ bool gpio_set_outputs(struct t_config *config) {
             MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->id);
             return false;
         }
-        struct t_gpio_node_out *data = (struct t_gpio_node_out *)current->data;
+        struct t_gpio_out_data *data = (struct t_gpio_out_data *)current->data;
         MYGPIOD_LOG_INFO("Setting gpio \"%u\" as output to value \"%s\"",
             current->id, lookup_gpio_value(data->value));
         gpiod_line_bulk_add(&bulk_out, line);
@@ -123,7 +123,7 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
             MYGPIOD_LOG_ERROR("Error getting gpio \"%u\"", current->id);
             return false;
         }
-        struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
+        struct t_gpio_in_data *data = (struct t_gpio_in_data *)current->data;
         MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s",
             current->id, lookup_event_request(data->request_event));
         gpiod_line_bulk_add(&bulk_in, line);
@@ -148,7 +148,7 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
     current= config->gpios_in.head;
     unsigned i = 0;
     while (current != NULL) {
-        struct t_gpio_node_in *data = (struct t_gpio_node_in *)current->data;
+        struct t_gpio_in_data *data = (struct t_gpio_in_data *)current->data;
         line = gpiod_line_bulk_get_line(&bulk_in, i);
         data->fd = gpiod_line_event_get_fd(line);
         event_poll_fd_add(poll_fds, data->fd, PFD_TYPE_GPIO, POLLIN | POLLPRI);

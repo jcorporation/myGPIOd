@@ -7,8 +7,10 @@
 #include "compile_time.h"
 #include "src/server/socket.h"
 
+#include "dist/sds/sds.h"
 #include "src/lib/list.h"
 #include "src/lib/log.h"
+#include "src/lib/mem.h"
 #include "src/lib/timer.h"
 #include "src/lib/util.h"
 #include "src/server/protocol.h"
@@ -98,23 +100,11 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd) {
         return false;
     }
 
-    struct t_client_data *data = malloc(sizeof(struct t_client_data));
-    if (data == NULL) {
-        MYGPIOD_LOG_ERROR("Out of memory");
-        close(client_fd);
-        return false;
-    }
-    data->fd = client_fd;
-    data->state = CLIENT_SOCKET_STATE_WRITING;
-    memset(data->buf_in, 0, sizeof(data->buf_in));
-    memset(data->buf_out, 0, sizeof(data->buf_out));
-    data->bytes_in = 0;
-    data->buf_out_len = 0;
-    list_init(&data->waiting_events);
+    struct t_client_data *data = server_client_connection_new(client_fd);
     config->client_id++;
     list_push(&config->clients, config->client_id, data);
     MYGPIOD_LOG_DEBUG("Client#%u: Accepted new connection", config->client_id);
-    server_send_response(config->clients.tail, WELCOME_MESSAGE);
+    server_response_send(data, WELCOME_MESSAGE);
     data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
     timer_log_next_expire(data->timeout_fd);
     return true;
@@ -142,28 +132,33 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
     switch(data->state) {
         case CLIENT_SOCKET_STATE_READING:
         case CLIENT_SOCKET_STATE_IDLE: {
-            size_t max_bytes = SERVER_INPUT_BUFFER_SIZE - (size_t)data->bytes_in - 1;
-            ssize_t result = read(data->fd, data->buf_in + data->bytes_in, max_bytes);
-            if (result < 0) {
+            size_t oldlen = sdslen(data->buf_in);
+            data->buf_in = sdsMakeRoomFor(data->buf_in, BUFFER_SIZE);
+            ssize_t nread = read(data->fd, data->buf_in + oldlen, BUFFER_SIZE);
+            if (nread <= 0) {
                 MYGPIOD_LOG_ERROR("Client#%u: Could not read from socket", node->id);
                 server_client_disconnect(&config->clients, node);
                 return false;
             }
-            data->bytes_in += result;
-            char *buf_end = memchr(data->buf_in, '\n', (size_t)data->bytes_in);
+            sdsIncrLen(data->buf_in, nread);
+            char *buf_end = memchr(data->buf_in, '\n', sdslen(data->buf_in));
             if (buf_end != NULL) {
-                chomp(data->buf_in, (size_t)data->bytes_in);
+                sdstrim(data->buf_in, " \t \n");
                 MYGPIOD_LOG_DEBUG("Client#%u: Read line \"%s\"", node->id, data->buf_in);
                 data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
                 timer_log_next_expire(data->timeout_fd);
                 server_protocol_handler(config, node);
-                data->bytes_in = 0;
-                data->buf_in[0] = '\0';
+                return true;
+            }
+            if (sdslen(data->buf_in) >= BUFFER_SIZE_INPUT_MAX) {
+                MYGPIOD_LOG_ERROR("Client#%u: Request line too long", node->id);
+                server_client_disconnect(&config->clients, node);
+                return false;
             }
             return true;
         }
         case CLIENT_SOCKET_STATE_WRITING: {
-            size_t max_bytes = strlen(data->buf_out) - (size_t)data->bytes_out;
+            size_t max_bytes = sdslen(data->buf_out) - (size_t)data->bytes_out;
             ssize_t result = write(data->fd, data->buf_out + data->bytes_out, max_bytes);
             if (result < 0) {
                 MYGPIOD_LOG_ERROR("Client#%u: Could not write to socket", node->id);
@@ -174,6 +169,7 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
             if ((size_t)result == max_bytes) {
                 data->state = CLIENT_SOCKET_STATE_READING;
                 data->events = POLLIN;
+                sdsclear(data->buf_out);
             }
             return true;
         }
@@ -182,14 +178,30 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
 }
 
 /**
+ * Creates the client connection data
+ * @param client_fd client connection fd
+ * @return allocated client connection data
+ */
+struct t_client_data *server_client_connection_new(int client_fd) {
+    struct t_client_data *data = malloc_assert(sizeof(struct t_client_data));
+    data->fd = client_fd;
+    data->state = CLIENT_SOCKET_STATE_WRITING;
+    data->buf_in = sdsempty();
+    data->buf_out = sdsempty();
+    list_init(&data->waiting_events);
+    return data;
+}
+
+/**
  * Closes the client fd and frees the connection
  * @param node pointer to client
  */
 void server_client_connection_clear(struct t_list_node *node) {
     struct t_client_data *data = (struct t_client_data *)node->data;
-    if (data->fd > 0) {
-        close(data->fd);
-    }
+    close_fd(&data->fd);
+    close_fd(&data->timeout_fd);
+    FREE_SDS(data->buf_in);
+    FREE_SDS(data->buf_out);
     list_clear(&data->waiting_events, NULL);
 }
 
@@ -198,31 +210,58 @@ void server_client_connection_clear(struct t_list_node *node) {
  * and closes and frees it.
  * @param clients pointer to client list
  * @param node node holding the client data to remove
+ * @return true on success, else false
  */
-void server_client_disconnect(struct t_list *clients, struct t_list_node *node) {
+bool server_client_disconnect(struct t_list *clients, struct t_list_node *node) {
     MYGPIOD_LOG_INFO("Client#%u: Connection closed", node->id);
-    list_remove_node(clients, node);
+    if (list_remove_node(clients, node) == false) {
+        MYGPIOD_LOG_ERROR("Could not find client connection");
+        return false;
+    }
     server_client_connection_clear(node);
-    free(node->data);
-    free(node);
+    FREE_PTR(node->data);
+    FREE_PTR(node);
+    return true;
 }
 
 /**
- * Copies the message to the output buffer and sets the client state to writing
- * @param node pointer to node with client data
- * @param message message to send
+ * Starts a new response by clearing the output buffer.
+ * It sends the response from buf_out to the client.
+ * @param data pointer to client data
  */
-void server_send_response(struct t_list_node *node, const char *message) {
-    size_t len = strlen(message);
-    if (len >= SERVER_OUTPUT_BUFFER_SIZE - 1) {
-        MYGPIOD_LOG_ERROR("Client#%u: Response message too long", node->id);
-        return;
-    }
-    struct t_client_data *data = (struct t_client_data *)node->data;
+void server_response_start(struct t_client_data *data) {
+    sdsclear(data->buf_out);
+}
+
+/**
+ * Appends the message to the output buffer
+ * @param data pointer to client data
+ * @param message message to append
+ */
+void server_response_append(struct t_client_data *data, const char *message) {
+    data->buf_out = sdscat(data->buf_out, message);
+}
+
+/**
+ * Sets the client state to writing.
+ * It sends the response from buf_out to the client.
+ * @param data pointer to client data
+ */
+void server_response_end(struct t_client_data *data) {
     data->state = CLIENT_SOCKET_STATE_WRITING;
     data->bytes_out = 0;
     data->events = POLLOUT;
-    strcpy(data->buf_out, message);
+}
+
+/**
+ * Shortcut for server_response_start, server_response_append and server_response_end.
+ * @param data pointer to client data
+ * @param message message to send
+ */
+void server_response_send(struct t_client_data *data, const char *message) {
+    server_response_start(data);
+    server_response_append(data, message);
+    server_response_end(data);
 }
 
 /**
@@ -242,10 +281,7 @@ int server_client_connection_set_timeout(int timeout_fd, int timeout) {
  * @param data client data
  */
 void server_client_connection_remove_timeout(struct t_client_data *data) {
-    if (data->timeout_fd > 0) {
-        close(data->timeout_fd);
-    }
-    data->timeout_fd = -1;
+    close_fd(&data->timeout_fd);
 }
 
 /**

@@ -193,7 +193,10 @@ endif()
 # the main mygpiod target
 add_subdirectory("src")
 
-target_link_libraries(mygpiod gpiod)
+# dist targets
+add_subdirectory(dist)
+
+target_link_libraries(mygpiod gpiod sds)
 
 install(TARGETS mygpiod DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/cmake/Install.cmake)

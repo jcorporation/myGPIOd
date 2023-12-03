@@ -7,6 +7,7 @@
 #include "compile_time.h"
 #include "src/lib/util.h"
 
+#include "dist/sds/sds.h"
 #include "src/lib/config.h"
 #include "src/lib/log.h"
 
@@ -16,6 +17,63 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+
+/**
+ * Closes an open file descriptor.
+ * Checks it if is open and sets it to -1.
+ * @param fd 
+ */
+void close_fd(int *fd) {
+    if (*fd > -1) {
+        close(*fd);
+        *fd = -1;
+    }
+}
+
+/**
+ * Getline function that trims whitespace characters
+ * @param s an already allocated sds string
+ * @param fp a file descriptor to read from
+ * @param max max line length to read
+ * @return Number of bytes read or -1 on eof
+ */
+int sds_getline(sds *s, FILE *fp, size_t max) {
+    sdsclear(*s);
+    for (size_t i = 0; i < max; i++) {
+        int c = fgetc(fp);
+        if (c == EOF ||
+            c == '\n')
+        {
+            sdstrim(*s, "\r \t");
+            return c == EOF ? -1 : (int)sdslen(*s);
+        }
+        *s = sds_catchar(*s, (char)c);
+    }
+    MYGPIOD_LOG_ERROR("Line is too long, max length is %lu", (unsigned long)max);
+    sdstrim(*s, "\r \t");
+    return (int)sdslen(*s);
+}
+
+/**
+ * Appends a char to sds string s, this is faster than using sdscatfmt
+ * @param s sds string
+ * @param c char to append
+ * @return modified sds string
+ */
+sds sds_catchar(sds s, const char c) {
+    // Make sure there is always space for at least 1 char.
+    if (sdsavail(s) == 0) {
+        s = sdsMakeRoomFor(s, 1);
+    }
+    size_t i = sdslen(s);
+    s[i++] = c;
+    sdsinclen(s, 1);
+    // Add null-term
+    s[i] = '\0';
+    return s;
+}
 
 /**
  * Parses a string to a gpio value.
@@ -210,18 +268,4 @@ bool parse_int(char *str, int *result, char **rest, unsigned min, unsigned max) 
     }
     MYGPIOD_LOG_WARN("Invalid value");
     return false;
-}
-
-/**
- * Removes whitespace characters from end
- * @param line string to chomp
- * @return chomped string
- */
-char *chomp(char *line, size_t len) {
-    int offset = (int)len - 1;
-    while (offset >= 0 && isspace(line[offset])) {
-        offset--;
-    }
-    line[offset + 1] = '\0';
-    return line;
 }

@@ -48,8 +48,7 @@ bool handle_noidle(struct t_config *config, struct t_list_node *node) {
     MYGPIOD_LOG_INFO("Client#%u: Leaving idle mode", node->id);
     data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
     if (data->waiting_events.length == 0) {
-        server_send_response(node, DEFAULT_OK_MSG_PREFIX DEFAULT_END_MSG);
-        data->state = CLIENT_SOCKET_STATE_WRITING;
+        server_response_send(data, DEFAULT_OK_MSG_PREFIX DEFAULT_END_MSG);
         return true;
     }
     return send_idle_events(node->data);
@@ -66,18 +65,15 @@ bool send_idle_events(struct t_list_node *node) {
     MYGPIOD_LOG_DEBUG("Client#%u: Sending idle events", node->id);
     struct t_client_data *data = (struct t_client_data *)node->data;
 
-    char *response = malloc(SERVER_OUTPUT_BUFFER_SIZE);
-    int len = snprintf(response, SERVER_OUTPUT_BUFFER_SIZE, DEFAULT_OK_MSG_PREFIX);
+    server_response_start(data);
+    server_response_append(data, DEFAULT_OK_MSG_PREFIX);
     struct t_list_node *current = data->waiting_events.head;
     while (current != NULL) {
-        len = snprintf(response + len, (size_t)(SERVER_OUTPUT_BUFFER_SIZE - len), "event:\n");
+        server_response_append(data, "event:\n");
         current = current -> next;
     }
-    len = snprintf(response + len, (size_t)(SERVER_OUTPUT_BUFFER_SIZE - len), DEFAULT_END_MSG);
     list_clear(&data->waiting_events, NULL);
-
-    data->state = CLIENT_SOCKET_STATE_WRITING;
-    server_send_response(node, response);
-    free(response);
+    server_response_append(data, DEFAULT_END_MSG);
+    server_response_end(data);
     return true;
 }

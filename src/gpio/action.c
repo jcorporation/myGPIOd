@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 // private definitions
-static void action_delay(struct t_gpio_node_in *node);
+static void action_delay(struct t_gpio_in_data *data);
 static void action_execute(const char *action);
 static void action_execute_command(const char *cmd);
 
@@ -32,45 +32,45 @@ static void action_execute_command(const char *cmd);
  * @param gpio the gpio number
  * @param ts timestamp of the event
  * @param event_type the event type
- * @param node gpio config data
+ * @param data gpio config data
  */
-void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_gpio_node_in *node) {
+void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_gpio_in_data *data) {
     MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"[%8lld.%09ld]\" ",
         lookup_event(event_type),
         gpio, (long long)ts->tv_sec, ts->tv_nsec);
 
-    if (node->ignore_event == true) {
-        node->ignore_event = false;
+    if (data->ignore_event == true) {
+        data->ignore_event = false;
         return;
     }
     if (event_type == GPIOD_LINE_EVENT_FALLING_EDGE) {
-        if (node->action_falling != NULL) {
-            if (node->request_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE ||
-                node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
+        if (sdslen(data->action_falling) > 0) {
+            if (data->request_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE ||
+                data->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
             {
-                action_execute(node->action_falling);
+                action_execute(data->action_falling);
             }
         }
-        if (node->long_press_event == GPIOD_LINE_EVENT_FALLING_EDGE &&
-            node->long_press_action != NULL &&
-            node->long_press_timeout > 0)
+        if (data->long_press_event == GPIOD_LINE_EVENT_FALLING_EDGE &&
+            sdslen(data->long_press_action) > 0 &&
+            data->long_press_timeout > 0)
         {
-            action_delay(node);
+            action_delay(data);
         }
     }
     else {
-        if (node->action_rising != NULL) {
-            if (node->request_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE ||
-                node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
+        if (sdslen(data->action_rising) > 0) {
+            if (data->request_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE ||
+                data->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES)
             {
-                action_execute(node->action_rising);
+                action_execute(data->action_rising);
             }
         }
-        if (node->long_press_event == GPIOD_LINE_EVENT_RISING_EDGE &&
-            node->long_press_action != NULL &&
-            node->long_press_timeout > 0)
+        if (data->long_press_event == GPIOD_LINE_EVENT_RISING_EDGE &&
+            sdslen(data->long_press_action) > 0 &&
+            data->long_press_timeout > 0)
         {
-            action_delay(node);
+            action_delay(data);
         }
     }
 }
@@ -79,10 +79,10 @@ void action_handle(unsigned gpio, const struct timespec *ts, int event_type, str
  * Checks if the gpio value has not changed since the initial event 
  * and executes the defined action
  * @param gpio the gpio number
- * @param node gpio config data
+ * @param data gpio config data
  * @param config config
  */
-void action_execute_delayed(unsigned gpio, struct t_gpio_node_in *node, struct t_config *config) {
+void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t_config *config) {
     // check if gpio value has not changed
     struct gpiod_line *line = gpiod_chip_get_line(config->chip, gpio);
     if (line == NULL) {
@@ -95,28 +95,25 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_node_in *node, struct t
         MYGPIOD_LOG_ERROR("Error reading value from gpio %u: %s", gpio, strerror(errno));
         return;
     }
-    if ((rv == GPIO_VALUE_HIGH && node->long_press_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE) ||
-        (rv == GPIO_VALUE_LOW && node->long_press_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE))
+    if ((rv == GPIO_VALUE_HIGH && data->long_press_event == GPIOD_LINE_REQUEST_EVENT_RISING_EDGE) ||
+        (rv == GPIO_VALUE_LOW && data->long_press_event == GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE))
     {
-        action_execute(node->long_press_action);
-        if (node->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES) {
+        action_execute(data->long_press_action);
+        if (data->request_event == GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES) {
             // ignore the release event
-            node->ignore_event = true;
+            data->ignore_event = true;
         }
     }
     // remove timerfd
-    action_delay_abort(node);
+    action_delay_abort(data);
 }
 
 /**
  * Closes a timerfd for a delayed action
  * @param node pointer to node
  */
-void action_delay_abort(struct t_gpio_node_in *node) {
-    if (node->timer_fd > -1) {
-        close(node->timer_fd);
-        node->timer_fd = -1;
-    }
+void action_delay_abort(struct t_gpio_in_data *data) {
+    close_fd(&data->timer_fd);
 }
 
 //private functions
@@ -126,11 +123,11 @@ void action_delay_abort(struct t_gpio_node_in *node) {
  * @param node gpio config data
  * @param event_type the event type
  */
-static void action_delay(struct t_gpio_node_in *node) {
-    if (node->timer_fd > -1) {
-        action_delay_abort(node);
+static void action_delay(struct t_gpio_in_data *data) {
+    if (data->timer_fd > -1) {
+        action_delay_abort(data);
     }
-    node->timer_fd = timer_new(node->long_press_timeout);
+    data->timer_fd = timer_new(data->long_press_timeout);
 }
 
 /**

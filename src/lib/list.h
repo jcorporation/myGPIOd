@@ -13,7 +13,7 @@
  * A linked list node
  */
 struct t_list_node {
-    unsigned id;             //!< gpio number
+    unsigned id;               //!< node id
     void *data;                //!< data pointer
     struct t_list_node *next;  //!< pointer to next node in the list
 };

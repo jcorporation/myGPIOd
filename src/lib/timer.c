@@ -8,6 +8,7 @@
 #include "src/lib/timer.h"
 
 #include "src/lib/log.h"
+#include "src/lib/util.h"
 
 #include <errno.h>
 #include <string.h>
@@ -47,7 +48,7 @@ bool timer_set(int timer_fd, int timeout) {
     errno = 0;
     if (timerfd_settime(timer_fd, 0, &its, NULL) == -1) {
         MYGPIOD_LOG_ERROR("Can not set expiration for timer: \"%s\"", strerror(errno));
-        close(timer_fd);
+        close_fd(&timer_fd);
         return false;
     }
     return true;

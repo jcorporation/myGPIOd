@@ -30,5 +30,6 @@
 // Other defaults
 #define MAX_CLIENT_CONNECTIONS 10
 #define OPEN_FLAGS_READ "re"
+#define LINE_LENGTH_MAX 1024
 
 #endif

@@ -8,6 +8,7 @@
 #include "src/server/protocol.h"
 
 #include "src/lib/log.h"
+#include "src/lib/util.h"
 #include "src/server/idle.h"
 #include "src/server/socket.h"
 
@@ -18,11 +19,10 @@
 // private definitions
 
 #define WELCOME_MESSAGE "OK\nversion:myGPIOd " MYGPIOD_VERSION "\n"
-#define MAX_CMD_LEN 25
 
 static const char *cmd_strs[] = { CMDS(GEN_STR) };
 
-static void parse_command(char *line, enum cmd_ids *cmd_id, char **options);
+static enum cmd_ids parse_command(sds cmd);
 
 // public functions
 
@@ -34,55 +34,59 @@ static void parse_command(char *line, enum cmd_ids *cmd_id, char **options);
  */
 bool server_protocol_handler(struct t_config *config, struct t_list_node *node) {
     struct t_client_data *data = (struct t_client_data *)node->data;
-    enum cmd_ids cmd_id;
-    char *options = NULL;
-    parse_command(data->buf_in, &cmd_id, &options);
+
+    int count = 0;
+    sds *args = sdssplitargs(data->buf_in, &count);
+    sdsclear(data->buf_in);
+    if (count == 0) {
+        sdsfreesplitres(args, count);
+        return true;
+    }
+    enum cmd_ids cmd_id = parse_command(args[0]);
     if (data->state == CLIENT_SOCKET_STATE_IDLE &&
         cmd_id != CMD_NOIDLE)
     {
-        server_send_response(node, DEFAULT_ERROR_MSG_PREFIX "In idle state, only the noidle command is allowed\n" DEFAULT_END_MSG);
+        MYGPIOD_LOG_ERROR("Client#%u: Only noidle command is allowed", node->id);
+        server_response_send(data, DEFAULT_ERROR_MSG_PREFIX "In idle state, only the noidle command is allowed\n" DEFAULT_END_MSG);
+        sdsfreesplitres(args, count);
         return false;
     }
-    MYGPIOD_LOG_INFO("Client#%u: command: \"%s\", options: \"%s\"", node->id, get_cmd_name(cmd_id), options);
+
+    MYGPIOD_LOG_INFO("Client#%u: Command: \"%s\"", node->id, get_cmd_name(cmd_id));
+    bool rc = true;
     switch(cmd_id) {
         case CMD_CLOSE:
-            server_client_disconnect(&config->clients, node);
-            return true;
+            rc = server_client_disconnect(&config->clients, node);
+            break;
         case CMD_IDLE:
-            return handle_idle(node);
+            rc = handle_idle(node);
+            break;
         case CMD_NOIDLE:
-            return handle_noidle(config, node);
+            rc = handle_noidle(config, node);
+            break;
         case CMD_INVALID:
         case CMD_COUNT:
-            server_send_response(node, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n" DEFAULT_END_MSG);
-            MYGPIOD_LOG_ERROR("Invalid command \"%s\"", data->buf_in);
+            MYGPIOD_LOG_ERROR("Client#%u: Invalid command", node->id);
+            server_response_send(data, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n" DEFAULT_END_MSG);
+            rc = false;
     }
-    return false;
+    sdsfreesplitres(args, count);
+    return rc;
 }
 
 // private functions
 
 /**
- * Splits the command from options and lookups the cmd_id
- * @param line line to parse
- * @param cmd_id the cmd id
- * @param options pointer to options string
+ * Parses the command
+ * @param cmd line to parse
+ * @return the cmd id
  */
-static void parse_command(char *line, enum cmd_ids *cmd_id, char **options) {
-    char cmd_str[MAX_CMD_LEN];
-    snprintf(cmd_str, 5, "CMD_");
-    char *p = line;
-    size_t i = 4;
-    for (; i < MAX_CMD_LEN && *p != '\0'; p++, i++) {
-        if (isspace(*p)) {
-            p++;
-            break;
-        }
-        cmd_str[i] = *p;
-    }
-    cmd_str[i] = '\0';
-    *options = p;
-    *cmd_id = get_cmd_id(cmd_str);
+static enum cmd_ids parse_command(sds cmd) {
+    sds cmd_str = sdscatfmt(sdsempty(), "CMD_%s", cmd);
+    sdstoupper(cmd_str);
+    enum cmd_ids cmd_id = get_cmd_id(cmd_str);
+    FREE_SDS(cmd_str);
+    return cmd_id;
 }
 
 /**
@@ -92,7 +96,7 @@ static void parse_command(char *line, enum cmd_ids *cmd_id, char **options) {
  */
 enum cmd_ids get_cmd_id(const char *cmd) {
     for (unsigned i = 0; i < CMD_COUNT; i++) {
-        if (strcasecmp(cmd, cmd_strs[i]) == 0) {
+        if (strcmp(cmd, cmd_strs[i]) == 0) {
             return i;
         }
     }

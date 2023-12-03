@@ -11,8 +11,8 @@
 
 #include <time.h>
 
-void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_gpio_node_in *node);
-void action_delay_abort(struct t_gpio_node_in *node);
-void action_execute_delayed(unsigned gpio, struct t_gpio_node_in *node, struct t_config *config);
+void action_handle(unsigned gpio, const struct timespec *ts, int event_type, struct t_gpio_in_data *data);
+void action_delay_abort(struct t_gpio_in_data *data);
+void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t_config *config);
 
 #endif
