@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <gpiod.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,7 +72,7 @@ void config_clear(struct t_config *config) {
     list_clear(&config->gpios_out, gpio_node_out_clear);
     list_clear(&config->clients, server_client_connection_clear);
     close_fd(&config->signal_fd);
-    FREE_SDS(config->chip_name);
+    FREE_SDS(config->chip_path);
     FREE_SDS(config->dir_gpio);
     FREE_SDS(config->socket_path);
 }
@@ -91,12 +92,8 @@ static struct t_config *config_new(void) {
     }
     list_init(&config->gpios_in);
     list_init(&config->gpios_out);
-    config->chip_name = sdsnew(CFG_CHIP);
+    config->chip_path = sdsnew(CFG_CHIP);
     config->chip = NULL;
-    config->bulk_in = NULL;
-    config->active_low = CFG_ACTIVE_LOW;
-    config->bias = CFG_BIAS;
-    config->event_request = CFG_REQUEST_EVENT_CHIP;
     config->loglevel = loglevel;
     config->syslog = CFG_SYSLOG;
     config->dir_gpio = sdsnew(CFG_GPIO_DIR);
@@ -185,7 +182,7 @@ static bool config_read(struct t_config *config, sds config_file) {
             }
         }
         MYGPIOD_LOG_WARN("Skipping file %s/%s", config->dir_gpio, next_file->d_name);
-        if (i == GPIOD_LINE_BULK_MAX_LINES) {
+        if (i == GPIOS_MAX) {
             MYGPIOD_LOG_WARN("Too many gpios configured");
             break;
         }
@@ -204,24 +201,9 @@ static bool config_read(struct t_config *config, sds config_file) {
  */
 static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     if (strcmp(key, "chip") == 0) {
-        sdsclear(config->chip_name);
-        config->chip_name = sdscatsds(config->chip_name, value);
-        MYGPIOD_LOG_DEBUG("Setting chip to \"%s\"", config->chip_name);
-        return true;
-    }
-    if (strcmp(key, "request_event") == 0) {
-        config->event_request = parse_event_request(value);
-        MYGPIOD_LOG_DEBUG("Setting event to \"%s\"", lookup_event_request(config->event_request));
-        return true;
-    }
-    if (strcmp(key, "active_low") == 0) {
-        config->active_low = parse_bool(value);
-        MYGPIOD_LOG_DEBUG("Setting active_low to \"%s\"", bool_to_str(config->active_low));
-        return true;
-    }
-    if (strcmp(key, "bias") == 0) {
-        config->bias = parse_bias(value);
-        MYGPIOD_LOG_DEBUG("Setting bias to \"%s\"", lookup_bias(config->bias));
+        sdsclear(config->chip_path);
+        config->chip_path = sdscatsds(config->chip_path, value);
+        MYGPIOD_LOG_DEBUG("Setting chip to \"%s\"", config->chip_path);
         return true;
     }
     if (strcmp(key, "loglevel") == 0) {
@@ -312,6 +294,18 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
  * @return true on success, else false
  */
 static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_data *data) {
+    if (strcmp(key, "active_low") == 0) {
+        data->active_low = parse_bool(value);
+        return true;
+    }
+    if (strcmp(key, "bias") == 0) {
+        data->bias = parse_bias(value);
+        return true;
+    }
+    if (strcmp(key, "drive") == 0) {
+        data->drive = parse_drive(value);
+        return true;
+    }
     if (strcmp(key, "value") == 0) {
         data->value = parse_gpio_value(value);
     }
@@ -326,6 +320,14 @@ static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_
  * @return true on success, else false
  */
 static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_data *data) {
+    if (strcmp(key, "active_low") == 0) {
+        data->active_low = parse_bool(value);
+        return true;
+    }
+    if (strcmp(key, "bias") == 0) {
+        data->bias = parse_bias(value);
+        return true;
+    }
     if (strcmp(key, "request_event") == 0) {
         data->request_event = parse_event_request(value);
         return true;
@@ -354,6 +356,11 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         data->long_press_action = sdscatsds(data->long_press_action, value);
         return true;
     }
+    if (strcmp(key, "debounce") == 0) {
+        if (parse_ulong(value, &data->debounce_period_us, NULL, 0, UINT_MAX) == true) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -363,25 +370,20 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
  */
 static struct t_gpio_in_data *gpio_in_data_new(void) {
     struct t_gpio_in_data *data = malloc_assert(sizeof(struct t_gpio_in_data));
-    data->request_event = GPIOD_LINE_REQUEST_EVENT_RISING_EDGE;
+    data->request_event = GPIOD_LINE_EDGE_RISING;
     data->action_rising = sdsempty();
     data->action_falling = sdsempty();
     data->long_press_timeout = 0;
     data->long_press_action = sdsempty();
-    data->long_press_event = GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE;
+    data->long_press_event = GPIOD_LINE_EDGE_FALLING;
     data->ignore_event = false;
     data->timer_fd = -1;
-    data->fd = -1;
-    return data;
-}
-
-/**
- * Creates a new gpio out config data node and sets its values to defaults.
- * @return newly allocated struct t_gpio_out_data
- */
-static struct t_gpio_out_data *gpio_out_data_new(void) {
-    struct t_gpio_out_data *data = malloc_assert(sizeof(struct t_gpio_out_data));
-    data->value = GPIO_VALUE_LOW;
+    data->gpio_fd = -1;
+    data->bias = GPIOD_LINE_BIAS_AS_IS;
+    data->active_low = false;
+    data->debounce_period_us = 0;
+    data->request = NULL;
+    data->event_buffer = NULL;
     return data;
 }
 
@@ -390,8 +392,15 @@ static struct t_gpio_out_data *gpio_out_data_new(void) {
  * @param data gpio in config node to clear
  */
 static void gpio_in_data_clear(struct t_gpio_in_data *data) {
-    close_fd(&data->fd);
+    close_fd(&data->gpio_fd);
     close_fd(&data->timer_fd);
+    if (data->request != NULL) {
+        gpiod_line_request_release(data->request);
+        FREE_PTR(data->request);
+    }
+    if (data->event_buffer != NULL) {
+        gpiod_edge_event_buffer_free(data->event_buffer);
+    }
     FREE_SDS(data->action_falling);
     FREE_SDS(data->action_rising);
     FREE_SDS(data->long_press_action);
@@ -407,11 +416,28 @@ static void gpio_node_in_clear(struct t_list_node *node) {
 }
 
 /**
+ * Creates a new gpio out config data node and sets its values to defaults.
+ * @return newly allocated struct t_gpio_out_data
+ */
+static struct t_gpio_out_data *gpio_out_data_new(void) {
+    struct t_gpio_out_data *data = malloc_assert(sizeof(struct t_gpio_out_data));
+    data->bias = GPIOD_LINE_BIAS_AS_IS;
+    data->active_low = false;
+    data->drive = GPIOD_LINE_DRIVE_PUSH_PULL;
+    data->value = GPIOD_LINE_VALUE_INACTIVE;
+    data->request = NULL;
+    return data;
+}
+
+/**
  * Frees pointers and closes file descriptors from this node.
  * @param data gpio out data to clear
  */
 static void gpio_out_data_clear(struct t_gpio_out_data *data) {
-    (void)data;
+    if (data->request != NULL) {
+        gpiod_line_request_release(data->request);
+        FREE_PTR(data->request);
+    }
 }
 
 /**

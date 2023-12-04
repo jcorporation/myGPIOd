@@ -8,6 +8,7 @@
 #define MYGPIOD_EVENTS_H
 
 #include "src/lib/config.h"
+#include <inttypes.h>
 
 /**
  * myGPIOD event types
@@ -23,11 +24,11 @@ enum mygpiod_event_types {
  */
 struct t_event_data {
     enum mygpiod_event_types mygpiod_event_type;  //!< the myGPIOd event type
-    struct timespec ts;                     //!< timestamp of the event
+    uint64_t timestamp;                           //!< timestamp of the event
 };
 
 void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_types event_type,
-        const struct timespec *ts);
+        uint64_t timestamp);
 void event_data_clear(struct t_list_node *node);
 const char *mygpiod_event_name(enum mygpiod_event_types event_type);
 

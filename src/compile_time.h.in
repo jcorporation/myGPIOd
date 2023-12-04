@@ -18,9 +18,6 @@
 
 // Default configuration
 #define CFG_CHIP "0"
-#define CFG_ACTIVE_LOW true
-#define CFG_BIAS 0
-#define CFG_REQUEST_EVENT_CHIP GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE
 #define CFG_LOGLEVEL LOG_NOTICE
 #define CFG_SYSLOG false
 #define CFG_GPIO_DIR "/etc/mygpiod.d"
@@ -28,9 +25,11 @@
 #define CFG_SOCKET_TIMEOUT 10 //seconds
 
 // Other defaults
-#define MAX_CLIENT_CONNECTIONS 10
-#define OPEN_FLAGS_READ "re"
+#define CLIENT_CONNECTIONS_MAX 10
+#define GPIOS_MAX 64
 #define LINE_LENGTH_MAX 1024
 #define WAITING_EVENTS_MAX 10
+#define GPIO_EVENT_BUF_SIZE 32
+#define OPEN_FLAGS_READ "re"
 
 #endif

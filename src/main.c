@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
     MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
     MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
-    MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_version_string());
+    MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_api_version());
 
     // Handle command line parameter
     char *config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
     memset(&poll_fds, 0, sizeof(poll_fds));
 
     // open the chip, set output gpios and request input gpios
-    if (sdslen(config->chip_name) > 0) {
+    if (sdslen(config->chip_path) > 0) {
         if (gpio_open_chip(config) == false ||
             gpio_set_outputs(config) == false ||
             gpio_request_inputs(config, &poll_fds) == false)

@@ -84,7 +84,7 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
             MYGPIOD_LOG_DEBUG("%u: Event detected of type %d", i, poll_fds->type[i]);
             switch(poll_fds->type[i]) {
                 case PFD_TYPE_GPIO:
-                    gpio_handle_event(config, i);
+                    gpio_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
                 case PFD_TYPE_GPIO_TIMER:
                     gpio_timer_handle_event(&poll_fds->fd[i].fd, config, i);

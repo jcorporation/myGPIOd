@@ -10,37 +10,39 @@
 #include "dist/sds/sds.h"
 #include "src/lib/list.h"
 
+#include <gpiod.h>
 #include <stdbool.h>
 #include <time.h>
-
-/**
- * Valid value of a gpio
- */
-enum gpio_values {
-    GPIO_VALUE_LOW = 0,
-    GPIO_VALUE_HIGH
-};
 
 /**
  * Config and state data for an input gpio
  */
 struct t_gpio_in_data {
-    sds action_rising;       //!< command for rising event
-    sds action_falling;      //!< command for falling event
-    int request_event;       //!< events to request for this gpio
-    int fd;                  //!< gpio file descriptor
-    int long_press_timeout;  //!< timeout for the long press handler
-    sds long_press_action;   //!< long press command
-    int long_press_event;    //!< event for the long press handler
-    bool ignore_event;       //!< internal state for long press handler
-    int timer_fd;            //!< timer file descriptor for long press handler
+    enum gpiod_line_bias bias;                     //!< bias value
+    bool active_low;                               //!< active state is low?
+    unsigned long debounce_period_us;              //!< debounce period in microseconds
+    sds action_rising;                             //!< command for rising event
+    sds action_falling;                            //!< command for falling event
+    enum gpiod_line_edge request_event;            //!< events to request for this gpio
+    int gpio_fd;                                   //!< gpio file descriptor
+    int long_press_timeout;                        //!< timeout for the long press handler
+    sds long_press_action;                         //!< long press command
+    enum gpiod_line_edge long_press_event;         //!< event for the long press handler
+    bool ignore_event;                             //!< internal state for long press handler
+    int timer_fd;                                  //!< timer file descriptor for long press handler
+    struct gpiod_edge_event_buffer *event_buffer;  //!< buffer for gpio events
+    struct gpiod_line_request *request;            //!< gpio line request struct
 };
 
 /**
  * Config data for an output gpio
  */
 struct t_gpio_out_data {
-    int value;  //!< value to set
+    enum gpiod_line_bias bias;           //!< bias value
+    bool active_low;                     //!< active state is low?
+    enum gpiod_line_drive drive;         //!< drive value
+    enum gpiod_line_value value;         //!< value to set
+    struct gpiod_line_request *request;  //!< gpio line request struct
 };
 
 /**
@@ -49,10 +51,7 @@ struct t_gpio_out_data {
 struct t_config {
     struct t_list gpios_in;   //!< holds the list of gpios to monitor
     struct t_list gpios_out;  //!< holds the list of gpios to set
-    int event_request;        //!< events to request from the chip
-    bool active_low;          //!< active state is low?
-    int bias;                 //!< bias value for all the gpios in gpios_in
-    sds chip_name;            //!< name / path of the gpio chip
+    sds chip_path;            //!< path of the gpio chip device
     int loglevel;             //!< the loglevel
     bool syslog;              //!< enable syslog?
     int signal_fd;            //!< file descriptor for the signal handler
@@ -63,8 +62,7 @@ struct t_config {
     struct t_list clients;    //!< list of connected clients
     unsigned client_id;       //!< uniq client id
 
-    struct gpiod_chip *chip;          //!< gpiod chip object
-    struct gpiod_line_bulk *bulk_in;  //!< gpiod requested in gpios
+    struct gpiod_chip *chip;  //!< gpiod chip object
 };
 
 void config_clear(struct t_config *config);

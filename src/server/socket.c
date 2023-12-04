@@ -90,7 +90,7 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd) {
         MYGPIOD_LOG_ERROR("Error creating client socket");
         return false;
     }
-    if (config->clients.length == MAX_CLIENT_CONNECTIONS) {
+    if (config->clients.length == CLIENT_CONNECTIONS_MAX) {
         close(client_fd);
         MYGPIOD_LOG_ERROR("Client connection limit reached");
         return false;

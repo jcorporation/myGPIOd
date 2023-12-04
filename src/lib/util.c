@@ -80,27 +80,70 @@ sds sds_catchar(sds s, const char c) {
  * @param str string to parse
  * @return gpio value or GPIO_VALUE_LOW on error
  */
-int parse_gpio_value(const char *str) {
-    if (strcasecmp(str, "high") == 0) {
-        return GPIO_VALUE_HIGH;
+enum gpiod_line_value parse_gpio_value(const char *str) {
+    if (strcasecmp(str, "active") == 0) {
+        return GPIOD_LINE_VALUE_ACTIVE;
     }
-    if (strcasecmp(str, "low") == 0) {
-        return GPIO_VALUE_LOW;
+    if (strcasecmp(str, "inactive") == 0) {
+        return GPIOD_LINE_VALUE_INACTIVE;
     }
-    return GPIO_VALUE_LOW;
+    if (strcasecmp(str, "error") == 0) {
+        return GPIOD_LINE_VALUE_ERROR;
+    }
+    MYGPIOD_LOG_WARN("Could not parse gpio value, setting error");
+    return GPIOD_LINE_VALUE_ERROR;
 }
 
 /**
- * Lookups the name for a gpio value
+ * Lookups the string for a gpio value
  * @param value value
- * @return name
+ * @return value string
  */
-const char *lookup_gpio_value(int value) {
+const char *lookup_gpio_value(enum gpiod_line_value value) {
     switch(value) {
-        case GPIO_VALUE_HIGH:
-            return "high";
-        case GPIO_VALUE_LOW:
-            return "low";
+        case GPIOD_LINE_VALUE_ERROR:
+            return "error";
+        case GPIOD_LINE_VALUE_INACTIVE:
+            return "inactive";
+        case GPIOD_LINE_VALUE_ACTIVE:
+            return "active";
+    }
+    MYGPIOD_LOG_WARN("Could not lookup gpio value, setting error");
+    return "error";
+}
+
+/**
+ * Parses a string to a gpio drive setting.
+ * @param str string to parse
+ * @return gpio value or GPIO_VALUE_LOW on error
+ */
+enum gpiod_line_drive parse_drive(const char *str) {
+    if (strcasecmp(str, "push-pull") == 0) {
+        return GPIOD_LINE_DRIVE_PUSH_PULL;
+    }
+    if (strcasecmp(str, "open-drain") == 0) {
+        return GPIOD_LINE_DRIVE_OPEN_DRAIN;
+    }
+    if (strcasecmp(str, "open-source") == 0) {
+        return GPIOD_LINE_DRIVE_OPEN_SOURCE;
+    }
+    MYGPIOD_LOG_WARN("Could not parse gpio value, setting push-pull");
+    return GPIOD_LINE_DRIVE_PUSH_PULL;
+}
+
+/**
+ * Lookups the string for a gpio drive
+ * @param value value
+ * @return value string
+ */
+const char *lookup_drive(enum gpiod_line_drive value) {
+    switch(value) {
+        case GPIOD_LINE_DRIVE_PUSH_PULL:
+            return "push-pull";
+        case GPIOD_LINE_DRIVE_OPEN_DRAIN:
+            return "open-drain";
+        case GPIOD_LINE_DRIVE_OPEN_SOURCE:
+            return "open-source";
     }
     MYGPIOD_LOG_WARN("Could not lookup gpio value");
     return "";
@@ -139,7 +182,7 @@ const char *bool_to_str(bool v) {
  * @param option string to parse
  * @return parsed bias flag or as-is on error
  */
-int parse_bias(const char *str) {
+enum gpiod_line_bias parse_bias(const char *str) {
     if (strcasecmp(str, "pull-down") == 0) {
         return GPIOD_LINE_BIAS_PULL_DOWN;
     }
@@ -147,14 +190,16 @@ int parse_bias(const char *str) {
         return GPIOD_LINE_BIAS_PULL_UP;
     }
     if (strcasecmp(str, "disable") == 0) {
-        return GPIOD_LINE_BIAS_DISABLE;
+        return GPIOD_LINE_BIAS_DISABLED;
     }
     if (strcasecmp(str, "as-is") == 0) {
         return GPIOD_LINE_BIAS_AS_IS;
     }
-    // Bias set to as-is
-    MYGPIOD_LOG_WARN("Could not parse bias, setting default");
-    return 0;
+    if (strcasecmp(str, "unknown") == 0) {
+        return GPIOD_LINE_BIAS_UNKNOWN;
+    }
+    MYGPIOD_LOG_WARN("Could not parse bias, setting unknown");
+    return GPIOD_LINE_BIAS_UNKNOWN;
 }
 
 /**
@@ -162,38 +207,43 @@ int parse_bias(const char *str) {
  * @param bias the bias flag
  * @return name
  */
-const char *lookup_bias(int bias) {
+const char *lookup_bias(enum gpiod_line_bias bias) {
     switch(bias) {
         case GPIOD_LINE_BIAS_AS_IS:
             return "as-is";
+        case GPIOD_LINE_BIAS_UNKNOWN:
+            return "unknown";
         case GPIOD_LINE_BIAS_PULL_DOWN:
             return "pull-down";
         case GPIOD_LINE_BIAS_PULL_UP:
             return "pull-up";
-        case GPIOD_LINE_BIAS_DISABLE:
+        case GPIOD_LINE_BIAS_DISABLED:
             return "disable";
     }
-    MYGPIOD_LOG_WARN("Could not lookup bias");
-    return "";
+    MYGPIOD_LOG_WARN("Could not lookup bias, setting unknown");
+    return "unknown";
 }
 
 /**
- * Parses the request event setting for the chip.
+ * Parses the request event setting.
  * @param str string to parse
- * @return GPIOD_LINE_REQUEST_EVENT enum or GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE on error
+ * @return gpiod_line_edge enum
  */
-int parse_event_request(const char *str) {
+enum gpiod_line_edge parse_event_request(const char *str) {
+    if (strcasecmp(str, "none") == 0) {
+        return GPIOD_LINE_EDGE_NONE;
+    }
     if (strcasecmp(str, "falling") == 0) {
-        return GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE;
+        return GPIOD_LINE_EDGE_FALLING;
     }
     if (strcasecmp(str, "rising") == 0) {
-        return GPIOD_LINE_REQUEST_EVENT_RISING_EDGE;
+        return GPIOD_LINE_EDGE_RISING;
     }
     if (strcasecmp(str, "both") == 0) {
-        return GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES;
+        return GPIOD_LINE_EDGE_BOTH;
     }
-    MYGPIOD_LOG_WARN("Could not parse event request, setting default");
-    return GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE;
+    MYGPIOD_LOG_WARN("Could not parse event request, setting none");
+    return GPIOD_LINE_EDGE_NONE;
 }
 
 /**
@@ -201,32 +251,34 @@ int parse_event_request(const char *str) {
  * @param event events to request
  * @return the name of the event request
  */
-const char *lookup_event_request(int event) {
+const char *lookup_event_request(enum gpiod_line_edge event) {
     switch(event) {
-        case GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE:
+        case GPIOD_LINE_EDGE_NONE:
+            return "none";
+        case GPIOD_LINE_EDGE_RISING:
             return "falling";
-        case GPIOD_LINE_REQUEST_EVENT_RISING_EDGE:
+        case GPIOD_LINE_EDGE_FALLING:
             return "rising";
-        case GPIOD_LINE_REQUEST_EVENT_BOTH_EDGES:
+        case GPIOD_LINE_EDGE_BOTH:
             return "both";
     }
-    MYGPIOD_LOG_WARN("Could not lookup event request");
-    return "";
+    MYGPIOD_LOG_WARN("Could not lookup event request, setting none");
+    return "none";
 }
 
 /**
- * Lookups the string for a gpio event
- * @param event the event
- * @return name of the event
+ * Lookups the string for the event type
+ * @param event event type
+ * @return the name of the event type
  */
-const char *lookup_event(int event) {
+const char *lookup_event_type(enum gpiod_edge_event_type event) {
     switch(event) {
-        case GPIOD_LINE_EVENT_FALLING_EDGE:
+        case GPIOD_EDGE_EVENT_FALLING_EDGE:
             return "falling";
-        case GPIOD_LINE_EVENT_RISING_EDGE:
+        case GPIOD_EDGE_EVENT_RISING_EDGE:
             return "rising";
     }
-    MYGPIOD_LOG_WARN("Could not lookup event");
+    MYGPIOD_LOG_WARN("Could not lookup event type");
     return "";
 }
 
@@ -244,6 +296,26 @@ bool parse_uint(char *str, unsigned *result, char **rest, unsigned min, unsigned
     uintmax_t v = strtoumax(str, rest, 10);
     if (errno == 0 && v >= min && v <= max) {
         *result = (unsigned)v;
+        return true;
+    }
+    MYGPIOD_LOG_WARN("Invalid value");
+    return false;
+}
+
+/**
+ * Parses the start of a string to an unsigned long value and checks it against min and max.
+ * @param str string to parse
+ * @param result pointer for the result
+ * @param rest pointer to first none numeric char
+ * @param min minimum value (including)
+ * @param max maximum value (including)
+ * @return bool true on success, else false
+ */
+bool parse_ulong(char *str, unsigned long *result, char **rest, unsigned min, unsigned max) {
+    errno = 0;
+    uintmax_t v = strtoumax(str, rest, 10);
+    if (errno == 0 && v >= min && v <= max) {
+        *result = (unsigned long)v;
         return true;
     }
     MYGPIOD_LOG_WARN("Invalid value");
