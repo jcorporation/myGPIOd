@@ -56,7 +56,7 @@ if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
 endif()
 
 # configure some files - version and path information
-configure_file(src/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
+configure_file(mygpiod/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
 configure_file(contrib/initscripts/mygpiod.service.in contrib/initscripts/mygpiod.service @ONLY)
 configure_file(contrib/initscripts/mygpiod.sysVinit.in contrib/initscripts/mygpiod.sysVinit @ONLY)
@@ -200,13 +200,13 @@ else()
   # do not alter link options
 endif()
 
-# the main mygpiod target
-add_subdirectory("src")
+# the main mygpiod targets
+add_subdirectory("mygpiod")
+#add_subdirectory("mygpioc")
+#add_subdirectory("libmygpio")
 
 # dist targets
 add_subdirectory(dist)
 
-target_link_libraries(mygpiod gpiod sds)
-
-install(TARGETS mygpiod DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+# install
 install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/cmake/Install.cmake)

@@ -115,7 +115,7 @@ builddebug() {
     .
   make -j4 -C debug VERBOSE=1
   echo "Linking compilation database"
-  sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' debug/compile_commands.json > src/compile_commands.json
+  sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' debug/compile_commands.json > mygpiod/compile_commands.json
 }
 
 cleanup() {
