@@ -45,6 +45,16 @@ include(CheckCSourceCompiles)
 include(CheckIPOSupported)
 include(GNUInstallDirs)
 
+# custom cmake modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
+
+# find required dependencies
+find_package(LIBGPIOD REQUIRED)
+if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
+  message("Found libgpiod version: ${LIBGPIOD_VERSION}")
+  message(FATAL_ERROR "Required libgpiod version >= 2.0.0")
+endif()
+
 # configure some files - version and path information
 configure_file(src/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
