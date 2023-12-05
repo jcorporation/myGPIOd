@@ -34,9 +34,12 @@ enum cmd_ids {
     CMDS(GEN_ENUM)
 };
 
+/**
+ * Command and its arguments
+ */
 struct t_cmd_options {
-    sds *args;
-    int len;
+    sds *args;  //!< sds array of command + arguments
+    int len;    //!< length auf args array
 };
 
 bool server_protocol_handler(struct t_config *config, struct t_list_node *client_node);
