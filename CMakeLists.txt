@@ -200,10 +200,10 @@ else()
   # do not alter link options
 endif()
 
-# the main mygpiod targets
+# the main mygpio targets
+add_subdirectory("libmygpio")
 add_subdirectory("mygpiod")
-#add_subdirectory("mygpioc")
-#add_subdirectory("libmygpio")
+add_subdirectory("mygpioc")
 
 # dist targets
 add_subdirectory(dist)

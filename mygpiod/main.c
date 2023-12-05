@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
     MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_api_version());
 
     // Handle command line parameter
-    char *config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
+    sds config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
         ? sdsnew(argv[1])
         : sdsnew("/etc/mygpiod.conf");
 
