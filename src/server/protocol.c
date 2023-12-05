@@ -9,6 +9,7 @@
 
 #include "src/lib/log.h"
 #include "src/lib/util.h"
+#include "src/server/gpio.h"
 #include "src/server/idle.h"
 #include "src/server/response.h"
 #include "src/server/socket.h"
@@ -33,42 +34,56 @@ static enum cmd_ids parse_command(sds cmd);
  * @param node pointer to node holding the client connection
  * @return true on success, else false
  */
-bool server_protocol_handler(struct t_config *config, struct t_list_node *node) {
-    struct t_client_data *data = (struct t_client_data *)node->data;
+bool server_protocol_handler(struct t_config *config, struct t_list_node *client_node) {
+    struct t_client_data *client_data = (struct t_client_data *)client_node->data;
 
     int count = 0;
-    sds *args = sdssplitargs(data->buf_in, &count);
-    sdsclear(data->buf_in);
+    sds *args = sdssplitargs(client_data->buf_in, &count);
+    sdsclear(client_data->buf_in);
     if (count == 0) {
         sdsfreesplitres(args, count);
         return true;
     }
     enum cmd_ids cmd_id = parse_command(args[0]);
-    if (data->state == CLIENT_SOCKET_STATE_IDLE &&
+    if (client_data->state == CLIENT_SOCKET_STATE_IDLE &&
         cmd_id != CMD_NOIDLE)
     {
-        MYGPIOD_LOG_ERROR("Client#%u: Only noidle command is allowed", node->id);
-        server_response_send(data, DEFAULT_ERROR_MSG_PREFIX "In idle state, only the noidle command is allowed\n" DEFAULT_END_MSG);
+        MYGPIOD_LOG_ERROR("Client#%u: Only noidle command is allowed", client_node->id);
+        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "In idle state, only the noidle command is allowed\n" DEFAULT_END_MSG);
         sdsfreesplitres(args, count);
         return false;
     }
 
-    MYGPIOD_LOG_INFO("Client#%u: Command: \"%s\"", node->id, get_cmd_name(cmd_id));
+    struct t_cmd_options options = {
+        .args = args,
+        .len = count
+    };
+
+    MYGPIOD_LOG_INFO("Client#%u: Command: \"%s\"", client_node->id, get_cmd_name(cmd_id));
     bool rc = true;
     switch(cmd_id) {
         case CMD_CLOSE:
-            rc = server_client_disconnect(&config->clients, node);
+            rc = server_client_disconnect(&config->clients, client_node);
             break;
         case CMD_IDLE:
-            rc = handle_idle(node);
+            rc = handle_idle(client_node);
             break;
         case CMD_NOIDLE:
-            rc = handle_noidle(config, node);
+            rc = handle_noidle(config, client_node);
+            break;
+        case CMD_GPIOGET:
+            rc = handle_gpioget(&options, config, client_node);
+            break;
+        case CMD_GPIOSET:
+            rc = handle_gpioset(&options, config, client_node);
+            break;
+        case CMD_GPIOLIST:
+            rc = handle_gpiolist(config, client_node);
             break;
         case CMD_INVALID:
         case CMD_COUNT:
-            MYGPIOD_LOG_ERROR("Client#%u: Invalid command", node->id);
-            server_response_send(data, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n" DEFAULT_END_MSG);
+            MYGPIOD_LOG_ERROR("Client#%u: Invalid command", client_node->id);
+            server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n" DEFAULT_END_MSG);
             rc = false;
     }
     sdsfreesplitres(args, count);

@@ -11,9 +11,11 @@ This is the first larger release after the initial release.
 ### Notes
 
 - The configuration file format has changes significantly.
+- libgpiod v2 is required
 
 ### Changelog
 
+- Feat: Add a server socket and define a client protocol to retrieve gpio events and control gpio outputs
 - Feat: Rework build process to support the standard cmake build types
 - Feat: Distinct actions for gpio events
 - Feat: Long press detection

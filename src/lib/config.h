@@ -21,6 +21,7 @@ struct t_gpio_in_data {
     enum gpiod_line_bias bias;                     //!< bias value
     bool active_low;                               //!< active state is low?
     unsigned long debounce_period_us;              //!< debounce period in microseconds
+    enum gpiod_line_clock event_clock;             //!< the source clock for event timestamps
     sds action_rising;                             //!< command for rising event
     sds action_falling;                            //!< command for falling event
     enum gpiod_line_edge request_event;            //!< events to request for this gpio

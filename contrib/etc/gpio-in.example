@@ -28,6 +28,10 @@ bias = as-is
 # Valid values: debounce period in microseconds
 debounce = 0
 
+# Event clock
+# Valid values: monotonic, realtime, hte
+event_clock = monotonic
+
 # Action for rising event
 #action_rising = /usr/local/bin/poweroff.sh
 

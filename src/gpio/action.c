@@ -7,7 +7,8 @@
 #include "compile_time.h"
 #include "src/gpio/action.h"
 
-#include "src/gpio/gpio.h"
+#include "src/actions/system.h"
+#include "src/gpio/input.h"
 #include "src/lib/config.h"
 #include "src/lib/events.h"
 #include "src/lib/log.h"
@@ -25,13 +26,12 @@
 // private definitions
 static void action_delay(struct t_gpio_in_data *data);
 static void action_execute(const char *action);
-static void action_execute_command(const char *cmd);
 
 // public functions
 
 /**
- * Handles the configured actions for an event.
- * It forks and executes the script via system() call
+ * Handles the configured actions for an event
+ * and notifies the clients.
  * @param config pointer to config
  * @param gpio the gpio number
  * @param timestamp timestamp of the event in nanoseconds
@@ -133,39 +133,15 @@ static void action_delay(struct t_gpio_in_data *data) {
 }
 
 /**
- * Executes the action in a new process
+ * Executes the action
  * @param action action to execute
  */
 static void action_execute(const char *action) {
     MYGPIOD_LOG_INFO("Executing \"%s\"", action);
-    errno = 0;
-    int rc = fork();
-    if (rc == -1) {
-        MYGPIOD_LOG_ERROR("Could not fork: %s", strerror(errno));
-    }
-    else if (rc == 0) {
-        // this is the child process
-        if (action[0] == '/') {
-            action_execute_command(action);
-        }
-        else {
-            MYGPIOD_LOG_ERROR("Invalid action \"%s\"", action);
-            exit(EXIT_FAILURE);
-        }
+    if (action[0] == '/') {
+        action_system(action);
     }
     else {
-        MYGPIOD_LOG_DEBUG("Forked process with id %d", rc);
+        MYGPIOD_LOG_ERROR("Invalid action");
     }
-}
-
-/**
- * Runs an executable or script
- * @param cmd command to execute
- */
-static void action_execute_command(const char *cmd) {
-    errno = 0;
-    execl(cmd, cmd, (char *)NULL);
-    // successful execl call does not return
-    MYGPIOD_LOG_ERROR("Error executing action \"%s\": %s", cmd, strerror(errno));
-    exit(EXIT_FAILURE);
 }

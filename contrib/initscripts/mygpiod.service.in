@@ -14,6 +14,8 @@ Type=simple
 User=mygpiod
 Group=gpio
 
+RuntimeDirectory=mygpiod
+
 # disallow writing to /usr, /bin, /sbin, ...
 ProtectSystem=yes
 

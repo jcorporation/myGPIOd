@@ -332,6 +332,15 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         data->request_event = parse_event_request(value);
         return true;
     }
+    if (strcmp(key, "debounce") == 0) {
+        if (parse_ulong(value, &data->debounce_period_us, NULL, 0, UINT_MAX) == true) {
+            return true;
+        }
+    }
+    if (strcmp(key, "event_clock") == 0) {
+        data->event_clock = parse_event_clock(value);
+        return true;
+    }
     if (strcmp(key, "action_falling") == 0) {
         sdsclear(data->action_falling);
         data->action_falling = sdscatsds(data->action_falling, value);
@@ -355,11 +364,6 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         sdsclear(data->long_press_action);
         data->long_press_action = sdscatsds(data->long_press_action, value);
         return true;
-    }
-    if (strcmp(key, "debounce") == 0) {
-        if (parse_ulong(value, &data->debounce_period_us, NULL, 0, UINT_MAX) == true) {
-            return true;
-        }
     }
     return false;
 }

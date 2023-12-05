@@ -81,20 +81,19 @@ END
 
 ### gpioget {gpio number}
 
-Gets the current value of an output gpio.
+Gets the current value of a configured input gpio.
 
 **Response**
 
 ```
 OK
-gpio:{gpio number}
 value:{0|1}
 END
 ```
 
 ### gpioset {gpio number} {value}
 
-Sets the value of an output gpio. Valid values are:
+Sets the value of a configured output gpio. Valid values are:
 
-- 0 = low
-- 1 = high
+- 0, low, inactive
+- 1, high, active

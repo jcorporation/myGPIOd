@@ -7,7 +7,7 @@
 #include "compile_time.h"
 #include "src/event_loop/event_loop.h"
 
-#include "src/gpio/gpio.h"
+#include "src/gpio/event.h"
 #include "src/gpio/timer.h"
 #include "src/lib/list.h"
 #include "src/lib/log.h"

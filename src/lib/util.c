@@ -77,19 +77,27 @@ sds sds_catchar(sds s, const char c) {
 
 /**
  * Parses a string to a gpio value.
+ * Sets errno to EINVAL on error.
  * @param str string to parse
  * @return gpio value or GPIO_VALUE_LOW on error
  */
 enum gpiod_line_value parse_gpio_value(const char *str) {
-    if (strcasecmp(str, "active") == 0) {
+    if (strcasecmp(str, "active") == 0 ||
+        strcasecmp(str, "high") == 0 ||
+        strcmp(str, "1") == 0)
+    {
         return GPIOD_LINE_VALUE_ACTIVE;
     }
-    if (strcasecmp(str, "inactive") == 0) {
+    if (strcasecmp(str, "inactive") == 0 ||
+        strcasecmp(str, "low") == 0 ||
+        strcmp(str, "0") == 0)
+    {
         return GPIOD_LINE_VALUE_INACTIVE;
     }
     if (strcasecmp(str, "error") == 0) {
         return GPIOD_LINE_VALUE_ERROR;
     }
+    errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse gpio value, setting error");
     return GPIOD_LINE_VALUE_ERROR;
 }
@@ -222,6 +230,25 @@ const char *lookup_bias(enum gpiod_line_bias bias) {
     }
     MYGPIOD_LOG_WARN("Could not lookup bias, setting unknown");
     return "unknown";
+}
+
+/**
+ * Parses the clock setting.
+ * @param str string to parse
+ * @return enum gpiod_line_clock
+ */
+enum gpiod_line_clock parse_event_clock(const char *str) {
+    if (strcasecmp(str, "realtime") == 0) {
+        return GPIOD_LINE_CLOCK_REALTIME;
+    }
+    if (strcasecmp(str, "hte") == 0) {
+        return GPIOD_LINE_CLOCK_HTE;
+    }
+    if (strcmp(str, "monotonic") == 0) {
+        return GPIOD_LINE_CLOCK_MONOTONIC;
+    }
+    MYGPIOD_LOG_WARN("Could not parse event request, setting monotonic");
+    return GPIOD_LINE_CLOCK_MONOTONIC;
 }
 
 /**
