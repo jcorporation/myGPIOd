@@ -1,6 +1,30 @@
 # Configuration for an input gpio
 # Copy it to <gpio number>.out
 
+# Sets the GPIO active state
+# Valid values: true, false
+# - true = GPIO considered active if it is low
+# - false = GPIO considered active if it is high
+active_low = true
+#active_low = false
+
+# Sets the internal pull-up or pull-down resistor
+# Valid values: as-is, disable, pull-down, pull-up
+# - as-is = do not change it
+# - disable = disables the internal resistor
+# - pull-down = pulls the gpio down
+# - pull-up = pulls the gpio up
+bias = as-is
+#bias = disable
+#bias = pull-down
+#bias = pull-up
+
+# Set drive
+# Valid values: push-pull, open-drain, open-source
+drive = push-pull
+#drive = open-drain
+#drive = open-source
+
 # Value to set
 #value = high
 #value = low

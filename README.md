@@ -1,6 +1,6 @@
 # myGPIOd
 
-myGPIOd is a very lightweight daemon to call scripts on GPIO events. It has no dependencies but the libgpiod2 library.
+myGPIOd is a very lightweight daemon to call scripts on GPIO events. It has no dependencies but the libgpiod2 library version 2.
 
 It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/)
 
@@ -19,7 +19,7 @@ It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/l
 ## Build Dependencies
 
 - cmake >= 3.13
-- libgpiod-dev >= 1.5.0 and < 2.0.0
+- libgpiod-dev >= 2.0.0
 
 ## Quick Build Instructions
 
@@ -72,18 +72,17 @@ This example configuration does the following:
 
 **/etc/mygpiod.conf**
 ```
-chip = 0
-request_event = both
-active_low = true
-loglevel = notice
+chip = /dev/gpiochip0
+loglevel = info
 syslog = 0
-bias = pull-up
 gpio_dir = /etc/mygpiod.d
 ```
 
 **/etc/mygpiod.d/3.in**
 ```
 request_event = both
+active_low = false
+bias = pull-up
 action_rising = /usr/local/bin/poweroff.sh
 
 long_press_event = falling
@@ -94,6 +93,8 @@ long_press_action = /usr/local/bin/reboot.sh
 **/etc/mygpiod.d/4.in**
 ```
 request_event = falling
+active_low = false
+bias = pull-up
 action_falling = /usr/local/bin/poweroff.sh
 ```
 

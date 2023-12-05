@@ -42,10 +42,10 @@ Only the `noidle` command is allowed while the client is in idle mode.
 OK
 gpio:{gpio number}
 event:{event1}
-time:{seconds}.{milliseconds}
+time:{nanoseconds}
 gpio:{gpio number}
 event:{event2}
-time:{seconds}.{milliseconds}
+time:{nanoseconds}
 END
 ```
 
