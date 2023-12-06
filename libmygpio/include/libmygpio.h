@@ -4,12 +4,18 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef LIBMYGPIOD_H
-#define LIBMYGPIOD_H
+#ifndef LIBMYGPIO_H
+#define LIBMYGPIO_H
 
 struct t_mygpio_connection;
 
+struct t_mygpio_pair {
+    const char *name;
+    const char *value;
+};
+
 struct t_mygpio_connection *mygpio_connection_new(const char *socket_path);
 void mygpio_connection_free(struct t_mygpio_connection *connection);
+const char *mygpio_connection_version(struct t_mygpio_connection *connection);
 
 #endif

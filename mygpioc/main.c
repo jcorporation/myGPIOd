@@ -39,6 +39,12 @@ int main(int argc, char **argv) {
     }
 
     struct t_mygpio_connection *conn = mygpio_connection_new(argv[1]);
+    if (conn != NULL) {
+        printf("Connected, server version %s\n", mygpio_connection_version(conn));
+    }
+    else {
+        printf("Connection failed\n");
+    }
     mygpio_connection_free(conn);
 
     return rc;

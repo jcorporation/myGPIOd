@@ -12,7 +12,11 @@ target_include_directories(mygpio
 
 target_sources(mygpio
   PRIVATE
+    src/buffer.c
     src/connection.c
+    src/protocol.c
+    src/socket.c
+    src/util.c
 )
 
 set_target_properties(mygpio PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})

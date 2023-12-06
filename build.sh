@@ -116,6 +116,8 @@ builddebug() {
   make -j4 -C debug VERBOSE=1
   echo "Linking compilation database"
   sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' debug/compile_commands.json > mygpiod/compile_commands.json
+  cp mygpiod/compile_commands.json libmygpio
+  cp mygpiod/compile_commands.json mygpioc
 }
 
 cleanup() {
@@ -140,9 +142,9 @@ cleanuposc() {
 }
 
 check() {
-  if [ ! -f src/compile_commands.json ]
+  if [ ! -f mygpiod/compile_commands.json ]
   then
-    echo "src/compile_commands.json not found"
+    echo "mygpiod/compile_commands.json not found"
     echo "run: ./build.sh debug"
     exit 1
   fi
@@ -151,7 +153,13 @@ check() {
   then
     echo "Running clang-tidy"
     rm -f clang-tidy.out
-    cd src || exit 1
+    cd mygpiod || exit 1
+    find ./ -name '*.c' -exec clang-tidy \
+        --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
+    cd ../mygpioc || exit 1
+    find ./ -name '*.c' -exec clang-tidy \
+        --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
+    cd ../libmygpio || exit 1
     find ./ -name '*.c' -exec clang-tidy \
         --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
     cat ../clang-tidy.out
