@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
         set_loglevel(CFG_LOGLEVEL);
     #endif
 
-    MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIOD_VERSION);
+    MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIO_VERSION);
     MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
     MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_api_version());
 

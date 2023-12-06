@@ -128,7 +128,9 @@ cleanup() {
   find ./ -name \*~ -delete
   
   #compilation database
-  rm -f src/compile_commands.json
+  rm -f mygpiod/compile_commands.json
+  rm -f mygpioc/compile_commands.json
+  rm -f libmygpio/compile_commands.json
   #clang tidy
   rm -f clang-tidy.out
 }

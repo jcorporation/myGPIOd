@@ -8,9 +8,9 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 cmake_policy(SET CMP0003 NEW)
 
-# myGPIOd is written in C
+# myGPIO is written in C
 # supported compilers: gcc, clang
-project (mygpiod
+project (myGPIO
   VERSION 0.4.0
   LANGUAGES C
 )
@@ -56,7 +56,7 @@ if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
 endif()
 
 # configure some files - version and path information
-configure_file(mygpiod/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
+configure_file(compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
 configure_file(contrib/initscripts/mygpiod.service.in contrib/initscripts/mygpiod.service @ONLY)
 configure_file(contrib/initscripts/mygpiod.sysVinit.in contrib/initscripts/mygpiod.sysVinit @ONLY)

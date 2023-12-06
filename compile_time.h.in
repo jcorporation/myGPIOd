@@ -8,8 +8,9 @@
 #define COMPILE_TIME_H
 
 // Version and name from cmake
-#define MYGPIOD_VERSION "${PROJECT_VERSION}"
-#define MYGPIOD_NAME "${PROJECT_NAME}"
+#define MYGPIO_VERSION "${PROJECT_VERSION}"
+#define MYGPIOD_NAME "myGPIOd"
+#define MYGPIOC_NAME "myGPIOc"
 
 // Sanitizers
 #cmakedefine MYGPIOD_ENABLE_ASAN

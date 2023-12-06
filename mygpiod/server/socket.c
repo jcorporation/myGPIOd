@@ -30,7 +30,7 @@
 
 // private definitions
 
-#define WELCOME_MESSAGE DEFAULT_OK_MSG_PREFIX "version:" MYGPIOD_VERSION "\n" DEFAULT_END_MSG
+#define WELCOME_MESSAGE DEFAULT_OK_MSG_PREFIX "version:" MYGPIO_VERSION "\n" DEFAULT_END_MSG
 
 static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd);
 static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd);
