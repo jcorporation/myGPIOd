@@ -34,8 +34,8 @@ const char *lookup_event_request(enum gpiod_line_edge event);
 const char *lookup_event_type(enum gpiod_edge_event_type event);
 enum gpiod_line_drive parse_drive(const char *str);
 const char *lookup_drive(enum gpiod_line_drive value);
-bool parse_uint(char *str, unsigned *result, char **rest, unsigned min, unsigned max);
-bool parse_ulong(char *str, unsigned long *result, char **rest, unsigned min, unsigned max);
-bool parse_int(char *str, int *result, char **rest, unsigned min, unsigned max);
+bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max);
+bool parse_ulong(const char *str, unsigned long *result, char **rest, unsigned long min, unsigned long max);
+bool parse_int(const char *str, int *result, char **rest, int min, int max);
 
 #endif

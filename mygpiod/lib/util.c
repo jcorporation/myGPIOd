@@ -8,7 +8,6 @@
 #include "mygpiod/lib/util.h"
 
 #include "dist/sds/sds.h"
-#include "mygpiod/lib/config.h"
 #include "mygpiod/lib/log.h"
 
 #include <ctype.h>
@@ -318,7 +317,7 @@ const char *lookup_event_type(enum gpiod_edge_event_type event) {
  * @param max maximum value (including)
  * @return bool true on success, else false
  */
-bool parse_uint(char *str, unsigned *result, char **rest, unsigned min, unsigned max) {
+bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max) {
     errno = 0;
     uintmax_t v = strtoumax(str, rest, 10);
     if (errno == 0 && v >= min && v <= max) {
@@ -338,7 +337,7 @@ bool parse_uint(char *str, unsigned *result, char **rest, unsigned min, unsigned
  * @param max maximum value (including)
  * @return bool true on success, else false
  */
-bool parse_ulong(char *str, unsigned long *result, char **rest, unsigned min, unsigned max) {
+bool parse_ulong(const char *str, unsigned long *result, char **rest, unsigned long min, unsigned long max) {
     errno = 0;
     uintmax_t v = strtoumax(str, rest, 10);
     if (errno == 0 && v >= min && v <= max) {
@@ -358,7 +357,7 @@ bool parse_ulong(char *str, unsigned long *result, char **rest, unsigned min, un
  * @param max maximum value (including)
  * @return bool true on success, else false
  */
-bool parse_int(char *str, int *result, char **rest, unsigned min, unsigned max) {
+bool parse_int(const char *str, int *result, char **rest, int min, int max) {
     errno = 0;
     intmax_t v = strtoimax(str, rest, 10);
     if (errno == 0 && v >= min && v <= max) {
