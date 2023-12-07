@@ -402,7 +402,6 @@ static void gpio_in_data_clear(struct t_gpio_in_data *data) {
     close_fd(&data->timer_fd);
     if (data->request != NULL) {
         gpiod_line_request_release(data->request);
-        FREE_PTR(data->request);
     }
     if (data->event_buffer != NULL) {
         gpiod_edge_event_buffer_free(data->event_buffer);
@@ -442,7 +441,6 @@ static struct t_gpio_out_data *gpio_out_data_new(void) {
 static void gpio_out_data_clear(struct t_gpio_out_data *data) {
     if (data->request != NULL) {
         gpiod_line_request_release(data->request);
-        FREE_PTR(data->request);
     }
 }
 
