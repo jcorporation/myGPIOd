@@ -127,6 +127,7 @@ static bool config_read(struct t_config *config, sds config_file) {
         {
             continue;
         }
+        MYGPIOD_LOG_DEBUG("Parsing line: \"%s\"", line);
         int count = 0;
         sds *kv = sdssplitlen(line, (ssize_t)sdslen(line), "=", 1, &count);
         if (count == 2) {
@@ -267,6 +268,7 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
         {
             continue;
         }
+        MYGPIOD_LOG_DEBUG("Parsing line: \"%s\"", line);
         int count = 0;
         sds *kv = sdssplitlen(line, (ssize_t)sdslen(line), "=", 1, &count);
         if (count == 2) {
@@ -357,7 +359,7 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         }
     }
     if (strcmp(key, "long_press_event") == 0) {
-        data->long_press_event = parse_event_request(key);
+        data->long_press_event = parse_event_request(value);
         return true;
     }
     if (strcmp(key, "long_press_action") == 0) {
