@@ -40,7 +40,6 @@ bool handle_gpiolist(struct t_config *config, struct t_list_node *client_node) {
         server_response_append(client_data, "mode:out\n");
         current = current->next;
     }
-    server_response_append(client_data, "%s", DEFAULT_END_MSG);
     server_response_end(client_data);
     return true;
 }
@@ -55,23 +54,22 @@ bool handle_gpiolist(struct t_config *config, struct t_list_node *client_node) {
 bool handle_gpioget(struct t_cmd_options *options, struct t_config *config, struct t_list_node *client_node) {
     struct t_client_data *client_data = (struct t_client_data *)client_node->data;
     if (options->len != 2) {
-        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid number of arguments\n" DEFAULT_END_MSG);
+        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid number of arguments\n");
         return false;
     }
     unsigned gpio;
     if (parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
-        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid gpio number\n" DEFAULT_END_MSG);
+        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid gpio number\n");
         return false;
     }
     enum gpiod_line_value value = gpio_get_value(config, gpio);
     if (value == GPIOD_LINE_VALUE_ERROR) {
-        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Getting gpio value failed\n" DEFAULT_END_MSG);
+        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Getting gpio value failed\n");
         return false;
     }
     server_response_start(client_data);
     server_response_append(client_data, "%s", DEFAULT_OK_MSG_PREFIX);
     server_response_append(client_data, "value:%d\n", value);
-    server_response_append(client_data, "%s", DEFAULT_END_MSG);
     server_response_end(client_data);
     return true;
 }
@@ -86,24 +84,24 @@ bool handle_gpioget(struct t_cmd_options *options, struct t_config *config, stru
 bool handle_gpioset(struct t_cmd_options *options, struct t_config *config, struct t_list_node *client_node) {
     struct t_client_data *client_data = (struct t_client_data *)client_node->data;
     if (options->len != 3) {
-        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid number of arguments\n" DEFAULT_END_MSG);
+        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid number of arguments\n");
         return false;
     }
     unsigned gpio;
     if (parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
-        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid gpio number\n" DEFAULT_END_MSG);
+        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid gpio number\n");
         return false;
     }
     errno = 0;
     enum gpiod_line_value value = parse_gpio_value(options->args[2]);
     if (errno == EINVAL) {
-        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid value\n" DEFAULT_END_MSG);
+        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid value\n");
         return false;
     }
     if (gpio_set_value(config, gpio, value) == true) {
-        server_response_send(client_data, DEFAULT_OK_MSG_PREFIX DEFAULT_END_MSG);
+        server_response_send(client_data, DEFAULT_OK_MSG_PREFIX);
         return true;
     }
-    server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Setting gpio value failed\n" DEFAULT_END_MSG);
+    server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Setting gpio value failed\n");
     return false;
 }

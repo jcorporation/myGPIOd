@@ -9,7 +9,7 @@
 
 #include <stdbool.h>
 
-bool parse_int(const char *str, int *result, char **rest, int min, int max);
+bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max);
 
 #ifdef MYGPIOD_DEBUG
     #define LIBMYGPIO_LOG(...) log_log(__FILE__, __LINE__, __VA_ARGS__)

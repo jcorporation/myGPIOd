@@ -21,9 +21,9 @@
  * @param max maximum value (including)
  * @return bool true on success, else false
  */
-bool parse_int(const char *str, int *result, char **rest, int min, int max) {
+bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max) {
     errno = 0;
-    intmax_t v = strtoimax(str, rest, 10);
+    uintmax_t v = strtoumax(str, rest, 10);
     if (errno == 0 && v >= min && v <= max) {
         *result = (int)v;
         return true;

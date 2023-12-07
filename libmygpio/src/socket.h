@@ -14,5 +14,6 @@
 int socket_connect(const char *socket_path);
 void socket_close(int fd);
 bool socket_recv_line(int fd, struct t_buf *buf);
+bool socket_send_line(int fd, struct t_buf *buf);
 
 #endif

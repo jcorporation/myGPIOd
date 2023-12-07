@@ -4,7 +4,6 @@
  https://github.com/jcorporation/myGPIOd
 */
 
-#include "compile_time.h"
 #include "mygpiod/server/response.h"
 
 /**

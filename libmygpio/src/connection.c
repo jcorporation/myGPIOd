@@ -4,23 +4,14 @@
  https://github.com/jcorporation/mympd
 */
 
-#include "libmygpio/include/libmygpio.h"
 #include "libmygpio/src/connection.h"
 
 #include "libmygpio/src/protocol.h"
 #include "libmygpio/src/socket.h"
-#include "libmygpio/src/util.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-// privat definitions
-
-static bool check_response_version(struct t_mygpio_connection *connection);
-static bool parse_version(const char *str, struct t_mygpio_connection *connection);
-
-// public functions
 
 /**
  * Creates a new connection and checks the initial server response
@@ -33,22 +24,23 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path) {
         return NULL;
     }
     buf_init(&connection->buf_in);
-    connection->version_string = NULL;
+    buf_init(&connection->buf_out);
+    connection->version[0] = 0;
+    connection->version[1] = 0;
+    connection->version[2] = 0;
+    connection->error = NULL;
     connection->fd = socket_connect(socket_path);
     if (connection->fd == -1) {
-        mygpio_connection_free(connection);
-        return NULL;
+        connection_set_state(connection, MYGPIO_STATE_FATAL, "Connection failed");
+        return connection;
     }
-    if (socket_recv_line(connection->fd, &connection->buf_in) == false ||
-        check_response_ok(connection->buf_in.buffer) == false ||
-        socket_recv_line(connection->fd, &connection->buf_in) == false ||
-        check_response_version(connection) == false ||
-        socket_recv_line(connection->fd, &connection->buf_in) == false ||
-        check_response_end(connection->buf_in.buffer) == false)
+    if (recv_response_status(connection) == false ||
+        recv_version(connection)== false)
     {
-        mygpio_connection_free(connection);
-        return NULL;
+        connection_set_state(connection, MYGPIO_STATE_FATAL, "Handshake failed");
+        return connection;
     }
+    connection_set_state(connection, MYGPIO_STATE_OK, NULL);
     return connection;
 }
 
@@ -60,11 +52,61 @@ void mygpio_connection_free(struct t_mygpio_connection *connection) {
     if (connection != NULL) {
         socket_close(connection->fd);
         buf_clear(&connection->buf_in);
-        if (connection->version_string != NULL) {
-            free(connection->version_string);
-        }
+        buf_clear(&connection->buf_out);
         free(connection);
     }
+}
+
+/**
+ * Sets connection state and error message
+ * @param connection connection struct
+ * @param state state enum
+ * @param message error message
+ */
+void connection_set_state(struct t_mygpio_connection *connection,
+        enum mygpio_conn_state state, const char *message)
+{
+    connection->state = state;
+    if (connection->error != NULL) {
+        free(connection->error);
+    }
+    if (message != NULL) {
+        connection->error = strdup(message);
+    }
+    else {
+        connection->error = NULL;
+    }
+}
+
+/**
+ * Gets the connection state
+ * @param connection connection struct
+ * @return the connection state
+ */
+enum mygpio_conn_state mygpio_connection_get_state(struct t_mygpio_connection *connection) {
+    return connection->state;
+}
+
+/**
+ * Gets the connection error message
+ * @param connection connection struct
+ * @return the current error message
+ */
+const char *mygpio_connection_get_error(struct t_mygpio_connection *connection) {
+    return connection->error;
+}
+
+/**
+ * Clears the error state.
+ * @param connection connection struct
+ * @return true on success, for fatal errors false
+ */
+bool mygpio_connection_clear_error(struct t_mygpio_connection *connection) {
+    if (connection->state == MYGPIO_STATE_FATAL) {
+        return false;
+    }
+    connection_set_state(connection, MYGPIO_STATE_OK, NULL);
+    return true;
 }
 
 /**
@@ -72,53 +114,15 @@ void mygpio_connection_free(struct t_mygpio_connection *connection) {
  * @param connection connection struct
  * @return the myGPIOd version
  */
-const char *mygpio_connection_version(struct t_mygpio_connection *connection) {
-    return connection->version_string;
+const unsigned *mygpio_connection_get_version(struct t_mygpio_connection *connection) {
+    return connection->version;
 }
 
-// private functions
-
 /**
- * Checks for a correct version response line
+ * Returns the connection file descriptor
  * @param connection connection struct
- * @return true on success, else false
+ * @return file descriptor or -1 if not connected
  */
-static bool check_response_version(struct t_mygpio_connection *connection) {
-    struct t_mygpio_pair *pair = parse_pair(connection->buf_in.buffer);
-    if (pair == NULL) {
-        return false;
-    }
-    if (strcmp(pair->name, "version") != 0 ||
-        parse_version(pair->value, connection) == false)
-    {
-        free_pair(pair);
-        return false;
-    }
-    connection->version_string = strdup(pair->value);
-    return true;
-}
-
-/**
- * Parses the myGPIOd version string to major.minor.patch
- * @param str string to parse
- * @param connection connection to populate the version
- * @return true on success, else false
- */
-static bool parse_version(const char *str, struct t_mygpio_connection *connection) {
-    char *rest;
-    if (parse_int(str, &connection->version_major, &rest, 0, 99) == false) {
-        return false;
-    }
-    if (*rest != '.') { return false; }
-    rest++;
-    if (parse_int(rest, &connection->version_minor, &rest, 0, 99) == false) {
-        return false;
-    }
-    if (*rest != '.') { return false; }
-    rest++;
-    if (parse_int(rest, &connection->version_patch, &rest, 0, 99) == false) {
-        return false;
-    }
-    if (*rest != '\0') { return false; }
-    return true;
+int mygpio_connection_get_fd(struct t_mygpio_connection *connection) {
+    return connection->fd;
 }

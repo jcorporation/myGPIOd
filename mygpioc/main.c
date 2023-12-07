@@ -11,8 +11,10 @@
 
 #include "libmygpio/include/libmygpio.h"
 
+#include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef MYGPIOD_ENABLE_ASAN
 const char *__asan_default_options(void) {
@@ -33,19 +35,39 @@ const char *__asan_default_options(void) {
 #endif
 
 int main(int argc, char **argv) {
-    int rc = EXIT_SUCCESS;
     if (argc < 2) {
         return EXIT_FAILURE;
     }
 
     struct t_mygpio_connection *conn = mygpio_connection_new(argv[1]);
-    if (conn != NULL) {
-        printf("Connected, server version %s\n", mygpio_connection_version(conn));
+    if (conn == NULL) {
+        printf("Out of memory\n");
+        return EXIT_FAILURE;
     }
-    else {
-        printf("Connection failed\n");
+
+    if (mygpio_connection_get_state(conn) != MYGPIO_STATE_OK) {
+        printf("%s\n", mygpio_connection_get_error(conn));
+        mygpio_connection_free(conn);
+        return EXIT_FAILURE;
     }
+
+    const unsigned *version = mygpio_connection_get_version(conn);
+    printf("Connected, server version %u.%u.%u\n", version[0], version[1], version[2]);
+
+    struct t_mygpio_pair *pair = mygpio_recv_pair(conn);
+    if (pair == NULL) {
+        printf("No messages pending\n");
+    }
+
+    if (mygpio_send_idle(conn) == true) {
+        printf("In idle mode\n");
+    }
+
+    if (mygpio_recv_idle(conn, -1) == true) {
+        printf("Event waiting\n");
+    }
+
     mygpio_connection_free(conn);
 
-    return rc;
+    return EXIT_SUCCESS;
 }

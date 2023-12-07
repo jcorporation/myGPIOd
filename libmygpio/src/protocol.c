@@ -6,60 +6,120 @@
 
 #include "libmygpio/src/protocol.h"
 
+#include "libmygpio/src/connection.h"
+#include "libmygpio/src/pair.h"
+#include "libmygpio/src/socket.h"
+#include "libmygpio/src/util.h"
+
 #include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+// private definitions
+
+static bool parse_version(const char *str, struct t_mygpio_connection *connection);
+
+// public functions
+
 /**
- * Checks for the OK response line
- * @param line line to parse
+ * Writes the format string to the output buffer and writes it to the socket.
+ * @param connection connection struct
+ * @param fmt format string
+ * @param ... variadic arguments for the format string
  * @return true on success, else false
  */
-bool check_response_ok(const char *line) {
-    if (strcmp(line, "OK") == 0) {
+bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
+    //TODO: resize buffer if it is to small.
+    va_list args;
+    va_start(args, fmt);
+    int written = vsnprintf(connection->buf_out.buffer, connection->buf_out.capacity, fmt, args);
+    va_end(args);
+    if (written <= 0 ||
+        written >= (int)connection->buf_out.capacity)
+    {
+        buf_clear(&connection->buf_out);
+        connection_set_state(connection, MYGPIO_STATE_ERROR, "Buffer write error");
+        return false;
+    }
+    connection->buf_out.len = (size_t)written;
+    bool rc = socket_send_line(connection->fd, &connection->buf_out);
+    if (rc == false) {
+        connection_set_state(connection, MYGPIO_STATE_ERROR, "Socket write error");
+    }
+    return rc;
+}
+
+/**
+ * Checks the response status. Populates the connection error buffer
+ * @param conection connection struct
+ * @return true on success, else false
+ */
+bool recv_response_status(struct t_mygpio_connection *connection) {
+    if (socket_recv_line(connection->fd, &connection->buf_in) == false) {
+        return false;
+    }
+    if (strcmp(connection->buf_in.buffer, "OK") == 0) {
         return true;
+    }
+    if (connection->error != NULL) {
+        free(connection->error);
+        connection->error = NULL;
+    }
+    if (strcmp(connection->buf_in.buffer, "ERROR:") == 0) {
+        char *p = strchr(connection->buf_in.buffer, ':');
+        p++;
+        connection_set_state(connection, MYGPIO_STATE_ERROR, p);
+    }
+    else {
+        connection_set_state(connection, MYGPIO_STATE_ERROR, "Malformed server response");
     }
     return false;
 }
 
 /**
- * Checks for the END response line
- * @param line line to parse
+ * Receives and parses the version from myGPIOd connect handshake
+ * @param connection connection struct
  * @return true on success, else false
  */
-bool check_response_end(const char *line) {
-    if (strcmp(line, "END") == 0) {
-        return true;
+bool recv_version(struct t_mygpio_connection *connection) {
+    struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
+    if (pair == NULL) {
+        return false;
     }
-    return false;
+    if (strcmp(pair->name, "version") != 0 ||
+        parse_version(pair->value, connection) == false)
+    {
+        mygpio_free_pair(pair);
+        return false;
+    }
+    return true;
 }
 
-/**
- * Parses a line to a key/value pair.
- * Key and value are only pointers and are not copied.
- * @param line line to parse
- * @return allocated pair or NULL on error
- */
-struct t_mygpio_pair *parse_pair(const char *line) {
-    struct t_mygpio_pair *pair = malloc(sizeof(struct t_mygpio_pair));
-    assert(pair);
-    char *p = strchr(line, ':');
-    if (p == NULL) {
-        free_pair(pair);
-        return NULL;
-    }
-    pair->name = line;
-    *p = '\0';
-    pair->value = p + 1;
-    return pair;
-}
+// private functions
 
 /**
- * Frees the key/value pair
- * @param pair pair to free
+ * Parses the myGPIOd version string to major.minor.patch
+ * @param str string to parse
+ * @param connection connection to populate the version
+ * @return true on success, else false
  */
-void free_pair(struct t_mygpio_pair *pair) {
-    pair->name = NULL;
-    pair->value = NULL;
-    free(pair);
+static bool parse_version(const char *str, struct t_mygpio_connection *connection) {
+    char *rest;
+    if (parse_uint(str, &connection->version[0], &rest, 0, 99) == false) {
+        return false;
+    }
+    if (*rest != '.') { return false; }
+    rest++;
+    if (parse_uint(rest, &connection->version[1], &rest, 0, 99) == false) {
+        return false;
+    }
+    if (*rest != '.') { return false; }
+    rest++;
+    if (parse_uint(rest, &connection->version[2], &rest, 0, 99) == false) {
+        return false;
+    }
+    if (*rest != '\0') { return false; }
+    return true;
 }

@@ -7,14 +7,12 @@
 #ifndef LIBMYGPIO_PROTOCOL_H
 #define LIBMYGPIO_PROTOCOL_H
 
-#include "libmygpio/include/libmygpio.h"
+#include "libmygpio/src/connection.h"
 
 #include <stdbool.h>
 
-bool check_response_ok(const char *line);
-bool check_response_end(const char *line);
-
-struct t_mygpio_pair *parse_pair(const char *line);
-void free_pair(struct t_mygpio_pair *pair);
+bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...);
+bool recv_version(struct t_mygpio_connection *connection);
+bool recv_response_status(struct t_mygpio_connection *connection);
 
 #endif
