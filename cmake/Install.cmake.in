@@ -46,12 +46,10 @@ endif()
 
 # Install myGPIOd configuration
 if(NOT EXISTS "$ENV{DESTDIR}@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.conf")
-  message("-- Installing: $ENV{DESTDIR}@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.conf")
   file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf"
        DESTINATION @CMAKE_INSTALL_FULL_SYSCONFDIR@
        FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 else()
-  message("-- Installing: $ENV{DESTDIR}@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.conf.dist")
   file(RENAME "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf"
               "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf.dist")
   file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf.dist"
@@ -60,7 +58,6 @@ else()
 endif()
 
 # Install example gpio configuration files
-install(DIRECTORY DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d")
 file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio-in.example"
      DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d"
      FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
