@@ -14,5 +14,6 @@
 bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...);
 bool recv_version(struct t_mygpio_connection *connection);
 bool recv_response_status(struct t_mygpio_connection *connection);
+bool response_end(struct t_mygpio_connection *connection);
 
 #endif

@@ -61,7 +61,7 @@ void socket_close(int fd) {
 bool socket_recv_line(int fd, struct t_buf *buf) {
     buf_reset(buf);
     ssize_t nread;
-    while ((nread = recv(fd, buf->buffer + buf->len, 1, 0)) > 0) {
+    while ((nread = read(fd, buf->buffer + buf->len, 1)) > 0) {
         buf->len += nread;
         if (buf->len == buf->capacity) {
             buf->capacity += BUFFER_SIZE_INIT;

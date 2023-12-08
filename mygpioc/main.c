@@ -9,7 +9,7 @@
 
 #include "compile_time.h"
 
-#include "libmygpio/include/libmygpio.h"
+#include "libmygpio/include/libmygpio/libmygpio.h"
 
 #include <poll.h>
 #include <stdio.h>
@@ -46,18 +46,13 @@ int main(int argc, char **argv) {
     }
 
     if (mygpio_connection_get_state(conn) != MYGPIO_STATE_OK) {
-        printf("%s\n", mygpio_connection_get_error(conn));
+        printf("Error: %s\n", mygpio_connection_get_error(conn));
         mygpio_connection_free(conn);
         return EXIT_FAILURE;
     }
 
     const unsigned *version = mygpio_connection_get_version(conn);
     printf("Connected, server version %u.%u.%u\n", version[0], version[1], version[2]);
-
-    struct t_mygpio_pair *pair = mygpio_recv_pair(conn);
-    if (pair == NULL) {
-        printf("No messages pending\n");
-    }
 
     if (mygpio_send_idle(conn) == true) {
         printf("In idle mode\n");

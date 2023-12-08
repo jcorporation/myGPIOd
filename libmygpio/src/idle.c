@@ -4,8 +4,7 @@
  https://github.com/jcorporation/mympd
 */
 
-#include "libmygpio/src/idle.h"
-
+#include "libmygpio/include/libmygpio/idle.h"
 #include "libmygpio/src/protocol.h"
 
 #include <poll.h>

@@ -6,7 +6,8 @@ When the client connects, the server responds with:
 
 ```
 OK
-version:{myGPIOd version}
+version:{major}.{minor}.{patch}
+END
 ```
 
 Default socket: `/run/mygpiod/socket`
@@ -21,6 +22,7 @@ COMMAND [ARG...]
 
 - The first line of the response is `OK` on completion or `ERROR:<message>` on failure.
 - After that any number of `key:value` pairs can follow.
+- A final `END` denotes the end of the server response
 
 ## General commands
 
@@ -44,6 +46,7 @@ time:{nanoseconds}
 gpio:{gpio number}
 event:{event2}
 time:{nanoseconds}
+END
 ```
 
 ### noidle
@@ -72,6 +75,7 @@ Lists all configured gpios.
 OK
 gpio:{gpio number}
 mode:{in|out}
+END
 ...
 ```
 
@@ -84,6 +88,7 @@ Gets the current value of a configured input gpio.
 ```
 OK
 value:{0|1}
+END
 ```
 
 ### gpioset {gpio number} {value}

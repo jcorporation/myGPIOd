@@ -30,8 +30,6 @@
 
 // private definitions
 
-#define WELCOME_MESSAGE DEFAULT_OK_MSG_PREFIX "version:" MYGPIO_VERSION "\n"
-
 static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd);
 static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd);
 
@@ -106,7 +104,7 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd) {
     config->client_id++;
     list_push(&config->clients, config->client_id, data);
     MYGPIOD_LOG_DEBUG("Client#%u: Accepted new connection", config->client_id);
-    server_response_send(data, WELCOME_MESSAGE);
+    server_response_send(data, DEFAULT_MSG_OK "\nversion:" MYGPIO_VERSION "\n" DEFAULT_MSG_END);
     data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
     timer_log_next_expire(data->timeout_fd);
     return true;

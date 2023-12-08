@@ -35,7 +35,8 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path) {
         return connection;
     }
     if (recv_response_status(connection) == false ||
-        recv_version(connection)== false)
+        recv_version(connection) == false ||
+        response_end(connection) == false)
     {
         connection_set_state(connection, MYGPIO_STATE_FATAL, "Handshake failed");
         return connection;

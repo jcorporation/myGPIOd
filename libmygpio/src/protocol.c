@@ -6,8 +6,8 @@
 
 #include "libmygpio/src/protocol.h"
 
+#include "libmygpio/include/libmygpio/pair.h"
 #include "libmygpio/src/connection.h"
-#include "libmygpio/src/pair.h"
 #include "libmygpio/src/socket.h"
 #include "libmygpio/src/util.h"
 
@@ -53,7 +53,7 @@ bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
 
 /**
  * Checks the response status. Populates the connection error buffer
- * @param conection connection struct
+ * @param connection connection struct
  * @return true on success, else false
  */
 bool recv_response_status(struct t_mygpio_connection *connection) {
@@ -93,6 +93,22 @@ bool recv_version(struct t_mygpio_connection *connection) {
     {
         mygpio_free_pair(pair);
         return false;
+    }
+    mygpio_free_pair(pair);
+    return true;
+}
+
+/**
+ * Finish reading the server response
+ * @param connection connection struct
+ * @return true on success, else false
+ */
+bool response_end(struct t_mygpio_connection *connection) {
+    while (strcmp(connection->buf_in.buffer, "END") != 0) {
+        if (socket_recv_line(connection->fd, &connection->buf_in) == false) {
+            connection_set_state(connection, MYGPIO_STATE_ERROR, "Reading response failed");
+            return false;
+        }
     }
     return true;
 }

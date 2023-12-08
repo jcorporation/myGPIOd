@@ -4,8 +4,8 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef LIBMYGPIO_BUFFER_H
-#define LIBMYGPIO_BUFFER_H
+#ifndef LIBMYGPIO_SRC_BUFFER_H
+#define LIBMYGPIO_SRC_BUFFER_H
 
 #include <stddef.h>
 

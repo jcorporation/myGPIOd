@@ -4,10 +4,12 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef LIBMYGPIO_PAIR_H
-#define LIBMYGPIO_PAIR_H
+// Do not include this file directly, use libmygpio.h
 
-#include "libmygpio/src/connection.h"
+#ifndef MYGPIO_PAIR_H
+#define MYGPIO_PAIR_H
+
+struct t_mygpio_connection;
 
 struct t_mygpio_pair {
     const char *name;

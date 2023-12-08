@@ -43,7 +43,7 @@ bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
     MYGPIOD_LOG_INFO("Client#%u: Leaving idle mode", client_node->id);
     client_data->timeout_fd = server_client_connection_set_timeout(client_data->timeout_fd, config->socket_timeout);
     if (client_data->waiting_events.length == 0) {
-        server_response_send(client_data, DEFAULT_OK_MSG_PREFIX);
+        server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
         return true;
     }
     return send_idle_events(client_node->data);
@@ -59,16 +59,17 @@ bool send_idle_events(struct t_list_node *client_node) {
     struct t_client_data *client_data = (struct t_client_data *)client_node->data;
 
     server_response_start(client_data);
-    server_response_append(client_data, "%s", DEFAULT_OK_MSG_PREFIX);
+    server_response_append(client_data, "%s", DEFAULT_MSG_OK);
     struct t_list_node *current = client_data->waiting_events.head;
     while (current != NULL) {
         struct t_event_data *event_data = (struct t_event_data *)current->data;
-        server_response_append(client_data, "gpio:%u\n", current->id);
-        server_response_append(client_data, "event:%s\n", mygpiod_event_name(event_data->mygpiod_event_type));
-        server_response_append(client_data, "time:%llu\n", (long long unsigned)event_data->timestamp);
+        server_response_append(client_data, "gpio:%u", current->id);
+        server_response_append(client_data, "event:%s", mygpiod_event_name(event_data->mygpiod_event_type));
+        server_response_append(client_data, "time:%llu", (long long unsigned)event_data->timestamp);
         current = current -> next;
     }
     list_clear(&client_data->waiting_events, event_data_clear);
+    server_response_append(client_data, "%s", DEFAULT_MSG_END);
     server_response_end(client_data);
     return true;
 }

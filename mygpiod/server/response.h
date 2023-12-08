@@ -10,8 +10,9 @@
 #include "mygpiod/server/socket.h"
 
 // Socket server default responses
-#define DEFAULT_ERROR_MSG_PREFIX "ERROR:"
-#define DEFAULT_OK_MSG_PREFIX "OK\n"
+#define DEFAULT_MSG_ERROR "ERROR:"
+#define DEFAULT_MSG_OK "OK"
+#define DEFAULT_MSG_END "END"
 
 void server_response_send(struct t_client_data *client_data, const char *message);
 void server_response_start(struct t_client_data *client_data);

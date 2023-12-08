@@ -4,6 +4,7 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+#include "compile_time.h"
 #include "mygpiod/server/protocol.h"
 
 #include "mygpiod/lib/log.h"
@@ -18,8 +19,6 @@
 #include <string.h>
 
 // private definitions
-
-#define WELCOME_MESSAGE "OK\nversion:myGPIOd " MYGPIOD_VERSION "\n"
 
 static const char *cmd_strs[] = { CMDS(GEN_STR) };
 
@@ -48,7 +47,7 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
         cmd_id != CMD_NOIDLE)
     {
         MYGPIOD_LOG_ERROR("Client#%u: Only noidle command is allowed", client_node->id);
-        server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "In idle state, only the noidle command is allowed\n");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "In idle state, only the noidle command is allowed");
         sdsfreesplitres(args, count);
         return false;
     }
@@ -82,7 +81,7 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
         case CMD_INVALID:
         case CMD_COUNT:
             MYGPIOD_LOG_ERROR("Client#%u: Invalid command", client_node->id);
-            server_response_send(client_data, DEFAULT_ERROR_MSG_PREFIX "Invalid command\n");
+            server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid command");
             rc = false;
     }
     sdsfreesplitres(args, count);

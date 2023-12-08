@@ -26,6 +26,7 @@ void server_response_append(struct t_client_data *client_data, const char *fmt, 
     va_start(args, fmt);
     client_data->buf_out = sdscatvprintf(client_data->buf_out, fmt, args);
     va_end(args);
+    client_data->buf_out = sdscatlen(client_data->buf_out, "\n", 1);
 }
 
 /**
