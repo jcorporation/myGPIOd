@@ -21,8 +21,9 @@ COMMAND [ARG...]
 ## Responses
 
 - The first line of the response is `OK` on completion or `ERROR:<message>` on failure.
-- After that any number of `key:value` pairs can follow.
-- A final `END` denotes the end of the server response
+- After an `OK`:
+  - Any number of `key:value` pairs can follow.
+  - A final `END` denotes the end of the server response.
 
 ## General commands
 

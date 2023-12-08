@@ -57,7 +57,7 @@ bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
  * @return true on success, else false
  */
 bool recv_response_status(struct t_mygpio_connection *connection) {
-    if (socket_recv_line(connection->fd, &connection->buf_in) == false) {
+    if (socket_recv_line(connection->fd, &connection->buf_in, true) == false) {
         return false;
     }
     if (strcmp(connection->buf_in.buffer, "OK") == 0) {
@@ -105,7 +105,7 @@ bool recv_version(struct t_mygpio_connection *connection) {
  */
 bool response_end(struct t_mygpio_connection *connection) {
     while (strcmp(connection->buf_in.buffer, "END") != 0) {
-        if (socket_recv_line(connection->fd, &connection->buf_in) == false) {
+        if (socket_recv_line(connection->fd, &connection->buf_in, false) == false) {
             connection_set_state(connection, MYGPIO_STATE_ERROR, "Reading response failed");
             return false;
         }

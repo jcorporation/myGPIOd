@@ -56,12 +56,16 @@ void socket_close(int fd) {
  * This command blocks.
  * @param fd file descriptor to read
  * @param buf buffer to fill
+ * @param wait wait for input?
  * @return true on success, else false
  */
-bool socket_recv_line(int fd, struct t_buf *buf) {
+bool socket_recv_line(int fd, struct t_buf *buf, bool wait) {
     buf_reset(buf);
     ssize_t nread;
-    while ((nread = read(fd, buf->buffer + buf->len, 1)) > 0) {
+    int flag = wait == true
+        ? 0
+        : MSG_DONTWAIT;
+    while ((nread = recv(fd, buf->buffer + buf->len, 1, flag)) > 0) {
         buf->len += nread;
         if (buf->len == buf->capacity) {
             buf->capacity += BUFFER_SIZE_INIT;
@@ -71,7 +75,6 @@ bool socket_recv_line(int fd, struct t_buf *buf) {
             char *new_buf = realloc(buf->buffer, buf->capacity);
             assert(new_buf);
             buf->buffer = new_buf;
-            assert(buf->buffer);
         }
         buf->buffer[buf->len] = '\0';
         if (buf->buffer[buf->len - 1] == '\n') {
