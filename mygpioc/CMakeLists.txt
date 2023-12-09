@@ -13,6 +13,8 @@ target_include_directories(mygpioc
 target_sources(mygpioc
   PRIVATE
     main.c
+    options.c
+    util.c
 )
 
 target_link_directories(mygpioc

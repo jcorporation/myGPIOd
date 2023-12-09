@@ -1,17 +1,16 @@
 /*
- * SPDX-License-Identifier: GPL-3.0-or-later
- * myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
- * https://github.com/jcorporation/myGPIOd
- *
- * myGPIOd is based on the gpiomon tool from
- * https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
- */
+ SPDX-License-Identifier: GPL-3.0-or-later
+ myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ https://github.com/jcorporation/mympd
+*/
 
 #include "compile_time.h"
 
 #include "libmygpio/include/libmygpio/libmygpio.h"
 
-#include <poll.h>
+#include "mygpioc/commands.h"
+#include "mygpioc/options.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,17 +34,26 @@ const char *__asan_default_options(void) {
 #endif
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        printf("Usage: mygpioc /run/mygpiod/socket\n");
+    struct t_options options;
+    int option_index = handle_options(argc, argv, &options);
+    if (argc <= option_index) {
+        print_usage();
+        return EXIT_FAILURE;
+    }
+    const char *command = argv[option_index];
+    if (check_command(command) == false) {
+        print_usage();
         return EXIT_FAILURE;
     }
 
     printf("Connecting to myGPIOd\n");
-    struct t_mygpio_connection *conn = mygpio_connection_new(argv[1], 5000);
+    struct t_mygpio_connection *conn = mygpio_connection_new(options.socket, options.timeout);
     if (conn == NULL) {
         printf("Out of memory\n");
         return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
 
     if (mygpio_connection_get_state(conn) != MYGPIO_STATE_OK) {
         printf("Error: %s\n", mygpio_connection_get_error(conn));
