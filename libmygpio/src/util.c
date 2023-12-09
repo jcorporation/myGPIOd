@@ -26,7 +26,7 @@ bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, un
     errno = 0;
     uintmax_t v = strtoumax(str, rest, 10);
     if (errno == 0 && v >= min && v <= max) {
-        *result = (int)v;
+        *result = (unsigned)v;
         return true;
     }
     return false;
