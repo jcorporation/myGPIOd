@@ -15,8 +15,14 @@ struct t_mygpio_connection;
 
 enum mygpio_gpio_mode {
     MYGPIO_GPIO_MODE_UNKNOWN = -1,
-    MYGPIO_GPIO_MODE_OUT,
-    MYGPIO_GPIO_MODE_IN
+    MYGPIO_GPIO_MODE_IN,
+    MYGPIO_GPIO_MODE_OUT
+};
+
+enum mygpio_gpio_value {
+    MYGPIO_GPIO_VALUE_UNKNOWN = -1,
+    MYGPIO_GPIO_VALUE_HIGH,
+    MYGPIO_GPIO_VALUE_LOW
 };
 
 struct t_mygpio_gpio_conf {
@@ -25,7 +31,9 @@ struct t_mygpio_gpio_conf {
 };
 
 bool mygpio_gpiolist(struct t_mygpio_connection *connection);
-struct t_mygpio_gpio_conf *mygpio_recv_gpio(struct t_mygpio_connection *connection);
-void mygpio_free_gpio(struct t_mygpio_gpio_conf *gpio_conf);
+struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *connection);
+void mygpio_free_gpio_conf(struct t_mygpio_gpio_conf *gpio_conf);
+enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, unsigned gpio);
+bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value);
 
 #endif

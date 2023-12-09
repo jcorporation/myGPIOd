@@ -23,11 +23,5 @@ timeout = 10
 # GPIO chip number
 chip = /dev/gpiochip0
 
-# Trigger events
-# Valid values: falling, rising or both
-request_event = falling
-#request_event = rising
-#request_event = both
-
 # Directory for single gpio configuration files
 gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d

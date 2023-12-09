@@ -235,7 +235,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     }
     if (strcmp(key, "timeout") == 0) {
         parse_int(value, &config->socket_timeout, NULL, 10, 120);
-        MYGPIOD_LOG_DEBUG("Setting socket to \"%s\"", config->dir_gpio);
+        MYGPIOD_LOG_DEBUG("Setting timeout to \"%s\" seconds", config->dir_gpio);
         return true;
     }
     return false;

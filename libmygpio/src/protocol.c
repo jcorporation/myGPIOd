@@ -6,8 +6,8 @@
 
 #include "libmygpio/src/protocol.h"
 
-#include "libmygpio/include/libmygpio/pair.h"
 #include "libmygpio/src/connection.h"
+#include "libmygpio/src/pair.h"
 #include "libmygpio/src/socket.h"
 #include "libmygpio/src/util.h"
 
@@ -57,7 +57,7 @@ bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
  * @return true on success, else false
  */
 bool recv_response_status(struct t_mygpio_connection *connection) {
-    if (socket_recv_line(connection->fd, &connection->buf_in, true) == false) {
+    if (socket_recv_line(connection->fd, &connection->buf_in, connection->timeout) == false) {
         return false;
     }
     if (strcmp(connection->buf_in.buffer, "OK") == 0) {
@@ -67,7 +67,7 @@ bool recv_response_status(struct t_mygpio_connection *connection) {
         free(connection->error);
         connection->error = NULL;
     }
-    if (strcmp(connection->buf_in.buffer, "ERROR:") == 0) {
+    if (strncmp(connection->buf_in.buffer, "ERROR:", 6) == 0) {
         char *p = strchr(connection->buf_in.buffer, ':');
         p++;
         connection_set_state(connection, MYGPIO_STATE_ERROR, p);
@@ -103,9 +103,9 @@ bool recv_version(struct t_mygpio_connection *connection) {
  * @param connection connection struct
  * @return true on success, else false
  */
-bool response_end(struct t_mygpio_connection *connection) {
+bool mygpio_response_end(struct t_mygpio_connection *connection) {
     while (strcmp(connection->buf_in.buffer, "END") != 0) {
-        if (socket_recv_line(connection->fd, &connection->buf_in, false) == false) {
+        if (socket_recv_line(connection->fd, &connection->buf_in, 0) == false) {
             connection_set_state(connection, MYGPIO_STATE_ERROR, "Reading response failed");
             return false;
         }

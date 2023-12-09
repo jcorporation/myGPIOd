@@ -4,12 +4,14 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef LIBMYGPIO_UTIL_H
-#define LIBMYGPIO_UTIL_H
+#ifndef LIBMYGPIO_SRC_UTIL_H
+#define LIBMYGPIO_SRC_UTIL_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max);
+bool parse_uint64(const char *str, uint64_t *result);
 
 #ifdef MYGPIOD_DEBUG
     #define LIBMYGPIO_LOG(...) log_log(__FILE__, __LINE__, __VA_ARGS__)

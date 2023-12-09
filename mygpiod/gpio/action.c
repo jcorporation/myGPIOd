@@ -97,7 +97,15 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
         (value == GPIOD_LINE_VALUE_INACTIVE && data->long_press_event == GPIOD_LINE_EDGE_FALLING))
     {
         struct timespec ts;
-        clock_gettime(CLOCK_REALTIME, &ts);
+        switch (data->event_clock) {
+            case GPIOD_LINE_CLOCK_HTE:
+            case GPIOD_LINE_CLOCK_REALTIME:
+                clock_gettime(CLOCK_REALTIME, &ts);
+                break;
+            case GPIOD_LINE_CLOCK_MONOTONIC:
+                clock_gettime(CLOCK_MONOTONIC, &ts);
+                break;
+        }
         uint64_t timestamp = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
         event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, timestamp);
         action_execute(data->long_press_action);

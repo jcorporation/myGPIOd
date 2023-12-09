@@ -6,8 +6,8 @@
 
 // Do not include this file directly, use libmygpio.h
 
-#ifndef MYGPIO_PAIR_H
-#define MYGPIO_PAIR_H
+#ifndef MYGPIO_SRC_PAIR_H
+#define MYGPIO_SRC_PAIR_H
 
 struct t_mygpio_connection;
 

@@ -4,8 +4,8 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef LIBMYGPIO_SOCKET_H
-#define LIBMYGPIO_SOCKET_H
+#ifndef LIBMYGPIO_SRC_SOCKET_H
+#define LIBMYGPIO_SRC_SOCKET_H
 
 #include "libmygpio/src/buffer.h"
 
@@ -13,7 +13,7 @@
 
 int socket_connect(const char *socket_path);
 void socket_close(int fd);
-bool socket_recv_line(int fd, struct t_buf *buf, bool wait);
+bool socket_recv_line(int fd, struct t_buf *buf, int timeout);
 bool socket_send_line(int fd, struct t_buf *buf);
 
 #endif

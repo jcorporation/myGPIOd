@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <sys/poll.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -56,15 +57,28 @@ void socket_close(int fd) {
  * This command blocks.
  * @param fd file descriptor to read
  * @param buf buffer to fill
- * @param wait wait for input?
+ * @param timeout timeout in ms
+ *                0 for no wait
+ *                -1 for no timeout
  * @return true on success, else false
  */
-bool socket_recv_line(int fd, struct t_buf *buf, bool wait) {
+bool socket_recv_line(int fd, struct t_buf *buf, int timeout) {
     buf_reset(buf);
     ssize_t nread;
-    int flag = wait == true
-        ? 0
-        : MSG_DONTWAIT;
+    int flag = 0;
+
+    if (timeout == 0) {
+        flag = MSG_DONTWAIT;
+    }
+    else if (timeout > 0) {
+        struct pollfd pfds[1];
+        pfds[0].fd = fd;
+        pfds[0].events = POLLIN;
+        if (poll(pfds, 1, timeout) <= 0) {
+            return false;
+        }
+    }
+
     while ((nread = recv(fd, buf->buffer + buf->len, 1, flag)) > 0) {
         buf->len += nread;
         if (buf->len == buf->capacity) {

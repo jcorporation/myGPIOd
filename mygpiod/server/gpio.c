@@ -65,7 +65,7 @@ bool handle_gpioget(struct t_cmd_options *options, struct t_config *config, stru
     }
     enum gpiod_line_value value = gpio_get_value(config, gpio);
     if (value == GPIOD_LINE_VALUE_ERROR) {
-        server_response_send(client_data, DEFAULT_MSG_ERROR "Getting gpio value failed\n");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Getting gpio value failed");
         return false;
     }
     server_response_start(client_data);

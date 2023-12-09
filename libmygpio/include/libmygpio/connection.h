@@ -19,7 +19,7 @@ enum mygpio_conn_state {
 
 struct t_mygpio_connection;
 
-struct t_mygpio_connection *mygpio_connection_new(const char *socket_path);
+struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int timeout);
 void mygpio_connection_free(struct t_mygpio_connection *connection);
 const unsigned *mygpio_connection_get_version(struct t_mygpio_connection *connection);
 int mygpio_connection_get_fd(struct t_mygpio_connection *connection);

@@ -10,11 +10,27 @@
 #define LIBMYGPIO_IDLE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 struct t_mygpio_connection;
 
-bool mygpio_recv_idle(struct t_mygpio_connection *connection, int timeout);
+enum mygpio_event {
+    MYGPIO_EVENT_UNKNOWN = -1,  //<! unknown
+    MYGPIO_EVENT_FALLING,       //<! falling
+    MYGPIO_EVENT_RISING,        //<! rising
+    MYGPIO_EVENT_LONG_PRESS     //<! long_press
+};
+
+struct t_mygpio_idle_event {
+    unsigned gpio;            //<! gpio number
+    enum mygpio_event event;  //<! the event 
+    uint64_t timestamp;       //<! timestamp in nanoseconds
+};
+
 bool mygpio_send_idle(struct t_mygpio_connection *connection);
 bool mygpio_send_noidle(struct t_mygpio_connection *connection);
+bool mygpio_wait_idle(struct t_mygpio_connection *connection, int timeout);
+struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *connection);
+void mygpio_free_idle_event(struct t_mygpio_idle_event *event);
 
 #endif

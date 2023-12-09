@@ -6,6 +6,7 @@
 
 #include "libmygpio/src/connection.h"
 
+#include "libmygpio/include/libmygpio/protocol.h"
 #include "libmygpio/src/protocol.h"
 #include "libmygpio/src/socket.h"
 
@@ -16,9 +17,10 @@
 /**
  * Creates a new connection and checks the initial server response
  * @param socket_path unix socket path to connect
+ * @param timeout connection timeout in ms
  * @return allocated connection struct
  */
-struct t_mygpio_connection *mygpio_connection_new(const char *socket_path) {
+struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int timeout) {
     struct t_mygpio_connection *connection = malloc(sizeof(struct t_mygpio_connection));
     if (connection == NULL) {
         return NULL;
@@ -29,6 +31,7 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path) {
     connection->version[1] = 0;
     connection->version[2] = 0;
     connection->error = NULL;
+    connection->timeout = timeout;
     connection->fd = socket_connect(socket_path);
     if (connection->fd == -1) {
         connection_set_state(connection, MYGPIO_STATE_FATAL, "Connection failed");
@@ -36,7 +39,7 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path) {
     }
     if (recv_response_status(connection) == false ||
         recv_version(connection) == false ||
-        response_end(connection) == false)
+        mygpio_response_end(connection) == false)
     {
         connection_set_state(connection, MYGPIO_STATE_FATAL, "Handshake failed");
         return connection;

@@ -59,7 +59,7 @@ struct t_config {
     sds dir_gpio;             //!< directory for the gpio config files
 
     sds socket_path;          //!< server socket
-    int socket_timeout;       //!< socket timeout
+    int socket_timeout;       //!< socket timeout in seconds
     struct t_list clients;    //!< list of connected clients
     unsigned client_id;       //!< uniq client id
 

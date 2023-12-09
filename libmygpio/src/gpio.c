@@ -4,12 +4,15 @@
  https://github.com/jcorporation/mympd
 */
 
+#include "compile_time.h"
 #include "libmygpio/include/libmygpio/gpio.h"
-
-#include "libmygpio/include/libmygpio/pair.h"
+#include "libmygpio/include/libmygpio/protocol.h"
+#include "libmygpio/src/pair.h"
 #include "libmygpio/src/protocol.h"
 #include "libmygpio/src/util.h"
+
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,16 +32,23 @@ bool mygpio_gpiolist(struct t_mygpio_connection *connection) {
         recv_response_status(connection);
 }
 
-struct t_mygpio_gpio_conf *mygpio_recv_gpio(struct t_mygpio_connection *connection) {
+/**
+ * Receives the response for the gpiolist command
+ * @param connection connection struct
+ * @return gpio config struct or NULL on error or list end
+ */
+struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *connection) {
     unsigned gpio;
     enum mygpio_gpio_mode mode;
 
     struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "gpio") != 0 ||
-        parse_uint(pair->value, &gpio, NULL, 0, 99) == false)
+        parse_uint(pair->value, &gpio, NULL, 0, GPIOS_MAX) == false)
     {
-        mygpio_free_pair(pair);
+        if (pair != NULL) {
+            mygpio_free_pair(pair);
+        }
         return NULL;
     }
     mygpio_free_pair(pair);
@@ -48,7 +58,9 @@ struct t_mygpio_gpio_conf *mygpio_recv_gpio(struct t_mygpio_connection *connecti
         strcmp(pair->name, "mode") != 0 ||
         (mode = parse_gpio_mode(pair->value)) == MYGPIO_GPIO_MODE_UNKNOWN)
     {
-        mygpio_free_pair(pair);
+        if (pair != NULL) {
+            mygpio_free_pair(pair);
+        }
         return NULL;
     }
     mygpio_free_pair(pair);
@@ -60,17 +72,69 @@ struct t_mygpio_gpio_conf *mygpio_recv_gpio(struct t_mygpio_connection *connecti
     return gpio_conf;
 }
 
-void mygpio_free_gpio(struct t_mygpio_gpio_conf *gpio_conf) {
+/**
+ * Frees the gpio config struct
+ * @param gpio_conf 
+ */
+void mygpio_free_gpio_conf(struct t_mygpio_gpio_conf *gpio_conf) {
     free(gpio_conf);
 }
 
-// private functions;
+/**
+ * Receives the value of an input gpio
+ * @param connection connection struct
+ * @param gpio gpio number (0-99)
+ * @return value of the gpio or MYGPIO_GPIO_VALUE_UNKNOWN on error
+ */
+enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, unsigned gpio) {
+    unsigned value;
+    struct t_mygpio_pair *pair;
+    if (gpio > GPIOS_MAX) {
+        return MYGPIO_GPIO_VALUE_UNKNOWN;
+    }
+    char command[11];
+    snprintf(command, 11, "gpioget %u", gpio);
+    if (send_line(connection, command) != true ||
+        recv_response_status(connection) != true ||
+        (pair = mygpio_recv_pair(connection)) == NULL ||
+        strcmp(pair->name, "value") != 0 ||
+        parse_uint(pair->value, &value, NULL, 0, 1) == false)
+    {
+        return MYGPIO_GPIO_VALUE_UNKNOWN;
+    }
+    return value;
+}
 
+/**
+ * Sets the value of an output gpio
+ * @param connection connection struct
+ * @param gpio gpio number (0-99)
+ * @param value gpio value
+ * @return value of the gpio or MYGPIO_GPIO_VALUE_UNKNOWN on error
+ */
+bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value) {
+    if (gpio > 99) {
+        return false;
+    }
+    char command[14];
+    snprintf(command, 14, "gpioset %u %u", gpio, value);
+    return send_line(connection, command) &&
+        recv_response_status(connection) &&
+        mygpio_response_end(connection);
+}
+
+// private functions
+
+/**
+ * Parses the gpio mode
+ * @param str string to parse
+ * @return mode of the gpio
+ */
 static enum mygpio_gpio_mode parse_gpio_mode(const char *str) {
     if (strcmp(str, "in") == 0) {
         return MYGPIO_GPIO_MODE_IN;
     }
-    if (strcmp(str, "in") == 0) {
+    if (strcmp(str, "out") == 0) {
         return MYGPIO_GPIO_MODE_OUT;
     }
     return MYGPIO_GPIO_MODE_UNKNOWN;

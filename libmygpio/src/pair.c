@@ -4,8 +4,8 @@
  https://github.com/jcorporation/mympd
 */
 
-#include "libmygpio/include/libmygpio/pair.h"
 #include "libmygpio/src/connection.h"
+#include "libmygpio/src/pair.h"
 #include "libmygpio/src/socket.h"
 
 #include <assert.h>
@@ -24,7 +24,7 @@ static struct t_mygpio_pair *mygpio_parse_pair(const char *line);
  * @return the pair or NULL on error or response end
  */
 struct t_mygpio_pair *mygpio_recv_pair(struct t_mygpio_connection *connection) {
-    socket_recv_line(connection->fd, &connection->buf_in, false);
+    socket_recv_line(connection->fd, &connection->buf_in, 0);
     if (connection->buf_in.len == 0) {
         return NULL;
     }
