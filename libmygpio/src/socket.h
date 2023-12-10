@@ -11,9 +11,9 @@
 
 #include <stdbool.h>
 
-int socket_connect(const char *socket_path);
-void socket_close(int fd);
-bool socket_recv_line(int fd, struct t_buf *buf, int timeout);
-bool socket_send_line(int fd, struct t_buf *buf);
+int libmygpio_socket_connect(const char *socket_path);
+void libmygpio_socket_close(int fd);
+bool libmygpio_socket_recv_line(int fd, struct t_buf *buf, int timeout);
+bool libmygpio_socket_send_line(int fd, struct t_buf *buf);
 
 #endif

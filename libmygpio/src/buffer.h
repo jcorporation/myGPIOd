@@ -18,8 +18,8 @@ struct t_buf {
     size_t capacity;
 };
 
-void buf_init(struct t_buf *buf);
-void buf_reset(struct t_buf *buf);
-void buf_clear(struct t_buf *buf);
+void libmygpio_buf_init(struct t_buf *buf);
+void libmygpio_buf_reset(struct t_buf *buf);
+void libmygpio_buf_clear(struct t_buf *buf);
 
 #endif

@@ -21,7 +21,7 @@ struct t_mygpio_connection {
     char *error;                   //<! error message
 };
 
-void connection_set_state(struct t_mygpio_connection *connection,
+void libmygpio_connection_set_state(struct t_mygpio_connection *connection,
         enum mygpio_conn_state state, const char *message);
 
 #endif

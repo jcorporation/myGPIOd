@@ -16,7 +16,7 @@
 
 // private definitions
 
-static enum mygpio_event parse_event(const char *str);
+static enum mygpio_event libmygpio_parse_event(const char *str);
 
 // public functions
 
@@ -26,7 +26,7 @@ static enum mygpio_event parse_event(const char *str);
  * @return true on success, else false
  */
 bool mygpio_send_idle(struct t_mygpio_connection *connection) {
-    return send_line(connection, "idle");
+    return libmygpio_send_line(connection, "idle");
 }
 
 /**
@@ -35,8 +35,8 @@ bool mygpio_send_idle(struct t_mygpio_connection *connection) {
  * @return true on success, else false
  */
 bool mygpio_send_noidle(struct t_mygpio_connection *connection) {
-    return send_line(connection, "noidle") &&
-        recv_response_status(connection);
+    return libmygpio_send_line(connection, "noidle") &&
+        libmygpio_recv_response_status(connection);
 }
 
 /**
@@ -51,7 +51,7 @@ bool mygpio_wait_idle(struct t_mygpio_connection *connection, int timeout) {
     pfds[0].events = POLLIN;
     int events = poll(pfds, 1, timeout);
     if (events > 0) {
-        return recv_response_status(connection);
+        return libmygpio_recv_response_status(connection);
     }
     return false;
 }
@@ -69,7 +69,7 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
     struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "gpio") != 0 ||
-        parse_uint(pair->value, &gpio, NULL, 0, 99) == false)
+        libmygpio_parse_uint(pair->value, &gpio, NULL, 0, 99) == false)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);
@@ -81,7 +81,7 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
     pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "mode") != 0 ||
-        (event = parse_event(pair->value)) == MYGPIO_EVENT_UNKNOWN)
+        (event = libmygpio_parse_event(pair->value)) == MYGPIO_EVENT_UNKNOWN)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);
@@ -93,7 +93,7 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
     pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "mode") != 0 ||
-        parse_uint64(pair->value, &timestamp) == false)
+        libmygpio_parse_uint64(pair->value, &timestamp) == false)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);
@@ -125,7 +125,7 @@ void mygpio_free_idle_event(struct t_mygpio_idle_event *event) {
  * @param str string to parse
  * @return mygpio event
  */
-static enum mygpio_event parse_event(const char *str) {
+static enum mygpio_event libmygpio_parse_event(const char *str) {
     if (strcmp(str, "falling") == 0) {
         return MYGPIO_EVENT_FALLING;
     }

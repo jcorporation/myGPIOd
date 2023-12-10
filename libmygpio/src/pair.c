@@ -14,7 +14,7 @@
 
 // private definitions
 
-static struct t_mygpio_pair *mygpio_parse_pair(const char *line);
+static struct t_mygpio_pair *libmygpio_parse_pair(const char *line);
 
 // public functions
 
@@ -24,14 +24,14 @@ static struct t_mygpio_pair *mygpio_parse_pair(const char *line);
  * @return the pair or NULL on error or response end
  */
 struct t_mygpio_pair *mygpio_recv_pair(struct t_mygpio_connection *connection) {
-    socket_recv_line(connection->fd, &connection->buf_in, 0);
+    libmygpio_socket_recv_line(connection->fd, &connection->buf_in, 0);
     if (connection->buf_in.len == 0) {
         return NULL;
     }
     if (strcmp(connection->buf_in.buffer, "END") == 0) {
         return NULL;
     }
-    return mygpio_parse_pair(connection->buf_in.buffer);
+    return libmygpio_parse_pair(connection->buf_in.buffer);
 }
 
 /**
@@ -52,7 +52,7 @@ void mygpio_free_pair(struct t_mygpio_pair *pair) {
  * @param line line to parse
  * @return allocated pair or NULL on error
  */
-struct t_mygpio_pair *mygpio_parse_pair(const char *line) {
+struct t_mygpio_pair *libmygpio_parse_pair(const char *line) {
     struct t_mygpio_pair *pair = malloc(sizeof(struct t_mygpio_pair));
     if (pair == NULL) {
         return NULL;

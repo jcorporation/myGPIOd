@@ -19,7 +19,7 @@
 
 // private definitions
 
-static bool parse_version(const char *str, struct t_mygpio_connection *connection);
+static bool libmygpio_parse_version(const char *str, struct t_mygpio_connection *connection);
 
 // public functions
 
@@ -30,7 +30,7 @@ static bool parse_version(const char *str, struct t_mygpio_connection *connectio
  * @param ... variadic arguments for the format string
  * @return true on success, else false
  */
-bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
+bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
     //TODO: resize buffer if it is to small.
     va_list args;
     va_start(args, fmt);
@@ -39,14 +39,14 @@ bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
     if (written <= 0 ||
         written >= (int)connection->buf_out.capacity)
     {
-        buf_clear(&connection->buf_out);
-        connection_set_state(connection, MYGPIO_STATE_ERROR, "Buffer write error");
+        libmygpio_buf_clear(&connection->buf_out);
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Buffer write error");
         return false;
     }
     connection->buf_out.len = (size_t)written;
-    bool rc = socket_send_line(connection->fd, &connection->buf_out);
+    bool rc = libmygpio_socket_send_line(connection->fd, &connection->buf_out);
     if (rc == false) {
-        connection_set_state(connection, MYGPIO_STATE_ERROR, "Socket write error");
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Socket write error");
     }
     return rc;
 }
@@ -56,8 +56,9 @@ bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
  * @param connection connection struct
  * @return true on success, else false
  */
-bool recv_response_status(struct t_mygpio_connection *connection) {
-    if (socket_recv_line(connection->fd, &connection->buf_in, connection->timeout) == false) {
+bool libmygpio_recv_response_status(struct t_mygpio_connection *connection) {
+    if (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, connection->timeout) == false) {
+        LIBMYGPIO_LOG("Error receiving line");
         return false;
     }
     if (strcmp(connection->buf_in.buffer, "OK") == 0) {
@@ -70,10 +71,10 @@ bool recv_response_status(struct t_mygpio_connection *connection) {
     if (strncmp(connection->buf_in.buffer, "ERROR:", 6) == 0) {
         char *p = strchr(connection->buf_in.buffer, ':');
         p++;
-        connection_set_state(connection, MYGPIO_STATE_ERROR, p);
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, p);
     }
     else {
-        connection_set_state(connection, MYGPIO_STATE_ERROR, "Malformed server response");
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Malformed server response");
     }
     return false;
 }
@@ -83,14 +84,16 @@ bool recv_response_status(struct t_mygpio_connection *connection) {
  * @param connection connection struct
  * @return true on success, else false
  */
-bool recv_version(struct t_mygpio_connection *connection) {
+bool libmygpio_recv_version(struct t_mygpio_connection *connection) {
     struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
     if (pair == NULL) {
+        LIBMYGPIO_LOG("Could not receive version pair");
         return false;
     }
     if (strcmp(pair->name, "version") != 0 ||
-        parse_version(pair->value, connection) == false)
+        libmygpio_parse_version(pair->value, connection) == false)
     {
+        LIBMYGPIO_LOG("Invalid version pair");
         mygpio_free_pair(pair);
         return false;
     }
@@ -105,8 +108,8 @@ bool recv_version(struct t_mygpio_connection *connection) {
  */
 bool mygpio_response_end(struct t_mygpio_connection *connection) {
     while (strcmp(connection->buf_in.buffer, "END") != 0) {
-        if (socket_recv_line(connection->fd, &connection->buf_in, 0) == false) {
-            connection_set_state(connection, MYGPIO_STATE_ERROR, "Reading response failed");
+        if (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, 0) == false) {
+            libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Reading response failed");
             return false;
         }
     }
@@ -121,19 +124,19 @@ bool mygpio_response_end(struct t_mygpio_connection *connection) {
  * @param connection connection to populate the version
  * @return true on success, else false
  */
-static bool parse_version(const char *str, struct t_mygpio_connection *connection) {
+static bool libmygpio_parse_version(const char *str, struct t_mygpio_connection *connection) {
     char *rest;
-    if (parse_uint(str, &connection->version[0], &rest, 0, 99) == false) {
+    if (libmygpio_parse_uint(str, &connection->version[0], &rest, 0, 99) == false) {
         return false;
     }
     if (*rest != '.') { return false; }
     rest++;
-    if (parse_uint(rest, &connection->version[1], &rest, 0, 99) == false) {
+    if (libmygpio_parse_uint(rest, &connection->version[1], &rest, 0, 99) == false) {
         return false;
     }
     if (*rest != '.') { return false; }
     rest++;
-    if (parse_uint(rest, &connection->version[2], &rest, 0, 99) == false) {
+    if (libmygpio_parse_uint(rest, &connection->version[2], &rest, 0, 99) == false) {
         return false;
     }
     if (*rest != '\0') { return false; }

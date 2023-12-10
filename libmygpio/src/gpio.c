@@ -28,8 +28,8 @@ static enum mygpio_gpio_mode parse_gpio_mode(const char *str);
  * @return true on success, else false
  */
 bool mygpio_gpiolist(struct t_mygpio_connection *connection) {
-    return send_line(connection, "gpiolist") &&
-        recv_response_status(connection);
+    return libmygpio_send_line(connection, "gpiolist") &&
+        libmygpio_recv_response_status(connection);
 }
 
 /**
@@ -44,7 +44,7 @@ struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *con
     struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "gpio") != 0 ||
-        parse_uint(pair->value, &gpio, NULL, 0, GPIOS_MAX) == false)
+        libmygpio_parse_uint(pair->value, &gpio, NULL, 0, GPIOS_MAX) == false)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);
@@ -94,11 +94,11 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
     }
     char command[11];
     snprintf(command, 11, "gpioget %u", gpio);
-    if (send_line(connection, command) != true ||
-        recv_response_status(connection) != true ||
+    if (libmygpio_send_line(connection, command) != true ||
+        libmygpio_recv_response_status(connection) != true ||
         (pair = mygpio_recv_pair(connection)) == NULL ||
         strcmp(pair->name, "value") != 0 ||
-        parse_uint(pair->value, &value, NULL, 0, 1) == false)
+        libmygpio_parse_uint(pair->value, &value, NULL, 0, 1) == false)
     {
         return MYGPIO_GPIO_VALUE_UNKNOWN;
     }
@@ -118,8 +118,8 @@ bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum 
     }
     char command[14];
     snprintf(command, 14, "gpioset %u %u", gpio, value);
-    return send_line(connection, command) &&
-        recv_response_status(connection) &&
+    return libmygpio_send_line(connection, command) &&
+        libmygpio_recv_response_status(connection) &&
         mygpio_response_end(connection);
 }
 

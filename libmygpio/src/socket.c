@@ -19,7 +19,7 @@
  * @param socket_path unix socket to connect
  * @return open file descriptor
  */
-int socket_connect(const char *socket_path) {
+int libmygpio_socket_connect(const char *socket_path) {
     struct sockaddr_un address = { 0 };
     address.sun_family = AF_UNIX;
     strncpy(address.sun_path, socket_path, 108);
@@ -46,7 +46,7 @@ int socket_connect(const char *socket_path) {
  * Closes the file descriptor
  * @param fd file descriptor
  */
-void socket_close(int fd) {
+void libmygpio_socket_close(int fd) {
     if (fd > 0) {
         close(fd);
     }
@@ -62,8 +62,8 @@ void socket_close(int fd) {
  *                -1 for no timeout
  * @return true on success, else false
  */
-bool socket_recv_line(int fd, struct t_buf *buf, int timeout) {
-    buf_reset(buf);
+bool libmygpio_socket_recv_line(int fd, struct t_buf *buf, int timeout) {
+    libmygpio_buf_reset(buf);
     ssize_t nread;
     int flag = 0;
 
@@ -107,25 +107,25 @@ bool socket_recv_line(int fd, struct t_buf *buf, int timeout) {
  * @param buf buffer to write
  * @return true on success, else false
  */
-bool socket_send_line(int fd, struct t_buf *buf) {
+bool libmygpio_socket_send_line(int fd, struct t_buf *buf) {
     ssize_t nwrite;
     size_t written = 0;
     size_t max_bytes = buf->len;
     while ((nwrite = write(fd, buf->buffer + written, max_bytes)) > 0) {
         if (nwrite < 0) {
-            buf_reset(buf);
+            libmygpio_buf_reset(buf);
             return false;
         }
         written += (size_t)nwrite;
         max_bytes = buf->len - written;
         if (written == buf->len) {
-            buf_reset(buf);
+            libmygpio_buf_reset(buf);
             if (write(fd, "\n", 1) != 1) {
                 return false;
             }
             return true;
         }
     }
-    buf_reset(buf);
+    libmygpio_buf_reset(buf);
     return false;
 }

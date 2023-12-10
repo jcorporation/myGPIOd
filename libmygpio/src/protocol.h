@@ -11,8 +11,8 @@
 
 #include <stdbool.h>
 
-bool send_line(struct t_mygpio_connection *connection, const char *fmt, ...);
-bool recv_version(struct t_mygpio_connection *connection);
-bool recv_response_status(struct t_mygpio_connection *connection);
+bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt, ...);
+bool libmygpio_recv_version(struct t_mygpio_connection *connection);
+bool libmygpio_recv_response_status(struct t_mygpio_connection *connection);
 
 #endif

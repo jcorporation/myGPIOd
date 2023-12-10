@@ -39,3 +39,6 @@ configure_file(libmygpio.pc.in libmygpio.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/libmygpio/libmygpio.pc
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
 )
+
+# example
+add_subdirectory("example")

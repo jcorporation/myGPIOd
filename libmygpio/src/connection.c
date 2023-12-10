@@ -9,6 +9,7 @@
 #include "libmygpio/include/libmygpio/protocol.h"
 #include "libmygpio/src/protocol.h"
 #include "libmygpio/src/socket.h"
+#include "libmygpio/src/util.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -25,26 +26,26 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int t
     if (connection == NULL) {
         return NULL;
     }
-    buf_init(&connection->buf_in);
-    buf_init(&connection->buf_out);
+    libmygpio_buf_init(&connection->buf_in);
+    libmygpio_buf_init(&connection->buf_out);
     connection->version[0] = 0;
     connection->version[1] = 0;
     connection->version[2] = 0;
     connection->error = NULL;
     connection->timeout = timeout;
-    connection->fd = socket_connect(socket_path);
+    connection->fd = libmygpio_socket_connect(socket_path);
     if (connection->fd == -1) {
-        connection_set_state(connection, MYGPIO_STATE_FATAL, "Connection failed");
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Connection failed");
         return connection;
     }
-    if (recv_response_status(connection) == false ||
-        recv_version(connection) == false ||
+    if (libmygpio_recv_response_status(connection) == false ||
+        libmygpio_recv_version(connection) == false ||
         mygpio_response_end(connection) == false)
     {
-        connection_set_state(connection, MYGPIO_STATE_FATAL, "Handshake failed");
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Handshake failed");
         return connection;
     }
-    connection_set_state(connection, MYGPIO_STATE_OK, NULL);
+    libmygpio_connection_set_state(connection, MYGPIO_STATE_OK, NULL);
     return connection;
 }
 
@@ -54,9 +55,9 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int t
  */
 void mygpio_connection_free(struct t_mygpio_connection *connection) {
     if (connection != NULL) {
-        socket_close(connection->fd);
-        buf_clear(&connection->buf_in);
-        buf_clear(&connection->buf_out);
+        libmygpio_socket_close(connection->fd);
+        libmygpio_buf_clear(&connection->buf_in);
+        libmygpio_buf_clear(&connection->buf_out);
         free(connection);
     }
 }
@@ -67,7 +68,7 @@ void mygpio_connection_free(struct t_mygpio_connection *connection) {
  * @param state state enum
  * @param message error message
  */
-void connection_set_state(struct t_mygpio_connection *connection,
+void libmygpio_connection_set_state(struct t_mygpio_connection *connection,
         enum mygpio_conn_state state, const char *message)
 {
     connection->state = state;
@@ -75,6 +76,7 @@ void connection_set_state(struct t_mygpio_connection *connection,
         free(connection->error);
     }
     if (message != NULL) {
+        LIBMYGPIO_LOG("Server error: %s", message);
         connection->error = strdup(message);
     }
     else {
@@ -109,7 +111,7 @@ bool mygpio_connection_clear_error(struct t_mygpio_connection *connection) {
     if (connection->state == MYGPIO_STATE_FATAL) {
         return false;
     }
-    connection_set_state(connection, MYGPIO_STATE_OK, NULL);
+    libmygpio_connection_set_state(connection, MYGPIO_STATE_OK, NULL);
     return true;
 }
 

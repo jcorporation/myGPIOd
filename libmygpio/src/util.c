@@ -22,7 +22,7 @@
  * @param max maximum value (including)
  * @return bool true on success, else false
  */
-bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max) {
+bool libmygpio_parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max) {
     errno = 0;
     uintmax_t v = strtoumax(str, rest, 10);
     if (errno == 0 && v >= min && v <= max) {
@@ -38,7 +38,7 @@ bool parse_uint(const char *str, unsigned *result, char **rest, unsigned min, un
  * @param result pointer for the result
  * @return bool true on success, else false
  */
-bool parse_uint64(const char *str, uint64_t *result) {
+bool libmygpio_parse_uint64(const char *str, uint64_t *result) {
     errno = 0;
     unsigned long long v = strtoull(str, NULL, 10);
     if (errno == 0) {
@@ -56,7 +56,7 @@ bool parse_uint64(const char *str, uint64_t *result) {
  * @param fmt format string
  * @param ... variadic arguments for format string
  */
-void log_log(const char *file, int line, const char *fmt, ...) {
+void libmygpio_log_log(const char *file, int line, const char *fmt, ...) {
     printf("%s:%d: ", file, line);
     va_list args;
     va_start(args, fmt);
@@ -66,6 +66,5 @@ void log_log(const char *file, int line, const char *fmt, ...) {
     va_end(args);
     #pragma GCC diagnostic pop
     printf("\n");
-
 }
 #endif
