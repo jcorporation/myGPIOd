@@ -1,20 +1,27 @@
 # myGPIOd
 
-myGPIOd is a very lightweight daemon to call scripts on GPIO events. It has no dependencies but the libgpiod2 library version 2.
+myGPIOd is a lightweight gpio controlling daemon. It is written in C and has no dependencies but the libgpiod2 library version 2.
 
-It is based on the gpiomon tool from [libgpiod](https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/)
+It consists of a daemon, a client library and a command line tool.
 
 ## Features
 
-- Call executables on GPIO events
-  - rising
-  - falling
-  - long press
-- Control the pull-up and pull-down bias
-- Set the output value of gpios
-- Simple socket server
-  - Set and get GPIO values
-  - Get notifications of GPIO events
+- **mygpiod - the daemon component**
+  - Call executables on GPIO events
+    - rising
+    - falling
+    - long press
+  - Set various gpio attributes (bias, debounce, ...)
+  - Set the output value of gpios
+  - Provides a unix socket with simple line-based text protocol
+    - List gpio configuration
+    - Set and get GPIO values
+    - Get notifications of GPIO events
+- **libmygpio - the client library**
+  - Simple C client library
+  - High level API
+- **mygpioc - the command line client**
+  - Connects to the mygpiod socket to control the various functions.
 
 ## Build Dependencies
 
@@ -40,7 +47,7 @@ make -C build
 
 myGPIOd needs rw access to the gpio chip device (e. g. /dev/gpiochip0).
 
-The `./build.sh` script creates a mygpiod user with the group gpio. The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
+The `./build.sh` script and the packages are creating a mygpiod system user with the group gpio. The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
 
 Adapt the configuration file `/etc/mygpiod.conf` to your needs.
 
@@ -102,6 +109,30 @@ action_falling = /usr/local/bin/poweroff.sh
 ```
 value = high
 ```
+
+## Protocol
+
+myGPIOd can be controlled and queried through a simple line-based text protocol.
+
+- [Protocol specification](PROTOCOL.md)
+
+```sh
+socat unix-client:/run/mygpiod/socket stdio
+```
+
+## Command line client
+
+The `mygpioc` command line client connects to the socket to control myGPIOd.
+
+```sh
+mygpioc -h
+```
+
+## Client library
+
+The client library is documented in the header files. You can use doxygen to create the html documentation locally.
+
+You can find a usage example [here](libmygpio/example/main.c)
 
 ## Copyright
 

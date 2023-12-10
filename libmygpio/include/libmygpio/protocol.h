@@ -13,6 +13,11 @@ struct t_mygpio_connection;
 
 #include <stdbool.h>
 
+/**
+ * Finishes reading the response from myGPIOd and empties the input buffer.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @return true on success, else false
+ */
 bool mygpio_response_end(struct t_mygpio_connection *connection);
 
 #endif

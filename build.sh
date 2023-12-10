@@ -47,16 +47,20 @@ check_cmd_silent() {
 
 setversion() {
   echo "Setting version to ${VERSION}"
+  TS=$(stat -c%Y CMakeLists.txt)
   export LC_TIME="en_GB.UTF-8"
-  
-  sed -e "s/__VERSION__/${VERSION}/g" contrib/packaging/alpine/APKBUILD.in > contrib/packaging/alpine/APKBUILD
-  sed -e "s/__VERSION__/${VERSION}/g" contrib/packaging/arch/PKGBUILD.in > contrib/packaging/arch/PKGBUILD
-  DATE=$(date +"%a %b %d %Y")
-  sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE__/$DATE/g" \
-    contrib/packaging/rpm/mygpiod.spec.in > contrib/packaging/rpm/mygpiod.spec
-  DATE=$(date +"%a, %d %b %Y %H:%m:%S %z")
-  sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE__/$DATE/g" \
-    contrib/packaging/debian/changelog.in > contrib/packaging/debian/changelog
+  DATE_F1=$(date --date=@"${TS}" +"%a %b %d %Y")
+  DATE_F2=$(date --date=@"${TS}" +"%a, %d %b %Y %H:%m:%S %z")
+  DATE_F3=$(date --date=@"${TS}" +"%d %b %Y")
+
+  for F in contrib/packaging/alpine/APKBUILD contrib/packaging/arch/PKGBUILD \
+      contrib/packaging/rpm/mygpiod.spec contrib/packaging/debian/changelog \
+      contrib/man/mygpiod.1 contrib/man/mygpioc.1
+  do
+    echo "$F"
+    sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE_F1__/$DATE_F1/g" -e "s/__DATE_F2__/$DATE_F2/g" \
+        -e "s/__DATE_F3__/$DATE_F3/g" "$F.in" > "$F"
+  done
 }
 
 buildrelease() {

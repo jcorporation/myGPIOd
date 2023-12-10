@@ -19,7 +19,7 @@
  * Creates a new connection and checks the initial server response
  * @param socket_path unix socket path to connect
  * @param timeout connection timeout in ms
- * @return allocated connection struct
+ * @return allocated connection struct or NULL if malloc fails
  */
 struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int timeout) {
     struct t_mygpio_connection *connection = malloc(sizeof(struct t_mygpio_connection));

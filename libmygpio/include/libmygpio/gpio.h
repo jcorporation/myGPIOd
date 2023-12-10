@@ -13,27 +13,69 @@
 
 struct t_mygpio_connection;
 
+/**
+ * The mode of a GPIO.
+ */
 enum mygpio_gpio_mode {
-    MYGPIO_GPIO_MODE_UNKNOWN = -1,
-    MYGPIO_GPIO_MODE_IN,
-    MYGPIO_GPIO_MODE_OUT
+    MYGPIO_GPIO_MODE_UNKNOWN = -1,  //!< Unknown state.
+    MYGPIO_GPIO_MODE_IN,            //!< Input mode, myGPIOd can read events from this GPIO.
+    MYGPIO_GPIO_MODE_OUT            //!< Output mode, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_HIGH or MYGPIO_GPIO_VALUE_LOW.
 };
 
+/**
+ * The value of an output GPIO.
+ */
 enum mygpio_gpio_value {
-    MYGPIO_GPIO_VALUE_UNKNOWN = -1,
-    MYGPIO_GPIO_VALUE_HIGH,
-    MYGPIO_GPIO_VALUE_LOW
+    MYGPIO_GPIO_VALUE_UNKNOWN = -1,  //!< Unknown state
+    MYGPIO_GPIO_VALUE_LOW,           //!< GPIO state is low
+    MYGPIO_GPIO_VALUE_HIGH           //!< GPIO state is high
 };
 
+/**
+ * Struct holding the configuration of a GPIO.
+ */
 struct t_mygpio_gpio_conf {
-    unsigned gpio;
-    enum mygpio_gpio_mode mode;
+    unsigned gpio;               //!< GPIO number
+    enum mygpio_gpio_mode mode;  //!< GPIO mode
 };
 
+/**
+ * Lists the modes of all configured GPIOs.
+ * Retrieve the list elements with mygpio_recv_gpio_conf and end the response with mygpio_response_end.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @return bool true on success, else false.
+ */
 bool mygpio_gpiolist(struct t_mygpio_connection *connection);
+
+/**
+ * Receives a list element of mygpio_gpiolist.
+ * Free it with mygpio_free_gpio_conf.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @return Allocated struct t_mygpio_gpio_conf or NULL on list end or error.
+ */
 struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *connection);
+
+/**
+ * Frees the struct received by mygpio_recv_gpio_conf.
+ * @param gpio_conf Pointer to struct mygpio_recv_gpio_conf.
+ */
 void mygpio_free_gpio_conf(struct t_mygpio_gpio_conf *gpio_conf);
+
+/**
+ * Returns the current value of a configured input GPIO.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @param gpio GPIO number
+ * @return Value of the GPIO or MYGPIO_GPIO_VALUE_UNKNOWN on error.
+ */
 enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, unsigned gpio);
+
+/**
+ * Sets the value of a configured output GPIO.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @param gpio GPIO number
+ * @param value Value to set: MYGPIO_GPIO_VALUE_LOW or MYGPIO_GPIO_VALUE_HIGH
+ * @return true on success, else false.
+ */
 bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value);
 
 #endif

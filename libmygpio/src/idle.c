@@ -43,7 +43,7 @@ bool mygpio_send_noidle(struct t_mygpio_connection *connection) {
  * Waits for an idle event
  * @param connection connection struct
  * @param timeout timeout in ms, use -1 to wait without a timeout
- * @return true if events are waiting, false on timeout
+ * @return true if events are waiting, false on timeout or polling has failed
  */
 bool mygpio_wait_idle(struct t_mygpio_connection *connection, int timeout) {
     struct pollfd pfds[1];

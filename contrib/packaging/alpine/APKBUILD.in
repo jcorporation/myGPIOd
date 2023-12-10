@@ -8,12 +8,12 @@
 pkgname=mygpiod
 pkgver=__VERSION__
 pkgrel=0
-pkgdesc="A small daemon to call scripts on GPIO events."
+pkgdesc="Lightweight gpio controlling daemon"
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
 license="GPL-3.0-or-later"
-depends="libgpiod"
-makedepends="cmake libgpiod-dev"
+depends=""
+makedepends="cmake"
 install="$pkgname.pre-install $pkgname.post-install"
 source="mygpiod_$pkgver.orig.tar.gz"
 builddir="$srcdir"
