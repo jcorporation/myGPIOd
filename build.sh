@@ -118,6 +118,7 @@ builddebug() {
   sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' debug/compile_commands.json > mygpiod/compile_commands.json
   cp mygpiod/compile_commands.json libmygpio
   cp mygpiod/compile_commands.json mygpioc
+  cp mygpiod/compile_commands.json mygpio-common
 }
 
 cleanup() {

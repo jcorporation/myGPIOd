@@ -7,9 +7,11 @@ libmygpio/compile_commands.json
 mygpiod/compile_commands.json
 mygpioc/compile_commands.json
 libmygpio/compile_commands.json
+mygpio-common/compile_commands.json
 .vscode
 clang-tidy.out
 libmygpio/.cache
 mygpioc/.cache
 mygpiod/.cache
+mygpio-common/.cache
 docs/doxygen

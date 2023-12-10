@@ -56,7 +56,7 @@ if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
 endif()
 
 # configure some files - version and path information
-configure_file(compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
+configure_file(mygpio-common/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
 configure_file(contrib/initscripts/mygpiod.service.in contrib/initscripts/mygpiod.service @ONLY)
 configure_file(contrib/initscripts/mygpiod.sysVinit.in contrib/initscripts/mygpiod.sysVinit @ONLY)
@@ -201,6 +201,7 @@ else()
 endif()
 
 # the main mygpio targets
+add_subdirectory("mygpio-common")
 add_subdirectory("libmygpio")
 add_subdirectory("mygpiod")
 add_subdirectory("mygpioc")

@@ -22,7 +22,13 @@ target_sources(mygpio
     src/util.c
 )
 
-set_target_properties(mygpio PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+set_target_properties(mygpio
+  PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR}
+)
+
+target_link_libraries(mygpio
+  mygpio-common
+)
 
 # Install shared library
 install(TARGETS mygpio

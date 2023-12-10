@@ -26,7 +26,8 @@ target_link_directories(mygpioc
 
 target_link_libraries(mygpioc
   PRIVATE
-    "mygpio"
+    mygpio
+    mygpio-common
 )
 
 install(TARGETS mygpioc DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})

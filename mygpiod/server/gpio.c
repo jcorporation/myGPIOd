@@ -7,6 +7,7 @@
 #include "compile_time.h"
 #include "mygpiod/server/gpio.h"
 
+#include "mygpio-common/util.h"
 #include "mygpiod/gpio/input.h"
 #include "mygpiod/gpio/output.h"
 #include "mygpiod/lib/util.h"
@@ -59,7 +60,7 @@ bool handle_gpioget(struct t_cmd_options *options, struct t_config *config, stru
         return false;
     }
     unsigned gpio;
-    if (parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
+    if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
         server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid gpio number");
         return false;
     }
@@ -90,7 +91,7 @@ bool handle_gpioset(struct t_cmd_options *options, struct t_config *config, stru
         return false;
     }
     unsigned gpio;
-    if (parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
+    if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
         server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid gpio number");
         return false;
     }

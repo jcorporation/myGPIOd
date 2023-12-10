@@ -7,6 +7,7 @@
 #include "compile_time.h"
 #include "mygpiod/lib/config.h"
 
+#include "mygpio-common/util.h"
 #include "mygpiod/event_loop/signal_handler.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
@@ -157,7 +158,7 @@ static bool config_read(struct t_config *config, sds config_file) {
         }
         unsigned gpio; 
         char *rest;
-        if (parse_uint(next_file->d_name, &gpio, &rest, 0, 99) == true) {
+        if (mygpio_parse_uint(next_file->d_name, &gpio, &rest, 0, 99) == true) {
             if (rest[0] == '.') {
                 rest++;
                 if (strcmp(rest, "in") == 0) {
@@ -234,7 +235,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         return true;
     }
     if (strcmp(key, "timeout") == 0) {
-        parse_int(value, &config->socket_timeout, NULL, 10, 120);
+        mygpio_parse_int(value, &config->socket_timeout, NULL, 10, 120);
         MYGPIOD_LOG_DEBUG("Setting timeout to \"%s\" seconds", config->dir_gpio);
         return true;
     }
@@ -335,7 +336,7 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         return true;
     }
     if (strcmp(key, "debounce") == 0) {
-        if (parse_ulong(value, &data->debounce_period_us, NULL, 0, UINT_MAX) == true) {
+        if (mygpio_parse_ulong(value, &data->debounce_period_us, NULL, 0, UINT_MAX) == true) {
             return true;
         }
     }
@@ -354,7 +355,7 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         return true;
     }
     if (strcmp(key, "long_press_timeout") == 0) {
-        if (parse_int(value, &data->long_press_timeout, NULL, 0, 9) == true) {
+        if (mygpio_parse_int(value, &data->long_press_timeout, NULL, 0, 9) == true) {
             return true;
         }
     }

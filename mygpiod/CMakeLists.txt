@@ -42,6 +42,10 @@ target_sources(mygpiod PRIVATE
   server/socket.c
 )
 
-target_link_libraries(mygpiod gpiod sds)
+target_link_libraries(mygpiod
+  gpiod
+  sds
+  mygpio-common
+)
 
 install(TARGETS mygpiod DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})

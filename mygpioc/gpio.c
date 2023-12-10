@@ -6,6 +6,8 @@
 
 #include "compile_time.h"
 #include "mygpioc/gpio.h"
+
+#include "mygpio-common/util.h"
 #include "mygpioc/util.h"
 
 #include <stdio.h>
@@ -50,7 +52,7 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
 int handle_gpioget(int argc, char **argv, int option_index, struct t_mygpio_connection *conn) {
     (void)argc;
     unsigned gpio;
-    if (parse_uint(argv[option_index], &gpio, 0, GPIOS_MAX) == false) {
+    if (mygpio_parse_uint(argv[option_index], &gpio, NULL, 0, GPIOS_MAX) == false) {
         fprintf(stderr, "Invalid gpio number\n");
         return EXIT_FAILURE;
     }
@@ -77,13 +79,13 @@ int handle_gpioget(int argc, char **argv, int option_index, struct t_mygpio_conn
 int handle_gpioset(int argc, char **argv, int option_index, struct t_mygpio_connection *conn) {
     (void)argc;
     unsigned gpio;
-    if (parse_uint(argv[option_index], &gpio, 0, GPIOS_MAX) == false) {
+    if (mygpio_parse_uint(argv[option_index], &gpio, NULL, 0, GPIOS_MAX) == false) {
         fprintf(stderr, "Invalid gpio number\n");
         return EXIT_FAILURE;
     }
     option_index++;
     unsigned value;
-    if (parse_uint(argv[option_index], &value, 0, 1) == false) {
+    if (mygpio_parse_uint(argv[option_index], &value, NULL, 0, 1) == false) {
         fprintf(stderr, "Invalid gpio value\n");
         return EXIT_FAILURE;
     }

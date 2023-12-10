@@ -7,7 +7,7 @@
 #include "libmygpio/include/libmygpio/idle.h"
 #include "libmygpio/src/pair.h"
 #include "libmygpio/src/protocol.h"
-#include "libmygpio/src/util.h"
+#include "mygpio-common/util.h"
 
 #include <assert.h>
 #include <poll.h>
@@ -69,7 +69,7 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
     struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "gpio") != 0 ||
-        libmygpio_parse_uint(pair->value, &gpio, NULL, 0, 99) == false)
+        mygpio_parse_uint(pair->value, &gpio, NULL, 0, 99) == false)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);
@@ -92,8 +92,8 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
 
     pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
-        strcmp(pair->name, "mode") != 0 ||
-        libmygpio_parse_uint64(pair->value, &timestamp) == false)
+        strcmp(pair->name, "time") != 0 ||
+        mygpio_parse_uint64(pair->value, &timestamp, NULL, 0, UINT64_MAX) == false)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);

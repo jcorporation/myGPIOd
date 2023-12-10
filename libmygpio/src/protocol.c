@@ -10,6 +10,7 @@
 #include "libmygpio/src/pair.h"
 #include "libmygpio/src/socket.h"
 #include "libmygpio/src/util.h"
+#include "mygpio-common/util.h"
 
 #include <assert.h>
 #include <stdarg.h>
@@ -126,17 +127,17 @@ bool mygpio_response_end(struct t_mygpio_connection *connection) {
  */
 static bool libmygpio_parse_version(const char *str, struct t_mygpio_connection *connection) {
     char *rest;
-    if (libmygpio_parse_uint(str, &connection->version[0], &rest, 0, 99) == false) {
+    if (mygpio_parse_uint(str, &connection->version[0], &rest, 0, 99) == false) {
         return false;
     }
     if (*rest != '.') { return false; }
     rest++;
-    if (libmygpio_parse_uint(rest, &connection->version[1], &rest, 0, 99) == false) {
+    if (mygpio_parse_uint(rest, &connection->version[1], &rest, 0, 99) == false) {
         return false;
     }
     if (*rest != '.') { return false; }
     rest++;
-    if (libmygpio_parse_uint(rest, &connection->version[2], &rest, 0, 99) == false) {
+    if (mygpio_parse_uint(rest, &connection->version[2], &rest, 0, 99) == false) {
         return false;
     }
     if (*rest != '\0') { return false; }

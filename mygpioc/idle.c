@@ -6,6 +6,7 @@
 
 #include "mygpioc/idle.h"
 
+#include "mygpio-common/util.h"
 #include "mygpioc/util.h"
 
 #include <limits.h>
@@ -23,7 +24,7 @@
 int handle_idle(int argc, char **argv, int option_index, struct t_mygpio_connection *conn) {
     int timeout = -1;
     if (argc == option_index + 1) {
-        if (parse_int(argv[option_index], &timeout, -1, INT_MAX) == false) {
+        if (mygpio_parse_int(argv[option_index], &timeout, NULL, -1, INT_MAX) == false) {
             fprintf(stderr, "Invalid timeout\n");
             return EXIT_FAILURE;
         }

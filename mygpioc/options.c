@@ -6,6 +6,8 @@
 
 #include "compile_time.h"
 #include "mygpioc/options.h"
+
+#include "mygpio-common/util.h"
 #include "mygpioc/util.h"
 
 #include <getopt.h>
@@ -55,7 +57,7 @@ void print_usage(void) {
  */
 int handle_options(int argc, char **argv, struct t_options *options) {
     int n = 0;
-    while ((n = getopt_long(argc, argv, "vhs:", long_options, NULL)) != -1) {
+    while ((n = getopt_long(argc, argv, "vhs:t:", long_options, NULL)) != -1) {
         switch(n) {
             case 'v':
                 verbose = true;
@@ -68,7 +70,8 @@ int handle_options(int argc, char **argv, struct t_options *options) {
                 options->socket = optarg;
                 break;
             case 't':
-                if (parse_int(optarg, &options->timeout, 1, 1000000) == false) {
+                if (mygpio_parse_int(optarg, &options->timeout, NULL, 1, 1000000) == false) {
+                    fprintf(stderr, "Invalid timeout\n");
                     print_usage();
                     exit(EXIT_FAILURE);
                 }

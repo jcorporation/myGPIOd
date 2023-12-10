@@ -9,7 +9,7 @@
 #include "libmygpio/include/libmygpio/protocol.h"
 #include "libmygpio/src/pair.h"
 #include "libmygpio/src/protocol.h"
-#include "libmygpio/src/util.h"
+#include "mygpio-common/util.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -44,7 +44,7 @@ struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *con
     struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "gpio") != 0 ||
-        libmygpio_parse_uint(pair->value, &gpio, NULL, 0, GPIOS_MAX) == false)
+        mygpio_parse_uint(pair->value, &gpio, NULL, 0, GPIOS_MAX) == false)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);
@@ -98,7 +98,7 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
         libmygpio_recv_response_status(connection) != true ||
         (pair = mygpio_recv_pair(connection)) == NULL ||
         strcmp(pair->name, "value") != 0 ||
-        libmygpio_parse_uint(pair->value, &value, NULL, 0, 1) == false)
+        mygpio_parse_uint(pair->value, &value, NULL, 0, 1) == false)
     {
         return MYGPIO_GPIO_VALUE_UNKNOWN;
     }
