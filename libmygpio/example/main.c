@@ -48,7 +48,11 @@ int main(int argc, char **argv) {
         struct t_mygpio_idle_event *event;
         // Retrieve the list of events
         while ((event = mygpio_recv_idle_event(conn)) != NULL) {
-            printf("GPIO %u, event %u, timestamp %llu\n", event->gpio, event->event, (unsigned long long)event->timestamp);
+            printf("GPIO %u, event %u, timestamp %llu\n",
+                mygpio_idle_event_get_gpio(event),
+                mygpio_idle_event_get_event(event),
+                (unsigned long long)mygpio_idle_event_get_timestamp(event)
+            );
             mygpio_free_idle_event(event);
         }
     }
@@ -70,7 +74,10 @@ int main(int argc, char **argv) {
         struct t_mygpio_gpio_conf *gpio_conf;
         printf("Retrieving gpio config\n");
         while ((gpio_conf = mygpio_recv_gpio_conf(conn)) != NULL) {
-            printf("GPIO %u, mode %u\n", gpio_conf->gpio, gpio_conf->mode);
+            printf("GPIO %u, mode %u\n", 
+                mygpio_gpio_conf_get_gpio(gpio_conf),
+                mygpio_gpio_conf_get_mode(gpio_conf)
+            );
             mygpio_free_gpio_conf(gpio_conf);
         }
     }

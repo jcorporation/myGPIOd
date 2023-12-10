@@ -4,8 +4,6 @@
  https://github.com/jcorporation/mympd
 */
 
-// Do not include this file directly, use libmygpio.h
-
 #ifndef MYGPIO_SRC_PAIR_H
 #define MYGPIO_SRC_PAIR_H
 

@@ -7,6 +7,8 @@
 #include "compile_time.h"
 #include "mygpioc/gpio.h"
 
+#include "libmygpio/include/libmygpio/libmygpio.h"
+
 #include "mygpio-common/util.h"
 #include "mygpioc/util.h"
 
@@ -30,7 +32,10 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
         struct t_mygpio_gpio_conf *gpio_conf;
         printf("Retrieving gpio config\n");
         while ((gpio_conf = mygpio_recv_gpio_conf(conn)) != NULL) {
-            printf("GPIO %u, mode %u\n", gpio_conf->gpio, gpio_conf->mode);
+            printf("GPIO %u, mode %u\n", 
+                mygpio_gpio_conf_get_gpio(gpio_conf),
+                mygpio_gpio_conf_get_mode(gpio_conf)
+            );
             mygpio_free_gpio_conf(gpio_conf);
         }
         mygpio_response_end(conn);

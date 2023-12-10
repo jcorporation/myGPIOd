@@ -25,13 +25,9 @@ enum mygpio_event {
 };
 
 /**
- * Struct holding the event information received by mygpio_recv_idle_event.
+ * Opaque struct holding the event information received by mygpio_recv_idle_event.
  */
-struct t_mygpio_idle_event {
-    unsigned gpio;            //<! GPIO number
-    enum mygpio_event event;  //<! the event
-    uint64_t timestamp;       //<! timestamp in nanoseconds
-};
+struct t_mygpio_idle_event;
 
 /**
  * Enters the myGPIOd idle mode to get notifications about events.
@@ -66,6 +62,27 @@ bool mygpio_wait_idle(struct t_mygpio_connection *connection, int timeout);
  * @return Allocated struct t_mygpio_idle_event or NULL on list end or error.
  */
 struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *connection);
+
+/**
+ * Returns the GPIO number from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return GPIO number.
+ */
+unsigned mygpio_idle_event_get_gpio(struct t_mygpio_idle_event *event);
+
+/**
+ * Returns the event type from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return The event type, one of enum mygpio_event.
+ */
+enum mygpio_event mygpio_idle_event_get_event(struct t_mygpio_idle_event *event);
+
+/**
+ * Returns the timestamp from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return The timestamp in nanoseconds
+ */
+uint64_t mygpio_idle_event_get_timestamp(struct t_mygpio_idle_event *event);
 
 /**
  * Frees the struct received by mygpio_recv_idle_event

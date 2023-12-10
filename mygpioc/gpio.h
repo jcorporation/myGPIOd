@@ -7,7 +7,7 @@
 #ifndef MYGPIOC_GPIO_H
 #define MYGPIOC_GPIO_H
 
-#include "libmygpio/include/libmygpio/libmygpio.h"
+struct t_mygpio_connection;
 
 int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);
 int handle_gpioget(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);

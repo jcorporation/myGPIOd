@@ -7,7 +7,7 @@
 #ifndef MYGPIOC_IDLE_H
 #define MYGPIOC_IDLE_H
 
-#include "libmygpio/include/libmygpio/libmygpio.h"
+struct t_mygpio_connection;
 
 int handle_idle(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);
 

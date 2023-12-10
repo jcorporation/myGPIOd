@@ -1,6 +1,6 @@
 # myGPIOd
 
-myGPIOd is a lightweight gpio controlling daemon. It is written in C and has no dependencies but the libgpiod2 library version 2.
+myGPIOd is a lightweight GPIO controlling daemon. It is written in C and has no dependencies but the libgpiod2 library version 2.
 
 It consists of a daemon, a client library and a command line tool.
 

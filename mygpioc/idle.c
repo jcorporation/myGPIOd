@@ -4,7 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+#include "compile_time.h"
 #include "mygpioc/idle.h"
+
+#include "libmygpio/include/libmygpio/libmygpio.h"
 
 #include "mygpio-common/util.h"
 #include "mygpioc/util.h"
@@ -38,7 +41,11 @@ int handle_idle(int argc, char **argv, int option_index, struct t_mygpio_connect
         verbose_printf("Events waiting");
         struct t_mygpio_idle_event *event;
         while ((event = mygpio_recv_idle_event(conn)) != NULL) {
-            printf("GPIO %u, event %u, timestamp %llu\n", event->gpio, event->event, (unsigned long long)event->timestamp);
+            printf("GPIO %u, event %u, timestamp %llu\n",
+                mygpio_idle_event_get_gpio(event),
+                mygpio_idle_event_get_event(event),
+                (unsigned long long)mygpio_idle_event_get_timestamp(event)
+            );
             mygpio_free_idle_event(event);
         }
         mygpio_response_end(conn);

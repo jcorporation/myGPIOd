@@ -32,12 +32,9 @@ enum mygpio_gpio_value {
 };
 
 /**
- * Struct holding the configuration of a GPIO.
+ * Opaque struct holding the configuration of a GPIO.
  */
-struct t_mygpio_gpio_conf {
-    unsigned gpio;               //!< GPIO number
-    enum mygpio_gpio_mode mode;  //!< GPIO mode
-};
+struct t_mygpio_gpio_conf;
 
 /**
  * Lists the modes of all configured GPIOs.
@@ -54,6 +51,20 @@ bool mygpio_gpiolist(struct t_mygpio_connection *connection);
  * @return Allocated struct t_mygpio_gpio_conf or NULL on list end or error.
  */
 struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *connection);
+
+/**
+ * Returns the GPIO number from struct t_mygpio_gpio_conf.
+ * @param gpio_conf Pointer to struct t_mygpio_gpio_conf.
+ * @return GPIO number. 
+ */
+unsigned mygpio_gpio_conf_get_gpio(struct t_mygpio_gpio_conf *gpio_conf);
+
+/**
+ * Returns the GPIO mode from struct t_mygpio_gpio_conf.
+ * @param gpio_conf Pointer to struct t_mygpio_gpio_conf.
+ * @return GPIO mode, one of enum mygpio_gpio_mode.
+ */
+enum mygpio_gpio_mode mygpio_gpio_conf_get_mode(struct t_mygpio_gpio_conf *gpio_conf);
 
 /**
  * Frees the struct received by mygpio_recv_gpio_conf.

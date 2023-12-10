@@ -5,6 +5,7 @@
 */
 
 #include "libmygpio/include/libmygpio/idle.h"
+#include "libmygpio/src/idle.h"
 #include "libmygpio/src/pair.h"
 #include "libmygpio/src/protocol.h"
 #include "mygpio-common/util.h"
@@ -57,7 +58,7 @@ bool mygpio_wait_idle(struct t_mygpio_connection *connection, int timeout) {
 }
 
 /**
- * Receveices an idle event
+ * Receives an idle event
  * @param connection connection struct
  * @return idle event or NULL on error or list end
  */
@@ -111,6 +112,33 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
 }
 
 /**
+ * Returns the GPIO number from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return GPIO number.
+ */
+unsigned mygpio_idle_event_get_gpio(struct t_mygpio_idle_event *event) {
+    return event->gpio;
+}
+
+/**
+ * Returns the event type from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return The event type, one of enum mygpio_event.
+ */
+enum mygpio_event mygpio_idle_event_get_event(struct t_mygpio_idle_event *event) {
+    return event->event;
+}
+
+/**
+ * Returns the timestamp from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return The timestamp in nanoseconds
+ */
+uint64_t mygpio_idle_event_get_timestamp(struct t_mygpio_idle_event *event) {
+    return event->timestamp;
+}
+
+/**
  * Frees the idle event struct
  * @param event struct to free
  */
@@ -121,7 +149,7 @@ void mygpio_free_idle_event(struct t_mygpio_idle_event *event) {
 // privat functions
 
 /**
- * Parses an string to a mygpio_event
+ * Parses a string to a mygpio_event
  * @param str string to parse
  * @return mygpio event
  */
