@@ -10,6 +10,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-bool parse_int(const char *str, int *result, char **rest, int min, int max);
+extern bool verbose;
+
+bool parse_int(const char *str, int *result, int min, int max);
+bool parse_uint(const char *str, unsigned *result, unsigned min, unsigned max);
+void verbose_printf(const char *fmt, ...);
 
 #endif

@@ -13,6 +13,8 @@ target_include_directories(mygpioc
 target_sources(mygpioc
   PRIVATE
     main.c
+    gpio.c
+    idle.c
     options.c
     util.c
 )

@@ -11,12 +11,13 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static struct option long_options[] = {
+    {"help",    no_argument,       0, 'h'},
     {"socket",  required_argument, 0, 's'},
     {"timeout", required_argument, 0, 't'},
-    {"help",    no_argument,       0, 'h'},
-    {"version", no_argument,       0, 'v'}
+    {"verbose", no_argument,       0, 'v'}
 };
 
 /**
@@ -26,15 +27,23 @@ static struct option long_options[] = {
  */
 void print_usage(void) {
     fprintf(stderr, "\nUsage: mygpioc [OPTIONS] <COMMAND> [<ARGUMENTS>]\n\n"
-                    "mygpioc %s\n"
+                    "myGPIOc %s\n"
                     "(c) 2020-2023 Juergen Mang <mail@jcgames.de>\n"
                     "https://github.com/jcorporation/myGPIOd\n\n"
                     "Options:\n"
-                    "  -s, --socket           path to myGPIOd socket\n"
-                    "  -t, --timeout          connection timeout in milliseconds\n"
-                    "  -h, --help             displays this help\n"
-                    "  -v, --version          displays this help\n",
-        MYGPIO_VERSION);
+                    "  -h, --help                Displays this help\n"
+                    "  -s, --socket              Path to myGPIOd socket\n"
+                    "  -t, --timeout             Connection timeout in milliseconds\n"
+                    "  -v, --verbose             Verbose output\n\n",
+        MYGPIO_VERSION
+    );
+    fprintf(stderr, "Commands:\n"
+                    "  gpioget <number>          Gets the current value of an input gpio\n"
+                    "  gpioset <number> <value>  Sets the value of an output gpio\n"
+                    "  gpiolist                  Lists all configured gpios with its modes\n"
+                    "  idle [<timeout>]          Waits for idle events, timeout is in milliseconds\n"
+                    "\n"
+    );
 }
 
 /**
@@ -49,14 +58,17 @@ int handle_options(int argc, char **argv, struct t_options *options) {
     while ((n = getopt_long(argc, argv, "vhs:", long_options, NULL)) != -1) {
         switch(n) {
             case 'v':
+                verbose = true;
+                break;
             case 'h':
                 print_usage();
                 exit(EXIT_SUCCESS);
+                break;
             case 's':
                 options->socket = optarg;
                 break;
             case 't':
-                if (parse_int(optarg, &options->timeout, NULL, 1, 1000000) == false) {
+                if (parse_int(optarg, &options->timeout, 1, 1000000) == false) {
                     print_usage();
                     exit(EXIT_FAILURE);
                 }
@@ -67,4 +79,22 @@ int handle_options(int argc, char **argv, struct t_options *options) {
         }
     }
     return optind;
+}
+
+/**
+ * Initializes the options struct
+ * @param options options to initialize
+ */
+void init_options(struct t_options *options) {
+    verbose = false;
+    options->timeout = 5000;
+    options->socket = strdup(CFG_SOCKET_PATH);
+}
+
+/**
+ * Clears the options struct
+ * @param options options to initialize
+ */
+void clear_options(struct t_options *options) {
+    free(options->socket);
 }
