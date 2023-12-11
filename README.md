@@ -64,7 +64,7 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
 | gpioset | `<gpio>` `<value>` | Sets the value of a GPIO. |
-| system | `<command>` | Executes a executeable or script in a new child process. |
+| system | `<command>` | Executes an executable or script in a new child process. |
 
 ## Example configuration
 

@@ -344,19 +344,19 @@ installdeps() {
   then
     #debian
     apt-get update
-    apt-get install -y --no-install-recommends gcc cmake build-essential libgpiod-dev
+    apt-get install -y --no-install-recommends gcc cmake build-essential
   elif [ -f /etc/arch-release ]
   then
     #arch
-    pacman -S gcc cmake libgpiod
+    pacman -S gcc cmake
   elif [ -f /etc/alpine-release ]
   then
     #alpine
-    apk add cmake alpine-sdk linux-headers libgpiod-dev
+    apk add cmake alpine-sdk linux-headers
   elif [ -f /etc/SuSE-release ]
   then
     #suse
-    zypper install gcc cmake unzip libgpiod-devel
+    zypper install gcc cmake unzip
   elif [ -f /etc/redhat-release ]
   then
     #fedora
