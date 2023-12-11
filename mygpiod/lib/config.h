@@ -22,12 +22,12 @@ struct t_gpio_in_data {
     bool active_low;                               //!< active state is low?
     unsigned long debounce_period_us;              //!< debounce period in microseconds
     enum gpiod_line_clock event_clock;             //!< the source clock for event timestamps
-    sds action_rising;                             //!< command for rising event
-    sds action_falling;                            //!< command for falling event
+    struct t_list action_rising;                   //!< command for rising event
+    struct t_list action_falling;                  //!< command for falling event
     enum gpiod_line_edge request_event;            //!< events to request for this gpio
     int gpio_fd;                                   //!< gpio file descriptor
     int long_press_timeout;                        //!< timeout for the long press handler
-    sds long_press_action;                         //!< long press command
+    struct t_list long_press_action;               //!< long press command
     enum gpiod_line_edge long_press_event;         //!< event for the long press handler
     bool ignore_event;                             //!< internal state for long press handler
     int timer_fd;                                  //!< timer file descriptor for long press handler

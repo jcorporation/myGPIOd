@@ -5,10 +5,12 @@
 */
 
 #include "compile_time.h"
+#include "mygpiod/actions/gpioset.h"
 #include "mygpiod/gpio/action.h"
 
 #include "mygpiod/actions/system.h"
 #include "mygpiod/gpio/input.h"
+#include "mygpiod/lib/action.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/log.h"
@@ -25,7 +27,7 @@
 
 // private definitions
 static void action_delay(struct t_gpio_in_data *data);
-static void action_execute(const char *action);
+static void action_execute(struct t_config *config, struct t_list *actions);
 
 // public functions
 
@@ -50,15 +52,15 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
     }
     if (event_type == GPIOD_EDGE_EVENT_FALLING_EDGE) {
         event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, timestamp);
-        if (sdslen(data->action_falling) > 0) {
+        if (data->action_falling.length > 0) {
             if (data->request_event == GPIOD_LINE_EDGE_FALLING ||
                 data->request_event == GPIOD_LINE_EDGE_BOTH)
             {
-                action_execute(data->action_falling);
+                action_execute(config, &data->action_falling);
             }
         }
         if (data->long_press_event == GPIOD_LINE_EDGE_FALLING &&
-            sdslen(data->long_press_action) > 0 &&
+            data->long_press_action.length > 0 &&
             data->long_press_timeout > 0)
         {
             action_delay(data);
@@ -66,15 +68,15 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
     }
     else {
         event_enqueue(config, gpio, MYGPIOD_EVENT_RISING, timestamp);
-        if (sdslen(data->action_rising) > 0) {
+        if (data->action_rising.length > 0) {
             if (data->request_event == GPIOD_LINE_EDGE_RISING ||
                 data->request_event == GPIOD_LINE_EDGE_BOTH)
             {
-                action_execute(data->action_rising);
+                action_execute(config, &data->action_rising);
             }
         }
         if (data->long_press_event == GPIOD_LINE_EDGE_RISING &&
-            sdslen(data->long_press_action) > 0 &&
+            data->long_press_action.length > 0 &&
             data->long_press_timeout > 0)
         {
             action_delay(data);
@@ -108,7 +110,7 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
         }
         uint64_t timestamp = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
         event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, timestamp);
-        action_execute(data->long_press_action);
+        action_execute(config, &data->long_press_action);
         if (data->request_event == GPIOD_LINE_EDGE_BOTH) {
             // ignore the release event
             data->ignore_event = true;
@@ -142,14 +144,25 @@ static void action_delay(struct t_gpio_in_data *data) {
 
 /**
  * Executes the action
- * @param action action to execute
+ * @param actions list of actions to execute
+ * @param option option for the action
  */
-static void action_execute(const char *action) {
-    MYGPIOD_LOG_INFO("Executing \"%s\"", action);
-    if (action[0] == '/') {
-        action_system(action);
-    }
-    else {
-        MYGPIOD_LOG_ERROR("Invalid action");
+static void action_execute(struct t_config *config, struct t_list *actions) {
+    struct t_list_node *current = actions->head;
+    while (current != NULL) {
+        struct t_action *action = (struct t_action *)current->data;
+        MYGPIOD_LOG_INFO("Executing %s: \"%s\"", lookup_action(action->action), action->option);
+        switch(action->action) {
+            case MYGPIOD_ACTION_SYSTEM:
+                action_system(action->option);
+                break;
+            case MYGPIOD_ACTION_GPIO_SET:
+                action_gpioset(config, action->option);
+                break;
+            default:
+                MYGPIOD_LOG_ERROR("Invalid action");
+                break;
+        }
+        current = current->next;
     }
 }

@@ -59,9 +59,12 @@ The `./build.sh` script installs a startup script for systemd, openrc or sysVini
 
 ## Actions
 
-The actions are executed in a separate child process. It must be an absolute path to an executable or a script.
+Each event can have multiple actions. Actions and its arguments are delimited by a colon, arguments are delimited by space.
 
-Some more actions will be added in future versions through plugins.
+| ACTION | ARGUMENTS | DESCRIPTION |
+| ------ | --------- | ----------- |
+| gpioset | `<gpio>` `<value>` | Sets the value of a GPIO. |
+| system | `<command>` | Executes a executeable or script in a new child process. |
 
 ## Example configuration
 
@@ -69,11 +72,13 @@ This example configuration does the following:
 
 - Configures gpio 3 as input:
   - Enables the pull-up resistor on start
-  - Calls `/usr/local/bin/reboot.sh` after a button press of 2 seconds length
-  - Calls `/usr/local/bin/poweroff.sh` on a short press
-- Configures gpio 3 as input:
+  - Sets GPIO 6 to low on rising event
+  - Sets GPIO 6 to high on falling event
+  - Calls `/usr/local/bin/reboot.sh` after a button press (falling) of 2 seconds length
+  - Calls `/usr/local/bin/poweroff.sh` on a short press (rising)
+- Configures gpio 4 as input:
   - Enables the pull-up resistor on start
-  - Calls `/usr/local/bin/poweroff.sh` on a short press
+  - Calls `/usr/local/bin/poweroff.sh` on a short press (falling)
 - Configures gpio 5 as output:
   - Sets the value to high on start
 
@@ -90,11 +95,14 @@ gpio_dir = /etc/mygpiod.d
 request_event = both
 active_low = false
 bias = pull-up
-action_rising = /usr/local/bin/poweroff.sh
+action_rising = gpioset:6 low
+action_rising = system:/usr/local/bin/poweroff.sh
+
+action_falling = gpioset:6 high
 
 long_press_event = falling
 long_press_timeout = 2
-long_press_action = /usr/local/bin/reboot.sh
+long_press_action = system:/usr/local/bin/reboot.sh
 ```
 
 **/etc/mygpiod.d/4.in**
@@ -102,12 +110,17 @@ long_press_action = /usr/local/bin/reboot.sh
 request_event = falling
 active_low = false
 bias = pull-up
-action_falling = /usr/local/bin/poweroff.sh
+action_falling = system:/usr/local/bin/poweroff.sh
 ```
 
 **/etc/mygpiod.d/5.out**
 ```
 value = high
+```
+
+**/etc/mygpiod.d/6.out**
+```
+value = low
 ```
 
 ## Protocol

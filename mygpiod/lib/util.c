@@ -9,12 +9,14 @@
 
 #include "dist/sds/sds.h"
 #include "mygpiod/lib/log.h"
+#include "mygpiod/lib/mem.h"
 
 #include <ctype.h>
 #include <errno.h>
 #include <gpiod.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -36,42 +38,63 @@ void close_fd(int *fd) {
  * @param s an already allocated sds string
  * @param fp a file descriptor to read from
  * @param max max line length to read
- * @return Number of bytes read or -1 on eof
+ * @param nread read bytes
+ * @return Pointer to s
  */
-int sds_getline(sds *s, FILE *fp, size_t max) {
-    sdsclear(*s);
+sds sds_getline(sds s, FILE *fp, size_t max, int *nread) {
+    sdsclear(s);
+    s = sdsMakeRoomFor(s, max + 1);
     for (size_t i = 0; i < max; i++) {
         int c = fgetc(fp);
         if (c == EOF ||
             c == '\n')
         {
-            sdstrim(*s, "\r \t");
-            return c == EOF ? -1 : (int)sdslen(*s);
+            s[i] = '\0';
+            sdstrim(s, "\r \t");
+            *nread = c == EOF
+                ? -1
+                : (int)sdslen(s);
+            return s;
         }
-        *s = sds_catchar(*s, (char)c);
+        s[i] = (char)c;
+        sdsinclen(s, 1);
     }
     MYGPIOD_LOG_ERROR("Line is too long, max length is %lu", (unsigned long)max);
-    sdstrim(*s, "\r \t");
-    return (int)sdslen(*s);
+    s[max] = '\0';
+    sdstrim(s, "\r \t");
+
+    *nread = (int)sdslen(s);
+    return s;
 }
 
 /**
- * Appends a char to sds string s, this is faster than using sdscatfmt
- * @param s sds string
- * @param c char to append
- * @return modified sds string
+ * Splits the string into two parts by first occurrence of sep.
+ * Trims whitespaces from start and end of the tokens
+ * @param s sds string to split
+ * @param sep separator char
+ * @param count pointer to populate the 
+ * @return allocated array of tokens or NULL on error
  */
-sds sds_catchar(sds s, const char c) {
-    // Make sure there is always space for at least 1 char.
-    if (sdsavail(s) == 0) {
-        s = sdsMakeRoomFor(s, 1);
+sds *sds_splitfirst(sds s, char sep, int *count) {
+    size_t len = sdslen(s);
+    sds *tokens = malloc_assert(sizeof(sds)*2);
+    size_t start = 0;
+    int elements = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (*(s + i) == sep) {
+            tokens[elements] = sdsnewlen(s, i);
+            sdstrim(tokens[elements], " \t");
+            elements++;
+            start = i + 1;
+            break;
+        }
     }
-    size_t i = sdslen(s);
-    s[i++] = c;
-    sdsinclen(s, 1);
-    // Add null-term
-    s[i] = '\0';
-    return s;
+
+    tokens[elements] = sdsnewlen(s + start, len - start);
+    sdstrim(tokens[elements], " \t");
+    elements++;
+    *count = elements;
+    return tokens;
 }
 
 /**

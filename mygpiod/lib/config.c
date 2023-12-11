@@ -9,6 +9,7 @@
 
 #include "mygpio-common/util.h"
 #include "mygpiod/event_loop/signal_handler.h"
+#include "mygpiod/lib/action.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
@@ -32,6 +33,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config);
 static bool parse_gpio_config_file(int mode, void *data, const char *dirname, const char *filename);
 static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_data *data);
 static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_data *data);
+static struct t_action *action_node_data_from_value(sds value);
 static struct t_gpio_in_data *gpio_in_data_new(void);
 static struct t_gpio_out_data *gpio_out_data_new(void);
 static void gpio_in_data_clear(struct t_gpio_in_data *data);
@@ -120,7 +122,9 @@ static bool config_read(struct t_config *config, sds config_file) {
     
     sds line = sdsempty();
     unsigned line_num = 0;
-    while (sds_getline(&line, fp, LINE_LENGTH_MAX) >= 0) {
+    int nread = 0;
+    while (nread >= 0) {
+        line = sds_getline(line, fp, LINE_LENGTH_MAX, &nread);
         line_num++;
         //ignore blank lines and comments
         if (line[0] == '#' ||
@@ -130,10 +134,8 @@ static bool config_read(struct t_config *config, sds config_file) {
         }
         MYGPIOD_LOG_DEBUG("Parsing line: \"%s\"", line);
         int count = 0;
-        sds *kv = sdssplitlen(line, (ssize_t)sdslen(line), "=", 1, &count);
+        sds *kv = sds_splitfirst(line, '=', &count);
         if (count == 2) {
-            sdstrim(kv[0], " \t");
-            sdstrim(kv[1], " \t");
             if (parse_config_file_kv(kv[0], kv[1], config) == false) {
                 MYGPIOD_LOG_WARN("Invalid config line #%u", line_num);
             }
@@ -236,7 +238,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     }
     if (strcmp(key, "timeout") == 0) {
         mygpio_parse_int(value, &config->socket_timeout, NULL, 10, 120);
-        MYGPIOD_LOG_DEBUG("Setting timeout to \"%s\" seconds", config->dir_gpio);
+        MYGPIOD_LOG_DEBUG("Setting timeout to \"%d\" seconds", config->socket_timeout);
         return true;
     }
     return false;
@@ -261,7 +263,9 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
     FREE_SDS(filepath);
     sds line = sdsempty();
     unsigned line_num = 0;
-    while (sds_getline(&line, fp, LINE_LENGTH_MAX) >= 0) {
+    int nread = 0;
+    while (nread >= 0) {
+        line = sds_getline(line, fp, LINE_LENGTH_MAX, &nread);
         line_num++;
         //ignore blank lines and comments
         if (line[0] == '#' ||
@@ -271,10 +275,8 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
         }
         MYGPIOD_LOG_DEBUG("Parsing line: \"%s\"", line);
         int count = 0;
-        sds *kv = sdssplitlen(line, (ssize_t)sdslen(line), "=", 1, &count);
+        sds *kv = sds_splitfirst(line, '=', &count);
         if (count == 2) {
-            sdstrim(kv[0], " \t");
-            sdstrim(kv[1], " \t");
             bool rc = mode == GPIOD_LINE_DIRECTION_OUTPUT
                 ? parse_gpio_config_file_out_kv(kv[0], kv[1], data)
                 : parse_gpio_config_file_in_kv(kv[0], kv[1], data);
@@ -345,14 +347,18 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         return true;
     }
     if (strcmp(key, "action_falling") == 0) {
-        sdsclear(data->action_falling);
-        data->action_falling = sdscatsds(data->action_falling, value);
-        return true;
+        struct t_action *action_data = action_node_data_from_value(value);
+        if (action_data != NULL) {
+            return list_push(&data->action_falling, data->action_falling.length, action_data);
+        }
+        return false;
     }
     if (strcmp(key, "action_rising") == 0) {
-        sdsclear(data->action_rising);
-        data->action_rising = sdscatsds(data->action_rising, value);
-        return true;
+        struct t_action *action_data = action_node_data_from_value(value);
+        if (action_data != NULL) {
+            return list_push(&data->action_rising, data->action_falling.length, action_data);
+        }
+        return false;
     }
     if (strcmp(key, "long_press_timeout") == 0) {
         if (mygpio_parse_int(value, &data->long_press_timeout, NULL, 0, 9) == true) {
@@ -364,11 +370,35 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         return true;
     }
     if (strcmp(key, "long_press_action") == 0) {
-        sdsclear(data->long_press_action);
-        data->long_press_action = sdscatsds(data->long_press_action, value);
-        return true;
+        struct t_action *action_data = action_node_data_from_value(value);
+        if (action_data != NULL) {
+            return list_push(&data->long_press_action, data->action_falling.length, action_data);
+        }
+        return false;
     }
     return false;
+}
+
+/**
+ * Splits the action from the action option string.
+ * @param value string to split.
+ * @return allocated t_action struct or NULL on error.
+ */
+static struct t_action *action_node_data_from_value(sds value) {
+    int count = 0;
+    sds *kv = sds_splitfirst(value, ':', &count);
+    struct t_action *data = NULL;
+    if (count == 2) {
+        enum mygpiod_actions action = parse_action(kv[0]);
+        if (action != MYGPIOD_ACTION_UNKNOWN) {
+            data = action_node_data_new(action, kv[1]);
+        }
+        else {
+            MYGPIOD_LOG_WARN("Invalid action: %s", value);
+        }
+    }
+    sdsfreesplitres(kv, count);
+    return data;
 }
 
 /**
@@ -378,10 +408,10 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
 static struct t_gpio_in_data *gpio_in_data_new(void) {
     struct t_gpio_in_data *data = malloc_assert(sizeof(struct t_gpio_in_data));
     data->request_event = GPIOD_LINE_EDGE_RISING;
-    data->action_rising = sdsempty();
-    data->action_falling = sdsempty();
+    list_init(&data->action_rising);
+    list_init(&data->action_falling);
     data->long_press_timeout = 0;
-    data->long_press_action = sdsempty();
+    list_init(&data->long_press_action);
     data->long_press_event = GPIOD_LINE_EDGE_FALLING;
     data->ignore_event = false;
     data->timer_fd = -1;
@@ -407,9 +437,9 @@ static void gpio_in_data_clear(struct t_gpio_in_data *data) {
     if (data->event_buffer != NULL) {
         gpiod_edge_event_buffer_free(data->event_buffer);
     }
-    FREE_SDS(data->action_falling);
-    FREE_SDS(data->action_rising);
-    FREE_SDS(data->long_press_action);
+    list_clear(&data->action_falling, node_data_action_clear);
+    list_clear(&data->action_rising, node_data_action_clear);
+    list_clear(&data->long_press_action, node_data_action_clear);
 }
 
 /**

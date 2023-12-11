@@ -20,8 +20,8 @@
 } while (0)
 
 void close_fd(int *fd);
-int sds_getline(sds *s, FILE *fp, size_t max);
-sds sds_catchar(sds s, const char c);
+sds sds_getline(sds s, FILE *fp, size_t max, int *nread);
+sds *sds_splitfirst(sds s, char sep, int *count);
 const char *lookup_gpio_value(enum gpiod_line_value value);
 enum gpiod_line_value parse_gpio_value(const char *str);
 bool parse_bool(const char *str);

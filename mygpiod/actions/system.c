@@ -15,16 +15,13 @@
 #include <unistd.h>
 
 /**
- * Runs an executable or script
+ * Runs an executable or script in a new process
  * @param cmd command to execute
  */
-void action_system(const char *cmd) {
+bool action_system(const char *cmd) {
     errno = 0;
     int rc = fork();
-    if (rc == -1) {
-        MYGPIOD_LOG_ERROR("Could not fork: %s", strerror(errno));
-    }
-    else if (rc == 0) {
+    if (rc == 0) {
         // this is the child process
         errno = 0;
         execl(cmd, cmd, (char *)NULL);
@@ -33,6 +30,11 @@ void action_system(const char *cmd) {
         exit(EXIT_FAILURE);
     }
     else {
+        if (rc == -1) {
+            MYGPIOD_LOG_ERROR("Could not fork: %s", strerror(errno));
+            return false;
+        }
         MYGPIOD_LOG_DEBUG("Forked process with id %d", rc);
+        return true;
     }
 }
