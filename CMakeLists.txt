@@ -33,8 +33,8 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "")
 set(CMAKE_C_FLAGS_MINSIZEREL "")
 
 # available options
-option(MYMPD_DOC "Installs documentation, default ON" "ON")
-option(MYMPD_MANPAGES "Creates and installs manpages" "ON")
+option(MYGPIOD_DOC "Installs documentation, default ON" "ON")
+option(MYGPIOD_MANPAGES "Creates and installs manpages" "ON")
 option(MYGPIOD_STARTUP_SCRIPT "Installs the startup script, default ON" "ON")
 # sanitizer options
 option(MYGPIOD_ENABLE_ASAN "Enables build with address sanitizer, default OFF" "OFF")

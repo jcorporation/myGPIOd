@@ -17,6 +17,7 @@ makedepends="cmake"
 install="$pkgname.pre-install $pkgname.post-install"
 source="mygpiod_$pkgver.orig.tar.gz"
 builddir="$srcdir"
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-doc"
 options="!check"
 #no test suite
 
