@@ -123,8 +123,7 @@ static bool config_read(struct t_config *config, sds config_file) {
     sds line = sdsempty();
     unsigned line_num = 0;
     int nread = 0;
-    while (nread >= 0) {
-        line = sds_getline(line, fp, LINE_LENGTH_MAX, &nread);
+    while ((line = sds_getline(line, fp, LINE_LENGTH_MAX, &nread)) && nread >= 0) {
         line_num++;
         //ignore blank lines and comments
         if (line[0] == '#' ||
@@ -264,8 +263,7 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
     sds line = sdsempty();
     unsigned line_num = 0;
     int nread = 0;
-    while (nread >= 0) {
-        line = sds_getline(line, fp, LINE_LENGTH_MAX, &nread);
+    while ((line = sds_getline(line, fp, LINE_LENGTH_MAX, &nread)) && nread >= 0) {
         line_num++;
         //ignore blank lines and comments
         if (line[0] == '#' ||
