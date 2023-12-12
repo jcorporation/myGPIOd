@@ -32,15 +32,14 @@ static bool libmygpio_parse_version(const char *str, struct t_mygpio_connection 
  * @return true on success, else false
  */
 bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
-    //TODO: resize buffer if it is to small.
     va_list args;
     va_start(args, fmt);
-    int written = vsnprintf(connection->buf_out.buffer, connection->buf_out.capacity, fmt, args);
+    int written = vsnprintf(connection->buf_out.buffer, BUFFER_SIZE_MAX, fmt, args);
     va_end(args);
     if (written <= 0 ||
-        written >= (int)connection->buf_out.capacity)
+        written >= BUFFER_SIZE_MAX)
     {
-        libmygpio_buf_clear(&connection->buf_out);
+        libmygpio_buf_init(&connection->buf_out);
         libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Buffer write error");
         return false;
     }

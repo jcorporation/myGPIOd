@@ -56,8 +56,6 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int t
 void mygpio_connection_free(struct t_mygpio_connection *connection) {
     if (connection != NULL) {
         libmygpio_socket_close(connection->fd);
-        libmygpio_buf_clear(&connection->buf_in);
-        libmygpio_buf_clear(&connection->buf_out);
         free(connection);
     }
 }

@@ -64,7 +64,7 @@ void libmygpio_socket_close(int fd) {
  * @return true on success, else false
  */
 bool libmygpio_socket_recv_line(int fd, struct t_buf *buf, int timeout) {
-    libmygpio_buf_reset(buf);
+    libmygpio_buf_init(buf);
     ssize_t nread;
     int flag = 0;
 
@@ -82,22 +82,16 @@ bool libmygpio_socket_recv_line(int fd, struct t_buf *buf, int timeout) {
 
     while ((nread = recv(fd, buf->buffer + buf->len, 1, flag)) > 0) {
         buf->len += nread;
-        if (buf->len == buf->capacity) {
-            buf->capacity += BUFFER_SIZE_INIT;
-            if (buf->capacity > BUFFER_SIZE_MAX) {
-                return false;
-            }
-            char *new_buf = realloc(buf->buffer, buf->capacity);
-            assert(new_buf);
-            buf->buffer = new_buf;
-        }
-        buf->buffer[buf->len] = '\0';
         if (buf->buffer[buf->len - 1] == '\n') {
-            buf->buffer[buf->len - 1] = '\0';
             buf->len--;
+            buf->buffer[buf->len] = '\0';
             return true;
         }
+        if (buf->len == BUFFER_SIZE_MAX) {
+            break;
+        }
     }
+    buf->buffer[buf->len - 1] = '\0';
     return false;
 }
 
@@ -114,19 +108,19 @@ bool libmygpio_socket_send_line(int fd, struct t_buf *buf) {
     size_t max_bytes = buf->len;
     while ((nwrite = write(fd, buf->buffer + written, max_bytes)) > 0) {
         if (nwrite < 0) {
-            libmygpio_buf_reset(buf);
+            libmygpio_buf_init(buf);
             return false;
         }
         written += (size_t)nwrite;
         max_bytes = buf->len - written;
         if (written == buf->len) {
-            libmygpio_buf_reset(buf);
+            libmygpio_buf_init(buf);
             if (write(fd, "\n", 1) != 1) {
                 return false;
             }
             return true;
         }
     }
-    libmygpio_buf_reset(buf);
+    libmygpio_buf_init(buf);
     return false;
 }

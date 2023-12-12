@@ -9,17 +9,16 @@
 
 #include <stddef.h>
 
-#define BUFFER_SIZE_INIT 256
-#define BUFFER_SIZE_MAX 2048
+#define BUFFER_SIZE_MAX 1025
 
+/**
+ * Struct for input and output buffers
+ */
 struct t_buf {
-    char *buffer;
-    size_t len;
-    size_t capacity;
+    char buffer[BUFFER_SIZE_MAX]; //!< the buffer
+    size_t len;                   //!< current size
 };
 
 void libmygpio_buf_init(struct t_buf *buf);
-void libmygpio_buf_reset(struct t_buf *buf);
-void libmygpio_buf_clear(struct t_buf *buf);
 
 #endif

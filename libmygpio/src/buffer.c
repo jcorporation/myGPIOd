@@ -14,26 +14,6 @@
  * @param buf 
  */
 void libmygpio_buf_init(struct t_buf *buf) {
-    buf->buffer = malloc(BUFFER_SIZE_INIT);
-    assert(buf->buffer);
     buf->buffer[0] = '\0';
     buf->len = 0;
-    buf->capacity = BUFFER_SIZE_INIT;
-}
-
-/**
- * Resets the buffer struct
- * @param buf 
- */
-void libmygpio_buf_reset(struct t_buf *buf) {
-    buf->buffer[0] = '\0';
-    buf->len = 0;
-}
-
-/**
- * Clears the buffer struct
- * @param buf 
- */
-void libmygpio_buf_clear(struct t_buf *buf) {
-    free(buf->buffer);
 }
