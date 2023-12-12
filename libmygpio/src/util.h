@@ -13,6 +13,8 @@
 #ifdef MYGPIOD_DEBUG
     #define LIBMYGPIO_LOG(...) libmygpio_log_log(__FILE__, __LINE__, __VA_ARGS__)
     void libmygpio_log_log(const char *file, int line, const char *fmt, ...);
+#else
+    #define LIBMYGPIO_LOG(...)
 #endif
 
 #endif
