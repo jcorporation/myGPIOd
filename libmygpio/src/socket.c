@@ -8,8 +8,9 @@
 
 #include <assert.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <stdlib.h>
-#include <sys/poll.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
