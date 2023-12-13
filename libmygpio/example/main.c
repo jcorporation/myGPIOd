@@ -48,10 +48,10 @@ int main(int argc, char **argv) {
         struct t_mygpio_idle_event *event;
         // Retrieve the list of events
         while ((event = mygpio_recv_idle_event(conn)) != NULL) {
-            printf("GPIO %u, event %u, timestamp %llu\n",
+            printf("GPIO %u, event %u, timestamp %llu ms\n",
                 mygpio_idle_event_get_gpio(event),
                 mygpio_idle_event_get_event(event),
-                (unsigned long long)mygpio_idle_event_get_timestamp(event)
+                (unsigned long long)mygpio_idle_event_get_timestamp_ms(event)
             );
             mygpio_free_idle_event(event);
         }

@@ -15,7 +15,7 @@
 struct t_mygpio_idle_event {
     unsigned gpio;            //<! GPIO number
     enum mygpio_event event;  //<! the event
-    uint64_t timestamp;       //<! timestamp in nanoseconds
+    uint64_t timestamp_ms;       //<! timestamp in milliseconds
 };
 
 #endif

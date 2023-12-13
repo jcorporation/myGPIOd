@@ -25,6 +25,20 @@ enum mygpio_event {
 };
 
 /**
+ * Parses a string to the event type.
+ * @param str String to parse
+ * @return enum mygpio_event
+ */
+enum mygpio_event libmygpio_parse_event(const char *str);
+
+/**
+ * Lookups the name for the event.
+ * @param event event type
+ * @return Event name as string
+ */
+const char *libmygpio_lookup_event(enum mygpio_event event);
+
+/**
  * Opaque struct holding the event information received by mygpio_recv_idle_event.
  */
 struct t_mygpio_idle_event;
@@ -78,11 +92,18 @@ unsigned mygpio_idle_event_get_gpio(struct t_mygpio_idle_event *event);
 enum mygpio_event mygpio_idle_event_get_event(struct t_mygpio_idle_event *event);
 
 /**
+ * Returns the event type name from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return The event type name
+ */
+const char *mygpio_idle_event_get_event_name(struct t_mygpio_idle_event *event);
+
+/**
  * Returns the timestamp from an idle event.
  * @param event Pointer to struct t_mygpio_idle_event.
- * @return The timestamp in nanoseconds
+ * @return The timestamp in milliseconds.
  */
-uint64_t mygpio_idle_event_get_timestamp(struct t_mygpio_idle_event *event);
+uint64_t mygpio_idle_event_get_timestamp_ms(struct t_mygpio_idle_event *event);
 
 /**
  * Frees the struct received by mygpio_recv_idle_event

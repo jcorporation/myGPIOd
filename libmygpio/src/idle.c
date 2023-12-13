@@ -15,11 +15,42 @@
 #include <stdlib.h>
 #include <string.h>
 
-// private definitions
+/**
+ * Parses a string to the event type.
+ * @param str String to parse
+ * @return enum mygpio_event
+ */
+enum mygpio_event libmygpio_parse_event(const char *str) {
+    if (strcmp(str, "falling") == 0) {
+        return MYGPIO_EVENT_FALLING;
+    }
+    if (strcmp(str, "rising") == 0) {
+        return MYGPIO_EVENT_RISING;
+    }
+    if (strcmp(str, "long_press") == 0) {
+        return MYGPIO_EVENT_LONG_PRESS;
+    }
+    return MYGPIO_EVENT_UNKNOWN;
+}
 
-static enum mygpio_event libmygpio_parse_event(const char *str);
-
-// public functions
+/**
+ * Lookups the name for the event.
+ * @param event event type
+ * @return Event name as string
+ */
+const char *libmygpio_lookup_event(enum mygpio_event event) {
+    switch(event) {
+        case MYGPIO_EVENT_FALLING:
+            return "falling";
+        case MYGPIO_EVENT_RISING:
+            return "rising";
+        case MYGPIO_EVENT_LONG_PRESS:
+            return "long_press";
+        case MYGPIO_EVENT_UNKNOWN:
+            return "unknown";
+    }
+    return "unknown";
+}
 
 /**
  * Sends the idle command
@@ -93,7 +124,7 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
 
     pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
-        strcmp(pair->name, "time") != 0 ||
+        strcmp(pair->name, "timestamp_ms") != 0 ||
         mygpio_parse_uint64(pair->value, &timestamp, NULL, 0, UINT64_MAX) == false)
     {
         if (pair != NULL) {
@@ -107,7 +138,7 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
     assert(gpio_event);
     gpio_event->gpio = gpio;
     gpio_event->event = event;
-    gpio_event->timestamp = timestamp;
+    gpio_event->timestamp_ms = timestamp;
     return gpio_event;
 }
 
@@ -130,12 +161,21 @@ enum mygpio_event mygpio_idle_event_get_event(struct t_mygpio_idle_event *event)
 }
 
 /**
+ * Returns the event type name from an idle event.
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return The event type name
+ */
+const char *mygpio_idle_event_get_event_name(struct t_mygpio_idle_event *event) {
+    return libmygpio_lookup_event(event->event);
+}
+
+/**
  * Returns the timestamp from an idle event.
  * @param event Pointer to struct t_mygpio_idle_event.
- * @return The timestamp in nanoseconds
+ * @return The timestamp in milliseconds.
  */
-uint64_t mygpio_idle_event_get_timestamp(struct t_mygpio_idle_event *event) {
-    return event->timestamp;
+uint64_t mygpio_idle_event_get_timestamp_ms(struct t_mygpio_idle_event *event) {
+    return event->timestamp_ms;
 }
 
 /**
@@ -144,24 +184,4 @@ uint64_t mygpio_idle_event_get_timestamp(struct t_mygpio_idle_event *event) {
  */
 void mygpio_free_idle_event(struct t_mygpio_idle_event *event) {
     free(event);
-}
-
-// privat functions
-
-/**
- * Parses a string to a mygpio_event
- * @param str string to parse
- * @return mygpio event
- */
-static enum mygpio_event libmygpio_parse_event(const char *str) {
-    if (strcmp(str, "falling") == 0) {
-        return MYGPIO_EVENT_FALLING;
-    }
-    if (strcmp(str, "rising") == 0) {
-        return MYGPIO_EVENT_RISING;
-    }
-    if (strcmp(str, "long_press") == 0) {
-        return MYGPIO_EVENT_LONG_PRESS;
-    }
-    return MYGPIO_EVENT_UNKNOWN;
 }

@@ -65,7 +65,7 @@ bool send_idle_events(struct t_list_node *client_node) {
         struct t_event_data *event_data = (struct t_event_data *)current->data;
         server_response_append(client_data, "gpio:%u", current->id);
         server_response_append(client_data, "event:%s", mygpiod_event_name(event_data->mygpiod_event_type));
-        server_response_append(client_data, "time:%llu", (long long unsigned)event_data->timestamp);
+        server_response_append(client_data, "timestamp_ms:%llu", (long long unsigned)event_data->timestamp / 1000000);
         current = current -> next;
     }
     list_clear(&client_data->waiting_events, event_data_clear);

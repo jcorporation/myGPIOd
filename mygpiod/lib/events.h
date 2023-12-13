@@ -24,7 +24,7 @@ enum mygpiod_event_types {
  */
 struct t_event_data {
     enum mygpiod_event_types mygpiod_event_type;  //!< the myGPIOd event type
-    uint64_t timestamp;                           //!< timestamp of the event
+    uint64_t timestamp;                           //!< timestamp of the event in nanoseconds
 };
 
 void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_types event_type,
