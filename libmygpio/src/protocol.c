@@ -109,10 +109,10 @@ bool libmygpio_recv_version(struct t_mygpio_connection *connection) {
 bool mygpio_response_end(struct t_mygpio_connection *connection) {
     while (strcmp(connection->buf_in.buffer, "END") != 0) {
         if (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, 0) == false) {
-            libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Reading response failed");
             return false;
         }
     }
+    libmygpio_buf_init(&connection->buf_in);
     return true;
 }
 

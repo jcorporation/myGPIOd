@@ -180,8 +180,8 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
     }
     char command[11];
     snprintf(command, 11, "gpioget %u", gpio);
-    if (libmygpio_send_line(connection, command) != true ||
-        libmygpio_recv_response_status(connection) != true ||
+    if (libmygpio_send_line(connection, command) == false ||
+        libmygpio_recv_response_status(connection) == false ||
         (pair = mygpio_recv_pair(connection)) == NULL ||
         strcmp(pair->name, "value") != 0 ||
         mygpio_parse_uint(pair->value, &value, NULL, 0, 1) == false)
