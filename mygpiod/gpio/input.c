@@ -105,7 +105,7 @@ bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in
 }
 
 /**
- * Gets the current line value of a input gpio
+ * Gets the current line value of an input gpio
  * @param config pointer to config
  * @param gpio gpio to get the value
  * @return the active state
@@ -113,6 +113,7 @@ bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in
 enum gpiod_line_value gpio_get_value(struct t_config *config, unsigned gpio) {
     struct t_list_node *node = list_node_by_id(&config->gpios_in, gpio);
     if (node == NULL) {
+        MYGPIOD_LOG_ERROR("GPIO %u is not configured as input", gpio);
         return GPIOD_LINE_VALUE_ERROR;
     }
     struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;

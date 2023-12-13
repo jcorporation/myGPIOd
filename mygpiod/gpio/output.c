@@ -7,7 +7,6 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/output.h"
 
-#include "mygpiod/gpio/action.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
@@ -93,7 +92,7 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
 }
 
 /**
- * Sets the current line value of a output gpio
+ * Sets the current line value of an output gpio
  * @param config pointer to config
  * @param gpio gpio to set the value
  * @param value value to set
@@ -102,6 +101,7 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
 bool gpio_set_value(struct t_config *config, unsigned gpio, enum gpiod_line_value value) {
     struct t_list_node *node = list_node_by_id(&config->gpios_in, gpio);
     if (node == NULL) {
+        MYGPIOD_LOG_ERROR("GPIO %u is not configured as output", gpio);
         return false;
     }
     struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
