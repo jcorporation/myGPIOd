@@ -32,9 +32,9 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
         struct t_mygpio_gpio_conf *gpio_conf;
         printf("Retrieving gpio config\n");
         while ((gpio_conf = mygpio_recv_gpio_conf(conn)) != NULL) {
-            printf("GPIO %u, mode %u\n", 
+            printf("GPIO %u, mode %s\n",
                 mygpio_gpio_conf_get_gpio(gpio_conf),
-                mygpio_gpio_conf_get_mode(gpio_conf)
+                mygpio_gpio_lookup_mode(mygpio_gpio_conf_get_mode(gpio_conf))
             );
             mygpio_free_gpio_conf(gpio_conf);
         }
@@ -68,7 +68,7 @@ int handle_gpioget(int argc, char **argv, int option_index, struct t_mygpio_conn
         mygpio_response_end(conn);
         return EXIT_FAILURE;
     }
-    printf("Value: %u\n", value);
+    printf("Value: %s\n", mygpio_gpio_lookup_value(value));
     mygpio_response_end(conn);
     return EXIT_SUCCESS;
 }
@@ -89,8 +89,8 @@ int handle_gpioset(int argc, char **argv, int option_index, struct t_mygpio_conn
         return EXIT_FAILURE;
     }
     option_index++;
-    unsigned value;
-    if (mygpio_parse_uint(argv[option_index], &value, NULL, 0, 1) == false) {
+    enum mygpio_gpio_value value;
+    if ((value = mygpio_parse_gpio_value(argv[option_index])) == MYGPIO_GPIO_VALUE_UNKNOWN) {
         fprintf(stderr, "Invalid gpio value\n");
         return EXIT_FAILURE;
     }

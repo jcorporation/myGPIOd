@@ -23,6 +23,20 @@ enum mygpio_gpio_mode {
 };
 
 /**
+ * Lookups the name for the gpio mode.
+ * @param mode the gpio mode.
+ * @return gpio mode name
+ */
+const char *mygpio_gpio_lookup_mode(enum mygpio_gpio_mode mode);
+
+/**
+ * Parses a string to the gpio mode.
+ * @param str string to parse
+ * @return mode of the gpio
+ */
+enum mygpio_gpio_mode parse_gpio_mode(const char *str);
+
+/**
  * The value of an output GPIO.
  */
 enum mygpio_gpio_value {
@@ -30,6 +44,20 @@ enum mygpio_gpio_value {
     MYGPIO_GPIO_VALUE_LOW,           //!< GPIO state is low
     MYGPIO_GPIO_VALUE_HIGH           //!< GPIO state is high
 };
+
+/**
+ * Lookups the name for the gpio value.
+ * @param value the gpio value.
+ * @return gpio value name
+ */
+const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value);
+
+/**
+ * Parses a string to a gpio value.
+ * @param str string to parse
+ * @return gpio value or GPIO_VALUE_UNKNOWN on error
+ */
+enum mygpio_gpio_value mygpio_parse_gpio_value(const char *str);
 
 /**
  * Opaque struct holding the configuration of a GPIO.

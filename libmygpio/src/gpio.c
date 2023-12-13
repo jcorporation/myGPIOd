@@ -17,11 +17,76 @@
 #include <stdlib.h>
 #include <string.h>
 
-// private definitions
+/**
+ * Lookups the name for the gpio mode.
+ * @param mode the gpio mode.
+ * @return gpio mode name
+ */
+const char *mygpio_gpio_lookup_mode(enum mygpio_gpio_mode mode) {
+    switch(mode) {
+        case MYGPIO_GPIO_MODE_IN:
+            return "in";
+        case MYGPIO_GPIO_MODE_OUT:
+            return "out";
+        case MYGPIO_GPIO_MODE_UNKNOWN:
+            return "unknown";
+    }
+    return "unknown";
+}
 
-static enum mygpio_gpio_mode parse_gpio_mode(const char *str);
+/**
+ * Parses a string to the gpio mode.
+ * @param str string to parse
+ * @return mode of the gpio
+ */
+enum mygpio_gpio_mode parse_gpio_mode(const char *str) {
+    if (strcmp(str, "in") == 0) {
+        return MYGPIO_GPIO_MODE_IN;
+    }
+    if (strcmp(str, "out") == 0) {
+        return MYGPIO_GPIO_MODE_OUT;
+    }
+    return MYGPIO_GPIO_MODE_UNKNOWN;
+}
 
-// public functions
+
+/**
+ * Lookups the name for the gpio value.
+ * @param value the gpio value.
+ * @return gpio value name
+ */
+const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value) {
+    switch(value) {
+        case MYGPIO_GPIO_VALUE_HIGH:
+            return "high";
+        case MYGPIO_GPIO_VALUE_LOW:
+            return "low";
+        case MYGPIO_GPIO_VALUE_UNKNOWN:
+            return "unknown";
+    }
+    return "unknown";
+}
+
+/**
+ * Parses a string to a gpio value.
+ * @param str string to parse
+ * @return gpio value or GPIO_VALUE_LOW on error
+ */
+enum mygpio_gpio_value mygpio_parse_gpio_value(const char *str) {
+    if (strcasecmp(str, "active") == 0 ||
+        strcasecmp(str, "high") == 0 ||
+        strcmp(str, "1") == 0)
+    {
+        return MYGPIO_GPIO_VALUE_HIGH;
+    }
+    if (strcasecmp(str, "inactive") == 0 ||
+        strcasecmp(str, "low") == 0 ||
+        strcmp(str, "0") == 0)
+    {
+        return MYGPIO_GPIO_VALUE_LOW;
+    }
+    return MYGPIO_GPIO_VALUE_UNKNOWN;
+}
 
 /**
  * Send the gpiolist command and receives the status
@@ -129,7 +194,7 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
  * @param connection connection struct
  * @param gpio gpio number (0-99)
  * @param value gpio value
- * @return value of the gpio or MYGPIO_GPIO_VALUE_UNKNOWN on error
+ * @return true on success, else false
  */
 bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value) {
     if (gpio > 99) {
@@ -140,21 +205,4 @@ bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum 
     return libmygpio_send_line(connection, command) &&
         libmygpio_recv_response_status(connection) &&
         mygpio_response_end(connection);
-}
-
-// private functions
-
-/**
- * Parses the gpio mode
- * @param str string to parse
- * @return mode of the gpio
- */
-static enum mygpio_gpio_mode parse_gpio_mode(const char *str) {
-    if (strcmp(str, "in") == 0) {
-        return MYGPIO_GPIO_MODE_IN;
-    }
-    if (strcmp(str, "out") == 0) {
-        return MYGPIO_GPIO_MODE_OUT;
-    }
-    return MYGPIO_GPIO_MODE_UNKNOWN;
 }
