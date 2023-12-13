@@ -171,6 +171,7 @@ static bool config_read(struct t_config *config, sds config_file) {
             if (rest[0] == '.') {
                 rest++;
                 if (strcmp(rest, "in") == 0) {
+                    MYGPIOD_LOG_DEBUG("Parsing %s/%s", config->dir_gpio, next_file->d_name);
                     struct t_gpio_in_data *data = gpio_in_data_new();
                     rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_INPUT, data, config->dir_gpio, next_file->d_name);
                     if (rc == true && list_push(&config->gpios_in, gpio, data) == true) {
@@ -181,6 +182,7 @@ static bool config_read(struct t_config *config, sds config_file) {
                     FREE_PTR(data);
                 }
                 else if (strcmp(rest, "out") == 0) {
+                    MYGPIOD_LOG_DEBUG("Parsing %s/%s", config->dir_gpio, next_file->d_name);
                     struct t_gpio_out_data *data = gpio_out_data_new();
                     rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_OUTPUT, data, config->dir_gpio, next_file->d_name);
                     if (rc == true && list_push(&config->gpios_out, gpio, data) == true) {
