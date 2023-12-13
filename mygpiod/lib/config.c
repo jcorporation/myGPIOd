@@ -279,7 +279,7 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
                 ? parse_gpio_config_file_out_kv(kv[0], kv[1], data)
                 : parse_gpio_config_file_in_kv(kv[0], kv[1], data);
             if (rc == false) {
-                MYGPIOD_LOG_WARN("Invalid config line #%u", line_num);
+                MYGPIOD_LOG_WARN("Invalid config line %s#%u", filename, line_num);
             }
         }
         sdsfreesplitres(kv, count);
