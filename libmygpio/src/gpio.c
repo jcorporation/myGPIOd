@@ -75,12 +75,14 @@ const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value) {
 enum mygpio_gpio_value mygpio_parse_gpio_value(const char *str) {
     if (strcasecmp(str, "active") == 0 ||
         strcasecmp(str, "high") == 0 ||
+        strcasecmp(str, "on") == 0 ||
         strcmp(str, "1") == 0)
     {
         return MYGPIO_GPIO_VALUE_HIGH;
     }
     if (strcasecmp(str, "inactive") == 0 ||
         strcasecmp(str, "low") == 0 ||
+        strcasecmp(str, "off") == 0 ||
         strcmp(str, "0") == 0)
     {
         return MYGPIO_GPIO_VALUE_LOW;
