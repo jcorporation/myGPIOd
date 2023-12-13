@@ -30,11 +30,11 @@ static struct t_list_node *get_node_by_gpio_fd(struct t_list *gpios_in, int *gpi
 bool gpio_handle_event(struct t_config *config, int *fd) {
     struct t_list_node *node = get_node_by_gpio_fd(&config->gpios_in, fd);
     if (node == NULL) {
-        MYGPIOD_LOG_ERROR("Could not gpio node");
+        MYGPIOD_LOG_ERROR("Could not get gpio node");
         return false;
     }
-    MYGPIOD_LOG_DEBUG("Gpio event detected %u", node->id);
-    struct t_gpio_in_data *data = (struct t_gpio_in_data *)node;
+    MYGPIOD_LOG_DEBUG("Event detected for GPIO %u", node->id);
+    struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
 
     int ret = gpiod_line_request_read_edge_events(data->request,
                 data->event_buffer, GPIO_EVENT_BUF_SIZE);

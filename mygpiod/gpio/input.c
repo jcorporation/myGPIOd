@@ -95,6 +95,7 @@ bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in
         }
         else {
             MYGPIOD_LOG_ERROR("Unable to request line");
+            rc = false;
         }
     }
     gpiod_request_config_free(req_cfg);
