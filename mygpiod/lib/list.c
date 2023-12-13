@@ -80,26 +80,6 @@ bool list_push(struct t_list *list, unsigned id, void *data) {
 }
 
 /**
- * Gets a list node at specified index
- * @param list pointer to the list
- * @param idx index to get
- * @return found list node or NULL on error
- */
-struct t_list_node *list_node_at(struct t_list *list, unsigned idx) {
-    //if there's no data in the list, fail
-    if (list->head == NULL ||
-        idx >= list->length)
-    {
-        return NULL;
-    }
-    struct t_list_node *current = list->head;
-    for (; idx > 0; idx--) {
-        current = current->next;
-    }
-    return current;
-}
-
-/**
  * Gets a list node by its gpio number
  * @param list pointer to the list
  * @param id node id
@@ -111,6 +91,7 @@ struct t_list_node *list_node_by_id(struct t_list *list, unsigned id) {
         if (current->id == id) {
             return current;
         }
+        current = current->next;
     }
     return NULL;
 }
