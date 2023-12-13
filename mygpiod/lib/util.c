@@ -99,9 +99,9 @@ sds *sds_splitfirst(sds s, char sep, int *count) {
 
 /**
  * Parses a string to a gpio value.
- * Sets errno to EINVAL on error.
+ * Sets errno to EINVAL on parser error.
  * @param str string to parse
- * @return gpio value or GPIO_VALUE_LOW on error
+ * @return gpio value or GPIOD_LINE_VALUE_ERROR on error
  */
 enum gpiod_line_value parse_gpio_value(const char *str) {
     if (strcasecmp(str, "active") == 0 ||
