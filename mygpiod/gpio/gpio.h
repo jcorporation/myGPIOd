@@ -8,11 +8,9 @@
 #define MYGPIOD_GPIO_INPUT_H
 
 #include "mygpiod/lib/config.h"
-#include "mygpiod/event_loop/event_loop.h"
 
 #include <gpiod.h>
 
-bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds);
-bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in_data *data);
+enum gpiod_line_value gpio_get_value(struct t_config *config, unsigned gpio);
 
 #endif

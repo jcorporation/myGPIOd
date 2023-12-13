@@ -9,7 +9,7 @@
 #include "mygpiod/gpio/action.h"
 
 #include "mygpiod/actions/system.h"
-#include "mygpiod/gpio/input.h"
+#include "mygpiod/gpio/gpio.h"
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/events.h"

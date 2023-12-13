@@ -27,6 +27,7 @@ target_sources(mygpiod PRIVATE
   gpio/action.c
   gpio/chip.c
   gpio/event.c
+  gpio/gpio.c
   gpio/input.c
   gpio/output.c
   gpio/timer.c

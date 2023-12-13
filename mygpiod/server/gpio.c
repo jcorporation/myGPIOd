@@ -8,7 +8,7 @@
 #include "mygpiod/server/gpio.h"
 
 #include "mygpio-common/util.h"
-#include "mygpiod/gpio/input.h"
+#include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/output.h"
 #include "mygpiod/lib/util.h"
 #include "mygpiod/server/response.h"
