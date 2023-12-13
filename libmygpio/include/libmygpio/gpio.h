@@ -4,7 +4,11 @@
  https://github.com/jcorporation/mympd
 */
 
-// Do not include this file directly, use libmygpio.h
+/*! \file
+ * \brief myGPIOd client library
+ *
+ * Do not include this header directly. Use libmygpio/libmygpio.h instead.
+ */
 
 #ifndef LIBMYGPIO_GPIO_H
 #define LIBMYGPIO_GPIO_H
@@ -60,6 +64,8 @@ const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value);
 enum mygpio_gpio_value mygpio_parse_gpio_value(const char *str);
 
 /**
+ * \struct t_mygpio_gpio_conf
+ *
  * Opaque struct holding the configuration of a GPIO.
  */
 struct t_mygpio_gpio_conf;

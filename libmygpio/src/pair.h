@@ -9,9 +9,12 @@
 
 struct t_mygpio_connection;
 
+/**
+ * Key/Value pair
+ */
 struct t_mygpio_pair {
-    const char *name;
-    const char *value;
+    const char *name;   //!< pointer to name
+    const char *value;  //!< pointer to value
 };
 
 struct t_mygpio_pair *mygpio_recv_pair(struct t_mygpio_connection *connection);

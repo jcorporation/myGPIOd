@@ -52,7 +52,7 @@ void mygpio_free_pair(struct t_mygpio_pair *pair) {
  * @param line line to parse
  * @return allocated pair or NULL on error
  */
-struct t_mygpio_pair *libmygpio_parse_pair(const char *line) {
+static struct t_mygpio_pair *libmygpio_parse_pair(const char *line) {
     struct t_mygpio_pair *pair = malloc(sizeof(struct t_mygpio_pair));
     if (pair == NULL) {
         return NULL;

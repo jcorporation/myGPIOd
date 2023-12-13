@@ -14,4 +14,4 @@ libmygpio/.cache
 mygpioc/.cache
 mygpiod/.cache
 mygpio-common/.cache
-docs/doxygen
+docs

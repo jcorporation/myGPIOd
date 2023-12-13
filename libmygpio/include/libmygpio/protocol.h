@@ -4,7 +4,11 @@
  https://github.com/jcorporation/mympd
 */
 
-// Do not include this file directly, use libmygpio.h
+/*! \file
+ * \brief myGPIOd client library
+ *
+ * Do not include this header directly. Use libmygpio/libmygpio.h instead.
+ */
 
 #ifndef LIBMYGPIO_PROTOCOL_H
 #define LIBMYGPIO_PROTOCOL_H

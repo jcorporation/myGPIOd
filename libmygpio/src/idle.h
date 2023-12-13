@@ -13,9 +13,9 @@
  * Struct holding the event information received by mygpio_recv_idle_event.
  */
 struct t_mygpio_idle_event {
-    unsigned gpio;            //<! GPIO number
-    enum mygpio_event event;  //<! the event
-    uint64_t timestamp_ms;       //<! timestamp in milliseconds
+    unsigned gpio;            //!< GPIO number
+    enum mygpio_event event;  //!< the event
+    uint64_t timestamp_ms;    //!< timestamp in milliseconds
 };
 
 #endif

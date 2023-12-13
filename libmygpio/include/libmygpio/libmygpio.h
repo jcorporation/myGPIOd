@@ -4,16 +4,22 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef LIBMYGPIO_H
-#define LIBMYGPIO_H
-
 /**
- * This is central include file for libmygpio.
+ * @mainpage
+ *
+ * This is the official client library for myGPIOd
+ * (https://github.com/jcorporation/myGPIOd), written in C.
+ *
  * All functions and structs are documented in the following include files.
  * Include only the libymgpio.h header in your project.
  *
  * You can find examples for usage in the example directory.
+ *
+ * \author Juergen Mang (mail@jcgames.de)
  */
+
+#ifndef LIBMYGPIO_H
+#define LIBMYGPIO_H
 
 #include "connection.h"
 #include "gpio.h"

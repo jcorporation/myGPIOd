@@ -4,7 +4,11 @@
  https://github.com/jcorporation/mympd
 */
 
-// Do not include this file directly, use libmygpio.h
+/*! \file
+ * \brief myGPIOd client library
+ *
+ * Do not include this header directly. Use libmygpio/libmygpio.h instead.
+ */
 
 #ifndef LIBMYGPIO_IDLE_H
 #define LIBMYGPIO_IDLE_H
@@ -18,10 +22,10 @@ struct t_mygpio_connection;
  * Possible event types
  */
 enum mygpio_event {
-    MYGPIO_EVENT_UNKNOWN = -1,  //<! unknown
-    MYGPIO_EVENT_FALLING,       //<! falling
-    MYGPIO_EVENT_RISING,        //<! rising
-    MYGPIO_EVENT_LONG_PRESS     //<! long_press
+    MYGPIO_EVENT_UNKNOWN = -1,  //!< unknown
+    MYGPIO_EVENT_FALLING,       //!< falling
+    MYGPIO_EVENT_RISING,        //!< rising
+    MYGPIO_EVENT_LONG_PRESS     //!< long_press
 };
 
 /**
@@ -39,6 +43,8 @@ enum mygpio_event libmygpio_parse_event(const char *str);
 const char *libmygpio_lookup_event(enum mygpio_event event);
 
 /**
+ * \struct t_mygpio_idle_event
+ *
  * Opaque struct holding the event information received by mygpio_recv_idle_event.
  */
 struct t_mygpio_idle_event;

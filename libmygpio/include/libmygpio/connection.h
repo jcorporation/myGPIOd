@@ -4,7 +4,11 @@
  https://github.com/jcorporation/mympd
 */
 
-// Do not include this file directly, use libmygpio.h
+/*! \file
+ * \brief myGPIOd client library
+ *
+ * Do not include this header directly. Use libmygpio/libmygpio.h instead.
+ */
 
 #ifndef LIBMYGPIO_CONNECTION_H
 #define LIBMYGPIO_CONNECTION_H
@@ -21,6 +25,8 @@ enum mygpio_conn_state {
 };
 
 /**
+ * \struct t_mygpio_connection
+ *
  * The opaque myGPIOd connection object. You can not access it directly.
  * Use below functions for connection management.
  */

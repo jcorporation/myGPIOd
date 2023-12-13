@@ -11,14 +11,14 @@
 #include "libmygpio/src/buffer.h"
 
 struct t_mygpio_connection {
-    int fd;                        //<! myGPIOd socket
-    char *socket_path;             //<! path to myGPIOd socket
-    struct t_buf buf_in;           //<! input buffer
-    struct t_buf buf_out;          //<! output buffer
-    unsigned version[3];           //<! myGPIOd version
-    int timeout;                   //<! connection timeout in ms
-    enum mygpio_conn_state state;  //<! connection state
-    char *error;                   //<! error message
+    int fd;                        //!< myGPIOd socket
+    char *socket_path;             //!< path to myGPIOd socket
+    struct t_buf buf_in;           //!< input buffer
+    struct t_buf buf_out;          //!< output buffer
+    unsigned version[3];           //!< myGPIOd version
+    int timeout;                   //!< connection timeout in ms
+    enum mygpio_conn_state state;  //!< connection state
+    char *error;                   //!< error message
 };
 
 void libmygpio_connection_set_state(struct t_mygpio_connection *connection,
