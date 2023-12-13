@@ -6,7 +6,7 @@
 # Maintainer: Juergen Mang <mail@jcgames.de>
 #
 pkgname=mygpiod
-pkgver=0.3.0
+pkgver=0.3.1
 pkgrel=0
 pkgdesc="A small daemon to call scripts on GPIO events."
 url="https://jcorporation.github.io/myGPIOd/"
