@@ -107,13 +107,14 @@ bool libmygpio_recv_version(struct t_mygpio_connection *connection) {
  * @return true on success, else false
  */
 bool mygpio_response_end(struct t_mygpio_connection *connection) {
-    while (strcmp(connection->buf_in.buffer, "END") != 0) {
-        if (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, 0) == false) {
-            return false;
+    while (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, 0) == true) {
+        if (strcmp(connection->buf_in.buffer, "END") == 0) {
+            libmygpio_buf_init(&connection->buf_in);
+            return true;
         }
     }
     libmygpio_buf_init(&connection->buf_in);
-    return true;
+    return false;
 }
 
 // private functions
