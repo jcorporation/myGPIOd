@@ -144,6 +144,7 @@ const char *lookup_gpio_value(enum gpiod_line_value value) {
 
 /**
  * Parses a string to a gpio drive setting.
+ * Sets errno to EINVAL on parser error.
  * @param str string to parse
  * @return gpio value or GPIO_VALUE_LOW on error
  */
@@ -157,6 +158,7 @@ enum gpiod_line_drive parse_drive(const char *str) {
     if (strcasecmp(str, "open-source") == 0) {
         return GPIOD_LINE_DRIVE_OPEN_SOURCE;
     }
+    errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse gpio value, setting push-pull");
     return GPIOD_LINE_DRIVE_PUSH_PULL;
 }
@@ -181,6 +183,7 @@ const char *lookup_drive(enum gpiod_line_drive value) {
 
 /**
  * Parses a string to a boolean value.
+ * Sets errno to EINVAL on parser error.
  * Returns false if string is not true.
  * @param str string to parse
  * @return parsed value
@@ -192,7 +195,8 @@ bool parse_bool(const char *str) {
     if (strcasecmp(str, "false") == 0) {
         return false;
     }
-    MYGPIOD_LOG_WARN("Could not parse bool, setting default");
+    errno = EINVAL;
+    MYGPIOD_LOG_WARN("Could not parse bool, setting false");
     return false;
 }
 
@@ -209,6 +213,7 @@ const char *bool_to_str(bool v) {
 
 /**
  * Parses the bias flags
+ * Sets errno to EINVAL on parser error.
  * @param option string to parse
  * @return parsed bias flag or as-is on error
  */
@@ -228,6 +233,7 @@ enum gpiod_line_bias parse_bias(const char *str) {
     if (strcasecmp(str, "unknown") == 0) {
         return GPIOD_LINE_BIAS_UNKNOWN;
     }
+    errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse bias, setting unknown");
     return GPIOD_LINE_BIAS_UNKNOWN;
 }
@@ -256,6 +262,7 @@ const char *lookup_bias(enum gpiod_line_bias bias) {
 
 /**
  * Parses the clock setting.
+ * Sets errno to EINVAL on parser error.
  * @param str string to parse
  * @return enum gpiod_line_clock
  */
@@ -269,12 +276,14 @@ enum gpiod_line_clock parse_event_clock(const char *str) {
     if (strcmp(str, "monotonic") == 0) {
         return GPIOD_LINE_CLOCK_MONOTONIC;
     }
+    errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse event request, setting monotonic");
     return GPIOD_LINE_CLOCK_MONOTONIC;
 }
 
 /**
  * Parses the request event setting.
+ * Sets errno to EINVAL on parser error.
  * @param str string to parse
  * @return gpiod_line_edge enum
  */
@@ -291,6 +300,7 @@ enum gpiod_line_edge parse_event_request(const char *str) {
     if (strcasecmp(str, "both") == 0) {
         return GPIOD_LINE_EDGE_BOTH;
     }
+    errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse event request, setting none");
     return GPIOD_LINE_EDGE_NONE;
 }

@@ -8,6 +8,8 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/util.h"
+
+#include <errno.h>
 #include <strings.h>
 
 /**
@@ -52,6 +54,7 @@ const char *lookup_action(enum mygpiod_actions action) {
 
 /**
  * Parses a string to an action enum
+ * Sets errno to EINVAL on parser error.
  * @param str string to parse
  * @return parsed action enum
  */
@@ -62,6 +65,7 @@ enum mygpiod_actions parse_action(const char *str) {
     if (strcasecmp(str, "gpioset") == 0) {
         return MYGPIOD_ACTION_GPIO_SET;
     }
+    errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse action value, setting unknown");
     return MYGPIOD_ACTION_UNKNOWN;
 }

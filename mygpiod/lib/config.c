@@ -119,7 +119,7 @@ static bool config_read(struct t_config *config, sds config_file) {
         MYGPIOD_LOG_ERROR("Can not open \"%s\": %s", config_file, strerror(errno));
         return false;
     }
-    
+    bool rc = true;
     sds line = sdsempty();
     unsigned line_num = 0;
     int nread = 0;
@@ -137,12 +137,20 @@ static bool config_read(struct t_config *config, sds config_file) {
         if (count == 2) {
             if (parse_config_file_kv(kv[0], kv[1], config) == false) {
                 MYGPIOD_LOG_WARN("Invalid config line #%u", line_num);
+                sdsfreesplitres(kv, count);
+                rc = false;
+                break;
             }
         }
         sdsfreesplitres(kv, count);
     }
     FREE_SDS(line);
     (void)fclose(fp);
+
+    // exit on on invalid config
+    if (rc == false) {
+        return false;
+    }
 
     //gpio config
     errno = 0;
@@ -157,14 +165,14 @@ static bool config_read(struct t_config *config, sds config_file) {
         if (next_file->d_type != DT_REG) {
             continue;
         }
-        unsigned gpio; 
+        unsigned gpio;
         char *rest;
         if (mygpio_parse_uint(next_file->d_name, &gpio, &rest, 0, 99) == true) {
             if (rest[0] == '.') {
                 rest++;
                 if (strcmp(rest, "in") == 0) {
                     struct t_gpio_in_data *data = gpio_in_data_new();
-                    bool rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_INPUT, data, config->dir_gpio, next_file->d_name);
+                    rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_INPUT, data, config->dir_gpio, next_file->d_name);
                     if (rc == true && list_push(&config->gpios_in, gpio, data) == true) {
                         i++;
                         continue;
@@ -174,7 +182,7 @@ static bool config_read(struct t_config *config, sds config_file) {
                 }
                 else if (strcmp(rest, "out") == 0) {
                     struct t_gpio_out_data *data = gpio_out_data_new();
-                    bool rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_OUTPUT, data, config->dir_gpio, next_file->d_name);
+                    rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_OUTPUT, data, config->dir_gpio, next_file->d_name);
                     if (rc == true && list_push(&config->gpios_out, gpio, data) == true) {
                         i++;
                         continue;
@@ -203,6 +211,7 @@ static bool config_read(struct t_config *config, sds config_file) {
  * @return true on success, else false
  */
 static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
+    errno = 0;
     if (strcmp(key, "chip") == 0) {
         sdsclear(config->chip_path);
         config->chip_path = sdscatsds(config->chip_path, value);
@@ -212,12 +221,12 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     if (strcmp(key, "loglevel") == 0) {
         config->loglevel = parse_loglevel(value);
         MYGPIOD_LOG_DEBUG("Setting loglevel to \"%s\"", lookup_loglevel(config->loglevel));
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "syslog") == 0) {
         config->syslog = parse_bool(value);
         MYGPIOD_LOG_DEBUG("Setting syslog to \"%s\"", bool_to_str(config->syslog));
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "gpio_dir") == 0) {
         sdsclear(config->dir_gpio);
@@ -236,9 +245,11 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         return true;
     }
     if (strcmp(key, "timeout") == 0) {
-        mygpio_parse_int(value, &config->socket_timeout, NULL, 10, 120);
-        MYGPIOD_LOG_DEBUG("Setting timeout to \"%d\" seconds", config->socket_timeout);
-        return true;
+        if (mygpio_parse_int(value, &config->socket_timeout, NULL, 10, 120) == true) {
+            MYGPIOD_LOG_DEBUG("Setting timeout to \"%d\" seconds", config->socket_timeout);
+            return true;
+        }
+        return false;
     }
     return false;
 }
@@ -297,20 +308,22 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
  * @return true on success, else false
  */
 static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_data *data) {
+    errno = 0;
     if (strcmp(key, "active_low") == 0) {
         data->active_low = parse_bool(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "bias") == 0) {
         data->bias = parse_bias(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "drive") == 0) {
         data->drive = parse_drive(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "value") == 0) {
         data->value = parse_gpio_value(value);
+        return errno == 0 ? true : false;
     }
     return false;
 }
@@ -323,26 +336,28 @@ static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_
  * @return true on success, else false
  */
 static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_data *data) {
+    errno = 0;
     if (strcmp(key, "active_low") == 0) {
         data->active_low = parse_bool(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "bias") == 0) {
         data->bias = parse_bias(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "request_event") == 0) {
         data->request_event = parse_event_request(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "debounce") == 0) {
         if (mygpio_parse_ulong(value, &data->debounce_period_us, NULL, 0, UINT_MAX) == true) {
-            return true;
+            return errno == 0 ? true : false;
         }
+        return false;
     }
     if (strcmp(key, "event_clock") == 0) {
         data->event_clock = parse_event_clock(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "action_falling") == 0) {
         struct t_action *action_data = action_node_data_from_value(value);
@@ -360,12 +375,13 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
     }
     if (strcmp(key, "long_press_timeout") == 0) {
         if (mygpio_parse_int(value, &data->long_press_timeout, NULL, 0, 9) == true) {
-            return true;
+            return errno == 0 ? true : false;
         }
+        return false;
     }
     if (strcmp(key, "long_press_event") == 0) {
         data->long_press_event = parse_event_request(value);
-        return true;
+        return errno == 0 ? true : false;
     }
     if (strcmp(key, "long_press_action") == 0) {
         struct t_action *action_data = action_node_data_from_value(value);

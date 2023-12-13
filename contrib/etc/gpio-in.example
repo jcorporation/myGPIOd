@@ -10,8 +10,8 @@
 # Valid values: true, false
 # - true = GPIO considered active if it is low
 # - false = GPIO considered active if it is high
-active_low = true
-#active_low = false
+#active_low = true
+active_low = false
 
 # Sets the internal pull-up or pull-down resistor
 # Valid values: as-is, disable, pull-down, pull-up
