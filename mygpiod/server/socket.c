@@ -186,6 +186,7 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
 struct t_client_data *server_client_connection_new(int client_fd) {
     struct t_client_data *data = malloc_assert(sizeof(struct t_client_data));
     data->fd = client_fd;
+    data->timeout_fd = -1;
     data->state = CLIENT_SOCKET_STATE_WRITING;
     data->buf_in = sdsempty();
     data->buf_out = sdsempty();
