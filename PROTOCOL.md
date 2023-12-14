@@ -82,7 +82,7 @@ END
 
 ### gpioget {gpio number}
 
-Gets the current value of a configured input gpio.
+Gets the current value of a configured input or output gpio.
 
 **Response**
 
@@ -96,5 +96,5 @@ END
 
 Sets the value of a configured output gpio. Valid values are:
 
-- 0, low, inactive
-- 1, high, active
+- 0, low, inactive, off
+- 1, high, active, on
