@@ -99,11 +99,11 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
  * @return true on success, else false
  */
 bool gpio_set_value(struct t_config *config, unsigned gpio, enum gpiod_line_value value) {
-    struct t_list_node *node = list_node_by_id(&config->gpios_in, gpio);
+    struct t_list_node *node = list_node_by_id(&config->gpios_out, gpio);
     if (node == NULL) {
         MYGPIOD_LOG_ERROR("GPIO %u is not configured as output", gpio);
         return false;
     }
-    struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
+    struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
     return gpiod_line_request_set_value(data->request, gpio, value);
 }
