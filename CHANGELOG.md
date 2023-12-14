@@ -6,7 +6,11 @@ https://github.com/jcorporation/myGPIOd
 
 ## myGPIOd v0.4.0 (not yet released)
 
-This is the first larger release after the initial release.
+This is a complete rewrite of myGPIOd. It is now based on libgpiod v2.
+
+This release ships in addition to the myGPIOd daemon a simple C client library and a command line tool.
+
+The daemon can be controlled through a simple text based protocol accessible by a unix socket.
 
 ### Notes
 
@@ -16,6 +20,8 @@ This is the first larger release after the initial release.
 ### Changelog
 
 - Feat: Add a server socket and define a client protocol to retrieve gpio events and control gpio outputs
+- Feat: simple C client library
+- Feat: command line client
 - Feat: Rework build process to support the standard cmake build types
 - Feat: Distinct actions for gpio events
 - Feat: Long press detection

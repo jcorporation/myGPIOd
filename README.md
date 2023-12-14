@@ -7,19 +7,20 @@ It consists of a daemon, a client library and a command line tool.
 ## Features
 
 - **mygpiod - the daemon component**
-  - Call executables on GPIO events
+  - Call actions on GPIO events
     - rising
     - falling
     - long press
   - Set various gpio attributes (bias, debounce, ...)
   - Set the output value of gpios
-  - Provides a unix socket with simple line-based text protocol
+  - Provides a unix socket with a simple line-based text protocol
     - List gpio configuration
     - Set and get GPIO values
     - Get notifications of GPIO events
 - **libmygpio - the client library**
   - Simple C client library
   - High level API
+  - Integration in fd based event loops
 - **mygpioc - the command line client**
   - Connects to the mygpiod socket to control the various functions.
 
