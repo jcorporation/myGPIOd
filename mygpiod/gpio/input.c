@@ -94,7 +94,7 @@ bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in
             data->gpio_fd = gpiod_line_request_get_fd(data->request);
         }
         else {
-            MYGPIOD_LOG_ERROR("Unable to request line");
+            MYGPIOD_LOG_ERROR("Unable to request line %u", gpio);
             rc = false;
         }
     }

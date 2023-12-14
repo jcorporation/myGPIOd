@@ -84,6 +84,10 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
     }
     else {
         data->request = gpiod_chip_request_lines(chip, req_cfg, line_cfg);
+        if (data->request == NULL) {
+            MYGPIOD_LOG_ERROR("Unable to request line %u", gpio);
+            rc = false;
+        }
     }
     gpiod_request_config_free(req_cfg);
     gpiod_line_config_free(line_cfg);
