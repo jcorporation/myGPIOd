@@ -31,7 +31,9 @@ bool gpio_set_outputs(struct t_config *config) {
     struct t_list_node *current = config->gpios_out.head;
     while (current != NULL) {
         struct t_gpio_out_data *data = (struct t_gpio_out_data *)current->data;
-        gpio_set_output(config->chip, current->id, data);
+        if (gpio_set_output(config->chip, current->id, data) == false) {
+            return false;
+        }
         current = current->next;
     }
     return true;

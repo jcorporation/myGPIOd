@@ -31,9 +31,10 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
     struct t_list_node *current = config->gpios_in.head;
     while (current != NULL) {
         struct t_gpio_in_data *data = (struct t_gpio_in_data *)current->data;
-        if (gpio_request_input(config->chip, current->id, data) == true) {
-            event_poll_fd_add(poll_fds, data->gpio_fd, PFD_TYPE_GPIO, POLLIN | POLLPRI);
+        if (gpio_request_input(config->chip, current->id, data) == false) {
+            return false;
         }
+        event_poll_fd_add(poll_fds, data->gpio_fd, PFD_TYPE_GPIO, POLLIN | POLLPRI);
         current = current->next;
     }
     return true;
