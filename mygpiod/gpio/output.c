@@ -55,13 +55,13 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
         assert(settings);
     }
     if (gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set direction");
+        MYGPIOD_LOG_WARN("Unable to set direction for gpio %u to output", gpio);
     }
     if (gpiod_line_settings_set_bias(settings, data->bias) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set bias");
+        MYGPIOD_LOG_WARN("Unable to set bias for gpio %u to %s", gpio, lookup_bias(data->bias));
     }
     if (gpiod_line_settings_set_drive(settings, data->drive) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set drive");
+        MYGPIOD_LOG_WARN("Unable to set drive for gpio %u to %s", gpio, lookup_drive(data->drive));
     }
     gpiod_line_settings_set_active_low(settings, data->active_low);
 

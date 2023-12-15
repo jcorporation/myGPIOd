@@ -284,6 +284,24 @@ enum gpiod_line_clock parse_event_clock(const char *str) {
 }
 
 /**
+ * Lookups the event clock name
+ * @param clock the event clock
+ * @return name
+ */
+const char *lookup_event_clock(enum gpiod_line_clock clock) {
+    switch(clock) {
+        case GPIOD_LINE_CLOCK_REALTIME:
+            return "realtime";
+        case GPIOD_LINE_CLOCK_HTE:
+            return "hte";
+        case GPIOD_LINE_CLOCK_MONOTONIC:
+            return "monotonic";
+    }
+    MYGPIOD_LOG_WARN("Could not parse event clock, setting monotonic");
+    return "monotonic";
+}
+
+/**
  * Parses the request event setting.
  * Sets errno to EINVAL on parser error.
  * @param str string to parse

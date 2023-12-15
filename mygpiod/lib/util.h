@@ -29,6 +29,7 @@ const char *bool_to_str(bool v);
 enum gpiod_line_bias parse_bias(const char *str);
 const char *lookup_bias(enum gpiod_line_bias bias);
 enum gpiod_line_clock parse_event_clock(const char *str);
+const char *lookup_event_clock(enum gpiod_line_clock clock);
 enum gpiod_line_edge parse_event_request(const char *str);
 const char *lookup_event_request(enum gpiod_line_edge event);
 const char *lookup_event_type(enum gpiod_edge_event_type event);

@@ -56,16 +56,16 @@ bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in
         assert(settings);
     }
     if (gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_INPUT) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set direction");
+        MYGPIOD_LOG_WARN("Unable to set direction for gpio %u to input", gpio);
     }
     if (gpiod_line_settings_set_bias(settings, data->bias) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set bias");
+        MYGPIOD_LOG_WARN("Unable to set bias for gpio %u to %s", gpio, lookup_bias(data->bias));
     }
     if (gpiod_line_settings_set_event_clock(settings, data->event_clock) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set event clock");
+        MYGPIOD_LOG_WARN("Unable to set event clock for gpio %u to %s", gpio, lookup_event_clock(data->event_clock));
     }
     if (gpiod_line_settings_set_edge_detection(settings, data->request_event) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set edge detection");
+        MYGPIOD_LOG_WARN("Unable to set edge detection for gpio %u to %s", gpio, lookup_event_request(data->request_event));
     }
     gpiod_line_settings_set_active_low(settings, data->active_low);
     gpiod_line_settings_set_debounce_period_us(settings, data->debounce_period_us);
