@@ -435,6 +435,7 @@ static struct t_gpio_in_data *gpio_in_data_new(void) {
     data->bias = GPIOD_LINE_BIAS_AS_IS;
     data->active_low = false;
     data->debounce_period_us = 0;
+    data->event_clock = GPIOD_LINE_CLOCK_MONOTONIC;
     data->request = NULL;
     data->event_buffer = NULL;
     return data;
