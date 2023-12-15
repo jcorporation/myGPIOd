@@ -55,12 +55,17 @@ bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in
         MYGPIOD_LOG_ERROR("Unable to allocate line settings");
         assert(settings);
     }
-    gpiod_line_settings_set_bias(settings, data->bias);
+    if (gpiod_line_settings_set_bias(settings, data->bias) == -1 ||
+        gpiod_line_settings_set_event_clock(settings, data->event_clock) == -1 ||
+        gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_INPUT) == -1 ||
+        gpiod_line_settings_set_edge_detection(settings, data->request_event) == -1)
+    {
+        MYGPIOD_LOG_ERROR("Unable to set bias, event_clock, edge detection or direction");
+        gpiod_line_settings_free(settings);
+        return false;
+    }
     gpiod_line_settings_set_active_low(settings, data->active_low);
     gpiod_line_settings_set_debounce_period_us(settings, data->debounce_period_us);
-    gpiod_line_settings_set_event_clock(settings, data->event_clock);
-    gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_INPUT);
-    gpiod_line_settings_set_edge_detection(settings, data->request_event);
 
     struct gpiod_request_config *req_cfg = gpiod_request_config_new();
     if (req_cfg == NULL) {
@@ -86,7 +91,7 @@ bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in
 
     bool rc = true;
     if (gpiod_line_config_add_line_settings(line_cfg, offsets, 1, settings) == -1) {
-        MYGPIOD_LOG_ERROR("Unable to add line setting and value");
+        MYGPIOD_LOG_ERROR("Unable to add line setting");
         rc = false;
     }
     else {
