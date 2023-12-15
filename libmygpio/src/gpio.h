@@ -13,8 +13,9 @@
  * Struct holding the configuration of a GPIO.
  */
 struct t_mygpio_gpio_conf {
-    unsigned gpio;               //!< GPIO number
-    enum mygpio_gpio_mode mode;  //!< GPIO mode
+    unsigned gpio;                //!< GPIO number
+    enum mygpio_gpio_mode mode;   //!< GPIO mode (direction)
+    enum mygpio_gpio_value value; //!< GPIO value
 };
 
 #endif

@@ -81,6 +81,9 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
         case CMD_GPIOLIST:
             rc = handle_gpiolist(config, client_node);
             break;
+        case CMD_GPIOINFO:
+            rc = handle_gpioinfo(&options, config, client_node);
+            break;
         case CMD_INVALID:
         case CMD_COUNT:
             MYGPIOD_LOG_ERROR("Client#%u: Invalid command", client_node->id);

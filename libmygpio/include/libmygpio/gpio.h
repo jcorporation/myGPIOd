@@ -38,7 +38,7 @@ const char *mygpio_gpio_lookup_mode(enum mygpio_gpio_mode mode);
  * @param str string to parse
  * @return mode of the gpio
  */
-enum mygpio_gpio_mode parse_gpio_mode(const char *str);
+enum mygpio_gpio_mode mygpio_gpio_parse_mode(const char *str);
 
 /**
  * The value of an output GPIO.
@@ -61,7 +61,7 @@ const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value);
  * @param str string to parse
  * @return gpio value or GPIO_VALUE_UNKNOWN on error
  */
-enum mygpio_gpio_value mygpio_parse_gpio_value(const char *str);
+enum mygpio_gpio_value mygpio_gpio_parse_value(const char *str);
 
 /**
  * \struct t_mygpio_gpio_conf
@@ -84,7 +84,7 @@ bool mygpio_gpiolist(struct t_mygpio_connection *connection);
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
  * @return Allocated struct t_mygpio_gpio_conf or NULL on list end or error.
  */
-struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *connection);
+struct t_mygpio_gpio_conf *mygpio_recv_gpio_list(struct t_mygpio_connection *connection);
 
 /**
  * Returns the GPIO number from struct t_mygpio_gpio_conf.
@@ -99,6 +99,13 @@ unsigned mygpio_gpio_conf_get_gpio(struct t_mygpio_gpio_conf *gpio_conf);
  * @return GPIO mode, one of enum mygpio_gpio_mode.
  */
 enum mygpio_gpio_mode mygpio_gpio_conf_get_mode(struct t_mygpio_gpio_conf *gpio_conf);
+
+/**
+ * Returns the GPIO value from struct t_mygpio_gpio_conf.
+ * @param gpio_conf Pointer to struct t_mygpio_gpio_conf.
+ * @return GPIO mode, one of enum mygpio_gpio_mode.
+ */
+enum mygpio_gpio_value mygpio_gpio_conf_get_value(struct t_mygpio_gpio_conf *gpio_conf);
 
 /**
  * Frees the struct received by mygpio_recv_gpio_conf.

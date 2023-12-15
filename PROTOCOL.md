@@ -80,6 +80,37 @@ END
 ...
 ```
 
+### gpioinfo {gpio number}
+
+Gets the current settings of a configured input or output gpio.
+
+**Response for an input gpio**
+
+```
+OK
+mode:in
+value:0
+active_low:0
+bias:as-is
+request_event:both
+is_debounced:0
+debounce_period:0
+event_clock:monotonic
+END
+```
+
+**Response for an output gpio**
+
+```
+OK
+mode:out
+value:1
+active_low:0
+bias:as-is
+drive:push-pull
+END
+```
+
 ### gpioget {gpio number}
 
 Gets the current value of a configured input or output gpio.

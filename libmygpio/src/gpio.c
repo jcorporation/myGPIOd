@@ -39,7 +39,7 @@ const char *mygpio_gpio_lookup_mode(enum mygpio_gpio_mode mode) {
  * @param str string to parse
  * @return mode of the gpio
  */
-enum mygpio_gpio_mode parse_gpio_mode(const char *str) {
+enum mygpio_gpio_mode mygpio_gpio_parse_mode(const char *str) {
     if (strcmp(str, "in") == 0) {
         return MYGPIO_GPIO_MODE_IN;
     }
@@ -72,7 +72,7 @@ const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value) {
  * @param str string to parse
  * @return gpio value or GPIO_VALUE_LOW on error
  */
-enum mygpio_gpio_value mygpio_parse_gpio_value(const char *str) {
+enum mygpio_gpio_value mygpio_gpio_parse_value(const char *str) {
     if (strcasecmp(str, "active") == 0 ||
         strcasecmp(str, "high") == 0 ||
         strcasecmp(str, "on") == 0 ||
@@ -105,9 +105,10 @@ bool mygpio_gpiolist(struct t_mygpio_connection *connection) {
  * @param connection connection struct
  * @return gpio config struct or NULL on error or list end
  */
-struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *connection) {
+struct t_mygpio_gpio_conf *mygpio_recv_gpio_list(struct t_mygpio_connection *connection) {
     unsigned gpio;
     enum mygpio_gpio_mode mode;
+    enum mygpio_gpio_value value;
 
     struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
@@ -124,7 +125,19 @@ struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *con
     pair = mygpio_recv_pair(connection);
     if (pair == NULL ||
         strcmp(pair->name, "mode") != 0 ||
-        (mode = parse_gpio_mode(pair->value)) == MYGPIO_GPIO_MODE_UNKNOWN)
+        (mode = mygpio_gpio_parse_mode(pair->value)) == MYGPIO_GPIO_MODE_UNKNOWN)
+    {
+        if (pair != NULL) {
+            mygpio_free_pair(pair);
+        }
+        return NULL;
+    }
+    mygpio_free_pair(pair);
+
+    pair = mygpio_recv_pair(connection);
+    if (pair == NULL ||
+        strcmp(pair->name, "value") != 0 ||
+        (value = mygpio_gpio_parse_value(pair->value)) == MYGPIO_GPIO_VALUE_UNKNOWN)
     {
         if (pair != NULL) {
             mygpio_free_pair(pair);
@@ -137,6 +150,7 @@ struct t_mygpio_gpio_conf *mygpio_recv_gpio_conf(struct t_mygpio_connection *con
     assert(gpio_conf);
     gpio_conf->gpio = gpio;
     gpio_conf->mode = mode;
+    gpio_conf->value = value;
     return gpio_conf;
 }
 
@@ -156,6 +170,15 @@ unsigned mygpio_gpio_conf_get_gpio(struct t_mygpio_gpio_conf *gpio_conf) {
  */
 enum mygpio_gpio_mode mygpio_gpio_conf_get_mode(struct t_mygpio_gpio_conf *gpio_conf) {
     return gpio_conf->mode;
+}
+
+/**
+ * Returns the GPIO value from struct t_mygpio_gpio_conf.
+ * @param gpio_conf Pointer to struct t_mygpio_gpio_conf.
+ * @return GPIO mode, one of enum mygpio_gpio_mode.
+ */
+enum mygpio_gpio_value mygpio_gpio_conf_get_value(struct t_mygpio_gpio_conf *gpio_conf) {
+    return gpio_conf->value;
 }
 
 /**
