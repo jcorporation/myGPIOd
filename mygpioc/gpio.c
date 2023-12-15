@@ -103,3 +103,28 @@ int handle_gpioset(int argc, char **argv, int option_index, struct t_mygpio_conn
     mygpio_response_end(conn);
     return EXIT_SUCCESS;
 }
+
+/**
+ * Toggles an output gpio
+ * @param argc argument count
+ * @param argv argument list
+ * @param option_index parsed option index
+ * @param conn connection struct
+ * @return 0 on success, else 1
+ */
+int handle_gpiotoggle(int argc, char **argv, int option_index, struct t_mygpio_connection *conn) {
+    (void)argc;
+    unsigned gpio;
+    if (mygpio_parse_uint(argv[option_index], &gpio, NULL, 0, GPIOS_MAX) == false) {
+        fprintf(stderr, "Invalid gpio number\n");
+        return EXIT_FAILURE;
+    }
+    verbose_printf("Sending gpiotoggle");
+    if (mygpio_gpiotoggle(conn, gpio) == false) {
+        fprintf(stderr, "Error: %s\n", mygpio_connection_get_error(conn));
+        mygpio_response_end(conn);
+        return EXIT_FAILURE;
+    }
+    mygpio_response_end(conn);
+    return EXIT_SUCCESS;
+}

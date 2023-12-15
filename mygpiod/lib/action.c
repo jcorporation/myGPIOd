@@ -45,6 +45,8 @@ const char *lookup_action(enum mygpiod_actions action) {
             return "system";
         case MYGPIOD_ACTION_GPIO_SET:
             return "gpioset";
+        case MYGPIOD_ACTION_GPIO_TOGGLE:
+            return "gpiotoggle";
         case MYGPIOD_ACTION_UNKNOWN:
             return "";
     }
@@ -64,6 +66,9 @@ enum mygpiod_actions parse_action(const char *str) {
     }
     if (strcasecmp(str, "gpioset") == 0) {
         return MYGPIOD_ACTION_GPIO_SET;
+    }
+    if (strcasecmp(str, "gpiotoggle") == 0) {
+        return MYGPIOD_ACTION_GPIO_TOGGLE;
     }
     errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse action value, setting unknown");

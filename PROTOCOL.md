@@ -98,3 +98,7 @@ Sets the value of a configured output gpio. Valid values are:
 
 - 0, low, inactive, off
 - 1, high, active, on
+
+### gpiotoggle {gpio number}
+
+Toggles the value of a configured output gpio.

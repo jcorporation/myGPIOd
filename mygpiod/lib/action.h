@@ -16,7 +16,8 @@
 enum mygpiod_actions {
     MYGPIOD_ACTION_UNKNOWN = -1,  //!< Unknown action type
     MYGPIOD_ACTION_SYSTEM,        //!< System action
-    MYGPIOD_ACTION_GPIO_SET       //!< Set a GPIO
+    MYGPIOD_ACTION_GPIO_SET,      //!< Set a GPIO value
+    MYGPIOD_ACTION_GPIO_TOGGLE    //!< Toggle a GPIO value
 };
 
 /**

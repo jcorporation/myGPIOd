@@ -178,9 +178,7 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
     if (gpio > GPIOS_MAX) {
         return MYGPIO_GPIO_VALUE_UNKNOWN;
     }
-    char command[11];
-    snprintf(command, 11, "gpioget %u", gpio);
-    if (libmygpio_send_line(connection, command) == false ||
+    if (libmygpio_send_line(connection, "gpioget %u", gpio) == false ||
         libmygpio_recv_response_status(connection) == false ||
         (pair = mygpio_recv_pair(connection)) == NULL ||
         strcmp(pair->name, "value") != 0 ||
@@ -199,12 +197,25 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
  * @return true on success, else false
  */
 bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value) {
-    if (gpio > 99) {
+    if (gpio > GPIOS_MAX) {
         return false;
     }
-    char command[14];
-    snprintf(command, 14, "gpioset %u %u", gpio, value);
-    return libmygpio_send_line(connection, command) &&
+    return libmygpio_send_line(connection, "gpioset %u %u", gpio, value) &&
+        libmygpio_recv_response_status(connection) &&
+        mygpio_response_end(connection);
+}
+
+/**
+ * Toggles the value of a configured output GPIO.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @param gpio GPIO number
+ * @return true on success, else false.
+ */
+bool mygpio_gpiotoggle(struct t_mygpio_connection *connection, unsigned gpio) {
+    if (gpio > GPIOS_MAX) {
+        return false;
+    }
+    return libmygpio_send_line(connection, "gpiotoggle %u", gpio) &&
         libmygpio_recv_response_status(connection) &&
         mygpio_response_end(connection);
 }

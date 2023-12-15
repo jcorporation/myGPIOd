@@ -123,4 +123,12 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
  */
 bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value);
 
+/**
+ * Toggles the value of a configured output GPIO.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @param gpio GPIO number
+ * @return true on success, else false.
+ */
+bool mygpio_gpiotoggle(struct t_mygpio_connection *connection, unsigned gpio);
+
 #endif

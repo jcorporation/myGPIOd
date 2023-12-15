@@ -159,7 +159,10 @@ static void action_execute(struct t_config *config, struct t_list *actions) {
             case MYGPIOD_ACTION_GPIO_SET:
                 action_gpioset(config, action->option);
                 break;
-            default:
+            case MYGPIOD_ACTION_GPIO_TOGGLE:
+                action_gpiotoggle(config, action->option);
+                break;
+            case MYGPIOD_ACTION_UNKNOWN:
                 MYGPIOD_LOG_ERROR("Invalid action");
                 break;
         }

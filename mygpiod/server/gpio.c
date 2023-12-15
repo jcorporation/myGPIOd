@@ -108,3 +108,29 @@ bool handle_gpioset(struct t_cmd_options *options, struct t_config *config, stru
     server_response_send(client_data, DEFAULT_MSG_ERROR "Setting gpio value failed");
     return false;
 }
+
+/**
+ * Handles the gpioset command
+ * @param options client command
+ * @param config pointer to config
+ * @param client_node client
+ * @return true on success, else false
+ */
+bool handle_gpiotoggle(struct t_cmd_options *options, struct t_config *config, struct t_list_node *client_node) {
+    struct t_client_data *client_data = (struct t_client_data *)client_node->data;
+    if (options->len != 2) {
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid number of arguments");
+        return false;
+    }
+    unsigned gpio;
+    if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid gpio number");
+        return false;
+    }
+    if (gpio_toggle_value(config, gpio) == true) {
+        server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
+        return true;
+    }
+    server_response_send(client_data, DEFAULT_MSG_ERROR "Setting gpio value failed");
+    return false;
+}

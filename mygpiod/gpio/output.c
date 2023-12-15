@@ -118,3 +118,23 @@ bool gpio_set_value(struct t_config *config, unsigned gpio, enum gpiod_line_valu
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
     return gpiod_line_request_set_value(data->request, gpio, value);
 }
+
+/**
+ * Toggles the current line value of an output gpio
+ * @param config pointer to config
+ * @param gpio gpio to set the value
+ * @return true on success, else false
+ */
+bool gpio_toggle_value(struct t_config *config, unsigned gpio) {
+    struct t_list_node *node = list_node_by_id(&config->gpios_out, gpio);
+    if (node == NULL) {
+        MYGPIOD_LOG_ERROR("GPIO %u is not configured as output", gpio);
+        return false;
+    }
+    struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
+    // get and toggle the value
+    enum gpiod_line_value value = gpiod_line_request_get_value(data->request, gpio) == GPIOD_LINE_VALUE_INACTIVE
+        ? GPIOD_LINE_VALUE_ACTIVE
+        : GPIOD_LINE_VALUE_INACTIVE;
+    return gpiod_line_request_set_value(data->request, gpio, value);
+}

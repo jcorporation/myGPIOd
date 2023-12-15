@@ -15,5 +15,6 @@ bool gpio_set_outputs(struct t_config *config);
 bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_data *data);
 
 bool gpio_set_value(struct t_config *config, unsigned gpio, enum gpiod_line_value value);
+bool gpio_toggle_value(struct t_config *config, unsigned gpio);
 
 #endif
