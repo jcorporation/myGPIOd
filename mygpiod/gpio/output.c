@@ -54,13 +54,14 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
         MYGPIOD_LOG_ERROR("Unable to allocate line settings");
         assert(settings);
     }
-    if (gpiod_line_settings_set_bias(settings, data->bias) == -1 ||
-        gpiod_line_settings_set_drive(settings, data->drive) == -1 ||
-        gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT) == -1)
-    {
-        MYGPIOD_LOG_ERROR("Unable to set bias, drive or direction");
-        gpiod_line_settings_free(settings);
-        return false;
+    if (gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT) == -1) {
+        MYGPIOD_LOG_WARN("Unable to set direction");
+    }
+    if (gpiod_line_settings_set_bias(settings, data->bias) == -1) {
+        MYGPIOD_LOG_WARN("Unable to set bias");
+    }
+    if (gpiod_line_settings_set_drive(settings, data->drive) == -1) {
+        MYGPIOD_LOG_WARN("Unable to set drive");
     }
     gpiod_line_settings_set_active_low(settings, data->active_low);
 
