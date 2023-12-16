@@ -111,8 +111,8 @@ enum mygpio_event_request {
 
 /**
  * Lookups the name for an event request.
- * @param value the gpio event request.
- * @return gpio value name
+ * @param event_request the gpio event request.
+ * @return gpio event request name
  */
 const char *mygpio_gpio_lookup_event_request(enum mygpio_event_request event_request);
 
