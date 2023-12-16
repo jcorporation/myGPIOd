@@ -30,7 +30,7 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
     verbose_printf("Sending gpiolist");
     if (mygpio_gpiolist(conn) == true) {
         struct t_mygpio_gpio *gpio;
-        printf("Retrieving configured gpios\n");
+        verbose_printf("Retrieving configured gpios");
         while ((gpio = mygpio_recv_gpio_list(conn)) != NULL) {
             printf("GPIO %u, mode %s, value %s\n",
                 mygpio_gpio_get_gpio(gpio),
@@ -64,7 +64,7 @@ int handle_gpioinfo(int argc, char **argv, int option_index, struct t_mygpio_con
     }
     verbose_printf("Sending gpioinfo");
     if (mygpio_gpioinfo(conn, gpio_nr) == true) {
-        printf("Retrieving gpio info\n");
+        verbose_printf("Retrieving gpio info");
         struct t_mygpio_gpio *gpio = mygpio_recv_gpio_info(conn);
         if (gpio == NULL) {
             return EXIT_FAILURE;
