@@ -401,13 +401,13 @@ enum mygpio_drive mygpio_gpio_out_get_drive(struct t_mygpio_gpio *gpio) {
 struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_mode mode) {
     struct t_mygpio_gpio *gpio = malloc(sizeof(struct t_mygpio_gpio));
     assert(gpio);
+    gpio->in = NULL;
+    gpio->out = NULL;
     if (mode == MYGPIO_GPIO_MODE_IN) {
         gpio->in = malloc(sizeof(struct t_mygpio_in));
         assert(gpio->in);
-        gpio->out = NULL;
     }
     else if (mode == MYGPIO_GPIO_MODE_OUT) {
-        gpio->in = NULL;
         gpio->out = malloc(sizeof(struct t_mygpio_out));
         assert(gpio->out);
     }
