@@ -76,6 +76,7 @@ Lists all configured gpios.
 OK
 gpio:{gpio number}
 mode:{in|out}
+value:1
 END
 ...
 ```
@@ -92,7 +93,7 @@ mode:in
 value:0
 active_low:0
 bias:as-is
-request_event:both
+event_request:both
 is_debounced:0
 debounce_period:0
 event_clock:monotonic
@@ -105,8 +106,6 @@ END
 OK
 mode:out
 value:1
-active_low:0
-bias:as-is
 drive:push-pull
 END
 ```

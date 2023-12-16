@@ -2,9 +2,9 @@
 # Copy it to <gpio number>.in
 
 # The events to request
-#request_event = both
-#request_event = falling
-#request_event = rising
+#event_request = both
+#event_request = falling
+#event_request = rising
 
 # Sets the GPIO active state
 # Valid values: true, false

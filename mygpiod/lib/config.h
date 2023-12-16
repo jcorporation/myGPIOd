@@ -24,7 +24,7 @@ struct t_gpio_in_data {
     enum gpiod_line_clock event_clock;             //!< the source clock for event timestamps
     struct t_list action_rising;                   //!< command for rising event
     struct t_list action_falling;                  //!< command for falling event
-    enum gpiod_line_edge request_event;            //!< events to request for this gpio
+    enum gpiod_line_edge event_request;            //!< events to request for this gpio
     int gpio_fd;                                   //!< gpio file descriptor
     int long_press_timeout;                        //!< timeout for the long press handler
     struct t_list long_press_action;               //!< long press command
@@ -39,8 +39,6 @@ struct t_gpio_in_data {
  * Config data for an output gpio
  */
 struct t_gpio_out_data {
-    enum gpiod_line_bias bias;           //!< bias value
-    bool active_low;                     //!< active state is low?
     enum gpiod_line_drive drive;         //!< drive value
     enum gpiod_line_value value;         //!< value to set
     struct gpiod_line_request *request;  //!< gpio line request struct

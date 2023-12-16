@@ -13,6 +13,8 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 /**
  * Parses a string to an integer value and checks it against min and max.
@@ -188,4 +190,37 @@ bool mygpio_parse_uint64(const char *str, uint64_t *result, char **rest, uint64_
         return true;
     }
     return false;
+}
+
+/**
+ * Parses a string to a boolean value.
+ * Sets errno to EINVAL on parser error.
+ * Returns false if string is not true.
+ * @param str string to parse
+ * @return parsed value
+ */
+bool mygpio_parse_bool(const char *str) {
+    if (strcasecmp(str, "true") == 0 ||
+        strcmp(str, "1") == 0)
+    {
+        return true;
+    }
+    if (strcasecmp(str, "false") == 0 ||
+        strcmp(str, "0") == 0)
+    {
+        return false;
+    }
+    errno = EINVAL;
+    return false;
+}
+
+/**
+ * Prints a bool value as string
+ * @param v the bool value
+ * @return string
+ */
+const char *mygpio_bool_to_str(bool v) {
+    return v == true
+        ? "true"
+        : "false";
 }

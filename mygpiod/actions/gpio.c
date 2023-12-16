@@ -5,11 +5,10 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/actions/gpioset.h"
+#include "mygpiod/actions/gpio.h"
 
 #include "dist/sds/sds.h"
 #include "mygpio-common/util.h"
-#include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/output.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/util.h"

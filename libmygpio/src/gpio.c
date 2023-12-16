@@ -91,102 +91,156 @@ enum mygpio_gpio_value mygpio_gpio_parse_value(const char *str) {
 }
 
 /**
- * Send the gpiolist command and receives the status
- * @param connection connection struct
- * @return true on success, else false
+ * Lookups the name for the gpio bias.
+ * @param bias the gpio bias.
+ * @return gpio bias name
  */
-bool mygpio_gpiolist(struct t_mygpio_connection *connection) {
-    return libmygpio_send_line(connection, "gpiolist") &&
-        libmygpio_recv_response_status(connection);
-}
-
-/**
- * Receives the response for the gpiolist command
- * @param connection connection struct
- * @return gpio config struct or NULL on error or list end
- */
-struct t_mygpio_gpio_conf *mygpio_recv_gpio_list(struct t_mygpio_connection *connection) {
-    unsigned gpio;
-    enum mygpio_gpio_mode mode;
-    enum mygpio_gpio_value value;
-
-    struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
-    if (pair == NULL ||
-        strcmp(pair->name, "gpio") != 0 ||
-        mygpio_parse_uint(pair->value, &gpio, NULL, 0, GPIOS_MAX) == false)
-    {
-        if (pair != NULL) {
-            mygpio_free_pair(pair);
-        }
-        return NULL;
+const char *mygpio_gpio_lookup_bias(enum mygpio_gpio_bias bias) {
+    switch(bias) {
+        case MYGPIO_BIAS_AS_IS:
+            return "as-is";
+        case MYGPIO_BIAS_DISABLED:
+            return "disable";
+        case MYGPIO_BIAS_PULL_DOWN:
+            return "pull-down";
+        case MYGPIO_BIAS_PULL_UP:
+            return "pull-up";
+        case MYGPIO_EVENT_REQUEST_UNKNOWN:
+            return "unknown";
     }
-    mygpio_free_pair(pair);
+    return "unknown";
+}
 
-    pair = mygpio_recv_pair(connection);
-    if (pair == NULL ||
-        strcmp(pair->name, "mode") != 0 ||
-        (mode = mygpio_gpio_parse_mode(pair->value)) == MYGPIO_GPIO_MODE_UNKNOWN)
-    {
-        if (pair != NULL) {
-            mygpio_free_pair(pair);
-        }
-        return NULL;
+/**
+ * Parses a string to a gpio bias.
+ * @param str string to parse
+ * @return gpio bias or GPIO_BIAS_UNKNOWN on error
+ */
+enum mygpio_gpio_bias mygpio_gpio_parse_bias(const char *str) {
+    if (strcasecmp(str, "as-is") == 0) {
+        return MYGPIO_BIAS_AS_IS;
     }
-    mygpio_free_pair(pair);
-
-    pair = mygpio_recv_pair(connection);
-    if (pair == NULL ||
-        strcmp(pair->name, "value") != 0 ||
-        (value = mygpio_gpio_parse_value(pair->value)) == MYGPIO_GPIO_VALUE_UNKNOWN)
-    {
-        if (pair != NULL) {
-            mygpio_free_pair(pair);
-        }
-        return NULL;
+    if (strcasecmp(str, "disable") == 0) {
+        return MYGPIO_BIAS_DISABLED;
     }
-    mygpio_free_pair(pair);
-
-    struct t_mygpio_gpio_conf *gpio_conf = malloc(sizeof(struct t_mygpio_gpio_conf));
-    assert(gpio_conf);
-    gpio_conf->gpio = gpio;
-    gpio_conf->mode = mode;
-    gpio_conf->value = value;
-    return gpio_conf;
+    if (strcasecmp(str, "pull-down") == 0) {
+        return MYGPIO_BIAS_PULL_DOWN;
+    }
+    if (strcasecmp(str, "pull-up") == 0) {
+        return MYGPIO_BIAS_PULL_UP;
+    }
+    return MYGPIO_BIAS_UNKNOWN;
 }
 
 /**
- * Returns the GPIO number from struct t_mygpio_gpio_conf.
- * @param gpio_conf Pointer to struct t_mygpio_gpio_conf.
- * @return GPIO number. 
+ * Lookups the name for an event request.
+ * @param value the gpio event request.
+ * @return gpio value name
  */
-unsigned mygpio_gpio_conf_get_gpio(struct t_mygpio_gpio_conf *gpio_conf) {
-    return gpio_conf->gpio;
+const char *mygpio_gpio_lookup_event_request(enum mygpio_event_request event_request) {
+    switch(event_request) {
+        case MYGPIO_EVENT_REQUEST_FALLING:
+            return "monotonic";
+        case MYGPIO_EVENT_REQUEST_RISING:
+            return "realtime";
+        case MYGPIO_EVENT_REQUEST_BOTH:
+            return "hte";
+        case MYGPIO_EVENT_REQUEST_UNKNOWN:
+            return "unknown";
+    }
+    return "unknown";
 }
 
 /**
- * Returns the GPIO mode from struct t_mygpio_gpio_conf.
- * @param gpio_conf Pointer to struct t_mygpio_gpio_conf.
- * @return GPIO mode, one of enum mygpio_gpio_mode.
+ * Parses a string to an event request.
+ * @param str string to parse
+ * @return gpio event request or GPIO_EVENT_REQUEST_UNKNOWN on error
  */
-enum mygpio_gpio_mode mygpio_gpio_conf_get_mode(struct t_mygpio_gpio_conf *gpio_conf) {
-    return gpio_conf->mode;
+enum mygpio_event_request mygpio_gpio_parse_event_request(const char *str) {
+    if (strcasecmp(str, "falling") == 0) {
+        return MYGPIO_EVENT_REQUEST_FALLING;
+    }
+    if (strcasecmp(str, "rising") == 0) {
+        return MYGPIO_EVENT_REQUEST_RISING;
+    }
+    if (strcasecmp(str, "both") == 0) {
+        return MYGPIO_EVENT_REQUEST_BOTH;
+    }
+    return MYGPIO_EVENT_REQUEST_UNKNOWN;
 }
 
 /**
- * Returns the GPIO value from struct t_mygpio_gpio_conf.
- * @param gpio_conf Pointer to struct t_mygpio_gpio_conf.
- * @return GPIO mode, one of enum mygpio_gpio_mode.
+ * Lookups the name for the gpio event clock.
+ * @param clock the gpio clock.
+ * @return gpio clock name
  */
-enum mygpio_gpio_value mygpio_gpio_conf_get_value(struct t_mygpio_gpio_conf *gpio_conf) {
-    return gpio_conf->value;
+const char *mygpio_gpio_lookup_event_clock(enum mygpio_event_clock clock) {
+    switch(clock) {
+        case MYGPIO_EVENT_CLOCK_MONOTONIC:
+            return "monotonic";
+        case MYGPIO_EVENT_CLOCK_REALTIME:
+            return "realtime";
+        case MYGPIO_EVENT_CLOCK_HTE:
+            return "hte";
+        case MYGPIO_EVENT_CLOCK_UNKNOWN:
+            return "unknown";
+    }
+    return "unknown";
 }
 
 /**
- * Frees the gpio config struct
- * @param gpio_conf 
+ * Parses a string to a gpio event clock.
+ * @param str string to parse
+ * @return gpio event clock or MYGPIO_EVENT_CLOCK_UNKNOWN on error
  */
-void mygpio_free_gpio_conf(struct t_mygpio_gpio_conf *gpio_conf) {
-    free(gpio_conf);
+enum mygpio_event_clock mygpio_gpio_parse_event_clock(const char *str) {
+    if (strcasecmp(str, "monotonic") == 0) {
+        return MYGPIO_EVENT_CLOCK_MONOTONIC;
+    }
+    if (strcasecmp(str, "realtime") == 0) {
+        return MYGPIO_EVENT_CLOCK_REALTIME;
+    }
+    if (strcasecmp(str, "hte") == 0) {
+        return MYGPIO_EVENT_CLOCK_HTE;
+    }
+    return MYGPIO_EVENT_CLOCK_UNKNOWN;
+}
+
+/**
+ * Lookups the name for the gpio drive setting.
+ * @param drive the gpio drive.
+ * @return gpio drive name
+ */
+const char *mygpio_gpio_lookup_drive(enum mygpio_drive drive) {
+    switch(drive) {
+        case MYGPIO_DRIVE_PUSH_PULL:
+            return "push-pull";
+        case MYGPIO_DRIVE_OPEN_DRAIN:
+            return "open-drain";
+        case MYGPIO_DRIVE_OPEN_SOURCE:
+            return "open-source";
+        case MYGPIO_DRIVE_UNKNOWN:
+            return "unknown";
+    }
+    return "unknown";
+}
+
+/**
+ * Parses a string to a gpio drive.
+ * @param str string to parse
+ * @return gpio bias or MYGPIO_DRIVE_UNKNOWN on error
+ */
+enum mygpio_drive mygpio_gpio_parse_drive(const char *str) {
+    if (strcasecmp(str, "push-pull") == 0) {
+        return MYGPIO_DRIVE_PUSH_PULL;
+    }
+    if (strcasecmp(str, "open-drain") == 0) {
+        return MYGPIO_DRIVE_OPEN_DRAIN;
+    }
+    if (strcasecmp(str, "open-source") == 0) {
+        return MYGPIO_DRIVE_OPEN_SOURCE;
+    }
+    return MYGPIO_DRIVE_UNKNOWN;
 }
 
 /**
@@ -241,4 +295,135 @@ bool mygpio_gpiotoggle(struct t_mygpio_connection *connection, unsigned gpio) {
     return libmygpio_send_line(connection, "gpiotoggle %u", gpio) &&
         libmygpio_recv_response_status(connection) &&
         mygpio_response_end(connection);
+}
+
+/**
+ * Returns the GPIO number from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO number. 
+ */
+unsigned mygpio_gpio_get_gpio(struct t_mygpio_gpio *gpio) {
+    return gpio->gpio;
+}
+
+/**
+ * Returns the GPIO mode from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO mode, one of enum mygpio_gpio_mode.
+ */
+enum mygpio_gpio_mode mygpio_gpio_get_mode(struct t_mygpio_gpio *gpio) {
+    return gpio->mode;
+}
+
+/**
+ * Returns the GPIO value from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO mode, one of enum mygpio_gpio_mode.
+ */
+enum mygpio_gpio_value mygpio_gpio_get_value(struct t_mygpio_gpio *gpio) {
+    return gpio->value;
+}
+
+/**
+ * Returns the GPIO active_low from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO is set to active_low?
+ */
+bool mygpio_gpio_in_get_active_low(struct t_mygpio_gpio *gpio) {
+    assert(gpio->in);
+    return gpio->in->active_low;
+}
+
+/**
+ * Returns the GPIO bias from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO bias, one of enum mygpio_gpio_bias.
+ */
+enum mygpio_gpio_bias mygpio_gpio_in_get_bias(struct t_mygpio_gpio *gpio) {
+    assert(gpio->in);
+    return gpio->in->bias;
+}
+
+/**
+ * Returns the requested events from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return requested GPIO events, one of enum event_request.
+ */
+enum mygpio_event_request mygpio_gpio_in_get_event_request(struct t_mygpio_gpio *gpio) {
+    assert(gpio->in);
+    return gpio->in->event_request;
+}
+
+/**
+ * Returns if the GPIO is debounced.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO debounced?
+ */
+bool mygpio_gpio_in_get_is_debounced(struct t_mygpio_gpio *gpio) {
+    assert(gpio->in);
+    return gpio->in->is_debounced;
+}
+
+/**
+ * Returns the GPIO debounce period from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO debounce period in nanoseconds.
+ */
+int mygpio_gpio_in_get_debounce_period(struct t_mygpio_gpio *gpio) {
+    assert(gpio->in);
+    return gpio->in->debounce_period;
+}
+
+/**
+ * Returns the GPIO event clock from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO event clock, one of enum mygpio_event_clock.
+ */
+enum mygpio_event_clock mygpio_gpio_in_get_event_clock(struct t_mygpio_gpio *gpio) {
+    assert(gpio->in);
+    return gpio->in->event_clock;
+}
+
+/**
+ * Returns the GPIO drive setting from struct t_mygpio_gpio.
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO drive setting, one of enum mygpio_drive.
+ */
+enum mygpio_drive mygpio_gpio_out_get_drive(struct t_mygpio_gpio *gpio) {
+    assert(gpio->out);
+    return gpio->out->drive;
+}
+
+/**
+ * Creates a new gpio struct
+ * @return struct t_mygpio_gpio* 
+ */
+struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_mode mode) {
+    struct t_mygpio_gpio *gpio = malloc(sizeof(struct t_mygpio_gpio));
+    assert(gpio);
+    if (mode == MYGPIO_GPIO_MODE_IN) {
+        gpio->in = malloc(sizeof(struct t_mygpio_in));
+        assert(gpio->in);
+        gpio->out = NULL;
+    }
+    else if (mode == MYGPIO_GPIO_MODE_OUT) {
+        gpio->in = NULL;
+        gpio->out = malloc(sizeof(struct t_mygpio_out));
+        assert(gpio->out);
+    }
+    return gpio;
+}
+
+/**
+ * Frees the gpio struct
+ * @param gpio 
+ */
+void mygpio_free_gpio(struct t_mygpio_gpio *gpio) {
+    if (gpio->in != NULL) {
+        free(gpio->in);
+    }
+    if (gpio->out != NULL) {
+        free(gpio->out);
+    }
+    free(gpio);
 }

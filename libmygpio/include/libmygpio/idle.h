@@ -16,8 +16,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct t_mygpio_connection;
-
 /**
  * Possible event types
  */
@@ -27,6 +25,15 @@ enum mygpio_event {
     MYGPIO_EVENT_RISING,        //!< rising
     MYGPIO_EVENT_LONG_PRESS     //!< long_press
 };
+
+/**
+ * \struct t_mygpio_idle_event
+ *
+ * Opaque struct holding the event information received by mygpio_recv_idle_event.
+ */
+struct t_mygpio_idle_event;
+
+struct t_mygpio_connection;
 
 /**
  * Parses a string to the event type.
@@ -41,13 +48,6 @@ enum mygpio_event libmygpio_parse_event(const char *str);
  * @return Event name as string
  */
 const char *libmygpio_lookup_event(enum mygpio_event event);
-
-/**
- * \struct t_mygpio_idle_event
- *
- * Opaque struct holding the event information received by mygpio_recv_idle_event.
- */
-struct t_mygpio_idle_event;
 
 /**
  * Enters the myGPIOd idle mode to get notifications about events.

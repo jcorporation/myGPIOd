@@ -24,8 +24,6 @@ sds sds_getline(sds s, FILE *fp, size_t max, int *nread);
 sds *sds_splitfirst(sds s, char sep, int *count);
 const char *lookup_gpio_value(enum gpiod_line_value value);
 enum gpiod_line_value parse_gpio_value(const char *str);
-bool parse_bool(const char *str);
-const char *bool_to_str(bool v);
 enum gpiod_line_bias parse_bias(const char *str);
 const char *lookup_bias(enum gpiod_line_bias bias);
 enum gpiod_line_clock parse_event_clock(const char *str);

@@ -27,17 +27,62 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
     (void)argc;
     (void)(argv);
     (void)option_index;
-    verbose_printf("Sending gpiolist\n");
+    verbose_printf("Sending gpiolist");
     if (mygpio_gpiolist(conn) == true) {
-        struct t_mygpio_gpio_conf *gpio_conf;
-        printf("Retrieving gpio config\n");
-        while ((gpio_conf = mygpio_recv_gpio_list(conn)) != NULL) {
+        struct t_mygpio_gpio *gpio;
+        printf("Retrieving configured gpios\n");
+        while ((gpio = mygpio_recv_gpio_list(conn)) != NULL) {
             printf("GPIO %u, mode %s, value %s\n",
-                mygpio_gpio_conf_get_gpio(gpio_conf),
-                mygpio_gpio_lookup_mode(mygpio_gpio_conf_get_mode(gpio_conf)),
-                mygpio_gpio_lookup_value(mygpio_gpio_conf_get_value(gpio_conf))
+                mygpio_gpio_get_gpio(gpio),
+                mygpio_gpio_lookup_mode(mygpio_gpio_get_mode(gpio)),
+                mygpio_gpio_lookup_value(mygpio_gpio_get_value(gpio))
             );
-            mygpio_free_gpio_conf(gpio_conf);
+            mygpio_free_gpio(gpio);
+        }
+        mygpio_response_end(conn);
+        return EXIT_SUCCESS;
+    }
+    fprintf(stderr, "Error: %s\n", mygpio_connection_get_error(conn));
+    mygpio_response_end(conn);
+    return EXIT_FAILURE;
+}
+
+/**
+ * Gets the configuration of a gpio
+ * @param argc argument count
+ * @param argv argument list
+ * @param option_index parsed option index
+ * @param conn connection struct
+ * @return 0 on success, else 1
+ */
+int handle_gpioinfo(int argc, char **argv, int option_index, struct t_mygpio_connection *conn) {
+    (void)argc;
+    unsigned gpio_nr;
+    if (mygpio_parse_uint(argv[option_index], &gpio_nr, NULL, 0, GPIOS_MAX) == false) {
+        fprintf(stderr, "Invalid gpio number\n");
+        return EXIT_FAILURE;
+    }
+    verbose_printf("Sending gpioinfo");
+    if (mygpio_gpioinfo(conn, gpio_nr) == true) {
+        printf("Retrieving gpio info\n");
+        struct t_mygpio_gpio *gpio = mygpio_recv_gpio_info(conn);
+        if (gpio == NULL) {
+            return EXIT_FAILURE;
+        }
+        enum mygpio_gpio_mode mode = mygpio_gpio_get_mode(gpio);
+        printf("GPIO: %u\n", mygpio_gpio_get_gpio(gpio));
+        printf("Mode: %s\n", mygpio_gpio_lookup_mode(mode));
+        printf("Value: %s\n", mygpio_gpio_lookup_value(mygpio_gpio_get_value(gpio)));
+        if (mode == MYGPIO_GPIO_MODE_IN) {
+            printf("Active low: %s\n", mygpio_bool_to_str(mygpio_gpio_in_get_active_low(gpio)));
+            printf("Bias: %s\n", mygpio_gpio_lookup_bias(mygpio_gpio_in_get_bias(gpio)));
+            printf("Event request: %s\n", mygpio_gpio_lookup_event_request(mygpio_gpio_in_get_event_request(gpio)));
+            printf("Is debounced: %s\n", mygpio_bool_to_str(mygpio_gpio_in_get_is_debounced(gpio)));
+            printf("Debounce period: %d ns", mygpio_gpio_in_get_debounce_period(gpio));
+            printf("Event clock: %s\n", mygpio_gpio_lookup_event_clock(mygpio_gpio_in_get_event_clock(gpio)));
+        }
+        else if (mode == MYGPIO_GPIO_MODE_OUT) {
+            printf("Drive: %s\n", mygpio_gpio_lookup_drive(mygpio_gpio_out_get_drive(gpio)));
         }
         mygpio_response_end(conn);
         return EXIT_SUCCESS;
@@ -62,7 +107,7 @@ int handle_gpioget(int argc, char **argv, int option_index, struct t_mygpio_conn
         fprintf(stderr, "Invalid gpio number\n");
         return EXIT_FAILURE;
     }
-    verbose_printf("Sending gpioget 5\n");
+    verbose_printf("Sending gpioget");
     enum mygpio_gpio_value value = mygpio_gpioget(conn, gpio);
     if (value == MYGPIO_GPIO_VALUE_UNKNOWN) {
         fprintf(stderr, "Error: %s\n", mygpio_connection_get_error(conn));

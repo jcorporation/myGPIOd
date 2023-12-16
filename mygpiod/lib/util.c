@@ -184,36 +184,6 @@ const char *lookup_drive(enum gpiod_line_drive value) {
 }
 
 /**
- * Parses a string to a boolean value.
- * Sets errno to EINVAL on parser error.
- * Returns false if string is not true.
- * @param str string to parse
- * @return parsed value
- */
-bool parse_bool(const char *str) {
-    if (strcasecmp(str, "true") == 0) {
-        return true;
-    }
-    if (strcasecmp(str, "false") == 0) {
-        return false;
-    }
-    errno = EINVAL;
-    MYGPIOD_LOG_WARN("Could not parse bool, setting false");
-    return false;
-}
-
-/**
- * Prints a bool value as string
- * @param v the bool value
- * @return string
- */
-const char *bool_to_str(bool v) {
-    return v == true
-        ? "true"
-        : "false";
-}
-
-/**
  * Parses the bias flags
  * Sets errno to EINVAL on parser error.
  * @param option string to parse

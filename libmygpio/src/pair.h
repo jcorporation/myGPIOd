@@ -18,6 +18,7 @@ struct t_mygpio_pair {
 };
 
 struct t_mygpio_pair *mygpio_recv_pair(struct t_mygpio_connection *connection);
+struct t_mygpio_pair *mygpio_recv_pair_name(struct t_mygpio_connection *connection, const char *name);
 void mygpio_free_pair(struct t_mygpio_pair *pair);
 
 #endif

@@ -42,7 +42,9 @@ void print_usage(void) {
     fprintf(stderr, "Commands:\n"
                     "  gpioget <number>          Gets the current value of an input gpio\n"
                     "  gpioset <number> <value>  Sets the value of an output gpio\n"
-                    "  gpiolist                  Lists all configured gpios with its modes\n"
+                    "  gpiotoggle <number>       Toggles the value of an output gpio\n"
+                    "  gpioinfo                  Gets the settings of a gpio\n"
+                    "  gpiolist                  Lists all configured gpios with its mode and value\n"
                     "  idle [<timeout>]          Waits for idle events, timeout is in milliseconds\n"
                     "\n"
     );

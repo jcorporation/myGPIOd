@@ -29,6 +29,7 @@ struct t_commands {
 
 static struct t_commands commands[] = {
     { "idle", handle_idle, 0, 1 },
+    { "gpioinfo", handle_gpiolist, 1, 1 },
     { "gpiolist", handle_gpiolist, 0, 0 },
     { "gpioget", handle_gpioget, 1, 1 },
     { "gpioset", handle_gpioset, 2, 2 },

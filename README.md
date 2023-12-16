@@ -65,6 +65,7 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
 | gpioset | `<gpio>` `<value>` | Sets the value of a GPIO. |
+| gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
 | system | `<command>` | Executes an executable or script in a new child process. |
 
 ## Example configuration
@@ -93,7 +94,7 @@ gpio_dir = /etc/mygpiod.d
 
 **/etc/mygpiod.d/3.in**
 ```
-request_event = both
+event_request = both
 active_low = false
 bias = pull-up
 action_rising = gpioset:6 low
@@ -108,7 +109,7 @@ long_press_action = system:/usr/local/bin/reboot.sh
 
 **/etc/mygpiod.d/4.in**
 ```
-request_event = falling
+event_request = falling
 active_low = false
 bias = pull-up
 action_falling = system:/usr/local/bin/poweroff.sh

@@ -80,6 +80,7 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
 
     server_response_start(client_data);
     server_response_append(client_data, "%s", DEFAULT_MSG_OK);
+    server_response_append(client_data, "gpio:%u", gpio);
     if (gpio_mode == GPIOD_LINE_DIRECTION_INPUT) {
         struct gpiod_line_info *info = gpiod_chip_get_line_info(config->chip, node->id);
         if (info != NULL) {
@@ -87,7 +88,7 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
             server_response_append(client_data, "value:%d", gpio_get_value(config, gpio));
             server_response_append(client_data, "active_low:%d", gpiod_line_info_is_active_low(info));
             server_response_append(client_data, "bias:%s", lookup_bias(gpiod_line_info_get_bias(info)));
-            server_response_append(client_data, "request_event:%s", lookup_event_request(gpiod_line_info_get_edge_detection(info)));
+            server_response_append(client_data, "event_request:%s", lookup_event_request(gpiod_line_info_get_edge_detection(info)));
             server_response_append(client_data, "is_debounced:%d", gpiod_line_info_is_debounced(info));
             server_response_append(client_data, "debounce_period:%lu", gpiod_line_info_get_debounce_period_us(info));
             server_response_append(client_data, "event_clock:%s", lookup_event_clock(gpiod_line_info_get_event_clock(info)));
@@ -98,8 +99,6 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
         if (info != NULL) {
             server_response_append(client_data, "mode:out");
             server_response_append(client_data, "value:%d", gpio_get_value(config, gpio));
-            server_response_append(client_data, "active_low:%d", gpiod_line_info_is_active_low(info));
-            server_response_append(client_data, "bias:%s", lookup_bias(gpiod_line_info_get_bias(info)));
             server_response_append(client_data, "drive:%s", lookup_drive(gpiod_line_info_get_drive(info)));
         }
     }

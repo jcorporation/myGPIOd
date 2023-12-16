@@ -226,8 +226,8 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         return errno == 0 ? true : false;
     }
     if (strcmp(key, "syslog") == 0) {
-        config->syslog = parse_bool(value);
-        MYGPIOD_LOG_DEBUG("Setting syslog to \"%s\"", bool_to_str(config->syslog));
+        config->syslog = mygpio_parse_bool(value);
+        MYGPIOD_LOG_DEBUG("Setting syslog to \"%s\"", mygpio_bool_to_str(config->syslog));
         return errno == 0 ? true : false;
     }
     if (strcmp(key, "gpio_dir") == 0) {
@@ -311,14 +311,6 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
  */
 static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_data *data) {
     errno = 0;
-    if (strcmp(key, "active_low") == 0) {
-        data->active_low = parse_bool(value);
-        return errno == 0 ? true : false;
-    }
-    if (strcmp(key, "bias") == 0) {
-        data->bias = parse_bias(value);
-        return errno == 0 ? true : false;
-    }
     if (strcmp(key, "drive") == 0) {
         data->drive = parse_drive(value);
         return errno == 0 ? true : false;
@@ -340,15 +332,15 @@ static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_
 static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_data *data) {
     errno = 0;
     if (strcmp(key, "active_low") == 0) {
-        data->active_low = parse_bool(value);
+        data->active_low = mygpio_parse_bool(value);
         return errno == 0 ? true : false;
     }
     if (strcmp(key, "bias") == 0) {
         data->bias = parse_bias(value);
         return errno == 0 ? true : false;
     }
-    if (strcmp(key, "request_event") == 0) {
-        data->request_event = parse_event_request(value);
+    if (strcmp(key, "event_request") == 0) {
+        data->event_request = parse_event_request(value);
         return errno == 0 ? true : false;
     }
     if (strcmp(key, "debounce") == 0) {
@@ -423,7 +415,7 @@ static struct t_action *action_node_data_from_value(sds value) {
  */
 static struct t_gpio_in_data *gpio_in_data_new(void) {
     struct t_gpio_in_data *data = malloc_assert(sizeof(struct t_gpio_in_data));
-    data->request_event = GPIOD_LINE_EDGE_RISING;
+    data->event_request = GPIOD_LINE_EDGE_RISING;
     list_init(&data->action_rising);
     list_init(&data->action_falling);
     data->long_press_timeout = 0;
@@ -474,8 +466,6 @@ static void gpio_node_in_clear(struct t_list_node *node) {
  */
 static struct t_gpio_out_data *gpio_out_data_new(void) {
     struct t_gpio_out_data *data = malloc_assert(sizeof(struct t_gpio_out_data));
-    data->bias = GPIOD_LINE_BIAS_AS_IS;
-    data->active_low = false;
     data->drive = GPIOD_LINE_DRIVE_PUSH_PULL;
     data->value = GPIOD_LINE_VALUE_INACTIVE;
     data->request = NULL;

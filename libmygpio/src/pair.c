@@ -34,6 +34,18 @@ struct t_mygpio_pair *mygpio_recv_pair(struct t_mygpio_connection *connection) {
     return libmygpio_parse_pair(connection->buf_in.buffer);
 }
 
+struct t_mygpio_pair *mygpio_recv_pair_name(struct t_mygpio_connection *connection, const char *name) {
+    struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
+    if (pair == NULL) {
+        return NULL;
+    }
+    if (strcmp(name, pair->value) != 0) {
+        mygpio_free_pair(pair);
+        return NULL;
+    }
+    return pair;
+}
+
 /**
  * Frees the key/value pair
  * @param pair pair to free

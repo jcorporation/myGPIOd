@@ -14,5 +14,6 @@ bool mygpio_parse_int(const char *str, int *result, char **rest, int min, int ma
 bool mygpio_parse_uint(const char *str, unsigned *result, char **rest, unsigned min, unsigned max);
 bool mygpio_parse_ulong(const char *str, unsigned long *result, char **rest, unsigned long min, unsigned long max);
 bool mygpio_parse_uint64(const char *str, uint64_t *result, char **rest, uint64_t min, uint64_t max);
-
+bool mygpio_parse_bool(const char *str);
+const char *mygpio_bool_to_str(bool v);
 #endif

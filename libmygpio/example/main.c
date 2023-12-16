@@ -71,15 +71,15 @@ int main(int argc, char **argv) {
     // List the modes of the configured GPIOs
     printf("Sending gpiolist\n");
     if (mygpio_gpiolist(conn) == true) {
-        struct t_mygpio_gpio_conf *gpio_conf;
+        struct t_mygpio_gpio *gpio;
         printf("Retrieving gpio config\n");
-        while ((gpio_conf = mygpio_recv_gpio_list(conn)) != NULL) {
+        while ((gpio = mygpio_recv_gpio_list(conn)) != NULL) {
             printf("GPIO %u, mode %u, value %d\n", 
-                mygpio_gpio_conf_get_gpio(gpio_conf),
-                mygpio_gpio_conf_get_mode(gpio_conf),
-                mygpio_gpio_conf_get_value(gpio_conf)
+                mygpio_gpio_get_gpio(gpio),
+                mygpio_gpio_get_mode(gpio),
+                mygpio_gpio_get_value(gpio)
             );
-            mygpio_free_gpio_conf(gpio_conf);
+            mygpio_free_gpio(gpio);
         }
     }
     else {

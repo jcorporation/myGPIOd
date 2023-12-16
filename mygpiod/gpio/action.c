@@ -5,7 +5,7 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/actions/gpioset.h"
+#include "mygpiod/actions/gpio.h"
 #include "mygpiod/gpio/action.h"
 
 #include "mygpiod/actions/system.h"
@@ -53,8 +53,8 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
     if (event_type == GPIOD_EDGE_EVENT_FALLING_EDGE) {
         event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, timestamp);
         if (data->action_falling.length > 0) {
-            if (data->request_event == GPIOD_LINE_EDGE_FALLING ||
-                data->request_event == GPIOD_LINE_EDGE_BOTH)
+            if (data->event_request == GPIOD_LINE_EDGE_FALLING ||
+                data->event_request == GPIOD_LINE_EDGE_BOTH)
             {
                 action_execute(config, &data->action_falling);
             }
@@ -69,8 +69,8 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
     else {
         event_enqueue(config, gpio, MYGPIOD_EVENT_RISING, timestamp);
         if (data->action_rising.length > 0) {
-            if (data->request_event == GPIOD_LINE_EDGE_RISING ||
-                data->request_event == GPIOD_LINE_EDGE_BOTH)
+            if (data->event_request == GPIOD_LINE_EDGE_RISING ||
+                data->event_request == GPIOD_LINE_EDGE_BOTH)
             {
                 action_execute(config, &data->action_rising);
             }
@@ -111,7 +111,7 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
         uint64_t timestamp = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
         event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, timestamp);
         action_execute(config, &data->long_press_action);
-        if (data->request_event == GPIOD_LINE_EDGE_BOTH) {
+        if (data->event_request == GPIOD_LINE_EDGE_BOTH) {
             // ignore the release event
             data->ignore_event = true;
         }

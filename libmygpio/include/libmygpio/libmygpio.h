@@ -23,6 +23,8 @@
 
 #include "connection.h"
 #include "gpio.h"
+#include "gpioinfo.h"
+#include "gpiolist.h"
 #include "idle.h"
 #include "protocol.h"
 
