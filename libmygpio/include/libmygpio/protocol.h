@@ -13,9 +13,13 @@
 #ifndef LIBMYGPIO_PROTOCOL_H
 #define LIBMYGPIO_PROTOCOL_H
 
-struct t_mygpio_connection;
-
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct t_mygpio_connection;
 
 /**
  * Finishes reading the response from myGPIOd and empties the input buffer.
@@ -23,5 +27,9 @@ struct t_mygpio_connection;
  * @return true on success, else false
  */
 bool mygpio_response_end(struct t_mygpio_connection *connection);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

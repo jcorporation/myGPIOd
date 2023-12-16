@@ -16,6 +16,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Possible event types
  */
@@ -116,5 +120,9 @@ uint64_t mygpio_idle_event_get_timestamp_ms(struct t_mygpio_idle_event *event);
  * @param event Pointer to struct t_mygpio_idle_event.
  */
 void mygpio_free_idle_event(struct t_mygpio_idle_event *event);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

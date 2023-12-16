@@ -15,6 +15,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * myGPIOd connections states
  */
@@ -85,5 +89,9 @@ const char *mygpio_connection_get_error(struct t_mygpio_connection *connection);
  * @return true on success, else false
  */
 bool mygpio_connection_clear_error(struct t_mygpio_connection *connection);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

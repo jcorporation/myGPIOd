@@ -15,6 +15,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct t_mygpio_connection;
 
 /**
@@ -267,5 +271,9 @@ enum mygpio_drive mygpio_gpio_out_get_drive(struct t_mygpio_gpio *gpio);
  * @param gpio Pointer to struct mygpio_recv_gpio.
  */
 void mygpio_free_gpio(struct t_mygpio_gpio *gpio);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

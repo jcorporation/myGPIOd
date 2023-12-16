@@ -15,6 +15,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct t_mygpio_connection;
 struct t_mygpio_gpio;
 
@@ -33,5 +37,9 @@ bool mygpio_gpiolist(struct t_mygpio_connection *connection);
  * @return Allocated struct t_mygpio_gpio or NULL on list end or error.
  */
 struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connection);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
