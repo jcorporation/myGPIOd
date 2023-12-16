@@ -130,6 +130,7 @@ cleanup() {
   rm -rf release
   rm -rf debug
   rm -rf package
+  rm -rf docs/html
   
   #tmp files
   find ./ -name \*~ -delete
