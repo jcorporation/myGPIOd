@@ -78,7 +78,7 @@ int handle_gpioinfo(int argc, char **argv, int option_index, struct t_mygpio_con
             printf("Bias: %s\n", mygpio_gpio_lookup_bias(mygpio_gpio_in_get_bias(gpio)));
             printf("Event request: %s\n", mygpio_gpio_lookup_event_request(mygpio_gpio_in_get_event_request(gpio)));
             printf("Is debounced: %s\n", mygpio_bool_to_str(mygpio_gpio_in_get_is_debounced(gpio)));
-            printf("Debounce period: %d ns", mygpio_gpio_in_get_debounce_period(gpio));
+            printf("Debounce period: %d ns\n", mygpio_gpio_in_get_debounce_period(gpio));
             printf("Event clock: %s\n", mygpio_gpio_lookup_event_clock(mygpio_gpio_in_get_event_clock(gpio)));
         }
         else if (mode == MYGPIO_GPIO_MODE_OUT) {
