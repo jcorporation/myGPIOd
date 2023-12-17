@@ -204,7 +204,7 @@ pkgdebian() {
   SIGNOPT="--no-sign"
   if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
   then
-    SIGNOPT="--sign-key=$GPGKEYID"  
+    SIGNOPT="--sign-key=$GPGKEYID"
   else
     echo "Package would not be signed"
   fi
@@ -228,16 +228,9 @@ pkgdebian() {
 }
 
 pkgalpine() {
-  if [ -z "${1+x}" ]
-  then
-    TARONLY=""
-  else
-    TARONLY=$1
-  fi
   check_cmd abuild
   prepare
   tar -czf "mygpiod_${VERSION}.orig.tar.gz" -- *
-  [ "$TARONLY" = "taronly" ] && return 0
   cp contrib/packaging/alpine/* .
   abuild checksum
   abuild -r
@@ -283,7 +276,7 @@ pkgarch() {
   if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
   then
     KEYARG=""
-    [ -z "${GPGKEYID+x}" ] || KEYARG="--key $PGPGKEYID"
+    [ -z "${GPGKEYID+x}" ] || KEYARG="--key $GPGKEYID"
     makepkg --sign "$KEYARG" mygpiod-*.pkg.tar.xz
   fi
   if check_cmd namcap
@@ -351,22 +344,22 @@ installdeps() {
     #debian
     apt-get update
     apt-get install -y --no-install-recommends gcc cmake build-essential
-    echo "Debian has no native libpiod v2 package, you must build it yourself."
+    echo "Debian has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/arch-release ]
   then
     #arch
     pacman -S gcc cmake
-    echo "Arch has no native libpiod v2 package, you must build it yourself."
+    echo "Arch has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/alpine-release ]
   then
     #alpine
     apk add cmake alpine-sdk linux-headers
-    echo "Alpine Linux has no native libpiod v2 package, you must build it yourself."
+    echo "Alpine Linux has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/SuSE-release ]
   then
     #suse
     zypper install gcc cmake unzip
-    echo "SuSe has no native libpiod v2 package, you must build it yourself."
+    echo "SuSe has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/redhat-release ]
   then
     #fedora
@@ -380,23 +373,16 @@ installdeps() {
   fi
 }
 
-# Also deletes stale installations in other locations.
-#
 uninstall() {
+  [ -z "${DESTDIR+x}" ] && DESTDIR=""
   # cmake does not provide an uninstall target,
   # instead its manifest is of use at least for
   # the binaries
   if [ -f release/install_manifest.txt ]
   then
-    xargs rm -f < release/install_manifest.txt
+    xargs rm -v -f < release/install_manifest.txt
   fi
 
-  #CMAKE_INSTALL_PREFIX="/usr"
-  rm -f "$DESTDIR/usr/bin/mygpiod"
-   #CMAKE_INSTALL_PREFIX="/usr/local"
-  rm -f "$DESTDIR/usr/local/bin/mygpiod"
-  #CMAKE_INSTALL_PREFIX="/opt/mygpiod/"
-  rm -rf "$DESTDIR/opt/mygpiod"
   #systemd
   rm -f "$DESTDIR/usr/lib/systemd/system/mygpiod.service"
   rm -f "$DESTDIR/lib/systemd/system/mygpiod.service"
@@ -410,14 +396,16 @@ uninstall() {
 }
 
 purge() {
+  [ -z "${DESTDIR+x}" ] && DESTDIR=""
+  rm -f "$DESTDIR/etc/init.d/mygpiod"
   #CMAKE_INSTALL_PREFIX="/usr"
-  rm -rf "$DESTDIR/var/lib/mygpiod"
   rm -f "$DESTDIR/etc/mygpiod.conf"
   rm -f "$DESTDIR/etc/mygpiod.conf.dist"
-  rm -f "$DESTDIR/etc/init.d/mygpiod"
+  rm -fr "$DESTDIR/etc/mygpiod.d"
   #CMAKE_INSTALL_PREFIX="/usr/local"
   rm -f "$DESTDIR/usr/local/etc/mygpiod.conf"
   rm -f "$DESTDIR/usr/local/etc/mygpiod.conf.dist"
+  rm -fr "$DESTDIR/usr/local/etc/mygpiod.d"
   #CMAKE_INSTALL_PREFIX="/opt/mygpiod/"
   rm -rf "$DESTDIR/var/opt/mygpiod"
   rm -rf "$DESTDIR/etc/opt/mygpiod"
@@ -426,14 +414,14 @@ purge() {
   then
     if check_cmd_silent userdel
     then
-    userdel mygpiod
-  elif check_cmd_silent deluser
-  then
-    deluser mygpiod
-  else
-    echo "Can not del user mygpiod"
-    return 1
-  fi
+      userdel mygpiod
+    elif check_cmd_silent deluser
+    then
+      deluser mygpiod
+    else
+      echo "Can not remove user mygpiod"
+      return 1
+    fi
   fi
   return 0
 }
@@ -515,19 +503,15 @@ case "$ACTION" in
     echo "  debug:            builds debug files in directory debug,"
     echo "  asan|tsan|ubsan:  builds debug files in directory debug"
     echo "                    linked with the sanitizer"
-    echo "  check:            runs cppcheck and flawfinder on source files"
-    echo "                    following environment variables are respected"
-    echo "                      - CPPCHECKOPTS=\"--enable=warning\""
-    echo "                      - FLAWFINDEROPTS=\"-m3\""
+    echo "  check:            runs clang-tidy on source files"
     echo "  installdeps:      installs build and run dependencies"
     echo ""
     echo "Cleanup options:"
     echo "  cleanup:          cleanup source tree"
-    echo "  cleanupdist:      cleanup dist directory, forces release to build new assets"
     echo "  uninstall:        removes mygpiod files, leaves configuration in place "
     echo "                    following environment variables are respected"
     echo "                      - DESTDIR=\"\""
-    echo "  purge:            removes all mygpiod files, also your init scripts"
+    echo "  purge:            removes all mygpiod files, also your init scripts and configuration"
     echo "                    following environment variables are respected"
     echo "                      - DESTDIR=\"\""
     echo ""
