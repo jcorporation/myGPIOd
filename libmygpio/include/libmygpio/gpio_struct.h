@@ -141,7 +141,7 @@ enum mygpio_gpio_bias mygpio_gpio_in_get_bias(struct t_mygpio_gpio *gpio);
 enum mygpio_event_request mygpio_gpio_in_get_event_request(struct t_mygpio_gpio *gpio);
 
 /**
- * Returns if the GPIO is debounced.
+ * Returns true if the GPIO is debounced.
  * @param gpio Pointer to struct t_mygpio_gpio.
  * @return GPIO debounced?
  */

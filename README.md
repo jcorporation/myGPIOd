@@ -39,7 +39,7 @@ It consists of a daemon, a client library and a command line tool.
 
 The `build.sh` script is only a wrapper for cmake. You can use the default cmake workflow to compile myGPIOd.
 
-```
+```sh
 cmake -B build -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .
 make -C build
 ```
@@ -50,9 +50,12 @@ myGPIOd needs rw access to the gpio chip device (e. g. /dev/gpiochip0).
 
 The `./build.sh` script and the packages are creating a mygpiod system user with the group gpio. The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
 
-Adapt the configuration file `/etc/mygpiod.conf` to your needs.
+### Configuration steps
 
-```
+- Adapt the configuration file `/etc/mygpiod.conf` to your needs.
+- Create GPIO configuration files in the directory `/etc/mygpiod.d`. There are example configuration files for input and output configuration. myGPIOd only accesses GPIOs configured in this files.
+
+```sh
 runuser -u mygpiod -g gpio -- /usr/bin/mygpiod [/etc/mygpiod.conf]
 ```
 

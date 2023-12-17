@@ -28,7 +28,7 @@ static struct t_list_node *get_node_by_timerfd(struct t_list *gpios_in, int *fd)
  */
 bool gpio_timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
     timer_log_next_expire(*fd);
-    MYGPIOD_LOG_DEBUG("%u: Long press timer event detected", idx);
+    MYGPIOD_LOG_INFO("%u: Long press timer event detected", idx);
     struct t_list_node *node = get_node_by_timerfd(&config->gpios_in, fd);
     if (fd == NULL) {
         MYGPIOD_LOG_ERROR("Error getting node for timer_fd");

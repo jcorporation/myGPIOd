@@ -33,10 +33,10 @@ debounce = 0
 event_clock = monotonic
 
 # Action for rising event
-#action_rising = /usr/local/bin/poweroff.sh
+#action_rising = system:/usr/local/bin/poweroff.sh
 
 # Action for falling event
-#action_falling = /usr/local/bin/poweroff.sh
+#action_falling = system:/usr/local/bin/poweroff.sh
 
 # Long press support
 # Event for the long press handler
@@ -47,4 +47,4 @@ event_clock = monotonic
 #long_press_timeout = 2
 
 # The long press action
-#long_press_action = /usr/local/bin/reboot.sh
+#long_press_action = system:/usr/local/bin/reboot.sh

@@ -47,6 +47,7 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
         lookup_event_type(event_type), gpio, (long long unsigned)timestamp);
 
     if (data->ignore_event == true) {
+        MYGPIOD_LOG_DEBUG("Ignoring event");
         data->ignore_event = false;
         return;
     }
@@ -60,7 +61,6 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
             }
         }
         if (data->long_press_event == GPIOD_LINE_EDGE_FALLING &&
-            data->long_press_action.length > 0 &&
             data->long_press_timeout > 0)
         {
             action_delay(data);
@@ -76,7 +76,6 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
             }
         }
         if (data->long_press_event == GPIOD_LINE_EDGE_RISING &&
-            data->long_press_action.length > 0 &&
             data->long_press_timeout > 0)
         {
             action_delay(data);
@@ -113,6 +112,7 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
         action_execute(config, &data->long_press_action);
         if (data->event_request == GPIOD_LINE_EDGE_BOTH) {
             // ignore the release event
+            MYGPIOD_LOG_DEBUG("Set next event to ignore");
             data->ignore_event = true;
         }
     }
