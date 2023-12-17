@@ -5,9 +5,9 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/actions/gpio.h"
 #include "mygpiod/gpio/action.h"
 
+#include "mygpiod/actions/gpio.h"
 #include "mygpiod/actions/system.h"
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/lib/action.h"
@@ -43,14 +43,16 @@ static void action_execute(struct t_config *config, struct t_list *actions);
 void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
         enum gpiod_edge_event_type event_type, struct t_gpio_in_data *data)
 {
-    MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"%llu\"",
-        lookup_event_type(event_type), gpio, (long long unsigned)timestamp);
-
     if (data->ignore_event == true) {
-        MYGPIOD_LOG_DEBUG("Ignoring event");
+        MYGPIOD_LOG_INFO("Ignoring event: \"%s\" gpio: \"%u\" timestamp: \"%llu\"",
+            lookup_event_type(event_type), gpio, (long long unsigned)timestamp);
         data->ignore_event = false;
         return;
     }
+
+    MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"%llu\"",
+        lookup_event_type(event_type), gpio, (long long unsigned)timestamp);
+
     if (event_type == GPIOD_EDGE_EVENT_FALLING_EDGE) {
         event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, timestamp);
         if (data->action_falling.length > 0) {
