@@ -20,6 +20,25 @@
 extern "C" {
 #endif
 
+struct t_mygpio_connection;
+
+/**
+ * @struct t_mygpio_idle_event
+ * @{
+ * The opaque myGPIOd idle event object. You can not access it directly.
+ * Refer to @ref idle_event for function that operate on this struct.
+ * @}
+ */
+struct t_mygpio_idle_event;
+
+/**
+ * @defgroup idle_event Idle events
+ *
+ * @brief This module provides functions for the idle mode.
+ *
+ * @{
+ */
+
 /**
  * Possible event types
  */
@@ -29,15 +48,6 @@ enum mygpio_event {
     MYGPIO_EVENT_RISING,        //!< rising
     MYGPIO_EVENT_LONG_PRESS     //!< long_press
 };
-
-/**
- * \struct t_mygpio_idle_event
- *
- * Opaque struct holding the event information received by mygpio_recv_idle_event.
- */
-struct t_mygpio_idle_event;
-
-struct t_mygpio_connection;
 
 /**
  * Parses a string to the event type.
@@ -81,6 +91,7 @@ bool mygpio_wait_idle(struct t_mygpio_connection *connection, int timeout);
 
 /**
  * Receives a list element of the waiting idle events.
+ * Access the values with the mygpio_idle_event_get_* functions.
  * Free it with mygpio_free_idle_event.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
  * @return Allocated struct t_mygpio_idle_event or NULL on list end or error.
@@ -120,6 +131,10 @@ uint64_t mygpio_idle_event_get_timestamp_ms(struct t_mygpio_idle_event *event);
  * @param event Pointer to struct t_mygpio_idle_event.
  */
 void mygpio_free_idle_event(struct t_mygpio_idle_event *event);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

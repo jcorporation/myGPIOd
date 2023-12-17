@@ -20,6 +20,23 @@ extern "C" {
 #endif
 
 /**
+ * @struct t_mygpio_connection
+ * @{
+ * The opaque myGPIOd connection object. You can not access it directly.
+ * Refer to @ref connection for function that operate on this struct.
+ * @}
+ */
+struct t_mygpio_connection;
+
+/**
+ * @defgroup connection myGPIOd connection
+ *
+ * @brief This module provides functions for myGPIOd connection management.
+ *
+ * @{
+ */
+
+/**
  * myGPIOd connections states
  */
 enum mygpio_conn_state {
@@ -27,14 +44,6 @@ enum mygpio_conn_state {
     MYGPIO_STATE_ERROR,  //!< Error state, read the error with mygpio_connection_get_error and clear it with mygpio_connection_clear_error
     MYGPIO_STATE_FATAL   //!< Fatal state, read the error with mygpio_connection_get_error. You must reconnect to recover.
 };
-
-/**
- * \struct t_mygpio_connection
- *
- * The opaque myGPIOd connection object. You can not access it directly.
- * Use below functions for connection management.
- */
-struct t_mygpio_connection;
 
 /**
  * Creates a new connection to the myGPIOd socket and tries to connect.
@@ -89,6 +98,10 @@ const char *mygpio_connection_get_error(struct t_mygpio_connection *connection);
  * @return true on success, else false
  */
 bool mygpio_connection_clear_error(struct t_mygpio_connection *connection);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

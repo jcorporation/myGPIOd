@@ -23,6 +23,14 @@ struct t_mygpio_connection;
 struct t_mygpio_gpio;
 
 /**
+ * @defgroup gpioinfo GPIO info
+ *
+ * @brief This module provides functions for the gpioinfo protocol command.
+ *
+ * @{
+ */
+
+/**
  * Lists the current settings of a GPIO.
  * Retrieve the settings with mygpio_recv_gpio_info and end the response with mygpio_response_end.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
@@ -32,12 +40,18 @@ struct t_mygpio_gpio;
 bool mygpio_gpioinfo(struct t_mygpio_connection *connection, unsigned gpio);
 
 /**
- * Receives a list element of mygpio_gpioinfo.
+ * Receives the result of mygpio_gpioinfo.
  * Free it with mygpio_free_gpio.
+ * Use the mygpio_gpio_get_gpio_*, mygpio_gpio_in_get_gpio_* and mygpio_gpio_in_get_gpio_*
+ * functions to access the values.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
  * @return Allocated struct t_mygpio_gpio or NULL on list end or error.
  */
 struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connection);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

@@ -14,10 +14,12 @@ target_sources(mygpio
   PRIVATE
     src/buffer.c
     src/connection.c
+    src/gpio_struct.c
     src/gpio.c
     src/gpioinfo.c
     src/gpiolist.c
     src/idle.c
+    src/parser.c
     src/pair.c
     src/protocol.c
     src/socket.c

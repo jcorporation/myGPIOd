@@ -7,7 +7,8 @@
 #include "compile_time.h"
 
 #include "libmygpio/include/libmygpio/gpiolist.h"
-#include "libmygpio/src/gpio.h"
+#include "libmygpio/include/libmygpio/parser.h"
+#include "libmygpio/src/gpio_struct.h"
 #include "libmygpio/src/pair.h"
 #include "libmygpio/src/protocol.h"
 #include "mygpio-common/util.h"

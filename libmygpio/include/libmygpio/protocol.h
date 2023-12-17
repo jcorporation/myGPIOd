@@ -22,11 +22,23 @@ extern "C" {
 struct t_mygpio_connection;
 
 /**
+ * @defgroup protocol Protocol
+ *
+ * @brief This module provides generic myGPIOd protocol functions.
+ *
+ * @{
+ */
+
+/**
  * Finishes reading the response from myGPIOd and empties the input buffer.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
  * @return true on success, else false
  */
 bool mygpio_response_end(struct t_mygpio_connection *connection);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

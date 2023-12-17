@@ -23,6 +23,14 @@ struct t_mygpio_connection;
 struct t_mygpio_gpio;
 
 /**
+ * @defgroup gpiolist GPIO list
+ *
+ * @brief This module provides functions for the gpiolist protocol command.
+ *
+ * @{
+ */
+
+/**
  * Lists the modes and values of all configured GPIOs.
  * Retrieve the list elements with mygpio_recv_gpio_list and end the response with mygpio_response_end.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
@@ -32,11 +40,16 @@ bool mygpio_gpiolist(struct t_mygpio_connection *connection);
 
 /**
  * Receives a list element of mygpio_gpiolist.
+ * Use the mygpio_gpio_get_gpio_* functions to access the values.
  * Free it with mygpio_free_gpio.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
  * @return Allocated struct t_mygpio_gpio or NULL on list end or error.
  */
 struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connection);
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }
