@@ -55,7 +55,7 @@ bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
  * @return true on success, else false
  */
 bool send_idle_events(struct t_list_node *client_node) {
-    MYGPIOD_LOG_DEBUG("Client#%u: Sending idle events", client_node->id);
+    MYGPIOD_LOG_INFO("Client#%u: Sending idle events", client_node->id);
     struct t_client_data *client_data = (struct t_client_data *)client_node->data;
 
     server_response_start(client_data);
