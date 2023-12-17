@@ -43,59 +43,59 @@ struct t_mygpio_gpio;
  * The mode of a GPIO.
  */
 enum mygpio_gpio_mode {
-    MYGPIO_GPIO_MODE_UNKNOWN = -1,  //!< Unknown mode.
+    MYGPIO_GPIO_MODE_UNKNOWN = -1,  //!< Unknown GPIO mode.
     MYGPIO_GPIO_MODE_IN,            //!< Input mode, myGPIOd can read events from this GPIO.
     MYGPIO_GPIO_MODE_OUT            //!< Output mode, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_HIGH or MYGPIO_GPIO_VALUE_LOW.
 };
 
 /**
- * The value of an output GPIO.
+ * The value of an output or input GPIO.
  */
 enum mygpio_gpio_value {
-    MYGPIO_GPIO_VALUE_UNKNOWN = -1,  //!< Unknown state
+    MYGPIO_GPIO_VALUE_UNKNOWN = -1,  //!< Unknown GPIO value
     MYGPIO_GPIO_VALUE_LOW,           //!< GPIO state is low
     MYGPIO_GPIO_VALUE_HIGH           //!< GPIO state is high
 };
 
 /**
- * Bias setting for an input gpio
+ * Bias setting for an input GPIO.
  */
 enum mygpio_gpio_bias {
-    MYGPIO_BIAS_UNKNOWN = -1,
-    MYGPIO_BIAS_AS_IS,
-    MYGPIO_BIAS_DISABLED,
-    MYGPIO_BIAS_PULL_DOWN,
-    MYGPIO_BIAS_PULL_UP
+    MYGPIO_BIAS_UNKNOWN = -1,  //!< Unknown bias setting
+    MYGPIO_BIAS_AS_IS,         //!< Do not touch the bias state
+    MYGPIO_BIAS_DISABLED,      //!< Disable the bias
+    MYGPIO_BIAS_PULL_DOWN,     //!< Pull-down the GPIO
+    MYGPIO_BIAS_PULL_UP        //!< Pull-up the GPIO
 };
 
 /**
- * Events requested for an input gpio
+ * Events requested for an input GPIO.
  */
 enum mygpio_event_request {
-    MYGPIO_EVENT_REQUEST_UNKNOWN = -1,
-    MYGPIO_EVENT_REQUEST_FALLING,
-    MYGPIO_EVENT_REQUEST_RISING,
-    MYGPIO_EVENT_REQUEST_BOTH
+    MYGPIO_EVENT_REQUEST_UNKNOWN = -1,  //!< Unknown event request setting
+    MYGPIO_EVENT_REQUEST_FALLING,       //!< Request falling events
+    MYGPIO_EVENT_REQUEST_RISING,        //!< Request rising events
+    MYGPIO_EVENT_REQUEST_BOTH           //!< Request falling and rising events
 };
 
 /**
- * Clock setting for an input gpio
+ * Clock setting for an input GPIO.
  */
 enum mygpio_event_clock {
-    MYGPIO_EVENT_CLOCK_UNKNOWN = -1,
-    MYGPIO_EVENT_CLOCK_MONOTONIC,
-    MYGPIO_EVENT_CLOCK_REALTIME,
-    MYGPIO_EVENT_CLOCK_HTE
+    MYGPIO_EVENT_CLOCK_UNKNOWN = -1,  //!< Unknown event clock setting
+    MYGPIO_EVENT_CLOCK_MONOTONIC,     //!< Monotonic clock
+    MYGPIO_EVENT_CLOCK_REALTIME,      //!< Realtime clock
+    MYGPIO_EVENT_CLOCK_HTE            //!< Hardware timestamp engine
 };
 
 /**
- * Drive setting for an output gpio
+ * Drive setting for an output GPIO.
  */
 enum mygpio_drive {
-    MYGPIO_DRIVE_UNKNOWN = -1,
-    MYGPIO_DRIVE_PUSH_PULL,
-    MYGPIO_DRIVE_OPEN_DRAIN,
-    MYGPIO_DRIVE_OPEN_SOURCE
+    MYGPIO_DRIVE_UNKNOWN = -1,  //!< Unknown drive setting
+    MYGPIO_DRIVE_PUSH_PULL,     //!< Drive setting is push-pull
+    MYGPIO_DRIVE_OPEN_DRAIN,    //!< Drive setting is open-drain
+    MYGPIO_DRIVE_OPEN_SOURCE    //!< Drive setting is open-source
 };
 
 /**
