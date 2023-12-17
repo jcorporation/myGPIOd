@@ -1,8 +1,10 @@
 # myGPIOd
 
-myGPIOd is a lightweight GPIO controlling daemon. It is written in C and has no dependencies but the libgpiod2 library version 2.
+myGPIOd is a lightweight GPIO controlling framework. It is written in C and has no dependencies but the libgpiod2 library version 2.
 
-It consists of a daemon, a client library and a command line tool.
+It consists of a daemon, a client library and a command line tool. It is designed to run on Raspberry PIs and similar devices.
+
+I wrote this tool primarily for [myMPDos](https://github.com/jcorporation/myMPDos) and [myMPD](https://github.com/jcorporation/myMPD).
 
 ## Features
 
@@ -58,7 +60,7 @@ This builds and installs the `mygpiod` daemon, `mygpioc` command line tool, the 
 
 ## Run
 
-myGPIOd needs rw access to the gpio chip device (e. g. /dev/gpiochip0).
+myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
 ### Configuration steps
 
@@ -160,7 +162,9 @@ mygpioc -h
 
 The client library is documented in the header files. You can use doxygen to create the html documentation locally.
 
-You can find a usage example [here](libmygpio/example/main.c)
+You can find a usage example [here](libmygpio/example/main.c).
+
+The `mygpioc` command line client is also based on this library.
 
 ## Copyright
 
