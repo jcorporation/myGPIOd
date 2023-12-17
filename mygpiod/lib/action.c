@@ -28,7 +28,7 @@ void node_data_action_clear(struct t_list_node *node) {
  * @return newly allocated action data
  */
 struct t_action *action_node_data_new(enum mygpiod_actions action, sds option) {
-    struct t_action *data = malloc_assert(sizeof(struct t_action *));
+    struct t_action *data = malloc_assert(sizeof(struct t_action));
     data->action = action;
     data->option = sdsdup(option);
     return data;
