@@ -6,7 +6,7 @@
 
 #include "compile_time.h"
 
-#include "libmygpio/include/libmygpio/idle.h"
+#include "libmygpio/include/libmygpio/libmygpio_idle.h"
 #include "libmygpio/src/idle.h"
 #include "libmygpio/src/pair.h"
 #include "libmygpio/src/protocol.h"
@@ -22,7 +22,7 @@
  * @param str String to parse
  * @return enum mygpio_event
  */
-enum mygpio_event libmygpio_parse_event(const char *str) {
+enum mygpio_event mygpio_parse_event(const char *str) {
     if (strcmp(str, "falling") == 0) {
         return MYGPIO_EVENT_FALLING;
     }
@@ -40,7 +40,7 @@ enum mygpio_event libmygpio_parse_event(const char *str) {
  * @param event event type
  * @return Event name as string
  */
-const char *libmygpio_lookup_event(enum mygpio_event event) {
+const char *mygpio_lookup_event(enum mygpio_event event) {
     switch(event) {
         case MYGPIO_EVENT_FALLING:
             return "falling";
@@ -113,7 +113,7 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
     if ((pair = mygpio_recv_pair_name(connection, "event")) == NULL) {
         return NULL;
     }
-    if ((event = libmygpio_parse_event(pair->value)) == MYGPIO_EVENT_UNKNOWN) {
+    if ((event = mygpio_parse_event(pair->value)) == MYGPIO_EVENT_UNKNOWN) {
         mygpio_free_pair(pair);
         return NULL;
     }
@@ -160,7 +160,7 @@ enum mygpio_event mygpio_idle_event_get_event(struct t_mygpio_idle_event *event)
  * @return The event type name
  */
 const char *mygpio_idle_event_get_event_name(struct t_mygpio_idle_event *event) {
-    return libmygpio_lookup_event(event->event);
+    return mygpio_lookup_event(event->event);
 }
 
 /**

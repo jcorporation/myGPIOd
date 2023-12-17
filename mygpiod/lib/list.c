@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 /**
- * Initializes the list
+ * Initializes the list.
  * @param list pointer to already allocated list to initialize
  */
 void list_init(struct t_list *list) {
@@ -80,7 +80,7 @@ bool list_push(struct t_list *list, unsigned id, void *data) {
 }
 
 /**
- * Gets a list node by its gpio number
+ * Gets a list node by its id
  * @param list pointer to the list
  * @param id node id
  * @return found list node or NULL on error

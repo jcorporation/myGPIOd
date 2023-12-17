@@ -13,7 +13,7 @@
 #ifndef LIBMYGPIO_GPIO_H
 #define LIBMYGPIO_GPIO_H
 
-#include "gpio_struct.h"
+#include "libmygpio_gpio_struct.h"
 
 #include <stdbool.h>
 
@@ -24,7 +24,7 @@ extern "C" {
 struct t_mygpio_connection;
 
 /**
- * @defgroup gpio_functions GPIO functions
+ * @defgroup libmygpio_gpio_functions GPIO functions
  *
  * @brief This module provides functions to set and get values of a GPIO.
  *

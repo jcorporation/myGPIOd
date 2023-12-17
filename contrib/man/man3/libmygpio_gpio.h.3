@@ -1,0 +1,35 @@
+.TH "libmygpio/include/libmygpio/libmygpio_gpio.h" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio/include/libmygpio/libmygpio_gpio.h \- myGPIOd client library  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'libmygpio_gpio_struct\&.h'\fP
+.br
+\fC#include <stdbool\&.h>\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP \fBmygpio_gpioget\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpioset\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio, enum \fBmygpio_gpio_value\fP value)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpiotoggle\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+myGPIOd client library 
+
+Do not include this header directly\&. Use \fBlibmygpio/libmygpio\&.h\fP instead\&. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

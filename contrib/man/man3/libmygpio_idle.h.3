@@ -1,0 +1,66 @@
+.TH "libmygpio/include/libmygpio/libmygpio_idle.h" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio/include/libmygpio/libmygpio_idle.h \- myGPIOd client library  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdbool\&.h>\fP
+.br
+\fC#include <stdint\&.h>\fP
+.br
+
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_FALLING\fP, \fBMYGPIO_EVENT_RISING\fP, \fBMYGPIO_EVENT_LONG_PRESS\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_event\fP \fBmygpio_parse_event\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_lookup_event\fP (enum \fBmygpio_event\fP event)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_send_idle\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_send_noidle\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_wait_idle\fP (struct \fBt_mygpio_connection\fP *connection, int timeout)"
+.br
+.ti -1c
+.RI "struct \fBt_mygpio_idle_event\fP * \fBmygpio_recv_idle_event\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "unsigned \fBmygpio_idle_event_get_gpio\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event\fP \fBmygpio_idle_event_get_event\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_idle_event_get_event_name\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "uint64_t \fBmygpio_idle_event_get_timestamp_ms\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "void \fBmygpio_free_idle_event\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+myGPIOd client library 
+
+Do not include this header directly\&. Use \fBlibmygpio/libmygpio\&.h\fP instead\&. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

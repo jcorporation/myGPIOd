@@ -46,7 +46,7 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
     if (client_data->state == CLIENT_SOCKET_STATE_IDLE &&
         cmd_id != CMD_NOIDLE)
     {
-        MYGPIOD_LOG_ERROR("Client#%u: Only noidle command is allowed", client_node->id);
+        MYGPIOD_LOG_ERROR("Client#%u: In idle state, only the noidle command is allowed", client_node->id);
         server_response_send(client_data, DEFAULT_MSG_ERROR "In idle state, only the noidle command is allowed");
         sdsfreesplitres(args, count);
         return false;

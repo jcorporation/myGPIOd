@@ -24,14 +24,14 @@ struct t_mygpio_connection;
 /**
  * @struct t_mygpio_gpio
  * @{
- * The opaque GPIO obect. You can not access it directly.
- * Refer to @ref gpio_settings for function that operate on this struct.
+ * The opaque GPIO object. You can not access it directly.
+ * Refer to @ref libmygpio_gpio_settings for function that operate on this struct.
  * @}
  */
 struct t_mygpio_gpio;
 
 /**
- * @defgroup gpio_settings GPIO
+ * @defgroup libmygpio_gpio_settings GPIO
  *
  * @brief This module provides functions to access the t_mygpio_gpio struct,
  * received by gpioinfo or gpiolist.

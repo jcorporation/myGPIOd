@@ -1,0 +1,164 @@
+.TH "libmygpio_connection" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_connection \- myGPIOd connection
+.PP
+ \- This module provides functions for myGPIOd connection management\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_conn_state\fP { \fBMYGPIO_STATE_OK\fP, \fBMYGPIO_STATE_ERROR\fP, \fBMYGPIO_STATE_FATAL\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "struct \fBt_mygpio_connection\fP * \fBmygpio_connection_new\fP (const char *socket_path, int timeout)"
+.br
+.ti -1c
+.RI "void \fBmygpio_connection_free\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "const unsigned * \fBmygpio_connection_get_version\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "int \fBmygpio_connection_get_fd\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_conn_state\fP \fBmygpio_connection_get_state\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_connection_get_error\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_connection_clear_error\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides functions for myGPIOd connection management\&. 
+
+
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBmygpio_conn_state\fP"
+myGPIOd connections states 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_STATE_OK \fP\fP
+OK state\&. 
+.TP
+\fB\fIMYGPIO_STATE_ERROR \fP\fP
+Error state, read the error with mygpio_connection_get_error and clear it with mygpio_connection_clear_error\&. 
+.TP
+\fB\fIMYGPIO_STATE_FATAL \fP\fP
+Fatal state, read the error with mygpio_connection_get_error\&. You must reconnect to recover\&. 
+.SH "Function Documentation"
+.PP 
+.SS "bool mygpio_connection_clear_error (struct \fBt_mygpio_connection\fP * connection)"
+Clears the current error message\&. MYGPIO_STATE_FATAL messages can not be cleared\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false 
+.RE
+.PP
+
+.SS "void mygpio_connection_free (struct \fBt_mygpio_connection\fP * connection)"
+Closes the connection and frees the \fBt_mygpio_connection\fP struct 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+
+.SS "const char * mygpio_connection_get_error (struct \fBt_mygpio_connection\fP * connection)"
+Gets the current error message\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Error message or NULL if no error is present 
+.RE
+.PP
+
+.SS "int mygpio_connection_get_fd (struct \fBt_mygpio_connection\fP * connection)"
+Returns the file descriptor of the underlying socket\&. You can use it to poll the file descriptor in an external event loop\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+File descriptor 
+.RE
+.PP
+
+.SS "enum \fBmygpio_conn_state\fP mygpio_connection_get_state (struct \fBt_mygpio_connection\fP * connection)"
+Gets the current connection state\&. Use mygpio_connection_get_error to get the error message and mygpio_connection_clear_error to clear it\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The connection state 
+.RE
+.PP
+
+.SS "const unsigned * mygpio_connection_get_version (struct \fBt_mygpio_connection\fP * connection)"
+Gets the server version\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Unsigned array consisting of major, minor and patch version\&. 
+.RE
+.PP
+
+.SS "struct \fBt_mygpio_connection\fP * mygpio_connection_new (const char * socket_path, int timeout)"
+Creates a new connection to the myGPIOd socket and tries to connect\&. Check the state with mygpio_connection_get_state\&. It must be freed by the caller with mygpio_connection_free\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIsocket_path\fP Server socket to connect to\&. 
+.br
+\fItimeout\fP The connection timeout in milliseconds 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Returns the \fBt_mygpio_connection\fP struct on NULL in a out of memory condition\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

@@ -22,7 +22,7 @@ extern "C" {
 struct t_mygpio_connection;
 
 /**
- * @defgroup protocol Protocol
+ * @defgroup libmygpio_protocol Protocol
  *
  * @brief This module provides generic myGPIOd protocol functions.
  *

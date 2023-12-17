@@ -1,0 +1,84 @@
+.TH "libmygpio_gpio_functions" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_gpio_functions \- GPIO functions
+.PP
+ \- This module provides functions to set and get values of a GPIO\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP \fBmygpio_gpioget\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpioset\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio, enum \fBmygpio_gpio_value\fP value)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpiotoggle\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides functions to set and get values of a GPIO\&. 
+
+
+.SH "Function Documentation"
+.PP 
+.SS "enum \fBmygpio_gpio_value\fP mygpio_gpioget (struct \fBt_mygpio_connection\fP * connection, unsigned gpio)"
+Returns the current value of a configured input or output GPIO\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.br
+\fIgpio\fP GPIO number 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Value of the GPIO or MYGPIO_GPIO_VALUE_UNKNOWN on error\&. 
+.RE
+.PP
+
+.SS "bool mygpio_gpioset (struct \fBt_mygpio_connection\fP * connection, unsigned gpio, enum \fBmygpio_gpio_value\fP value)"
+Sets the value of a configured output GPIO\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.br
+\fIgpio\fP GPIO number 
+.br
+\fIvalue\fP Value to set: MYGPIO_GPIO_VALUE_LOW or MYGPIO_GPIO_VALUE_HIGH 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false\&. 
+.RE
+.PP
+
+.SS "bool mygpio_gpiotoggle (struct \fBt_mygpio_connection\fP * connection, unsigned gpio)"
+Toggles the value of a configured output GPIO\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.br
+\fIgpio\fP GPIO number 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

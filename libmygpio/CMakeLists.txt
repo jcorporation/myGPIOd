@@ -34,21 +34,25 @@ target_link_libraries(mygpio
   mygpio-common
 )
 
-# Install shared library
-install(TARGETS mygpio
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+if (MYGPIOD_LIBRARY)
+  # Install shared library
+  install(TARGETS mygpio
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  )
 
-# Install public headers
-install(DIRECTORY include/libmygpio
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+  # example
+  add_subdirectory("example")
+endif()
 
-# pkg-config file
-configure_file(libmygpio.pc.in libmygpio.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/libmygpio/libmygpio.pc
-  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
-)
+if (MYGPIOD_HEADER)
+  # Install public headers
+  install(DIRECTORY include/libmygpio
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
 
-# example
-add_subdirectory("example")
+  # pkg-config file
+  configure_file(libmygpio.pc.in libmygpio.pc @ONLY)
+  install(FILES ${CMAKE_BINARY_DIR}/libmygpio/libmygpio.pc
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
+  )
+endif()

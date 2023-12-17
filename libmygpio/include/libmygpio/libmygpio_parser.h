@@ -13,7 +13,7 @@
 #ifndef LIBMYGPIO_PARSER_H
 #define LIBMYGPIO_PARSER_H
 
-#include "gpio_struct.h"
+#include "libmygpio_gpio_struct.h"
 
 #include <stdbool.h>
 
@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup parser Parser
+ * @defgroup libmygpio_parser Parser
  *
  * @brief This module provides parsing and lookup functions for GPIO settings.
  *

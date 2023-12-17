@@ -10,8 +10,8 @@
  * Do not include this header directly. Use libmygpio/libmygpio.h instead.
  */
 
-#ifndef LIBMYGPIO_GPIOLIST_H
-#define LIBMYGPIO_GPIOLIST_H
+#ifndef LIBMYGPIO_GPIOINFO_H
+#define LIBMYGPIO_GPIOINFO_H
 
 #include <stdbool.h>
 
@@ -23,29 +23,32 @@ struct t_mygpio_connection;
 struct t_mygpio_gpio;
 
 /**
- * @defgroup gpiolist GPIO list
+ * @defgroup libmygpio_gpioinfo GPIO info
  *
- * @brief This module provides functions for the gpiolist protocol command.
+ * @brief This module provides functions for the gpioinfo protocol command.
  *
  * @{
  */
 
 /**
- * Lists the modes and values of all configured GPIOs.
- * Retrieve the list elements with mygpio_recv_gpio_list and end the response with mygpio_response_end.
+ * Lists the current settings of a GPIO.
+ * Retrieve the settings with mygpio_recv_gpio_info and end the response with mygpio_response_end.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @param gpio GPIO number
  * @return bool true on success, else false.
  */
-bool mygpio_gpiolist(struct t_mygpio_connection *connection);
+bool mygpio_gpioinfo(struct t_mygpio_connection *connection, unsigned gpio);
 
 /**
- * Receives a list element of mygpio_gpiolist.
- * Use the mygpio_gpio_get_gpio_* functions to access the values.
+ * Receives the result of mygpio_gpioinfo.
  * Free it with mygpio_free_gpio.
+ * Use the mygpio_gpio_get_gpio_*, mygpio_gpio_in_get_gpio_* and mygpio_gpio_in_get_gpio_*
+ * functions to access the values.
+ * The caller must free it with mygpio_free_gpio.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
  * @return Allocated struct t_mygpio_gpio or NULL on list end or error.
  */
-struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connection);
+struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connection);
 
 /**
  * @}

@@ -25,57 +25,78 @@ function(install_sysvinit)
        FILE_PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endfunction()
 
-if("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "ON")
-  # Try to detect installed init system
-  if(EXISTS "/lib/systemd/system" OR EXISTS "/usr/lib/systemd/system")
+if("@MYGPIOD_DAEMON@" STREQUAL "ON")
+  if("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "ON")
+    # Try to detect installed init system
+    if(EXISTS "/lib/systemd/system" OR EXISTS "/usr/lib/systemd/system")
+      install_systemd()
+    elseif(EXISTS "/sbin/openrc-run")
+      install_openrc()
+    elseif(EXISTS "/etc/init.d")
+      install_sysvinit()
+    else()
+      message("No supported init system found, no startup script was installed")
+    endif()
+  elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "SYSTEMD")
     install_systemd()
-  elseif(EXISTS "/sbin/openrc-run")
+  elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "OPENRC")
     install_openrc()
-  elseif(EXISTS "/etc/init.d")
+  elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "SYSVINIT")
     install_sysvinit()
-  else()
-    message("No supported init system found, no startup script was installed")
   endif()
-elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "SYSTEMD")
-  install_systemd()
-elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "OPENRC")
-  install_openrc()
-elseif("@MYGPIOD_STARTUP_SCRIPT@" STREQUAL "SYSVINIT")
-  install_sysvinit()
-endif()
 
-# Install myGPIOd configuration
-if(NOT EXISTS "$ENV{DESTDIR}@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.conf")
-  file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf"
-       DESTINATION @CMAKE_INSTALL_FULL_SYSCONFDIR@
-       FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
-else()
-  file(RENAME "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf"
-              "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf.dist")
-  file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf.dist"
-       DESTINATION @CMAKE_INSTALL_FULL_SYSCONFDIR@
-       FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
-endif()
+  # Install myGPIOd configuration
+  if(NOT EXISTS "$ENV{DESTDIR}@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.conf")
+    file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf"
+        DESTINATION @CMAKE_INSTALL_FULL_SYSCONFDIR@
+        FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  else()
+    file(RENAME "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf"
+                "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf.dist")
+    file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/etc/mygpiod.conf.dist"
+        DESTINATION @CMAKE_INSTALL_FULL_SYSCONFDIR@
+        FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  endif()
 
-# Install example gpio configuration files
-file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio-in.example"
-     DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d"
-     FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
-file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio-out.example"
-     DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d"
-     FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  # Install example gpio configuration files
+  file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio-in.example"
+      DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d"
+      FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio-out.example"
+      DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d"
+      FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+endif()
 
 # Install and compress manpages
 if("@MYGPIOD_MANPAGES@" STREQUAL "ON")
-  execute_process(COMMAND gzip -n -c -9 "@CMAKE_SOURCE_DIR@/contrib/man/mygpiod.1" OUTPUT_FILE "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpiod.1.gz")
-  file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpiod.1.gz"
-       DESTINATION "@CMAKE_INSTALL_FULL_MANDIR@/man1"
-       FILE_PERMISSIONS PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  if("@MYGPIOD_DAEMON@" STREQUAL "ON")
+    execute_process(COMMAND gzip -n -c -9 "@CMAKE_SOURCE_DIR@/contrib/man/man1/mygpiod.1"
+                    OUTPUT_FILE "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpiod.1.gz")
+    file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpiod.1.gz"
+        DESTINATION "@CMAKE_INSTALL_FULL_MANDIR@/man1"
+        FILE_PERMISSIONS PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  endif()
 
-  execute_process(COMMAND gzip -n -c -9 "@CMAKE_SOURCE_DIR@/contrib/man/mygpioc.1" OUTPUT_FILE "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpioc.1.gz")
-  file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpioc.1.gz"
-       DESTINATION "@CMAKE_INSTALL_FULL_MANDIR@/man1"
-       FILE_PERMISSIONS PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  if("@MYGPIOD_CLIENT@" STREQUAL "ON")
+    execute_process(COMMAND gzip -n -c -9 "@CMAKE_SOURCE_DIR@/contrib/man/man1/mygpioc.1"
+                    OUTPUT_FILE "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpioc.1.gz")
+    file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/mygpioc.1.gz"
+        DESTINATION "@CMAKE_INSTALL_FULL_MANDIR@/man1"
+        FILE_PERMISSIONS PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+  endif()
+
+  if("@MYGPIOD_LIBRARY@" STREQUAL "ON")
+    file(MAKE_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@/contrib/man3")
+    file(GLOB files "@CMAKE_SOURCE_DIR@/contrib/man/man3/*.3")
+    foreach(file ${files})
+      get_filename_component(filename "${file}" NAME)
+      execute_process(COMMAND gzip -n -c -9 "@CMAKE_SOURCE_DIR@/contrib/man/man3/${filename}"
+                      OUTPUT_FILE "@CMAKE_CURRENT_BINARY_DIR@/contrib/man3/${filename}.gz")
+      file(INSTALL "@CMAKE_CURRENT_BINARY_DIR@/contrib/man3/${filename}.gz"
+          DESTINATION "@CMAKE_INSTALL_FULL_MANDIR@/man3"
+          FILE_PERMISSIONS PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+    endforeach()
+  endif()
 endif()
 
 # Install documentation

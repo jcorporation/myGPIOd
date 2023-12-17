@@ -7,7 +7,7 @@
 #ifndef LIBMYGPIO_SRC_CONNECTION_H
 #define LIBMYGPIO_SRC_CONNECTION_H
 
-#include "libmygpio/include/libmygpio/connection.h"
+#include "libmygpio/include/libmygpio/libmygpio_connection.h"
 #include "libmygpio/src/buffer.h"
 
 struct t_mygpio_connection {

@@ -34,7 +34,7 @@ void close_fd(int *fd) {
 }
 
 /**
- * Getline function that trims whitespace characters
+ * Getline function that trims whitespace characters.
  * @param s an already allocated sds string
  * @param fp a file descriptor to read from
  * @param max max line length to read
@@ -98,10 +98,10 @@ sds *sds_splitfirst(sds s, char sep, int *count) {
 }
 
 /**
- * Parses a string to a gpio value.
+ * Parses a string to a GPIO value.
  * Sets errno to EINVAL on parser error.
  * @param str string to parse
- * @return gpio value or GPIOD_LINE_VALUE_ERROR on error
+ * @return GPIO value or GPIOD_LINE_VALUE_ERROR on error
  */
 enum gpiod_line_value parse_gpio_value(const char *str) {
     if (strcasecmp(str, "active") == 0 ||
@@ -127,7 +127,7 @@ enum gpiod_line_value parse_gpio_value(const char *str) {
 }
 
 /**
- * Lookups the string for a gpio value
+ * Lookups the string for a GPIO value.
  * @param value value
  * @return value string
  */
@@ -145,10 +145,10 @@ const char *lookup_gpio_value(enum gpiod_line_value value) {
 }
 
 /**
- * Parses a string to a gpio drive setting.
+ * Parses a string to a GPIO drive setting.
  * Sets errno to EINVAL on parser error.
  * @param str string to parse
- * @return gpio value or GPIO_VALUE_LOW on error
+ * @return GPIO value or GPIO_VALUE_LOW on error
  */
 enum gpiod_line_drive parse_drive(const char *str) {
     if (strcasecmp(str, "push-pull") == 0) {
@@ -166,7 +166,7 @@ enum gpiod_line_drive parse_drive(const char *str) {
 }
 
 /**
- * Lookups the string for a gpio drive
+ * Lookups the string for a GPIO drive
  * @param value value
  * @return value string
  */

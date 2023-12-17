@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 /**
- * Creates a new timer fd
+ * Creates a new timer fd.
  * @param timeout timeout in seconds
  * @return created timer fd or -1 on error
  */
@@ -34,7 +34,7 @@ int timer_new(int timeout) {
 }
 
 /**
- * Sets the realtive timeout for a timer fd
+ * Sets the relative timeout for a timer fd.
  * @param timer_fd timer fd
  * @param timeout relative timeout in seconds
  * @return true on success, else false
@@ -55,7 +55,7 @@ bool timer_set(int timer_fd, int timeout) {
 }
 
 /**
- * Logs the next timer expiration
+ * Logs the next timer expiration.
  * @param timer_fd timer fd
  */
 void timer_log_next_expire(int timer_fd) {

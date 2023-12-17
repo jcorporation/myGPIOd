@@ -6,7 +6,7 @@
 
 #include "libmygpio/src/connection.h"
 
-#include "libmygpio/include/libmygpio/protocol.h"
+#include "libmygpio/include/libmygpio/libmygpio_protocol.h"
 #include "libmygpio/src/protocol.h"
 #include "libmygpio/src/socket.h"
 #include "libmygpio/src/util.h"

@@ -21,13 +21,13 @@
 #ifndef LIBMYGPIO_H
 #define LIBMYGPIO_H
 
-#include "connection.h"
-#include "gpio_struct.h"
-#include "gpio.h"
-#include "gpioinfo.h"
-#include "gpiolist.h"
-#include "idle.h"
-#include "parser.h"
-#include "protocol.h"
+#include "libmygpio_connection.h"
+#include "libmygpio_gpio_struct.h"
+#include "libmygpio_gpio.h"
+#include "libmygpio_gpioinfo.h"
+#include "libmygpio_gpiolist.h"
+#include "libmygpio_idle.h"
+#include "libmygpio_parser.h"
+#include "libmygpio_protocol.h"
 
 #endif

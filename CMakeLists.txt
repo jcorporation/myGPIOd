@@ -36,6 +36,10 @@ set(CMAKE_C_FLAGS_MINSIZEREL "")
 option(MYGPIOD_DOC "Installs documentation, default ON" "ON")
 option(MYGPIOD_MANPAGES "Creates and installs manpages" "ON")
 option(MYGPIOD_STARTUP_SCRIPT "Installs the startup script, default ON" "ON")
+option(MYGPIOD_CLIENT "Includes the myGPIOd client, default ON" "ON")
+option(MYGPIOD_DAEMON "Includes the myGPIOd daemon, default ON" "ON")
+option(MYGPIOD_HEADER "Includes the myGPIOd headers, default ON" "ON")
+option(MYGPIOD_LIBRARY "Includes the myGPIOd library, default ON" "ON")
 # sanitizer options
 option(MYGPIOD_ENABLE_ASAN "Enables build with address sanitizer, default OFF" "OFF")
 option(MYGPIOD_ENABLE_TSAN "Enables build with thread sanitizer, default OFF" "OFF")
@@ -51,10 +55,12 @@ include(GNUInstallDirs)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
 # find required dependencies
-find_package(LIBGPIOD REQUIRED)
-if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
-  message("Found libgpiod version: ${LIBGPIOD_VERSION}")
-  message(FATAL_ERROR "Required libgpiod version >= 2.0.0")
+if (MYGPIOD_DAEMON)
+  find_package(LIBGPIOD REQUIRED)
+  if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
+    message("Found libgpiod version: ${LIBGPIOD_VERSION}")
+    message(FATAL_ERROR "Required libgpiod version >= 2.0.0")
+  endif()
 endif()
 
 # configure some files - version and path information
@@ -204,9 +210,15 @@ endif()
 
 # the main mygpio targets
 add_subdirectory("mygpio-common")
-add_subdirectory("libmygpio")
-add_subdirectory("mygpiod")
-add_subdirectory("mygpioc")
+if (MYGPIOD_LIBRARY OR MYGPIOD_CLIENT)
+  add_subdirectory("libmygpio")
+endif()
+if (MYGPIOD_CLIENT)
+  add_subdirectory("mygpioc")
+endif()
+if (MYGPIOD_DAEMON)
+  add_subdirectory("mygpiod")
+endif()
 
 # dist targets
 add_subdirectory(dist)

@@ -55,12 +55,18 @@ setversion() {
 
   for F in contrib/packaging/alpine/APKBUILD contrib/packaging/arch/PKGBUILD \
       contrib/packaging/rpm/mygpiod.spec contrib/packaging/debian/changelog \
-      contrib/man/mygpiod.1 contrib/man/mygpioc.1
+      contrib/man/man1/mygpiod.1 contrib/man/man1/mygpioc.1
   do
     echo "$F"
     sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE_F1__/$DATE_F1/g" -e "s/__DATE_F2__/$DATE_F2/g" \
         -e "s/__DATE_F3__/$DATE_F3/g" "$F.in" > "$F"
   done
+  echo "Generating man pages"
+  rm -f contrib/man/man3/*.3
+  doxygen
+  mv contrib/man/man3/t_mygpio_connection.3 contrib/man/man3/libmygpio_t_mygpio_connection.3 
+  mv contrib/man/man3/t_mygpio_gpio.3 contrib/man/man3/libmygpio_t_mygpio_gpio.3 
+  mv contrib/man/man3/t_mygpio_idle_event.3 contrib/man/man3/libmygpio_t_mygpio_idle_event.3 
 }
 
 buildrelease() {
@@ -79,10 +85,12 @@ addmygpioduser() {
   then
     if check_cmd_silent useradd
     then
+      groupadd -r gpio || true
       useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
     elif check_cmd_silent adduser
     then
       #alpine
+      addgroup -S gpio || true
       adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -G gpio -g myGPIOd mygpiod
     else
       echo "Can not add user mygpiod"

@@ -17,7 +17,6 @@ Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
-BuildRequires:  libgpiod-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %global debug_package %{nil}
@@ -51,7 +50,6 @@ true
 
 %files 
 %defattr(-,root,root,-)
-%doc README.md LICENSE.md
 /usr/bin/mygpiod
 /usr/bin/mygpioc
 /usr/include/libmygpio/connection.h
@@ -71,7 +69,6 @@ true
 %{_defaultdocdir}/mygpiod/LICENSE.md
 %{_defaultdocdir}/mygpiod/README.md
 %{_defaultdocdir}/mygpiod/PROTOCOL.md
-%license LICENSE.md
 
 %changelog
 * __DATE_F1__ Juergen Mang <mail@jcgames.de> __VERSION__-0

@@ -23,7 +23,7 @@ static struct t_event_data *event_data_new(enum mygpiod_event_types mygpiod_even
 // public functions
 
 /**
- * Enqueues a gpio event for all client connections
+ * Enqueues a GPIO event for all client connections
  * @param config pointer to config
  * @param gpio gpio number of the event
  * @param event_type the mygpiod event type
@@ -50,7 +50,7 @@ void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_ty
 }
 
 /**
- * Clears the event data
+ * Clears the event data.
  * @param node pointer to node holding the data to clear
  */
 void event_data_clear(struct t_list_node *node) {
@@ -59,15 +59,18 @@ void event_data_clear(struct t_list_node *node) {
 }
 
 /**
- * Returns the mygpiod event type as string
+ * Returns the mygpiod event type as string.
  * @param event_type the event type
  * @return Event type name
  */
 const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
     switch(event_type) {
-        case MYGPIOD_EVENT_FALLING:    return "falling";
-        case MYGPIOD_EVENT_RISING:     return "rising";
-        case MYGPIOD_EVENT_LONG_PRESS: return "long_press";
+        case MYGPIOD_EVENT_FALLING:
+            return "falling";
+        case MYGPIOD_EVENT_RISING:
+            return "rising";
+        case MYGPIOD_EVENT_LONG_PRESS:
+            return "long_press";
     }
     return "";
 }

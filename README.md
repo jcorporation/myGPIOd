@@ -29,7 +29,7 @@ It consists of a daemon, a client library and a command line tool.
 - cmake >= 3.13
 - libgpiod-dev >= 2.0.0
 
-## Quick Build Instructions
+## Build Instructions
 
 1. Get myGPIOd tarball from [GitHub](https://github.com/jcorporation/myGPIOd/releases/latest)
 2. Extract myGPIOd tarball and change path to this directory

@@ -1,0 +1,330 @@
+.TH "libmygpio_gpio_settings" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_gpio_settings \- GPIO
+.PP
+ \- This module provides functions to access the \fBt_mygpio_gpio\fP struct, received by gpioinfo or gpiolist\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_gpio_mode\fP { \fBMYGPIO_GPIO_MODE_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_MODE_IN\fP, \fBMYGPIO_GPIO_MODE_OUT\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP { \fBMYGPIO_GPIO_VALUE_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_VALUE_LOW\fP, \fBMYGPIO_GPIO_VALUE_HIGH\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_bias\fP { \fBMYGPIO_BIAS_UNKNOWN\fP = -1, \fBMYGPIO_BIAS_AS_IS\fP, \fBMYGPIO_BIAS_DISABLED\fP, \fBMYGPIO_BIAS_PULL_DOWN\fP, \fBMYGPIO_BIAS_PULL_UP\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_request\fP { \fBMYGPIO_EVENT_REQUEST_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_REQUEST_FALLING\fP, \fBMYGPIO_EVENT_REQUEST_RISING\fP, \fBMYGPIO_EVENT_REQUEST_BOTH\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_clock\fP { \fBMYGPIO_EVENT_CLOCK_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_CLOCK_MONOTONIC\fP, \fBMYGPIO_EVENT_CLOCK_REALTIME\fP, \fBMYGPIO_EVENT_CLOCK_HTE\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_drive\fP { \fBMYGPIO_DRIVE_UNKNOWN\fP = -1, \fBMYGPIO_DRIVE_PUSH_PULL\fP, \fBMYGPIO_DRIVE_OPEN_DRAIN\fP, \fBMYGPIO_DRIVE_OPEN_SOURCE\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "unsigned \fBmygpio_gpio_get_gpio\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_mode\fP \fBmygpio_gpio_get_mode\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP \fBmygpio_gpio_get_value\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpio_in_get_active_low\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_bias\fP \fBmygpio_gpio_in_get_bias\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_request\fP \fBmygpio_gpio_in_get_event_request\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpio_in_get_is_debounced\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "int \fBmygpio_gpio_in_get_debounce_period\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_clock\fP \fBmygpio_gpio_in_get_event_clock\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_drive\fP \fBmygpio_gpio_out_get_drive\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "void \fBmygpio_free_gpio\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides functions to access the \fBt_mygpio_gpio\fP struct, received by gpioinfo or gpiolist\&. 
+
+
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBmygpio_drive\fP"
+Drive setting for an output GPIO\&. 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_DRIVE_UNKNOWN \fP\fP
+Unknown drive setting\&. 
+.TP
+\fB\fIMYGPIO_DRIVE_PUSH_PULL \fP\fP
+Drive setting is push-pull\&. 
+.TP
+\fB\fIMYGPIO_DRIVE_OPEN_DRAIN \fP\fP
+Drive setting is open-drain\&. 
+.TP
+\fB\fIMYGPIO_DRIVE_OPEN_SOURCE \fP\fP
+Drive setting is open-source\&. 
+.SS "enum \fBmygpio_event_clock\fP"
+Clock setting for an input GPIO\&. 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_EVENT_CLOCK_UNKNOWN \fP\fP
+Unknown event clock setting\&. 
+.TP
+\fB\fIMYGPIO_EVENT_CLOCK_MONOTONIC \fP\fP
+Monotonic clock\&. 
+.TP
+\fB\fIMYGPIO_EVENT_CLOCK_REALTIME \fP\fP
+Realtime clock\&. 
+.TP
+\fB\fIMYGPIO_EVENT_CLOCK_HTE \fP\fP
+Hardware timestamp engine\&. 
+.SS "enum \fBmygpio_event_request\fP"
+Events requested for an input GPIO\&. 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_EVENT_REQUEST_UNKNOWN \fP\fP
+Unknown event request setting\&. 
+.TP
+\fB\fIMYGPIO_EVENT_REQUEST_FALLING \fP\fP
+Request falling events\&. 
+.TP
+\fB\fIMYGPIO_EVENT_REQUEST_RISING \fP\fP
+Request rising events\&. 
+.TP
+\fB\fIMYGPIO_EVENT_REQUEST_BOTH \fP\fP
+Request falling and rising events\&. 
+.SS "enum \fBmygpio_gpio_bias\fP"
+Bias setting for an input GPIO\&. 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_BIAS_UNKNOWN \fP\fP
+Unknown bias setting\&. 
+.TP
+\fB\fIMYGPIO_BIAS_AS_IS \fP\fP
+Do not touch the bias state\&. 
+.TP
+\fB\fIMYGPIO_BIAS_DISABLED \fP\fP
+Disable the bias\&. 
+.TP
+\fB\fIMYGPIO_BIAS_PULL_DOWN \fP\fP
+Pull-down the GPIO\&. 
+.TP
+\fB\fIMYGPIO_BIAS_PULL_UP \fP\fP
+Pull-up the GPIO\&. 
+.SS "enum \fBmygpio_gpio_mode\fP"
+The mode of a GPIO\&. 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_GPIO_MODE_UNKNOWN \fP\fP
+Unknown GPIO mode\&. 
+.TP
+\fB\fIMYGPIO_GPIO_MODE_IN \fP\fP
+Input mode, myGPIOd can read events from this GPIO\&. 
+.TP
+\fB\fIMYGPIO_GPIO_MODE_OUT \fP\fP
+Output mode, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_HIGH or MYGPIO_GPIO_VALUE_LOW\&. 
+.SS "enum \fBmygpio_gpio_value\fP"
+The value of an output or input GPIO\&. 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_GPIO_VALUE_UNKNOWN \fP\fP
+Unknown GPIO value\&. 
+.TP
+\fB\fIMYGPIO_GPIO_VALUE_LOW \fP\fP
+GPIO state is low\&. 
+.TP
+\fB\fIMYGPIO_GPIO_VALUE_HIGH \fP\fP
+GPIO state is high\&. 
+.SH "Function Documentation"
+.PP 
+.SS "void mygpio_free_gpio (struct \fBt_mygpio_gpio\fP * gpio)"
+Frees the struct received by mygpio_recv_gpio\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct mygpio_recv_gpio\&. 
+.RE
+.PP
+
+.SS "unsigned mygpio_gpio_get_gpio (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO number from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO number\&. 
+.RE
+.PP
+
+.SS "enum \fBmygpio_gpio_mode\fP mygpio_gpio_get_mode (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO mode from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO mode, one of enum mygpio_gpio_mode\&. 
+.RE
+.PP
+
+.SS "enum \fBmygpio_gpio_value\fP mygpio_gpio_get_value (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO value from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO mode, one of enum mygpio_gpio_mode\&. 
+.RE
+.PP
+
+.SS "bool mygpio_gpio_in_get_active_low (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO active_low from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO is set to active_low? 
+.RE
+.PP
+
+.SS "enum \fBmygpio_gpio_bias\fP mygpio_gpio_in_get_bias (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO bias from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO bias, one of enum mygpio_gpio_bias\&. 
+.RE
+.PP
+
+.SS "int mygpio_gpio_in_get_debounce_period (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO debounce period from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO debounce period in nanoseconds\&. 
+.RE
+.PP
+
+.SS "enum \fBmygpio_event_clock\fP mygpio_gpio_in_get_event_clock (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO event clock from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO event clock, one of enum mygpio_event_clock\&. 
+.RE
+.PP
+
+.SS "enum \fBmygpio_event_request\fP mygpio_gpio_in_get_event_request (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the requested events from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+requested GPIO events, one of enum event_request\&. 
+.RE
+.PP
+
+.SS "bool mygpio_gpio_in_get_is_debounced (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns true if the GPIO is debounced\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO debounced? 
+.RE
+.PP
+
+.SS "enum \fBmygpio_drive\fP mygpio_gpio_out_get_drive (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO drive setting from struct \fBt_mygpio_gpio\fP\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO drive setting, one of enum mygpio_drive\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

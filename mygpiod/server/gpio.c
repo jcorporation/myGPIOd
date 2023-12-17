@@ -63,7 +63,7 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
     }
     unsigned gpio;
     if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
-        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid gpio number");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid GPIO number");
         return false;
     }
 
@@ -74,7 +74,7 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
         gpio_mode = GPIOD_LINE_DIRECTION_OUTPUT;
     }
     if (node == NULL) {
-        server_response_send(client_data, DEFAULT_MSG_ERROR "Gpio not configured");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "GPIO not configured");
         return false;
     }
 
@@ -109,7 +109,6 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
     return true;
 }
 
-
 /**
  * Handles the gpioget command
  * @param options client command
@@ -125,12 +124,12 @@ bool handle_gpioget(struct t_cmd_options *options, struct t_config *config, stru
     }
     unsigned gpio;
     if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
-        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid gpio number");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid GPIO number");
         return false;
     }
     enum gpiod_line_value value = gpio_get_value(config, gpio);
     if (value == GPIOD_LINE_VALUE_ERROR) {
-        server_response_send(client_data, DEFAULT_MSG_ERROR "Getting gpio value failed");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Getting GPIO value failed");
         return false;
     }
     server_response_start(client_data);
@@ -156,7 +155,7 @@ bool handle_gpioset(struct t_cmd_options *options, struct t_config *config, stru
     }
     unsigned gpio;
     if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
-        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid gpio number");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid GPIO number");
         return false;
     }
     errno = 0;
@@ -169,12 +168,12 @@ bool handle_gpioset(struct t_cmd_options *options, struct t_config *config, stru
         server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
         return true;
     }
-    server_response_send(client_data, DEFAULT_MSG_ERROR "Setting gpio value failed");
+    server_response_send(client_data, DEFAULT_MSG_ERROR "Setting GPIO value failed");
     return false;
 }
 
 /**
- * Handles the gpioset command
+ * Handles the gpiotoggle command
  * @param options client command
  * @param config pointer to config
  * @param client_node client
@@ -188,13 +187,13 @@ bool handle_gpiotoggle(struct t_cmd_options *options, struct t_config *config, s
     }
     unsigned gpio;
     if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
-        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid gpio number");
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid GPIO number");
         return false;
     }
     if (gpio_toggle_value(config, gpio) == true) {
         server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
         return true;
     }
-    server_response_send(client_data, DEFAULT_MSG_ERROR "Setting gpio value failed");
+    server_response_send(client_data, DEFAULT_MSG_ERROR "Setting GPIO value failed");
     return false;
 }

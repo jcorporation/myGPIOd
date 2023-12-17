@@ -7,7 +7,7 @@
 #ifndef LIBMYGPIO_SRC_IDLE_H
 #define LIBMYGPIO_SRC_IDLE_H
 
-#include "libmygpio/include/libmygpio/idle.h"
+#include "libmygpio/include/libmygpio/libmygpio_idle.h"
 
 /**
  * Struct holding the event information received by mygpio_recv_idle_event.

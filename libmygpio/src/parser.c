@@ -5,7 +5,7 @@
 */
 
 #include "compile_time.h"
-#include "libmygpio/include/libmygpio/gpio.h"
+#include "libmygpio/include/libmygpio/libmygpio_gpio.h"
 
 #include <assert.h>
 #include <stdio.h>

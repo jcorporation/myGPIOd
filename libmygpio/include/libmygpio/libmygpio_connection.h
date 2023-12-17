@@ -23,13 +23,13 @@ extern "C" {
  * @struct t_mygpio_connection
  * @{
  * The opaque myGPIOd connection object. You can not access it directly.
- * Refer to @ref connection for function that operate on this struct.
+ * Refer to @ref libmygpio_connection for function that operate on this struct.
  * @}
  */
 struct t_mygpio_connection;
 
 /**
- * @defgroup connection myGPIOd connection
+ * @defgroup libmygpio_connection myGPIOd connection
  *
  * @brief This module provides functions for myGPIOd connection management.
  *
