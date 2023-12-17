@@ -68,12 +68,12 @@ struct t_config *get_config(sds config_file) {
  * @param config pointer to config to free
  */
 void config_clear(struct t_config *config) {
-    if (config->chip != NULL) {
-        gpiod_chip_close(config->chip);
-    }
     list_clear(&config->gpios_in, gpio_node_in_clear);
     list_clear(&config->gpios_out, gpio_node_out_clear);
     list_clear(&config->clients, server_client_connection_clear);
+    if (config->chip != NULL) {
+        gpiod_chip_close(config->chip);
+    }
     close_fd(&config->signal_fd);
     FREE_SDS(config->chip_path);
     FREE_SDS(config->dir_gpio);
