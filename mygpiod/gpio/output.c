@@ -113,7 +113,9 @@ bool gpio_set_value(struct t_config *config, unsigned gpio, enum gpiod_line_valu
         return false;
     }
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
-    return gpiod_line_request_set_value(data->request, gpio, value);
+    return gpiod_line_request_set_value(data->request, gpio, value) == 0
+        ? true
+        : false;
 }
 
 /**
@@ -133,5 +135,7 @@ bool gpio_toggle_value(struct t_config *config, unsigned gpio) {
     enum gpiod_line_value value = gpiod_line_request_get_value(data->request, gpio) == GPIOD_LINE_VALUE_INACTIVE
         ? GPIOD_LINE_VALUE_ACTIVE
         : GPIOD_LINE_VALUE_INACTIVE;
-    return gpiod_line_request_set_value(data->request, gpio, value);
+    return gpiod_line_request_set_value(data->request, gpio, value) == 0
+        ? true
+        : false;
 }
