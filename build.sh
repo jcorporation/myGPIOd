@@ -321,21 +321,18 @@ pkgosc() {
   cd "$STARTPATH" || exit 1
   cp "package/build/mygpiod-${VERSION}.tar.gz" "osc/$OSC_REPO/"
   
-  if [ -f /etc/debian_version ]
-  then
-    pkgdebian
-  else
-    pkgalpine taronly
-    rm -f "$OSC_REPO"/debian.*
-  fi
+  #if [ -f /etc/debian_version ]
+  #then
+  #  pkgdebian
+  #fi
 
   cd "$STARTPATH/osc" || exit 1
-  cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
-  if [ -f /etc/debian_version ]
-  then
-    cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
-    cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
-  fi
+  #if [ -f /etc/debian_version ]
+  #then
+  #  cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
+  #  cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
+  #  cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
+  #fi
   cp ../contrib/packaging/rpm/mygpiod.spec "$OSC_REPO/"
   cp ../contrib/packaging/arch/PKGBUILD "$OSC_REPO/"
   cp ../contrib/packaging/arch/archlinux.install "$OSC_REPO/"
@@ -354,18 +351,22 @@ installdeps() {
     #debian
     apt-get update
     apt-get install -y --no-install-recommends gcc cmake build-essential
+    echo "Debian has no native libpiod v2 package, you must build it yourself."
   elif [ -f /etc/arch-release ]
   then
     #arch
     pacman -S gcc cmake
+    echo "Arch has no native libpiod v2 package, you must build it yourself."
   elif [ -f /etc/alpine-release ]
   then
     #alpine
     apk add cmake alpine-sdk linux-headers
+    echo "Alpine Linux has no native libpiod v2 package, you must build it yourself."
   elif [ -f /etc/SuSE-release ]
   then
     #suse
     zypper install gcc cmake unzip
+    echo "SuSe has no native libpiod v2 package, you must build it yourself."
   elif [ -f /etc/redhat-release ]
   then
     #fedora
@@ -375,6 +376,7 @@ installdeps() {
     echo "You should manually install:"
     echo "  - gcc"
     echo "  - cmake"
+    echo "  - libgpiod v2"
   fi
 }
 

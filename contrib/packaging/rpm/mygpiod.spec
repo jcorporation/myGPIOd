@@ -34,12 +34,11 @@ myGPIOd is a lightweight gpio controlling daemon.
 %setup -q -n %{name}-%{version}
 
 %build
-cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo  ..
-make -c release
+cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo  .
+make -C release
 
 %install
-cd release || exit 1
-make install DESTDIR=%{buildroot}
+make -C release install DESTDIR=%{buildroot}
 
 %post
 echo "Checking status of mygpiod system user and group"
@@ -51,27 +50,49 @@ true
 
 %files 
 %defattr(-,root,root,-)
-%doc README.md LICENSE.md
-/usr/bin/mygpiod
-/usr/bin/mygpioc
-/usr/include/libmygpio/connection.h
-/usr/include/libmygpio/gpio.h
-/usr/include/libmygpio/idle.h
-/usr/include/libmygpio/libmygpio.h
-/usr/include/libmygpio/protocol.h
-/usr/lib/libmygpio.so
-/usr/lib/libmygpio.so.0
+%{_bindir}/mygpiod
+%{_bindir}/mygpioc
+%{_includedir}/libmygpio/libmygpio_connection.h
+%{_includedir}/libmygpio/libmygpio_gpio.h
+%{_includedir}/libmygpio/libmygpio_gpioinfo.h
+%{_includedir}/libmygpio/libmygpio_gpiolist.h
+%{_includedir}/libmygpio/libmygpio_gpio_struct.h
+%{_includedir}/libmygpio/libmygpio.h
+%{_includedir}/libmygpio/libmygpio_idle.h
+%{_includedir}/libmygpio/libmygpio_parser.h
+%{_includedir}/libmygpio/libmygpio_protocol.h
+%{_libdir}/libmygpio.so
+%{_libdir}/libmygpio.so.0
+%{_datadir}/pkgconfig/libmygpio.pc
 /usr/lib/systemd/system/mygpiod.service
 %config(noreplace) /etc/mygpiod.conf
 %config() /etc/mygpiod.d/gpio-in.example
 %config() /etc/mygpiod.d/gpio-out.example
 %{_mandir}/man1/mygpiod.1.gz
 %{_mandir}/man1/mygpioc.1.gz
+%{_mandir}/man3/libmygpio_connection.3.gz
+%{_mandir}/man3/libmygpio_connection.h.3.gz
+%{_mandir}/man3/libmygpio_gpio_functions.3.gz
+%{_mandir}/man3/libmygpio_gpio.h.3.gz
+%{_mandir}/man3/libmygpio_gpioinfo.3.gz
+%{_mandir}/man3/libmygpio_gpioinfo.h.3.gz
+%{_mandir}/man3/libmygpio_gpiolist.3.gz
+%{_mandir}/man3/libmygpio_gpiolist.h.3.gz
+%{_mandir}/man3/libmygpio_gpio_settings.3.gz
+%{_mandir}/man3/libmygpio_gpio_struct.h.3.gz
+%{_mandir}/man3/libmygpio_idle_event.3.gz
+%{_mandir}/man3/libmygpio_idle.h.3.gz
+%{_mandir}/man3/libmygpio_parser.3.gz
+%{_mandir}/man3/libmygpio_parser.h.3.gz
+%{_mandir}/man3/libmygpio_protocol.3.gz
+%{_mandir}/man3/libmygpio_protocol.h.3.gz
+%{_mandir}/man3/libmygpio_t_mygpio_connection.3.gz
+%{_mandir}/man3/libmygpio_t_mygpio_gpio.3.gz
+%{_mandir}/man3/libmygpio_t_mygpio_idle_event.3.gz
 %{_defaultdocdir}/mygpiod/CHANGELOG.md
 %{_defaultdocdir}/mygpiod/LICENSE.md
 %{_defaultdocdir}/mygpiod/README.md
 %{_defaultdocdir}/mygpiod/PROTOCOL.md
-%license LICENSE.md
 
 %changelog
 * Sun Dec 17 2023 Juergen Mang <mail@jcgames.de> 0.4.0-0
