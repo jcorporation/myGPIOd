@@ -4,6 +4,8 @@
  https://github.com/jcorporation/mympd
 */
 
+#include "compile_time.h"
+
 #include "libmygpio/include/libmygpio/idle.h"
 #include "libmygpio/src/idle.h"
 #include "libmygpio/src/pair.h"
@@ -98,38 +100,30 @@ struct t_mygpio_idle_event *mygpio_recv_idle_event(struct t_mygpio_connection *c
     enum mygpio_event event;
     uint64_t timestamp;
 
-    struct t_mygpio_pair *pair = mygpio_recv_pair(connection);
-    if (pair == NULL ||
-        strcmp(pair->name, "gpio") != 0 ||
-        mygpio_parse_uint(pair->value, &gpio, NULL, 0, 99) == false)
-    {
-        if (pair != NULL) {
-            mygpio_free_pair(pair);
-        }
+    struct t_mygpio_pair *pair;
+    if ((pair = mygpio_recv_pair_name(connection, "gpio")) == NULL) {
+        return NULL;
+    }
+    if (mygpio_parse_uint(pair->value, &gpio, NULL, 0, GPIOS_MAX) == false) {
+        mygpio_free_pair(pair);
         return NULL;
     }
     mygpio_free_pair(pair);
 
-    pair = mygpio_recv_pair(connection);
-    if (pair == NULL ||
-        strcmp(pair->name, "mode") != 0 ||
-        (event = libmygpio_parse_event(pair->value)) == MYGPIO_EVENT_UNKNOWN)
-    {
-        if (pair != NULL) {
-            mygpio_free_pair(pair);
-        }
+    if ((pair = mygpio_recv_pair_name(connection, "event")) == NULL) {
+        return NULL;
+    }
+    if ((event = libmygpio_parse_event(pair->value)) == MYGPIO_EVENT_UNKNOWN) {
+        mygpio_free_pair(pair);
         return NULL;
     }
     mygpio_free_pair(pair);
 
-    pair = mygpio_recv_pair(connection);
-    if (pair == NULL ||
-        strcmp(pair->name, "timestamp_ms") != 0 ||
-        mygpio_parse_uint64(pair->value, &timestamp, NULL, 0, UINT64_MAX) == false)
-    {
-        if (pair != NULL) {
-            mygpio_free_pair(pair);
-        }
+    if ((pair = mygpio_recv_pair_name(connection, "timestamp_ms")) == NULL) {
+        return NULL;
+    }
+    if (mygpio_parse_uint64(pair->value, &timestamp, NULL, 0, UINT64_MAX) == false) {
+        mygpio_free_pair(pair);
         return NULL;
     }
     mygpio_free_pair(pair);
