@@ -24,31 +24,41 @@ It consists of a daemon, a client library and a command line tool.
 - **mygpioc - the command line client**
   - Connects to the mygpiod socket to control the various functions.
 
-## Build Dependencies
+## Build
 
+Building myGPIOd is straight forward.
+
+### Dependencies
+
+- C build environment
 - cmake >= 3.13
 - libgpiod-dev >= 2.0.0
 
-## Build Instructions
+Only the current Fedora release packages the version 2 of libgpiod. For all other distributions, you must compile libgpiod yourself.
+
+### Build libgpiod
+
+Install it in `/usr/local` to avoid conflicts with an already installed libgpiod version.
+
+1. Get latest release tarball from [kernel.org git](https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/)
+2. Extract myGPIOd tarball and change path to this directory
+3. Run autotools: `./autogen.sh --enable-tools=yes --prefix=/usr/local`
+4. Build: `make`
+5. Install (as root): `make install`
+
+### Build myGPIOd
+
+This builds and installs the `mygpiod` daemon, `mygpioc` command line tool, the shared library `libmygpio`, the associated header files for development and the documentation.
 
 1. Get myGPIOd tarball from [GitHub](https://github.com/jcorporation/myGPIOd/releases/latest)
 2. Extract myGPIOd tarball and change path to this directory
-3. Install dependencies (as root): `./build.sh installdeps`
-4. Build: `./build.sh release`
-5. Install (as root): `./build.sh install`
-
-The `build.sh` script is only a wrapper for cmake. You can use the default cmake workflow to compile myGPIOd.
-
-```sh
-cmake -B build -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .
-make -C build
-```
+3. Run cmake: `cmake -B build -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .`
+4. Build: `make -C build`
+5. Install (as root): `make -C build install`
 
 ## Run
 
 myGPIOd needs rw access to the gpio chip device (e. g. /dev/gpiochip0).
-
-The `./build.sh` script and the packages are creating a mygpiod system user with the group gpio. The GPIO group has on many systems sufficient privileges, do not run myGPIOd as root.
 
 ### Configuration steps
 
@@ -56,10 +66,10 @@ The `./build.sh` script and the packages are creating a mygpiod system user with
 - Create GPIO configuration files in the directory `/etc/mygpiod.d`. There are example configuration files for input and output configuration. myGPIOd only accesses GPIOs configured in this files.
 
 ```sh
-runuser -u mygpiod -g gpio -- /usr/bin/mygpiod [/etc/mygpiod.conf]
+/usr/bin/mygpiod [/etc/mygpiod.conf]
 ```
 
-The `./build.sh` script installs a startup script for systemd, openrc or sysVinit.
+The cmake install script creates a startup script for systemd, openrc or sysVinit.
 
 ## Actions
 
