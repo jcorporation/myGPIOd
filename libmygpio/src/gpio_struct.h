@@ -7,7 +7,7 @@
 #ifndef LIBMYGPIO_SRC_GPIO_H
 #define LIBMYGPIO_SRC_GPIO_H
 
-#include "libmygpio/include/libmygpio/gpio.h"
+#include "libmygpio/include/libmygpio/gpio_struct.h"
 
 struct t_mygpio_in {
     bool active_low;
