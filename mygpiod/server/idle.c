@@ -30,7 +30,7 @@ bool handle_idle(struct t_list_node *client_node) {
         client_data->state = CLIENT_SOCKET_STATE_IDLE;
         return true;
     }
-    return send_idle_events(client_node->data);
+    return send_idle_events(client_node);
 }
 
 /**
@@ -46,7 +46,7 @@ bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
         server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
         return true;
     }
-    return send_idle_events(client_node->data);
+    return send_idle_events(client_node);
 }
 
 /**

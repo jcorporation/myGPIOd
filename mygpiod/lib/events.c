@@ -8,6 +8,7 @@
 #include "mygpiod/lib/events.h"
 
 #include "mygpiod/lib/config.h"
+#include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/server/idle.h"
 #include "mygpiod/server/socket.h"
@@ -35,6 +36,7 @@ void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_ty
     while (current != NULL) {
         struct t_client_data *data = (struct t_client_data *)current->data;
         struct t_event_data *event_data = event_data_new(event_type, timestamp);
+        MYGPIOD_LOG_DEBUG("Enqueuing event %s at gpio %u for client %u", mygpiod_event_name(event_type), gpio, current->id);
         list_push(&data->waiting_events, gpio, event_data);
         if (data->state == CLIENT_SOCKET_STATE_IDLE) {
             send_idle_events(current);
