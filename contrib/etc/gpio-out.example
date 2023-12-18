@@ -8,5 +8,6 @@ drive = push-pull
 #drive = open-source
 
 # Value to set
-#value = high
-#value = low
+# Valid values: active, inactive
+value = inactive
+#value = active

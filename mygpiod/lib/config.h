@@ -26,9 +26,10 @@ struct t_gpio_in_data {
     struct t_list action_falling;                  //!< command for falling event
     enum gpiod_line_edge event_request;            //!< events to request for this gpio
     int gpio_fd;                                   //!< gpio file descriptor
-    int long_press_timeout;                        //!< timeout for the long press handler
+    int long_press_timeout_ms;                     //!< timeout for the long press handler in milliseconds
     struct t_list long_press_action;               //!< long press command
     enum gpiod_line_edge long_press_event;         //!< event for the long press handler
+    enum gpiod_line_value long_press_value;        //!< initial gpio value for the long press event
     bool ignore_event;                             //!< internal state for long press handler
     int timer_fd;                                  //!< timer file descriptor for long press handler
     struct gpiod_edge_event_buffer *event_buffer;  //!< buffer for gpio events
@@ -57,7 +58,7 @@ struct t_config {
     sds dir_gpio;             //!< directory for the gpio config files
 
     sds socket_path;          //!< server socket
-    int socket_timeout;       //!< socket timeout in seconds
+    int socket_timeout_s;     //!< socket timeout in seconds
     struct t_list clients;    //!< list of connected clients
     unsigned client_id;       //!< uniq client id
 

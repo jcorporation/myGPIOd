@@ -57,7 +57,7 @@ bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt
  * @return true on success, else false
  */
 bool libmygpio_recv_response_status(struct t_mygpio_connection *connection) {
-    if (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, connection->timeout) == false) {
+    if (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, connection->timeout_ms) == false) {
         LIBMYGPIO_LOG("Error receiving line");
         return false;
     }

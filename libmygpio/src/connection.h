@@ -16,7 +16,7 @@ struct t_mygpio_connection {
     struct t_buf buf_in;           //!< input buffer
     struct t_buf buf_out;          //!< output buffer
     unsigned version[3];           //!< myGPIOd version
-    int timeout;                   //!< connection timeout in ms
+    int timeout_ms;                //!< connection timeout in ms
     enum mygpio_conn_state state;  //!< connection state
     char *error;                   //!< error message
 };

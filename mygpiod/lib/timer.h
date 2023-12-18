@@ -9,8 +9,8 @@
 
 #include <stdbool.h>
 
-int timer_new(int timeout);
-bool timer_set(int timer_fd, int timeout);
+int timer_new(int timeout_ms);
+bool timer_set(int timer_fd, int timeout_ms);
 void timer_log_next_expire(int timer_fd);
 
 #endif

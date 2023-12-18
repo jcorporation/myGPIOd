@@ -30,18 +30,18 @@ extern "C" {
  */
 
 /**
- * Lookups the name for the gpio mode.
+ * Lookups the name for the gpio direction.
  * @param mode the gpio mode.
  * @return gpio mode name
  */
-const char *mygpio_gpio_lookup_mode(enum mygpio_gpio_mode mode);
+const char *mygpio_gpio_lookup_direction(enum mygpio_gpio_direction direction);
 
 /**
- * Parses a string to the gpio mode.
+ * Parses a string to the gpio direction.
  * @param str string to parse
- * @return mode of the gpio
+ * @return direction of the gpio
  */
-enum mygpio_gpio_mode mygpio_gpio_parse_mode(const char *str);
+enum mygpio_gpio_direction mygpio_gpio_parse_direction(const char *str);
 
 /**
  * Lookups the name for the gpio value.

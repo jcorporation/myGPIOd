@@ -30,7 +30,7 @@
 static bool config_read(struct t_config *config, sds config_file);
 static struct t_config *config_new(void);
 static bool parse_config_file_kv(sds key, sds value, struct t_config *config);
-static bool parse_gpio_config_file(int mode, void *data, const char *dirname, const char *filename);
+static bool parse_gpio_config_file(int direction, void *data, const char *dirname, const char *filename);
 static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_data *data);
 static bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_data *data);
 static struct t_action *action_node_data_from_value(sds value);
@@ -101,7 +101,7 @@ static struct t_config *config_new(void) {
     config->syslog = CFG_SYSLOG;
     config->dir_gpio = sdsnew(CFG_GPIO_DIR);
     config->socket_path = sdsnew(CFG_SOCKET_PATH);
-    config->socket_timeout = CFG_SOCKET_TIMEOUT;
+    config->socket_timeout_s = CFG_SOCKET_TIMEOUT;
     config->client_id = 0;
     list_init(&config->clients);
     return config;
@@ -247,8 +247,8 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         return true;
     }
     if (strcmp(key, "timeout") == 0) {
-        if (mygpio_parse_int(value, &config->socket_timeout, NULL, 10, 120) == true) {
-            MYGPIOD_LOG_DEBUG("Setting timeout to \"%d\" seconds", config->socket_timeout);
+        if (mygpio_parse_int(value, &config->socket_timeout_s, NULL, 10, 120) == true) {
+            MYGPIOD_LOG_DEBUG("Setting timeout to \"%d\" seconds", config->socket_timeout_s);
             return true;
         }
         return false;
@@ -258,13 +258,13 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
 
 /**
  * Parses a gpio configuration file
- * @param mode one off GPIOD_LINE_DIRECTION_INPUT, GPIOD_LINE_DIRECTION_OUTPUT
+ * @param direction one off GPIOD_LINE_DIRECTION_INPUT, GPIOD_LINE_DIRECTION_OUTPUT
  * @param data already allocated gpio config data to populate
  * @param dirname directory name
  * @param filename file name
  * @return true on success, else false
  */
-static bool parse_gpio_config_file(int mode, void *data, const char *dirname, const char *filename) {
+static bool parse_gpio_config_file(int direction, void *data, const char *dirname, const char *filename) {
     sds filepath = sdscatprintf(sdsempty(), "%s/%s", dirname, filename);
     FILE *fp = fopen(filepath, OPEN_FLAGS_READ);
     if (fp == NULL) {
@@ -288,7 +288,7 @@ static bool parse_gpio_config_file(int mode, void *data, const char *dirname, co
         int count = 0;
         sds *kv = sds_splitfirst(line, '=', &count);
         if (count == 2) {
-            bool rc = mode == GPIOD_LINE_DIRECTION_OUTPUT
+            bool rc = direction == GPIOD_LINE_DIRECTION_OUTPUT
                 ? parse_gpio_config_file_out_kv(kv[0], kv[1], data)
                 : parse_gpio_config_file_in_kv(kv[0], kv[1], data);
             if (rc == false) {
@@ -368,7 +368,7 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         return false;
     }
     if (strcmp(key, "long_press_timeout") == 0) {
-        if (mygpio_parse_int(value, &data->long_press_timeout, NULL, 0, 9) == true) {
+        if (mygpio_parse_int(value, &data->long_press_timeout_ms, NULL, 0, 9999) == true) {
             return errno == 0 ? true : false;
         }
         return false;
@@ -418,16 +418,17 @@ static struct t_gpio_in_data *gpio_in_data_new(void) {
     data->event_request = GPIOD_LINE_EDGE_RISING;
     list_init(&data->action_rising);
     list_init(&data->action_falling);
-    data->long_press_timeout = 0;
+    data->long_press_timeout_ms = 0;
     list_init(&data->long_press_action);
     data->long_press_event = GPIOD_LINE_EDGE_FALLING;
+    data->long_press_value = GPIOD_LINE_VALUE_ERROR;
     data->ignore_event = false;
     data->timer_fd = -1;
     data->gpio_fd = -1;
     data->bias = GPIOD_LINE_BIAS_AS_IS;
     data->active_low = false;
     data->debounce_period_us = 0;
-    data->event_clock = GPIOD_LINE_CLOCK_MONOTONIC;
+    data->event_clock = GPIOD_LINE_CLOCK_REALTIME;
     data->request = NULL;
     data->event_buffer = NULL;
     return data;

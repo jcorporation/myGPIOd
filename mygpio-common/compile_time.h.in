@@ -23,7 +23,7 @@
 #define CFG_SYSLOG false
 #define CFG_GPIO_DIR "/etc/mygpiod.d"
 #define CFG_SOCKET_PATH "/run/mygpiod/socket"
-#define CFG_SOCKET_TIMEOUT 10 //seconds
+#define CFG_SOCKET_TIMEOUT 60 //seconds
 
 // Other defaults
 #define CLIENT_CONNECTIONS_MAX 10

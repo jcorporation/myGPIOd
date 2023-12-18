@@ -35,7 +35,7 @@ bool mygpio_gpiolist(struct t_mygpio_connection *connection) {
  */
 struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connection) {
     unsigned gpio_nr;
-    enum mygpio_gpio_mode mode;
+    enum mygpio_gpio_direction direction;
     enum mygpio_gpio_value value;
 
     struct t_mygpio_pair *pair;
@@ -48,10 +48,10 @@ struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connecti
     }
     mygpio_free_pair(pair);
 
-    if ((pair = mygpio_recv_pair_name(connection, "mode")) == NULL) {
+    if ((pair = mygpio_recv_pair_name(connection, "direction")) == NULL) {
         return NULL;
     }
-    if ((mode = mygpio_gpio_parse_mode(pair->value)) == MYGPIO_GPIO_MODE_UNKNOWN) {
+    if ((direction = mygpio_gpio_parse_direction(pair->value)) == MYGPIO_GPIO_DIRECTION_UNKNOWN) {
         mygpio_free_pair(pair);
         return NULL;
     }
@@ -66,9 +66,9 @@ struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connecti
     }
     mygpio_free_pair(pair);
 
-    struct t_mygpio_gpio *gpio = mygpio_gpio_new(MYGPIO_GPIO_MODE_UNKNOWN);
+    struct t_mygpio_gpio *gpio = mygpio_gpio_new(MYGPIO_GPIO_DIRECTION_UNKNOWN);
     gpio->gpio = gpio_nr;
-    gpio->mode = mode;
+    gpio->direction = direction;
     gpio->value = value;
     return gpio;
 }

@@ -13,37 +13,36 @@
 #include <string.h>
 
 /**
- * Lookups the name for the gpio mode.
- * @param mode the gpio mode.
- * @return gpio mode name
+ * Lookups the name for the gpio direction.
+ * @param direction the gpio direction.
+ * @return gpio direction name
  */
-const char *mygpio_gpio_lookup_mode(enum mygpio_gpio_mode mode) {
-    switch(mode) {
-        case MYGPIO_GPIO_MODE_IN:
+const char *mygpio_gpio_lookup_direction(enum mygpio_gpio_direction direction) {
+    switch(direction) {
+        case MYGPIO_GPIO_DIRECTION_IN:
             return "in";
-        case MYGPIO_GPIO_MODE_OUT:
+        case MYGPIO_GPIO_DIRECTION_OUT:
             return "out";
-        case MYGPIO_GPIO_MODE_UNKNOWN:
+        case MYGPIO_GPIO_DIRECTION_UNKNOWN:
             return "unknown";
     }
     return "unknown";
 }
 
 /**
- * Parses a string to the gpio mode.
+ * Parses a string to the gpio direction.
  * @param str string to parse
- * @return mode of the gpio
+ * @return direction of the gpio
  */
-enum mygpio_gpio_mode mygpio_gpio_parse_mode(const char *str) {
+enum mygpio_gpio_direction mygpio_gpio_parse_direction(const char *str) {
     if (strcmp(str, "in") == 0) {
-        return MYGPIO_GPIO_MODE_IN;
+        return MYGPIO_GPIO_DIRECTION_IN;
     }
     if (strcmp(str, "out") == 0) {
-        return MYGPIO_GPIO_MODE_OUT;
+        return MYGPIO_GPIO_DIRECTION_OUT;
     }
-    return MYGPIO_GPIO_MODE_UNKNOWN;
+    return MYGPIO_GPIO_DIRECTION_UNKNOWN;
 }
-
 
 /**
  * Lookups the name for the gpio value.
@@ -52,10 +51,10 @@ enum mygpio_gpio_mode mygpio_gpio_parse_mode(const char *str) {
  */
 const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value) {
     switch(value) {
-        case MYGPIO_GPIO_VALUE_HIGH:
-            return "high";
-        case MYGPIO_GPIO_VALUE_LOW:
-            return "low";
+        case MYGPIO_GPIO_VALUE_ACTIVE:
+            return "active";
+        case MYGPIO_GPIO_VALUE_INACTIVE:
+            return "inactive";
         case MYGPIO_GPIO_VALUE_UNKNOWN:
             return "unknown";
     }
@@ -68,19 +67,11 @@ const char *mygpio_gpio_lookup_value(enum mygpio_gpio_value value) {
  * @return gpio value or GPIO_VALUE_LOW on error
  */
 enum mygpio_gpio_value mygpio_gpio_parse_value(const char *str) {
-    if (strcasecmp(str, "active") == 0 ||
-        strcasecmp(str, "high") == 0 ||
-        strcasecmp(str, "on") == 0 ||
-        strcmp(str, "1") == 0)
-    {
-        return MYGPIO_GPIO_VALUE_HIGH;
+    if (strcasecmp(str, "active") == 0) {
+        return MYGPIO_GPIO_VALUE_ACTIVE;
     }
-    if (strcasecmp(str, "inactive") == 0 ||
-        strcasecmp(str, "low") == 0 ||
-        strcasecmp(str, "off") == 0 ||
-        strcmp(str, "0") == 0)
-    {
-        return MYGPIO_GPIO_VALUE_LOW;
+    if (strcasecmp(str, "inactive") == 0) {
+        return MYGPIO_GPIO_VALUE_INACTIVE;
     }
     return MYGPIO_GPIO_VALUE_UNKNOWN;
 }
@@ -135,11 +126,11 @@ enum mygpio_gpio_bias mygpio_gpio_parse_bias(const char *str) {
 const char *mygpio_gpio_lookup_event_request(enum mygpio_event_request event_request) {
     switch(event_request) {
         case MYGPIO_EVENT_REQUEST_FALLING:
-            return "monotonic";
+            return "falling";
         case MYGPIO_EVENT_REQUEST_RISING:
-            return "realtime";
+            return "rising";
         case MYGPIO_EVENT_REQUEST_BOTH:
-            return "hte";
+            return "both";
         case MYGPIO_EVENT_REQUEST_UNKNOWN:
             return "unknown";
     }

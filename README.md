@@ -118,7 +118,7 @@ action_rising = system:/usr/local/bin/poweroff.sh
 action_falling = gpioset:6 high
 
 long_press_event = falling
-long_press_timeout = 2
+long_press_timeout = 2000
 long_press_action = system:/usr/local/bin/reboot.sh
 ```
 

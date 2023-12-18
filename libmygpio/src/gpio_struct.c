@@ -22,18 +22,18 @@ unsigned mygpio_gpio_get_gpio(struct t_mygpio_gpio *gpio) {
 }
 
 /**
- * Returns the GPIO mode from struct t_mygpio_gpio.
+ * Returns the GPIO direction from struct t_mygpio_gpio.
  * @param gpio Pointer to struct t_mygpio_gpio.
- * @return GPIO mode, one of enum mygpio_gpio_mode.
+ * @return GPIO direction, one of enum mygpio_gpio_direction.
  */
-enum mygpio_gpio_mode mygpio_gpio_get_mode(struct t_mygpio_gpio *gpio) {
-    return gpio->mode;
+enum mygpio_gpio_direction mygpio_gpio_get_direction(struct t_mygpio_gpio *gpio) {
+    return gpio->direction;
 }
 
 /**
  * Returns the GPIO value from struct t_mygpio_gpio.
  * @param gpio Pointer to struct t_mygpio_gpio.
- * @return GPIO mode, one of enum mygpio_gpio_mode.
+ * @return GPIO value, one of enum mygpio_gpio_value.
  */
 enum mygpio_gpio_value mygpio_gpio_get_value(struct t_mygpio_gpio *gpio) {
     return gpio->value;
@@ -82,11 +82,11 @@ bool mygpio_gpio_in_get_is_debounced(struct t_mygpio_gpio *gpio) {
 /**
  * Returns the GPIO debounce period from struct t_mygpio_gpio.
  * @param gpio Pointer to struct t_mygpio_gpio.
- * @return GPIO debounce period in nanoseconds.
+ * @return GPIO debounce period in microseconds.
  */
-int mygpio_gpio_in_get_debounce_period(struct t_mygpio_gpio *gpio) {
+int mygpio_gpio_in_get_debounce_period_us(struct t_mygpio_gpio *gpio) {
     assert(gpio->in);
-    return gpio->in->debounce_period;
+    return gpio->in->debounce_period_us;
 }
 
 /**
@@ -113,16 +113,16 @@ enum mygpio_drive mygpio_gpio_out_get_drive(struct t_mygpio_gpio *gpio) {
  * Creates a new gpio struct
  * @return struct t_mygpio_gpio* 
  */
-struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_mode mode) {
+struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_direction direction) {
     struct t_mygpio_gpio *gpio = malloc(sizeof(struct t_mygpio_gpio));
     assert(gpio);
     gpio->in = NULL;
     gpio->out = NULL;
-    if (mode == MYGPIO_GPIO_MODE_IN) {
+    if (direction == MYGPIO_GPIO_DIRECTION_IN) {
         gpio->in = malloc(sizeof(struct t_mygpio_in));
         assert(gpio->in);
     }
-    else if (mode == MYGPIO_GPIO_MODE_OUT) {
+    else if (direction == MYGPIO_GPIO_DIRECTION_OUT) {
         gpio->out = malloc(sizeof(struct t_mygpio_out));
         assert(gpio->out);
     }

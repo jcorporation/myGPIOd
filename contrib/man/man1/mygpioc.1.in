@@ -28,10 +28,16 @@ Connection timeout in milliseconds.
 .SH COMMANDS
 .TP
 \fBgpioget <number>\fR
-Gets the current value of an input gpio.
+Gets the current value of a gpio.
 .TP
-\fBgpioset <number> <value>\fR
+\fBgpioset <number> <active|inactive>\fR
 Sets the value of an output gpio.
+.TP
+\fBgpiotoggle <number>\fR
+Toggles the value of an output gpio.
+.TP
+\fBgpioinfo <number>\fR
+Gets the settings of a gpio.
 .TP
 \fBgpiolist\fR
 Lists all configured gpios with its modes.

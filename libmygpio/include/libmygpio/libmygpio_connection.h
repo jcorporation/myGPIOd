@@ -50,10 +50,10 @@ enum mygpio_conn_state {
  * Check the state with mygpio_connection_get_state.
  * It must be freed by the caller with mygpio_connection_free.
  * @param socket_path Server socket to connect to.
- * @param timeout The connection timeout in milliseconds
+ * @param timeout_ms The read timeout in milliseconds
  * @return Returns the t_mygpio_connection struct on NULL in a out of memory condition.
  */
-struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int timeout);
+struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int timeout_ms);
 
 /**
  * Closes the connection and frees the t_mygpio_connection struct

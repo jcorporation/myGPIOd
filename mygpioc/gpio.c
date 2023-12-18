@@ -32,9 +32,9 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
         struct t_mygpio_gpio *gpio;
         verbose_printf("Retrieving configured gpios");
         while ((gpio = mygpio_recv_gpio_list(conn)) != NULL) {
-            printf("GPIO %u, mode %s, value %s\n",
+            printf("GPIO %u, direction %s, value %s\n",
                 mygpio_gpio_get_gpio(gpio),
-                mygpio_gpio_lookup_mode(mygpio_gpio_get_mode(gpio)),
+                mygpio_gpio_lookup_direction(mygpio_gpio_get_direction(gpio)),
                 mygpio_gpio_lookup_value(mygpio_gpio_get_value(gpio))
             );
             mygpio_free_gpio(gpio);
@@ -69,19 +69,19 @@ int handle_gpioinfo(int argc, char **argv, int option_index, struct t_mygpio_con
         if (gpio == NULL) {
             return EXIT_FAILURE;
         }
-        enum mygpio_gpio_mode mode = mygpio_gpio_get_mode(gpio);
+        enum mygpio_gpio_direction direction = mygpio_gpio_get_direction(gpio);
         printf("GPIO: %u\n", mygpio_gpio_get_gpio(gpio));
-        printf("Mode: %s\n", mygpio_gpio_lookup_mode(mode));
+        printf("Direction: %s\n", mygpio_gpio_lookup_direction(direction));
         printf("Value: %s\n", mygpio_gpio_lookup_value(mygpio_gpio_get_value(gpio)));
-        if (mode == MYGPIO_GPIO_MODE_IN) {
+        if (direction == MYGPIO_GPIO_DIRECTION_IN) {
             printf("Active low: %s\n", mygpio_bool_to_str(mygpio_gpio_in_get_active_low(gpio)));
             printf("Bias: %s\n", mygpio_gpio_lookup_bias(mygpio_gpio_in_get_bias(gpio)));
             printf("Event request: %s\n", mygpio_gpio_lookup_event_request(mygpio_gpio_in_get_event_request(gpio)));
             printf("Is debounced: %s\n", mygpio_bool_to_str(mygpio_gpio_in_get_is_debounced(gpio)));
-            printf("Debounce period: %d ns\n", mygpio_gpio_in_get_debounce_period(gpio));
+            printf("Debounce period: %d us\n", mygpio_gpio_in_get_debounce_period_us(gpio));
             printf("Event clock: %s\n", mygpio_gpio_lookup_event_clock(mygpio_gpio_in_get_event_clock(gpio)));
         }
-        else if (mode == MYGPIO_GPIO_MODE_OUT) {
+        else if (direction == MYGPIO_GPIO_DIRECTION_OUT) {
             printf("Drive: %s\n", mygpio_gpio_lookup_drive(mygpio_gpio_out_get_drive(gpio)));
         }
         mygpio_response_end(conn);

@@ -8,10 +8,10 @@
 
 # Sets the GPIO active state
 # Valid values: true, false
-# - true = GPIO considered active if it is low
-# - false = GPIO considered active if it is high
-#active_low = true
+# - true = GPIO considered active, if it is low
+# - false = GPIO considered active, if it is high
 active_low = false
+#active_low = true
 
 # Sets the internal pull-up or pull-down resistor
 # Valid values: as-is, disable, pull-down, pull-up
@@ -33,18 +33,22 @@ debounce = 0
 event_clock = monotonic
 
 # Action for rising event
+# Multiple lines are supported
 #action_rising = system:/usr/local/bin/poweroff.sh
 
 # Action for falling event
+# Multiple lines are supported
 #action_falling = system:/usr/local/bin/poweroff.sh
 
 # Long press support
+# long_press_event and long_press_timeout must be set
 # Event for the long press handler
 #long_press_event = falling
-#long_press_event = raising
+#long_press_event = rising
 
-# Timeout in seconds after long press action is executed
-#long_press_timeout = 2
+# Timeout in milliseconds after long press action is executed
+#long_press_timeout = 2000
 
 # The long press action
+# Multiple lines are supported
 #long_press_action = system:/usr/local/bin/reboot.sh

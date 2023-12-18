@@ -37,13 +37,13 @@ bool mygpio_gpioinfo(struct t_mygpio_connection *connection, unsigned gpio) {
  */
 struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connection) {
     unsigned gpio_nr;
-    enum mygpio_gpio_mode mode;
+    enum mygpio_gpio_direction direction;
     enum mygpio_gpio_value value;
     bool active_low = false;
     enum mygpio_gpio_bias bias = MYGPIO_BIAS_UNKNOWN;
     enum mygpio_event_request event_request = MYGPIO_EVENT_REQUEST_UNKNOWN;
     bool is_debounced = false;
-    int debounce_period = 0;
+    int debounce_period_us = 0;
     enum mygpio_event_clock event_clock = MYGPIO_EVENT_CLOCK_UNKNOWN;
     enum mygpio_drive drive = MYGPIO_DRIVE_UNKNOWN;
 
@@ -57,10 +57,10 @@ struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connecti
     }
     mygpio_free_pair(pair);
 
-    if ((pair = mygpio_recv_pair_name(connection, "mode")) == NULL) {
+    if ((pair = mygpio_recv_pair_name(connection, "direction")) == NULL) {
         return NULL;
     }
-    if ((mode = mygpio_gpio_parse_mode(pair->value)) == MYGPIO_GPIO_MODE_UNKNOWN) {
+    if ((direction = mygpio_gpio_parse_direction(pair->value)) == MYGPIO_GPIO_DIRECTION_UNKNOWN) {
         mygpio_free_pair(pair);
         return NULL;
     }
@@ -75,7 +75,7 @@ struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connecti
     }
     mygpio_free_pair(pair);
 
-    if (mode == MYGPIO_GPIO_MODE_IN) {
+    if (direction == MYGPIO_GPIO_DIRECTION_IN) {
         if ((pair = mygpio_recv_pair_name(connection, "active_low")) == NULL) {
             return NULL;
         }
@@ -106,10 +106,10 @@ struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connecti
         is_debounced = mygpio_parse_bool(pair->value);
         mygpio_free_pair(pair);
 
-        if ((pair = mygpio_recv_pair_name(connection, "debounce_period")) == NULL) {
+        if ((pair = mygpio_recv_pair_name(connection, "debounce_period_us")) == NULL) {
             return NULL;
         }
-        if (mygpio_parse_int(pair->value, &debounce_period, NULL, 0, INT_MAX) == false) {
+        if (mygpio_parse_int(pair->value, &debounce_period_us, NULL, 0, INT_MAX) == false) {
             mygpio_free_pair(pair);
             return NULL;
         }
@@ -124,7 +124,7 @@ struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connecti
         }
         mygpio_free_pair(pair);
     }
-    else if (mode == MYGPIO_GPIO_MODE_OUT) {
+    else if (direction == MYGPIO_GPIO_DIRECTION_OUT) {
         if ((pair = mygpio_recv_pair_name(connection, "drive")) == NULL) {
             return NULL;
         }
@@ -135,20 +135,20 @@ struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connecti
         mygpio_free_pair(pair);
     }
 
-    struct t_mygpio_gpio *gpio = mygpio_gpio_new(mode);
+    struct t_mygpio_gpio *gpio = mygpio_gpio_new(direction);
     assert(gpio);
     gpio->gpio = gpio_nr;
-    gpio->mode = mode;
+    gpio->direction = direction;
     gpio->value = value;
-    if (mode == MYGPIO_GPIO_MODE_IN) {
+    if (direction == MYGPIO_GPIO_DIRECTION_IN) {
         gpio->in->active_low = active_low;
         gpio->in->bias = bias;
         gpio->in->event_request = event_request;
         gpio->in->is_debounced = is_debounced;
-        gpio->in->debounce_period = debounce_period;
+        gpio->in->debounce_period_us = debounce_period_us;
         gpio->in->event_clock = event_clock;
     }
-    else if (mode == MYGPIO_GPIO_MODE_OUT) {
+    else if (direction == MYGPIO_GPIO_DIRECTION_OUT) {
         gpio->out->drive = drive;
     }
     return gpio;

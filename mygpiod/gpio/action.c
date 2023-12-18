@@ -63,8 +63,9 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
             }
         }
         if (data->long_press_event == GPIOD_LINE_EDGE_FALLING &&
-            data->long_press_timeout > 0)
+            data->long_press_timeout_ms > 0)
         {
+            data->long_press_value = gpio_get_value(config, gpio);
             action_delay(data);
         }
     }
@@ -78,8 +79,9 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
             }
         }
         if (data->long_press_event == GPIOD_LINE_EDGE_RISING &&
-            data->long_press_timeout > 0)
+            data->long_press_timeout_ms > 0)
         {
+            data->long_press_value = gpio_get_value(config, gpio);
             action_delay(data);
         }
     }
@@ -87,24 +89,21 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
 
 /**
  * Checks if the gpio value has not changed since the initial event 
- * and executes the defined action
+ * and executes the defined action.
  * @param gpio the gpio number
  * @param data gpio config data
  * @param config config
  */
 void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t_config *config) {
     // check if gpio value has not changed
-    enum gpiod_line_value value = gpio_get_value(config, gpio);
-
-    if ((value == GPIOD_LINE_VALUE_ACTIVE && data->long_press_event == GPIOD_LINE_EDGE_RISING) ||
-        (value == GPIOD_LINE_VALUE_INACTIVE && data->long_press_event == GPIOD_LINE_EDGE_FALLING))
-    {
+    if (gpio_get_value(config, gpio) == data->long_press_value) {
         struct timespec ts;
         switch (data->event_clock) {
-            case GPIOD_LINE_CLOCK_HTE:
             case GPIOD_LINE_CLOCK_REALTIME:
                 clock_gettime(CLOCK_REALTIME, &ts);
                 break;
+            case GPIOD_LINE_CLOCK_HTE:
+                //TODO: howto handle this?
             case GPIOD_LINE_CLOCK_MONOTONIC:
                 clock_gettime(CLOCK_MONOTONIC, &ts);
                 break;
@@ -141,7 +140,7 @@ static void action_delay(struct t_gpio_in_data *data) {
     if (data->timer_fd > -1) {
         action_delay_abort(data);
     }
-    data->timer_fd = timer_new(data->long_press_timeout);
+    data->timer_fd = timer_new(data->long_press_timeout_ms);
 }
 
 /**

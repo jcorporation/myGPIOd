@@ -41,7 +41,7 @@ bool handle_idle(struct t_list_node *client_node) {
 bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
     struct t_client_data *client_data = (struct t_client_data *)client_node->data;
     MYGPIOD_LOG_INFO("Client#%u: Leaving idle mode", client_node->id);
-    client_data->timeout_fd = server_client_connection_set_timeout(client_data->timeout_fd, config->socket_timeout);
+    client_data->timeout_fd = server_client_connection_set_timeout(client_data->timeout_fd, config->socket_timeout_s);
     if (client_data->waiting_events.length == 0) {
         server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
         return true;

@@ -14,7 +14,7 @@ struct t_mygpio_in {
     enum mygpio_gpio_bias bias;
     enum mygpio_event_request event_request;
     bool is_debounced;
-    int debounce_period;
+    int debounce_period_us;
     enum mygpio_event_clock event_clock;
 };
 
@@ -26,13 +26,13 @@ struct t_mygpio_out {
  * Struct holding the configuration of a GPIO.
  */
 struct t_mygpio_gpio {
-    unsigned gpio;                 //!< GPIO number
-    enum mygpio_gpio_mode mode;    //!< GPIO mode (direction)
-    enum mygpio_gpio_value value;  //!< GPIO value
-    struct t_mygpio_in *in;        //!< GPIO settings for input
-    struct t_mygpio_out *out;      //!< GPIO settings for output
+    unsigned gpio;                         //!< GPIO number
+    enum mygpio_gpio_direction direction;  //!< GPIO direction
+    enum mygpio_gpio_value value;          //!< GPIO value
+    struct t_mygpio_in *in;                //!< GPIO settings for input
+    struct t_mygpio_out *out;              //!< GPIO settings for output
 };
 
-struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_mode mode);
+struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_direction direction);
 
 #endif

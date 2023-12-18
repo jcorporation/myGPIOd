@@ -11,7 +11,7 @@
 
 struct t_options {
     char *socket;
-    int timeout;
+    int timeout_ms;
 };
 
 void print_usage(void);

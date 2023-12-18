@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
     }
 
     verbose_printf("Connecting to myGPIOd: %s", options.socket);
-    struct t_mygpio_connection *conn = mygpio_connection_new(options.socket, options.timeout);
+    struct t_mygpio_connection *conn = mygpio_connection_new(options.socket, options.timeout_ms);
     if (conn == NULL) {
         fprintf(stderr, "Out of memory\n");
         clear_options(&options);

@@ -106,7 +106,7 @@ bool server_client_connection_accept(struct t_config *config, int *server_fd) {
     list_push(&config->clients, config->client_id, data);
     MYGPIOD_LOG_INFO("Client#%u: Accepted new connection", config->client_id);
     server_response_send(data, DEFAULT_MSG_OK "\nversion:" MYGPIO_VERSION "\n" DEFAULT_MSG_END);
-    data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
+    data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout_s);
     timer_log_next_expire(data->timeout_fd);
     return true;
 }
@@ -146,7 +146,7 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
             if (buf_end != NULL) {
                 sdstrim(data->buf_in, " \t \n");
                 MYGPIOD_LOG_DEBUG("Client#%u: Read line \"%s\"", node->id, data->buf_in);
-                data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout);
+                data->timeout_fd = server_client_connection_set_timeout(data->timeout_fd, config->socket_timeout_s);
                 timer_log_next_expire(data->timeout_fd);
                 server_protocol_handler(config, node);
                 return true;
@@ -229,13 +229,13 @@ bool server_client_disconnect(struct t_list *clients, struct t_list_node *node) 
 /**
  * Adds/replaces a socket timeout handler
  * @param timeout_fd socket
- * @param timeout timeout in seconds
+ * @param timeout_s timeout in seconds
  */
-int server_client_connection_set_timeout(int timeout_fd, int timeout) {
+int server_client_connection_set_timeout(int timeout_fd, int timeout_s) {
     if (timeout_fd > 0) {
-        timer_set(timeout_fd, timeout);
+        timer_set(timeout_fd, timeout_s * 1000);
     }
-    return timer_new(timeout);
+    return timer_new(timeout_s * 1000);
 }
 
 /**

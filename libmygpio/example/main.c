@@ -74,9 +74,9 @@ int main(int argc, char **argv) {
         struct t_mygpio_gpio *gpio;
         printf("Retrieving gpio config\n");
         while ((gpio = mygpio_recv_gpio_list(conn)) != NULL) {
-            printf("GPIO %u, mode %u, value %d\n", 
+            printf("GPIO %u, direction %u, value %d\n", 
                 mygpio_gpio_get_gpio(gpio),
-                mygpio_gpio_get_mode(gpio),
+                mygpio_gpio_get_direction(gpio),
                 mygpio_gpio_get_value(gpio)
             );
             mygpio_free_gpio(gpio);
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
 
     // Set the value of GPIO number 6 to high
     printf("Sending gpioset 6 1\n");
-    if (mygpio_gpioset(conn, 6, MYGPIO_GPIO_VALUE_HIGH) == false) {
+    if (mygpio_gpioset(conn, 6, MYGPIO_GPIO_VALUE_ACTIVE) == false) {
         printf("Error: %s\n", mygpio_connection_get_error(conn));
         mygpio_connection_clear_error(conn);
     }

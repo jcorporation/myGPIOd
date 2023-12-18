@@ -45,7 +45,7 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
 bool server_client_disconnect(struct t_list *clients, struct t_list_node *node);
 struct t_client_data *server_client_connection_new(int client_fd);
 void server_client_connection_clear(struct t_list_node *node);
-int server_client_connection_set_timeout(int timeout_fd, int timeout);
+int server_client_connection_set_timeout(int timeout_fd, int timeout_s);
 void server_client_connection_remove_timeout(struct t_client_data *data);
 bool server_client_timeout(struct t_list *clients, int *timeout_fd);
 

@@ -20,7 +20,6 @@
 #include <string.h>
 #include <unistd.h>
 
-
 /**
  * Closes an open file descriptor.
  * Checks it if is open and sets it to -1.

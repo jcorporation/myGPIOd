@@ -21,7 +21,7 @@
  * @param timeout connection timeout in ms
  * @return allocated connection struct or NULL if malloc fails
  */
-struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int timeout) {
+struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int timeout_ms) {
     struct t_mygpio_connection *connection = malloc(sizeof(struct t_mygpio_connection));
     if (connection == NULL) {
         return NULL;
@@ -32,7 +32,7 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int t
     connection->version[1] = 0;
     connection->version[2] = 0;
     connection->error = NULL;
-    connection->timeout = timeout;
+    connection->timeout_ms = timeout_ms;
     connection->fd = libmygpio_socket_connect(socket_path);
     if (connection->fd == -1) {
         libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Connection failed");

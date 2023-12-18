@@ -40,12 +40,12 @@ struct t_mygpio_gpio;
  */
 
 /**
- * The mode of a GPIO.
+ * The direction of a GPIO.
  */
-enum mygpio_gpio_mode {
-    MYGPIO_GPIO_MODE_UNKNOWN = -1,  //!< Unknown GPIO mode.
-    MYGPIO_GPIO_MODE_IN,            //!< Input mode, myGPIOd can read events from this GPIO.
-    MYGPIO_GPIO_MODE_OUT            //!< Output mode, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_HIGH or MYGPIO_GPIO_VALUE_LOW.
+enum mygpio_gpio_direction {
+    MYGPIO_GPIO_DIRECTION_UNKNOWN = -1,  //!< Unknown GPIO direction.
+    MYGPIO_GPIO_DIRECTION_IN,            //!< Input direction, myGPIOd can read events from this GPIO.
+    MYGPIO_GPIO_DIRECTION_OUT            //!< Output direction, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_HIGH or MYGPIO_GPIO_VALUE_LOW.
 };
 
 /**
@@ -53,8 +53,8 @@ enum mygpio_gpio_mode {
  */
 enum mygpio_gpio_value {
     MYGPIO_GPIO_VALUE_UNKNOWN = -1,  //!< Unknown GPIO value
-    MYGPIO_GPIO_VALUE_LOW,           //!< GPIO state is low
-    MYGPIO_GPIO_VALUE_HIGH           //!< GPIO state is high
+    MYGPIO_GPIO_VALUE_INACTIVE,      //!< GPIO state is low
+    MYGPIO_GPIO_VALUE_ACTIVE         //!< GPIO state is high
 };
 
 /**
@@ -106,16 +106,16 @@ enum mygpio_drive {
 unsigned mygpio_gpio_get_gpio(struct t_mygpio_gpio *gpio);
 
 /**
- * Returns the GPIO mode from struct t_mygpio_gpio.
+ * Returns the GPIO direction from struct t_mygpio_gpio.
  * @param gpio Pointer to struct t_mygpio_gpio.
- * @return GPIO mode, one of enum mygpio_gpio_mode.
+ * @return GPIO direction, one of enum mygpio_gpio_direction.
  */
-enum mygpio_gpio_mode mygpio_gpio_get_mode(struct t_mygpio_gpio *gpio);
+enum mygpio_gpio_direction mygpio_gpio_get_direction(struct t_mygpio_gpio *gpio);
 
 /**
  * Returns the GPIO value from struct t_mygpio_gpio.
  * @param gpio Pointer to struct t_mygpio_gpio.
- * @return GPIO mode, one of enum mygpio_gpio_mode.
+ * @return GPIO value, one of enum mygpio_gpio_value.
  */
 enum mygpio_gpio_value mygpio_gpio_get_value(struct t_mygpio_gpio *gpio);
 
@@ -150,9 +150,9 @@ bool mygpio_gpio_in_get_is_debounced(struct t_mygpio_gpio *gpio);
 /**
  * Returns the GPIO debounce period from struct t_mygpio_gpio.
  * @param gpio Pointer to struct t_mygpio_gpio.
- * @return GPIO debounce period in nanoseconds.
+ * @return GPIO debounce period in microseconds.
  */
-int mygpio_gpio_in_get_debounce_period(struct t_mygpio_gpio *gpio);
+int mygpio_gpio_in_get_debounce_period_us(struct t_mygpio_gpio *gpio);
 
 /**
  * Returns the GPIO event clock from struct t_mygpio_gpio.

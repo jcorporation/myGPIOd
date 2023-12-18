@@ -58,24 +58,24 @@ void libmygpio_socket_close(int fd) {
  * This command blocks.
  * @param fd file descriptor to read
  * @param buf buffer to fill
- * @param timeout timeout in ms
- *                0 for no wait
- *                -1 for no timeout
+ * @param timeout_ms timeout in ms
+ *                   0 for no wait
+ *                   -1 for no timeout
  * @return true on success, else false
  */
-bool libmygpio_socket_recv_line(int fd, struct t_buf *buf, int timeout) {
+bool libmygpio_socket_recv_line(int fd, struct t_buf *buf, int timeout_ms) {
     libmygpio_buf_init(buf);
     ssize_t nread;
     int flag = 0;
 
-    if (timeout == 0) {
+    if (timeout_ms == 0) {
         flag = MSG_DONTWAIT;
     }
-    else if (timeout > 0) {
+    else if (timeout_ms > 0) {
         struct pollfd pfds[1];
         pfds[0].fd = fd;
         pfds[0].events = POLLIN;
-        if (poll(pfds, 1, timeout) <= 0) {
+        if (poll(pfds, 1, timeout_ms) <= 0) {
             return false;
         }
     }

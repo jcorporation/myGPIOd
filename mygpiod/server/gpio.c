@@ -32,15 +32,15 @@ bool handle_gpiolist(struct t_config *config, struct t_list_node *client_node) {
     struct t_list_node *current = config->gpios_in.head;
     while (current != NULL) {
         server_response_append(client_data, "gpio:%u", current->id);
-        server_response_append(client_data, "mode:in");
-        server_response_append(client_data, "value:%d", gpio_get_value(config, current->id));
+        server_response_append(client_data, "direction:in");
+        server_response_append(client_data, "value:%s", lookup_gpio_value(gpio_get_value(config, current->id)));
         current = current->next;
     }
     current = config->gpios_out.head;
     while (current != NULL) {
         server_response_append(client_data, "gpio:%u", current->id);
-        server_response_append(client_data, "mode:out");
-        server_response_append(client_data, "value:%d", gpio_get_value(config, current->id));
+        server_response_append(client_data, "direction:out");
+        server_response_append(client_data, "value:%s", lookup_gpio_value(gpio_get_value(config, current->id)));
         current = current->next;
     }
     server_response_append(client_data, "%s", DEFAULT_MSG_END);
@@ -67,11 +67,11 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
         return false;
     }
 
-    enum gpiod_line_direction gpio_mode = GPIOD_LINE_DIRECTION_INPUT;
+    enum gpiod_line_direction gpio_direction = GPIOD_LINE_DIRECTION_INPUT;
     struct t_list_node *node = list_node_by_id(&config->gpios_in, gpio);
     if (node == NULL) {
         node = list_node_by_id(&config->gpios_out, gpio);
-        gpio_mode = GPIOD_LINE_DIRECTION_OUTPUT;
+        gpio_direction = GPIOD_LINE_DIRECTION_OUTPUT;
     }
     if (node == NULL) {
         server_response_send(client_data, DEFAULT_MSG_ERROR "GPIO not configured");
@@ -81,25 +81,25 @@ bool handle_gpioinfo(struct t_cmd_options *options, struct t_config *config, str
     server_response_start(client_data);
     server_response_append(client_data, "%s", DEFAULT_MSG_OK);
     server_response_append(client_data, "gpio:%u", gpio);
-    if (gpio_mode == GPIOD_LINE_DIRECTION_INPUT) {
+    if (gpio_direction == GPIOD_LINE_DIRECTION_INPUT) {
         struct gpiod_line_info *info = gpiod_chip_get_line_info(config->chip, node->id);
         if (info != NULL) {
-            server_response_append(client_data, "mode:in");
-            server_response_append(client_data, "value:%d", gpio_get_value(config, gpio));
-            server_response_append(client_data, "active_low:%d", gpiod_line_info_is_active_low(info));
+            server_response_append(client_data, "direction:in");
+            server_response_append(client_data, "value:%s", lookup_gpio_value(gpio_get_value(config, gpio)));
+            server_response_append(client_data, "active_low:%s", mygpio_bool_to_str(gpiod_line_info_is_active_low(info)));
             server_response_append(client_data, "bias:%s", lookup_bias(gpiod_line_info_get_bias(info)));
             server_response_append(client_data, "event_request:%s", lookup_event_request(gpiod_line_info_get_edge_detection(info)));
-            server_response_append(client_data, "is_debounced:%d", gpiod_line_info_is_debounced(info));
-            server_response_append(client_data, "debounce_period:%lu", gpiod_line_info_get_debounce_period_us(info));
+            server_response_append(client_data, "is_debounced:%s", mygpio_bool_to_str(gpiod_line_info_is_debounced(info)));
+            server_response_append(client_data, "debounce_period_us:%lu", gpiod_line_info_get_debounce_period_us(info));
             server_response_append(client_data, "event_clock:%s", lookup_event_clock(gpiod_line_info_get_event_clock(info)));
             gpiod_line_info_free(info);
         }
     }
-    else if (gpio_mode == GPIOD_LINE_DIRECTION_OUTPUT) {
+    else if (gpio_direction == GPIOD_LINE_DIRECTION_OUTPUT) {
         struct gpiod_line_info *info = gpiod_chip_get_line_info(config->chip, node->id);
         if (info != NULL) {
-            server_response_append(client_data, "mode:out");
-            server_response_append(client_data, "value:%d", gpio_get_value(config, gpio));
+            server_response_append(client_data, "direction:out");
+            server_response_append(client_data, "value:%s", lookup_gpio_value(gpio_get_value(config, gpio)));
             server_response_append(client_data, "drive:%s", lookup_drive(gpiod_line_info_get_drive(info)));
             gpiod_line_info_free(info);
         }
@@ -134,7 +134,7 @@ bool handle_gpioget(struct t_cmd_options *options, struct t_config *config, stru
     }
     server_response_start(client_data);
     server_response_append(client_data, "%s", DEFAULT_MSG_OK);
-    server_response_append(client_data, "value:%d", value);
+    server_response_append(client_data, "value:%s", lookup_gpio_value(value));
     server_response_append(client_data, "%s", DEFAULT_MSG_END);
     server_response_end(client_data);
     return true;

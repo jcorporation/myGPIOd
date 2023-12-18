@@ -42,10 +42,10 @@ Only the `noidle` command is allowed while the client is in idle mode.
 ```
 OK
 gpio:{gpio number}
-event:{event1}
+event:{falling|rising|long_press}
 timestamp_ms:{milliseconds}
 gpio:{gpio number}
-event:{event2}
+event:{falling|rising|long_press}
 timestamp_ms:{milliseconds}
 END
 ```
@@ -75,10 +75,9 @@ Lists all configured gpios.
 ```
 OK
 gpio:{gpio number}
-mode:{in|out}
-value:1
+direction:{in|out}
+value:{active|inactive}
 END
-...
 ```
 
 ### gpioinfo {gpio number}
@@ -89,14 +88,14 @@ Gets the current settings of a configured input or output gpio.
 
 ```
 OK
-mode:in
-value:0
-active_low:0
-bias:as-is
-event_request:both
-is_debounced:0
-debounce_period:0
-event_clock:monotonic
+direction:in
+value:{active|inactive}
+active_low:{true|false}
+bias:{as-is|disable|pull-down|pull-up}
+event_request:{both|falling|rising}
+is_debounced:{true|false}
+debounce_period_us:{microseconds}
+event_clock:{monotonic|realtime|hte}
 END
 ```
 
@@ -104,9 +103,9 @@ END
 
 ```
 OK
-mode:out
-value:1
-drive:push-pull
+direction:out
+value:{active|inactive}
+drive:{push-pull|open-drain|open-source}
 END
 ```
 
@@ -118,16 +117,13 @@ Gets the current value of a configured input or output gpio.
 
 ```
 OK
-value:{0|1}
+value:{active|inactive}
 END
 ```
 
-### gpioset {gpio number} {value}
+### gpioset {gpio number} {active|inactive}
 
-Sets the value of a configured output gpio. Valid values are:
-
-- 0, low, inactive, off
-- 1, high, active, on
+Sets the value of a configured output gpio.
 
 ### gpiotoggle {gpio number}
 

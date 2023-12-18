@@ -18,9 +18,9 @@ syslog = false
 socket = /run/mygpiod/socket
 
 # Timeout for client connections in seconds
-timeout = 10
+timeout = 60
 
-# GPIO chip number
+# GPIO chip device
 chip = /dev/gpiochip0
 
 # Directory for single gpio configuration files

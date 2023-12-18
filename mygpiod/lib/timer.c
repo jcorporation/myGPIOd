@@ -17,16 +17,16 @@
 
 /**
  * Creates a new timer fd.
- * @param timeout timeout in seconds
+ * @param timeout_ms timeout in milliseconds
  * @return created timer fd or -1 on error
  */
-int timer_new(int timeout) {
+int timer_new(int timeout_ms) {
     int timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
     if (timer_fd == -1) {
         MYGPIOD_LOG_ERROR("Can not create timer: \"%s\"", strerror(errno));
         return -1;
     }
-    if (timer_set(timer_fd, timeout) == false) {
+    if (timer_set(timer_fd, timeout_ms) == false) {
         close(timer_fd);
         return -1;
     }
@@ -36,13 +36,13 @@ int timer_new(int timeout) {
 /**
  * Sets the relative timeout for a timer fd.
  * @param timer_fd timer fd
- * @param timeout relative timeout in seconds
+ * @param timeout_ms relative timeout in milliseconds
  * @return true on success, else false
  */
-bool timer_set(int timer_fd, int timeout) {
+bool timer_set(int timer_fd, int timeout_ms) {
     struct itimerspec its;
-    its.it_value.tv_sec = timeout;
-    its.it_value.tv_nsec = 0;
+    its.it_value.tv_sec = timeout_ms / 1000;
+    its.it_value.tv_nsec = (timeout_ms % 1000) * 1000000;
     its.it_interval.tv_sec = 0;
     its.it_interval.tv_nsec = 0;
     errno = 0;
@@ -65,5 +65,6 @@ void timer_log_next_expire(int timer_fd) {
         MYGPIOD_LOG_ERROR("Can not get expiration for timer: \"%s\"", strerror(errno));
         return;
     }
-    MYGPIOD_LOG_DEBUG("Timer expires in %lld seconds", (long long)its.it_value.tv_sec);
+    int64_t timestamp = its.it_value.tv_sec * 1000 + its.it_value.tv_nsec / 1000000;
+    MYGPIOD_LOG_DEBUG("Timer expires in %lld milliseconds", (long long)timestamp);
 }

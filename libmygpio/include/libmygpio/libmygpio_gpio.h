@@ -43,7 +43,7 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
  * Sets the value of a configured output GPIO.
  * @param connection Pointer to the connection struct returned by mygpio_connection_new.
  * @param gpio GPIO number
- * @param value Value to set: MYGPIO_GPIO_VALUE_LOW or MYGPIO_GPIO_VALUE_HIGH
+ * @param value Value to set: MYGPIO_GPIO_VALUE_INACTIVE or MYGPIO_GPIO_VALUE_ACTIVE
  * @return true on success, else false.
  */
 bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value);
