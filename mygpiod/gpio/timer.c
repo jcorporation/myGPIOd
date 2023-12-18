@@ -30,7 +30,7 @@ bool gpio_timer_handle_event(int *fd, struct t_config *config, unsigned idx) {
     timer_log_next_expire(*fd);
     MYGPIOD_LOG_INFO("Long press event for gpio \"%u\"", idx);
     struct t_list_node *node = get_node_by_timerfd(&config->gpios_in, fd);
-    if (fd == NULL) {
+    if (node == NULL) {
         MYGPIOD_LOG_ERROR("Error getting node for timer_fd");
         return false;
     }
