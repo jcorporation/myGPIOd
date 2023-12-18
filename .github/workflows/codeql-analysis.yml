@@ -23,11 +23,11 @@ jobs:
     - name: Install libgpiod v2
       run: |
         sudo apt-get update
-        sudo apt-get -y install wget build-essential
+        sudo apt-get -y install wget build-essential autoconf-archive automake
         wget https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/snapshot/libgpiod-2.1.tar.gz
         tar -xzf libgpiod-2.1.tar.gz
         cd libgpiod-2.1
-        ./configure --enable-tools=no
+        ./autogen.sh --prefix=/usr
         make
         sudo make install
         cd ..
