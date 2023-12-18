@@ -1,4 +1,4 @@
-.TH "libmygpio_connection" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.TH "libmygpio_connection" 3 "Mon Dec 18 2023" "libmygpio" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -20,7 +20,7 @@ libmygpio_connection \- myGPIOd connection
 
 .in +1c
 .ti -1c
-.RI "struct \fBt_mygpio_connection\fP * \fBmygpio_connection_new\fP (const char *socket_path, int timeout)"
+.RI "struct \fBt_mygpio_connection\fP * \fBmygpio_connection_new\fP (const char *socket_path, int timeout_ms)"
 .br
 .ti -1c
 .RI "void \fBmygpio_connection_free\fP (struct \fBt_mygpio_connection\fP *connection)"
@@ -143,14 +143,14 @@ Unsigned array consisting of major, minor and patch version\&.
 .RE
 .PP
 
-.SS "struct \fBt_mygpio_connection\fP * mygpio_connection_new (const char * socket_path, int timeout)"
+.SS "struct \fBt_mygpio_connection\fP * mygpio_connection_new (const char * socket_path, int timeout_ms)"
 Creates a new connection to the myGPIOd socket and tries to connect\&. Check the state with mygpio_connection_get_state\&. It must be freed by the caller with mygpio_connection_free\&. 
 .PP
 \fBParameters\fP
 .RS 4
 \fIsocket_path\fP Server socket to connect to\&. 
 .br
-\fItimeout\fP The connection timeout in milliseconds 
+\fItimeout_ms\fP The read timeout in milliseconds 
 .RE
 .PP
 \fBReturns\fP

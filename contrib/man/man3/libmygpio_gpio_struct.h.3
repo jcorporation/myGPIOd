@@ -1,4 +1,4 @@
-.TH "libmygpio/include/libmygpio/libmygpio_gpio_struct.h" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.TH "libmygpio/include/libmygpio/libmygpio_gpio_struct.h" 3 "Mon Dec 18 2023" "libmygpio" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -14,10 +14,10 @@ libmygpio/include/libmygpio/libmygpio_gpio_struct.h \- myGPIOd client library
 
 .in +1c
 .ti -1c
-.RI "enum \fBmygpio_gpio_mode\fP { \fBMYGPIO_GPIO_MODE_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_MODE_IN\fP, \fBMYGPIO_GPIO_MODE_OUT\fP }"
+.RI "enum \fBmygpio_gpio_direction\fP { \fBMYGPIO_GPIO_DIRECTION_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_DIRECTION_IN\fP, \fBMYGPIO_GPIO_DIRECTION_OUT\fP }"
 .br
 .ti -1c
-.RI "enum \fBmygpio_gpio_value\fP { \fBMYGPIO_GPIO_VALUE_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_VALUE_LOW\fP, \fBMYGPIO_GPIO_VALUE_HIGH\fP }"
+.RI "enum \fBmygpio_gpio_value\fP { \fBMYGPIO_GPIO_VALUE_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_VALUE_INACTIVE\fP, \fBMYGPIO_GPIO_VALUE_ACTIVE\fP }"
 .br
 .ti -1c
 .RI "enum \fBmygpio_gpio_bias\fP { \fBMYGPIO_BIAS_UNKNOWN\fP = -1, \fBMYGPIO_BIAS_AS_IS\fP, \fBMYGPIO_BIAS_DISABLED\fP, \fBMYGPIO_BIAS_PULL_DOWN\fP, \fBMYGPIO_BIAS_PULL_UP\fP }"
@@ -39,7 +39,7 @@ libmygpio/include/libmygpio/libmygpio_gpio_struct.h \- myGPIOd client library
 .RI "unsigned \fBmygpio_gpio_get_gpio\fP (struct \fBt_mygpio_gpio\fP *gpio)"
 .br
 .ti -1c
-.RI "enum \fBmygpio_gpio_mode\fP \fBmygpio_gpio_get_mode\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.RI "enum \fBmygpio_gpio_direction\fP \fBmygpio_gpio_get_direction\fP (struct \fBt_mygpio_gpio\fP *gpio)"
 .br
 .ti -1c
 .RI "enum \fBmygpio_gpio_value\fP \fBmygpio_gpio_get_value\fP (struct \fBt_mygpio_gpio\fP *gpio)"
@@ -57,7 +57,7 @@ libmygpio/include/libmygpio/libmygpio_gpio_struct.h \- myGPIOd client library
 .RI "bool \fBmygpio_gpio_in_get_is_debounced\fP (struct \fBt_mygpio_gpio\fP *gpio)"
 .br
 .ti -1c
-.RI "int \fBmygpio_gpio_in_get_debounce_period\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.RI "int \fBmygpio_gpio_in_get_debounce_period_us\fP (struct \fBt_mygpio_gpio\fP *gpio)"
 .br
 .ti -1c
 .RI "enum \fBmygpio_event_clock\fP \fBmygpio_gpio_in_get_event_clock\fP (struct \fBt_mygpio_gpio\fP *gpio)"

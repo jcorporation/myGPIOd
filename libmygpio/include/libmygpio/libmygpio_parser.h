@@ -31,8 +31,8 @@ extern "C" {
 
 /**
  * Lookups the name for the gpio direction.
- * @param mode the gpio mode.
- * @return gpio mode name
+ * @param direction the gpio direction.
+ * @return gpio direction name
  */
 const char *mygpio_gpio_lookup_direction(enum mygpio_gpio_direction direction);
 

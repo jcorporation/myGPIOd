@@ -17,7 +17,6 @@ Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
-BuildRequires:  libgpiod-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %global debug_package %{nil}

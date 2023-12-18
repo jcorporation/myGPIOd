@@ -1,4 +1,4 @@
-.TH "libmygpio_parser" 3 "Sun Dec 17 2023" "libmygpio" \" -*- nroff -*-
+.TH "libmygpio_parser" 3 "Mon Dec 18 2023" "libmygpio" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -13,10 +13,10 @@ libmygpio_parser \- Parser
 
 .in +1c
 .ti -1c
-.RI "const char * \fBmygpio_gpio_lookup_mode\fP (enum \fBmygpio_gpio_mode\fP mode)"
+.RI "const char * \fBmygpio_gpio_lookup_direction\fP (enum \fBmygpio_gpio_direction\fP direction)"
 .br
 .ti -1c
-.RI "enum \fBmygpio_gpio_mode\fP \fBmygpio_gpio_parse_mode\fP (const char *str)"
+.RI "enum \fBmygpio_gpio_direction\fP \fBmygpio_gpio_parse_direction\fP (const char *str)"
 .br
 .ti -1c
 .RI "const char * \fBmygpio_gpio_lookup_value\fP (enum \fBmygpio_gpio_value\fP value)"
@@ -70,6 +70,20 @@ gpio bias name
 .RE
 .PP
 
+.SS "const char * mygpio_gpio_lookup_direction (enum \fBmygpio_gpio_direction\fP direction)"
+Lookups the name for the gpio direction\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdirection\fP the gpio direction\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio direction name 
+.RE
+.PP
+
 .SS "const char * mygpio_gpio_lookup_drive (enum \fBmygpio_drive\fP drive)"
 Lookups the name for the gpio drive setting\&. 
 .PP
@@ -112,20 +126,6 @@ gpio event request name
 .RE
 .PP
 
-.SS "const char * mygpio_gpio_lookup_mode (enum \fBmygpio_gpio_mode\fP mode)"
-Lookups the name for the gpio mode\&. 
-.PP
-\fBParameters\fP
-.RS 4
-\fImode\fP the gpio mode\&. 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-gpio mode name 
-.RE
-.PP
-
 .SS "const char * mygpio_gpio_lookup_value (enum \fBmygpio_gpio_value\fP value)"
 Lookups the name for the gpio value\&. 
 .PP
@@ -151,6 +151,20 @@ Parses a string to a gpio bias\&.
 \fBReturns\fP
 .RS 4
 gpio bias or GPIO_BIAS_UNKNOWN on error 
+.RE
+.PP
+
+.SS "enum \fBmygpio_gpio_direction\fP mygpio_gpio_parse_direction (const char * str)"
+Parses a string to the gpio direction\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP string to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+direction of the gpio 
 .RE
 .PP
 
@@ -193,20 +207,6 @@ Parses a string to an event request\&.
 \fBReturns\fP
 .RS 4
 gpio event request or GPIO_EVENT_REQUEST_UNKNOWN on error 
-.RE
-.PP
-
-.SS "enum \fBmygpio_gpio_mode\fP mygpio_gpio_parse_mode (const char * str)"
-Parses a string to the gpio mode\&. 
-.PP
-\fBParameters\fP
-.RS 4
-\fIstr\fP string to parse 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-mode of the gpio 
 .RE
 .PP
 
