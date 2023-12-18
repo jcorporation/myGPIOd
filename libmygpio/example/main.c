@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
     }
     mygpio_response_end(conn);
 
-    // List the modes of the configured GPIOs
+    // Lists all configured GPIOs with some settings
     printf("Sending gpiolist\n");
     if (mygpio_gpiolist(conn) == true) {
         struct t_mygpio_gpio *gpio;
@@ -88,8 +88,32 @@ int main(int argc, char **argv) {
     }
     mygpio_response_end(conn);
 
+    // List details from gpio 5
+    struct t_mygpio_gpio *gpio;
+    if (mygpio_gpioinfo(conn, 5) == true &&
+        (gpio = mygpio_recv_gpio_info(conn)) != NULL)
+    {
+        enum mygpio_gpio_direction direction = mygpio_gpio_get_direction(gpio);
+        if (direction == MYGPIO_GPIO_DIRECTION_IN) {
+            printf("Active low: %d\n", mygpio_gpio_in_get_active_low(gpio));
+            printf("Bias: %s\n", mygpio_gpio_lookup_bias(mygpio_gpio_in_get_bias(gpio)));
+            printf("Event request: %s\n", mygpio_gpio_lookup_event_request(mygpio_gpio_in_get_event_request(gpio)));
+            printf("Is debounced: %d\n", mygpio_gpio_in_get_is_debounced(gpio));
+            printf("Debounce period: %d us\n", mygpio_gpio_in_get_debounce_period_us(gpio));
+            printf("Event clock: %s\n", mygpio_gpio_lookup_event_clock(mygpio_gpio_in_get_event_clock(gpio)));
+        }
+        else if (direction == MYGPIO_GPIO_DIRECTION_OUT) {
+            printf("Drive: %s\n", mygpio_gpio_lookup_drive(mygpio_gpio_out_get_drive(gpio)));
+        }
+        mygpio_free_gpio(gpio);
+    }
+    else {
+        fprintf(stderr, "Error: %s\n", mygpio_connection_get_error(conn));
+    }
+    mygpio_response_end(conn);
+
     // Get the value of GPIO number 5
-    // It must be configured as an input GPIO in the configuration of myGPIOd.
+    // It must be configured as input or output GPIO in the configuration of myGPIOd.
     printf("Sending gpioget 5\n");
     enum mygpio_gpio_value value = mygpio_gpioget(conn, 5);
     if (value == MYGPIO_GPIO_VALUE_UNKNOWN) {
@@ -102,8 +126,17 @@ int main(int argc, char **argv) {
     mygpio_response_end(conn);
 
     // Set the value of GPIO number 6 to active
+    // It must be configured as an ouput GPIO in the configuration of myGPIOd.
     printf("Sending gpioset 6 active\n");
     if (mygpio_gpioset(conn, 6, MYGPIO_GPIO_VALUE_ACTIVE) == false) {
+        printf("Error: %s\n", mygpio_connection_get_error(conn));
+        mygpio_connection_clear_error(conn);
+    }
+    mygpio_response_end(conn);
+
+    // Toggle the value of GPIO number 6
+    printf("Sending gpiotoggle 6\n");
+    if (mygpio_gpiotoggle(conn, 6) == false) {
         printf("Error: %s\n", mygpio_connection_get_error(conn));
         mygpio_connection_clear_error(conn);
     }
