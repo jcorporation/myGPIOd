@@ -45,16 +45,16 @@ struct t_mygpio_gpio;
 enum mygpio_gpio_direction {
     MYGPIO_GPIO_DIRECTION_UNKNOWN = -1,  //!< Unknown GPIO direction.
     MYGPIO_GPIO_DIRECTION_IN,            //!< Input direction, myGPIOd can read events from this GPIO.
-    MYGPIO_GPIO_DIRECTION_OUT            //!< Output direction, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_HIGH or MYGPIO_GPIO_VALUE_LOW.
+    MYGPIO_GPIO_DIRECTION_OUT            //!< Output direction, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_ACTIVE or MYGPIO_GPIO_VALUE_INACTIVE.
 };
 
 /**
- * The value of an output or input GPIO.
+ * The value of a GPIO.
  */
 enum mygpio_gpio_value {
     MYGPIO_GPIO_VALUE_UNKNOWN = -1,  //!< Unknown GPIO value
-    MYGPIO_GPIO_VALUE_INACTIVE,      //!< GPIO state is low
-    MYGPIO_GPIO_VALUE_ACTIVE         //!< GPIO state is high
+    MYGPIO_GPIO_VALUE_INACTIVE,      //!< GPIO state is inactive
+    MYGPIO_GPIO_VALUE_ACTIVE         //!< GPIO state is active
 };
 
 /**

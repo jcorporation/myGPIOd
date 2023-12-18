@@ -101,8 +101,8 @@ int main(int argc, char **argv) {
     }
     mygpio_response_end(conn);
 
-    // Set the value of GPIO number 6 to high
-    printf("Sending gpioset 6 1\n");
+    // Set the value of GPIO number 6 to active
+    printf("Sending gpioset 6 active\n");
     if (mygpio_gpioset(conn, 6, MYGPIO_GPIO_VALUE_ACTIVE) == false) {
         printf("Error: %s\n", mygpio_connection_get_error(conn));
         mygpio_connection_clear_error(conn);

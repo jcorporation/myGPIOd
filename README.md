@@ -79,7 +79,7 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
-| gpioset | `<gpio>` `<value>` | Sets the value of a GPIO. |
+| gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
 | gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
 | system | `<command>` | Executes an executable or script in a new child process. |
 
@@ -89,15 +89,15 @@ This example configuration does the following:
 
 - Configures gpio 3 as input:
   - Enables the pull-up resistor on start
-  - Sets GPIO 6 to low on rising event
-  - Sets GPIO 6 to high on falling event
+  - Sets GPIO 6 to inactive on rising event
+  - Sets GPIO 6 to active on falling event
   - Calls `/usr/local/bin/reboot.sh` after a button press (falling) of 2 seconds length
   - Calls `/usr/local/bin/poweroff.sh` on a short press (rising)
 - Configures gpio 4 as input:
   - Enables the pull-up resistor on start
   - Calls `/usr/local/bin/poweroff.sh` on a short press (falling)
 - Configures gpio 5 as output:
-  - Sets the value to high on start
+  - Sets the value to active on start
 
 **/etc/mygpiod.conf**
 ```
@@ -112,10 +112,10 @@ gpio_dir = /etc/mygpiod.d
 event_request = both
 active_low = false
 bias = pull-up
-action_rising = gpioset:6 low
+action_rising = gpioset:6 inactive
 action_rising = system:/usr/local/bin/poweroff.sh
 
-action_falling = gpioset:6 high
+action_falling = gpioset:6 active
 
 long_press_event = falling
 long_press_timeout = 2000
@@ -132,12 +132,12 @@ action_falling = system:/usr/local/bin/poweroff.sh
 
 **/etc/mygpiod.d/5.out**
 ```
-value = high
+value = active
 ```
 
 **/etc/mygpiod.d/6.out**
 ```
-value = low
+value = inactive
 ```
 
 ## Protocol

@@ -103,18 +103,10 @@ sds *sds_splitfirst(sds s, char sep, int *count) {
  * @return GPIO value or GPIOD_LINE_VALUE_ERROR on error
  */
 enum gpiod_line_value parse_gpio_value(const char *str) {
-    if (strcasecmp(str, "active") == 0 ||
-        strcasecmp(str, "high") == 0 ||
-        strcasecmp(str, "on") == 0 ||
-        strcmp(str, "1") == 0)
-    {
+    if (strcasecmp(str, "active") == 0) {
         return GPIOD_LINE_VALUE_ACTIVE;
     }
-    if (strcasecmp(str, "inactive") == 0 ||
-        strcasecmp(str, "low") == 0 ||
-        strcasecmp(str, "off") == 0 ||
-        strcmp(str, "0") == 0)
-    {
+    if (strcasecmp(str, "inactive") == 0) {
         return GPIOD_LINE_VALUE_INACTIVE;
     }
     if (strcasecmp(str, "error") == 0) {
