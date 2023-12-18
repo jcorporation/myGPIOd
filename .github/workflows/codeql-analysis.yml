@@ -45,7 +45,7 @@ jobs:
     - name: Compile
       run: |
         sudo ./build.sh installdeps 
-        ./build.sh memcheck 
+        ./build.sh debug 
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
