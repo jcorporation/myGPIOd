@@ -84,6 +84,7 @@ int handle_gpioinfo(int argc, char **argv, int option_index, struct t_mygpio_con
         else if (direction == MYGPIO_GPIO_DIRECTION_OUT) {
             printf("Drive: %s\n", mygpio_gpio_lookup_drive(mygpio_gpio_out_get_drive(gpio)));
         }
+        mygpio_free_gpio(gpio);
         mygpio_response_end(conn);
         return EXIT_SUCCESS;
     }
