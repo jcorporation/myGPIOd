@@ -42,7 +42,7 @@ int timer_new(int timeout_ms) {
 bool timer_set(int timer_fd, int timeout_ms) {
     struct itimerspec its;
     its.it_value.tv_sec = timeout_ms / 1000;
-    its.it_value.tv_nsec = (timeout_ms % 1000) * 1000000;
+    its.it_value.tv_nsec = (long)((timeout_ms % 1000) * 1000000);
     its.it_interval.tv_sec = 0;
     its.it_interval.tv_nsec = 0;
     errno = 0;
