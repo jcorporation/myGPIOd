@@ -73,7 +73,7 @@ myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
 The cmake install script creates a startup script for systemd, openrc or sysVinit.
 
-## Actions
+## Events and actions
 
 Each event can have multiple actions. Actions and its arguments are delimited by a colon, arguments are delimited by space.
 
@@ -83,15 +83,17 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 | gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
 | system | `<command>` | Executes an executable or script in a new child process. |
 
+myGPIOd can take actions on rising, falling and long_press events. Long press is triggered by a falling or rising event and does not disable the triggering event, but the release event. To use a button for normal press and long_press request both events and use one event for long and the other for short press. The example below illustrates this.
+
 ## Example configuration
 
 This example configuration does the following:
 
 - Configures gpio 3 as input:
   - Enables the pull-up resistor on start
-  - Sets GPIO 6 to inactive on rising event
   - Sets GPIO 6 to active on falling event
   - Calls `/usr/local/bin/reboot.sh` after a button press (falling) of 2 seconds length
+  - Toggles the value of GPIO 6 on long_press
   - Calls `/usr/local/bin/poweroff.sh` on a short press (rising)
 - Configures gpio 4 as input:
   - Enables the pull-up resistor on start
@@ -109,16 +111,26 @@ gpio_dir = /etc/mygpiod.d
 
 **/etc/mygpiod.d/3.in**
 ```
+# We request falling and rising events
 event_request = both
+
+# Active is high
 active_low = false
+
+# Enable the internal pull-up resistor
 bias = pull-up
-action_rising = gpioset:6 inactive
+
+# Short press does a poweroff
 action_rising = system:/usr/local/bin/poweroff.sh
 
+# Reboot on long press and activate a LED while GPIO 6 is pressed
+# set gpio 6 active on falling
 action_falling = gpioset:6 active
 
+# enable long press for falling
 long_press_event = falling
 long_press_timeout = 2000
+long_press_action = gpiotoggle:6
 long_press_action = system:/usr/local/bin/reboot.sh
 ```
 
