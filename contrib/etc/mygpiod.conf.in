@@ -6,7 +6,7 @@
 # Logging
 # Valid values:
 # emerg, alert, crit, error, warn, notice, info, debug
-loglevel = notice
+loglevel = info
 
 # Log destination
 # Valid values: true, false
