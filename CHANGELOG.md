@@ -4,7 +4,7 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.4.0 (not yet released)
+## myGPIOd v0.4.0 (2023-12-19)
 
 This is a complete rewrite of myGPIOd. It is now based on libgpiod v2.
 

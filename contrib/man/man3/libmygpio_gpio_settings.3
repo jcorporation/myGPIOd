@@ -1,4 +1,4 @@
-.TH "libmygpio_gpio_settings" 3 "Mon Dec 18 2023" "libmygpio" \" -*- nroff -*-
+.TH "libmygpio_gpio_settings" 3 "Tue Dec 19 2023" "libmygpio" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -159,9 +159,9 @@ Unknown GPIO direction\&.
 Input direction, myGPIOd can read events from this GPIO\&. 
 .TP
 \fB\fIMYGPIO_GPIO_DIRECTION_OUT \fP\fP
-Output direction, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_HIGH or MYGPIO_GPIO_VALUE_LOW\&. 
+Output direction, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_ACTIVE or MYGPIO_GPIO_VALUE_INACTIVE\&. 
 .SS "enum \fBmygpio_gpio_value\fP"
-The value of an output or input GPIO\&. 
+The value of a GPIO\&. 
 .PP
 \fBEnumerator\fP
 .in +1c
@@ -170,10 +170,10 @@ The value of an output or input GPIO\&.
 Unknown GPIO value\&. 
 .TP
 \fB\fIMYGPIO_GPIO_VALUE_INACTIVE \fP\fP
-GPIO state is low\&. 
+GPIO state is inactive\&. 
 .TP
 \fB\fIMYGPIO_GPIO_VALUE_ACTIVE \fP\fP
-GPIO state is high\&. 
+GPIO state is active\&. 
 .SH "Function Documentation"
 .PP 
 .SS "void mygpio_free_gpio (struct \fBt_mygpio_gpio\fP * gpio)"
