@@ -9,24 +9,6 @@
 STARTPATH=$(dirname "$(realpath "$0")")
 cd "$STARTPATH" || exit 1
 
-#clang tidy options
-CLANG_TIDY_CHECKS="*"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-id-dependent-backward-branch"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-unroll-loops"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-altera-struct-pack-align,-clang-analyzer-optin.performance.Padding"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-easily-swappable-parameters"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-signal-handler,-cert-sig30-c"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-bugprone-assignment-in-if-condition"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-clang-diagnostic-invalid-command-line-argument"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-concurrency-mt-unsafe"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-cppcoreguidelines*"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-hicpp-*"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-llvmlibc-restrict-system-libc-headers"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-identifier-length"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-function-cognitive-complexity,-google-readability-function-size,-readability-function-size"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-magic-numbers"
-CLANG_TIDY_CHECKS="$CLANG_TIDY_CHECKS,-readability-non-const-parameter"
-
 #exit on error
 set -e
 
@@ -65,26 +47,36 @@ check_cmd_silent() {
 
 setversion() {
   echo "Setting version to ${VERSION}"
+  TS=$(stat -c%Y CMakeLists.txt)
   export LC_TIME="en_GB.UTF-8"
-  
-  sed -e "s/__VERSION__/${VERSION}/g" contrib/packaging/alpine/APKBUILD.in > contrib/packaging/alpine/APKBUILD
-  sed -e "s/__VERSION__/${VERSION}/g" contrib/packaging/arch/PKGBUILD.in > contrib/packaging/arch/PKGBUILD
-  DATE=$(date +"%a %b %d %Y")
-  sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE__/$DATE/g" \
-    contrib/packaging/rpm/mygpiod.spec.in > contrib/packaging/rpm/mygpiod.spec
-  DATE=$(date +"%a, %d %b %Y %H:%m:%S %z")
-  sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE__/$DATE/g" \
-    contrib/packaging/debian/changelog.in > contrib/packaging/debian/changelog
+  DATE_F1=$(date --date=@"${TS}" +"%a %b %d %Y")
+  DATE_F2=$(date --date=@"${TS}" +"%a, %d %b %Y %H:%m:%S %z")
+  DATE_F3=$(date --date=@"${TS}" +"%d %b %Y")
+
+  for F in contrib/packaging/alpine/APKBUILD contrib/packaging/arch/PKGBUILD \
+      contrib/packaging/rpm/mygpiod.spec contrib/packaging/debian/changelog \
+      contrib/man/man1/mygpiod.1 contrib/man/man1/mygpioc.1
+  do
+    echo "$F"
+    sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE_F1__/$DATE_F1/g" -e "s/__DATE_F2__/$DATE_F2/g" \
+        -e "s/__DATE_F3__/$DATE_F3/g" "$F.in" > "$F"
+  done
+  echo "Generating man pages"
+  rm -f contrib/man/man3/*.3
+  doxygen
+  mv contrib/man/man3/t_mygpio_connection.3 contrib/man/man3/libmygpio_t_mygpio_connection.3 
+  mv contrib/man/man3/t_mygpio_gpio.3 contrib/man/man3/libmygpio_t_mygpio_gpio.3 
+  mv contrib/man/man3/t_mygpio_idle_event.3 contrib/man/man3/libmygpio_t_mygpio_idle_event.3 
 }
 
 buildrelease() {
-  echo "Compiling myGPIOd"
-  install -d release
-  cd release || exit 1
-  #set INSTALL_PREFIX and build mygpiod
-  export INSTALL_PREFIX="${MYGPIOD_INSTALL_PREFIX:-/usr}"
-  cmake -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX" -DCMAKE_BUILD_TYPE=Release ..
-  make
+  BUILD_TYPE=$1
+  echo "Compiling myGPIOd v${VERSION}"
+  cmake -B release \
+    -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+    -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+    .
+  make -j4 -C release
 }
 
 addmygpioduser() {
@@ -93,10 +85,12 @@ addmygpioduser() {
   then
     if check_cmd_silent useradd
     then
+      groupadd -r gpio || true
       useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
     elif check_cmd_silent adduser
     then
       #alpine
+      addgroup -S gpio || true
       adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -G gpio -g myGPIOd mygpiod
     else
       echo "Can not add user mygpiod"
@@ -117,15 +111,26 @@ installrelease() {
 }
 
 builddebug() {
-  MEMCHECK=$1
-  echo "Compiling myGPIOd"
-  install -d debug
-  cd debug || exit 1
-  cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Debug -DMYGPIOD_ENABLE_LIBASAN="$MEMCHECK" \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-  make VERBOSE=1
+  echo "Compiling myGPIOd v${VERSION}"
+  CMAKE_SANITIZER_OPTIONS=""
+  case "$ACTION" in
+    asan)  CMAKE_SANITIZER_OPTIONS="-DMYGPIOD_ENABLE_ASAN=ON" ;;
+    tsan)  CMAKE_SANITIZER_OPTIONS="-DMYGPIOD_ENABLE_TSAN=ON" ;;
+    ubsan) CMAKE_SANITIZER_OPTIONS="-DMYGPIOD_ENABLE_UBSAN=ON" ;;
+  esac
+
+  cmake -B debug \
+    -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    $CMAKE_SANITIZER_OPTIONS \
+    .
+  make -j4 -C debug VERBOSE=1
   echo "Linking compilation database"
-  sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' -e 's/-static-libasan//g' compile_commands.json > ../src/compile_commands.json
+  sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' debug/compile_commands.json > mygpiod/compile_commands.json
+  cp mygpiod/compile_commands.json libmygpio
+  cp mygpiod/compile_commands.json mygpioc
+  cp mygpiod/compile_commands.json mygpio-common
 }
 
 cleanup() {
@@ -133,12 +138,15 @@ cleanup() {
   rm -rf release
   rm -rf debug
   rm -rf package
+  rm -rf docs/html
   
   #tmp files
   find ./ -name \*~ -delete
   
   #compilation database
-  rm -f src/compile_commands.json
+  rm -f mygpiod/compile_commands.json
+  rm -f mygpioc/compile_commands.json
+  rm -f libmygpio/compile_commands.json
   #clang tidy
   rm -f clang-tidy.out
 }
@@ -148,38 +156,27 @@ cleanuposc() {
 }
 
 check() {
-  if check_cmd cppcheck
+  if [ ! -f mygpiod/compile_commands.json ]
   then
-    echo "Running cppcheck"
-    [ -z "${CPPCHECKOPTS+z}" ] && CPPCHECKOPTS="--enable=warning"
-    cppcheck $CPPCHECKOPTS src/*.c src/*.h
-  else
-    echo "cppcheck not found"
-  fi
-
-  if check_cmd flawfinder
-  then
-    echo "Running flawfinder"
-    [ -z "${FLAWFINDEROPTS+z}" ] && FLAWFINDEROPTS="-m3"
-    flawfinder $FLAWFINDEROPTS src
-  else
-    echo "flawfinder not found"
-  fi
-
-  if [ ! -f src/compile_commands.json ]
-  then
-    echo "src/compile_commands.json not found"
+    echo "mygpiod/compile_commands.json not found"
     echo "run: ./build.sh debug"
     exit 1
   fi
 
   if check_cmd clang-tidy
   then
-    echo "Running clang-tidy, output goes to clang-tidy.out"
+    echo "Running clang-tidy"
     rm -f clang-tidy.out
-    cd src || exit 1
+    cd mygpiod || exit 1
     find ./ -name '*.c' -exec clang-tidy \
-        --checks="$CLANG_TIDY_CHECKS" {} \; >> ../clang-tidy.out  2>/dev/null
+        --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
+    cd ../mygpioc || exit 1
+    find ./ -name '*.c' -exec clang-tidy \
+        --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
+    cd ../libmygpio || exit 1
+    find ./ -name '*.c' -exec clang-tidy \
+        --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
+    cat ../clang-tidy.out
   else
     echo "clang-tidy not found"  
   fi
@@ -193,7 +190,7 @@ prepare() {
   for F in $SRC
   do
     [ "$F" = "$STARTPATH/osc" ] && continue
-    cp -av "$F" .
+    cp -a "$F" .
   done
 }
 
@@ -207,7 +204,7 @@ pkgdebian() {
   SIGNOPT="--no-sign"
   if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
   then
-    SIGNOPT="--sign-key=$GPGKEYID"  
+    SIGNOPT="--sign-key=$GPGKEYID"
   else
     echo "Package would not be signed"
   fi
@@ -231,16 +228,9 @@ pkgdebian() {
 }
 
 pkgalpine() {
-  if [ -z "${1+x}" ]
-  then
-    TARONLY=""
-  else
-    TARONLY=$1
-  fi
   check_cmd abuild
   prepare
   tar -czf "mygpiod_${VERSION}.orig.tar.gz" -- *
-  [ "$TARONLY" = "taronly" ] && return 0
   cp contrib/packaging/alpine/* .
   abuild checksum
   abuild -r
@@ -286,7 +276,7 @@ pkgarch() {
   if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
   then
     KEYARG=""
-    [ -z "${GPGKEYID+x}" ] || KEYARG="--key $PGPGKEYID"
+    [ -z "${GPGKEYID+x}" ] || KEYARG="--key $GPGKEYID"
     makepkg --sign "$KEYARG" mygpiod-*.pkg.tar.xz
   fi
   if check_cmd namcap
@@ -324,21 +314,18 @@ pkgosc() {
   cd "$STARTPATH" || exit 1
   cp "package/build/mygpiod-${VERSION}.tar.gz" "osc/$OSC_REPO/"
   
-  if [ -f /etc/debian_version ]
-  then
-    pkgdebian
-  else
-    pkgalpine taronly
-    rm -f "$OSC_REPO"/debian.*
-  fi
+  #if [ -f /etc/debian_version ]
+  #then
+  #  pkgdebian
+  #fi
 
   cd "$STARTPATH/osc" || exit 1
-  cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
-  if [ -f /etc/debian_version ]
-  then
-    cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
-    cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
-  fi
+  #if [ -f /etc/debian_version ]
+  #then
+  #  cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
+  #  cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
+  #  cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
+  #fi
   cp ../contrib/packaging/rpm/mygpiod.spec "$OSC_REPO/"
   cp ../contrib/packaging/arch/PKGBUILD "$OSC_REPO/"
   cp ../contrib/packaging/arch/archlinux.install "$OSC_REPO/"
@@ -356,19 +343,23 @@ installdeps() {
   then
     #debian
     apt-get update
-    apt-get install -y --no-install-recommends gcc cmake build-essential libgpiod-dev
+    apt-get install -y --no-install-recommends gcc cmake build-essential
+    echo "Debian has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/arch-release ]
   then
     #arch
-    pacman -S gcc cmake libgpiod
+    pacman -S gcc cmake
+    echo "Arch has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/alpine-release ]
   then
     #alpine
-    apk add cmake alpine-sdk linux-headers libgpiod-dev
+    apk add cmake alpine-sdk linux-headers
+    echo "Alpine Linux has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/SuSE-release ]
   then
     #suse
-    zypper install gcc cmake unzip libgpiod-devel
+    zypper install gcc cmake unzip
+    echo "SuSe has no native libgpiod v2 package, you must build it yourself."
   elif [ -f /etc/redhat-release ]
   then
     #fedora
@@ -378,26 +369,20 @@ installdeps() {
     echo "You should manually install:"
     echo "  - gcc"
     echo "  - cmake"
+    echo "  - libgpiod v2"
   fi
 }
 
-# Also deletes stale installations in other locations.
-#
 uninstall() {
+  [ -z "${DESTDIR+x}" ] && DESTDIR=""
   # cmake does not provide an uninstall target,
   # instead its manifest is of use at least for
   # the binaries
   if [ -f release/install_manifest.txt ]
   then
-    xargs rm -f < release/install_manifest.txt
+    xargs rm -v -f < release/install_manifest.txt
   fi
 
-  #MYGPIOD_INSTALL_PREFIX="/usr"
-  rm -f "$DESTDIR/usr/bin/mygpiod"
-   #MYGPIOD_INSTALL_PREFIX="/usr/local"
-  rm -f "$DESTDIR/usr/local/bin/mygpiod"
-   #MYGPIOD_INSTALL_PREFIX="/opt/mygpiod/"
-  rm -rf "$DESTDIR/opt/mygpiod"
   #systemd
   rm -f "$DESTDIR/usr/lib/systemd/system/mygpiod.service"
   rm -f "$DESTDIR/lib/systemd/system/mygpiod.service"
@@ -411,15 +396,17 @@ uninstall() {
 }
 
 purge() {
-  #MYGPIOD_INSTALL_PREFIX="/usr"
-  rm -rf "$DESTDIR/var/lib/mygpiod"
+  [ -z "${DESTDIR+x}" ] && DESTDIR=""
+  rm -f "$DESTDIR/etc/init.d/mygpiod"
+  #CMAKE_INSTALL_PREFIX="/usr"
   rm -f "$DESTDIR/etc/mygpiod.conf"
   rm -f "$DESTDIR/etc/mygpiod.conf.dist"
-  rm -f "$DESTDIR/etc/init.d/mygpiod"
-  #MYGPIOD_INSTALL_PREFIX="/usr/local"
+  rm -fr "$DESTDIR/etc/mygpiod.d"
+  #CMAKE_INSTALL_PREFIX="/usr/local"
   rm -f "$DESTDIR/usr/local/etc/mygpiod.conf"
   rm -f "$DESTDIR/usr/local/etc/mygpiod.conf.dist"
-  #MYGPIOD_INSTALL_PREFIX="/opt/mygpiod/"
+  rm -fr "$DESTDIR/usr/local/etc/mygpiod.d"
+  #CMAKE_INSTALL_PREFIX="/opt/mygpiod/"
   rm -rf "$DESTDIR/var/opt/mygpiod"
   rm -rf "$DESTDIR/etc/opt/mygpiod"
   #remove user
@@ -427,14 +414,14 @@ purge() {
   then
     if check_cmd_silent userdel
     then
-    userdel mygpiod
-  elif check_cmd_silent deluser
-  then
-    deluser mygpiod
-  else
-    echo "Can not del user mygpiod"
-    return 1
-  fi
+      userdel mygpiod
+    elif check_cmd_silent deluser
+    then
+      deluser mygpiod
+    else
+      echo "Can not remove user mygpiod"
+      return 1
+    fi
   fi
   return 0
 }
@@ -448,22 +435,21 @@ else
 fi
 
 case "$ACTION" in
-  release)
-    buildrelease
+  release|MinSizeRel)
+    buildrelease "Release"
+  ;;
+  RelWithDebInfo)
+    buildrelease "RelWithDebInfo"
   ;;
   install)
     installrelease
   ;;
   releaseinstall)
-    buildrelease
-    cd .. || exit 1
+    buildrelease "Release"
     installrelease
   ;;
-  debug)
-    builddebug "FALSE"
-  ;;
-  memcheck)
-    builddebug "TRUE"
+  debug|asan|tsan|ubsan)
+    builddebug
   ;;
   installdeps)
     installdeps
@@ -508,28 +494,24 @@ case "$ACTION" in
     echo "Version: ${VERSION}"
     echo ""
     echo "Build options:"
-    echo "  release:          build release files in directory release"
+    echo "  release:          build release files in directory release (stripped)"
+    echo "  RelWithDebInfo:   build release files in directory release (with debug info)"
     echo "  install:          installs release files from directory release"
     echo "                    following environment variables are respected"
     echo "                      - DESTDIR=\"\""
     echo "  releaseinstall:   calls release and install afterwards"
     echo "  debug:            builds debug files in directory debug,"
-    echo "                    linked with libasan3, uses assets in htdocs"
-    echo "  memcheck:         builds debug files in directory debug"
-    echo "                    for use with valgrind, uses assets in htdocs"
-    echo "  check:            runs cppcheck and flawfinder on source files"
-    echo "                    following environment variables are respected"
-    echo "                      - CPPCHECKOPTS=\"--enable=warning\""
-    echo "                      - FLAWFINDEROPTS=\"-m3\""
+    echo "  asan|tsan|ubsan:  builds debug files in directory debug"
+    echo "                    linked with the sanitizer"
+    echo "  check:            runs clang-tidy on source files"
     echo "  installdeps:      installs build and run dependencies"
     echo ""
     echo "Cleanup options:"
     echo "  cleanup:          cleanup source tree"
-    echo "  cleanupdist:      cleanup dist directory, forces release to build new assets"
     echo "  uninstall:        removes mygpiod files, leaves configuration in place "
     echo "                    following environment variables are respected"
     echo "                      - DESTDIR=\"\""
-    echo "  purge:            removes all mygpiod files, also your init scripts"
+    echo "  purge:            removes all mygpiod files, also your init scripts and configuration"
     echo "                    following environment variables are respected"
     echo "                      - DESTDIR=\"\""
     echo ""
@@ -550,10 +532,7 @@ case "$ACTION" in
     echo ""
     echo "Misc options:"
     echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
-    echo "  addmygpioduser:     adds mygpiod group and user"
-    echo ""
-    echo "Environment variables for building"
-    echo "  - MYGPIOD_INSTALL_PREFIX=\"/usr\""
+    echo "  addmygpioduser:   adds mygpiod group and user"
     echo ""
     exit 1
   ;;

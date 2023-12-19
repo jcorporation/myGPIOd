@@ -14,5 +14,10 @@ start_stop_daemon_args=""
 pidfile="/run/$name.pid"
 
 depend() {
-	after firewall
+	need localmount
+}
+
+start_pre() {
+	checkpath --directory --quiet \
+		--owner "mygpiod" --mode 0775 /run/mygpiod
 }

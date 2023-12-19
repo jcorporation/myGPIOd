@@ -6,22 +6,23 @@
 # Maintainer: Juergen Mang <mail@jcgames.de>
 #
 pkgname=mygpiod
-pkgver=0.3.1
+pkgver=0.4.0
 pkgrel=0
-pkgdesc="A small daemon to call scripts on GPIO events."
+pkgdesc="Lightweight gpio controlling daemon"
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
 license="GPL-3.0-or-later"
-depends="libgpiod"
-makedepends="cmake libgpiod-dev"
+depends=""
+makedepends="cmake"
 install="$pkgname.pre-install $pkgname.post-install"
 source="mygpiod_$pkgver.orig.tar.gz"
 builddir="$srcdir"
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-doc"
 options="!check"
 #no test suite
 
 build() {
-    cmake -B "$builddir/release" -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_STRIP_BINARY=OFF "$builddir"
+    cmake -B "$builddir/release" -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo "$builddir"
     make -C "$builddir/release"
 }
 

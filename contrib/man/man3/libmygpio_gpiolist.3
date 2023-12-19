@@ -1,0 +1,59 @@
+.TH "libmygpio_gpiolist" 3 "Tue Dec 19 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_gpiolist \- GPIO list
+.PP
+ \- This module provides functions for the gpiolist protocol command\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBmygpio_gpiolist\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "struct \fBt_mygpio_gpio\fP * \fBmygpio_recv_gpio_list\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides functions for the gpiolist protocol command\&. 
+
+
+.SH "Function Documentation"
+.PP 
+.SS "bool mygpio_gpiolist (struct \fBt_mygpio_connection\fP * connection)"
+Lists the modes and values of all configured GPIOs\&. Retrieve the list elements with mygpio_recv_gpio_list and end the response with mygpio_response_end\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+bool true on success, else false\&. 
+.RE
+.PP
+
+.SS "struct \fBt_mygpio_gpio\fP * mygpio_recv_gpio_list (struct \fBt_mygpio_connection\fP * connection)"
+Receives a list element of mygpio_gpiolist\&. Use the mygpio_gpio_get_gpio_* functions to access the values\&. The caller must free it with mygpio_free_gpio\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Allocated struct \fBt_mygpio_gpio\fP or NULL on list end or error\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

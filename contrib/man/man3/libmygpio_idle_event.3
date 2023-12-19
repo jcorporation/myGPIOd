@@ -1,0 +1,235 @@
+.TH "libmygpio_idle_event" 3 "Tue Dec 19 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_idle_event \- Idle events
+.PP
+ \- This module provides functions for the idle mode\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_FALLING\fP, \fBMYGPIO_EVENT_RISING\fP, \fBMYGPIO_EVENT_LONG_PRESS\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_event\fP \fBmygpio_parse_event\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_lookup_event\fP (enum \fBmygpio_event\fP event)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_send_idle\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_send_noidle\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_wait_idle\fP (struct \fBt_mygpio_connection\fP *connection, int timeout)"
+.br
+.ti -1c
+.RI "struct \fBt_mygpio_idle_event\fP * \fBmygpio_recv_idle_event\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.ti -1c
+.RI "unsigned \fBmygpio_idle_event_get_gpio\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event\fP \fBmygpio_idle_event_get_event\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_idle_event_get_event_name\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "uint64_t \fBmygpio_idle_event_get_timestamp_ms\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "void \fBmygpio_free_idle_event\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides functions for the idle mode\&. 
+
+
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBmygpio_event\fP"
+Possible event types 
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIMYGPIO_EVENT_UNKNOWN \fP\fP
+unknown 
+.TP
+\fB\fIMYGPIO_EVENT_FALLING \fP\fP
+falling 
+.TP
+\fB\fIMYGPIO_EVENT_RISING \fP\fP
+rising 
+.TP
+\fB\fIMYGPIO_EVENT_LONG_PRESS \fP\fP
+long_press 
+.SH "Function Documentation"
+.PP 
+.SS "void mygpio_free_idle_event (struct \fBt_mygpio_idle_event\fP * event)"
+Frees the struct received by mygpio_recv_idle_event 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+
+.SS "enum \fBmygpio_event\fP mygpio_idle_event_get_event (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the event type from an idle event\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The event type, one of enum mygpio_event\&. 
+.RE
+.PP
+
+.SS "const char * mygpio_idle_event_get_event_name (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the event type name from an idle event\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The event type name 
+.RE
+.PP
+
+.SS "unsigned mygpio_idle_event_get_gpio (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the GPIO number from an idle event\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO number\&. 
+.RE
+.PP
+
+.SS "uint64_t mygpio_idle_event_get_timestamp_ms (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the timestamp from an idle event\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The timestamp in milliseconds\&. 
+.RE
+.PP
+
+.SS "const char * mygpio_lookup_event (enum \fBmygpio_event\fP event)"
+Lookups the name for the event\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP event type 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Event name as string 
+.RE
+.PP
+
+.SS "enum \fBmygpio_event\fP mygpio_parse_event (const char * str)"
+Parses a string to the event type\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP String to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+enum mygpio_event 
+.RE
+.PP
+
+.SS "struct \fBt_mygpio_idle_event\fP * mygpio_recv_idle_event (struct \fBt_mygpio_connection\fP * connection)"
+Receives a list element of the waiting idle events\&. Access the values with the mygpio_idle_event_get_* functions\&. The caller must free it with mygpio_free_idle_event\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Allocated struct \fBt_mygpio_idle_event\fP or NULL on list end or error\&. 
+.RE
+.PP
+
+.SS "bool mygpio_send_idle (struct \fBt_mygpio_connection\fP * connection)"
+Enters the myGPIOd idle mode to get notifications about events\&. Retrieve the list of events with mygpio_recv_idle_event\&. In this mode no commands but mygpio_send_noidle are allowed\&. All timeouts are disabled\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false 
+.RE
+.PP
+
+.SS "bool mygpio_send_noidle (struct \fBt_mygpio_connection\fP * connection)"
+Exits the myGPIOd idle mode\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false 
+.RE
+.PP
+
+.SS "bool mygpio_wait_idle (struct \fBt_mygpio_connection\fP * connection, int timeout)"
+Waits until an event occurs or the timeout expires\&. It returns instantly if events had occurred while not in idle mode\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.br
+\fItimeout\fP Timeout in milliseconds, -1 for no timeout 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true if an event has occurred, false on timeout or error\&. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

@@ -11,11 +11,11 @@ pkgname=mygpiod
 _pkgname=myGPIOd
 pkgver=__VERSION__
 pkgrel=1
-pkgdesc="A small daemon to call scripts on GPIO events. "
+pkgdesc="lightweight gpio controlling daemon"
 arch=('x86_64' 'armv7h' 'aarch64')
 url="https://jcorporation.github.io/myGPIOd/"
 license=('GPL')
-depends=('libgpiod')
+depends=('')
 makedepends=('cmake')
 optdepends=()
 provides=()
@@ -31,9 +31,8 @@ build() {
   local cmake_options=(
     -B build
     -S "${srcdir}"
-    -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo
     -DCMAKE_INSTALL_PREFIX=/usr
-    -DMYGPIOD_STRIP_BINARY=OFF
     -Wno-dev
   )
 

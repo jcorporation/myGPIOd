@@ -1,0 +1,62 @@
+.TH "libmygpio/include/libmygpio/libmygpio_parser.h" 3 "Tue Dec 19 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio/include/libmygpio/libmygpio_parser.h \- myGPIOd client library  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'libmygpio_gpio_struct\&.h'\fP
+.br
+\fC#include <stdbool\&.h>\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_direction\fP (enum \fBmygpio_gpio_direction\fP direction)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_direction\fP \fBmygpio_gpio_parse_direction\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_value\fP (enum \fBmygpio_gpio_value\fP value)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP \fBmygpio_gpio_parse_value\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_bias\fP (enum \fBmygpio_gpio_bias\fP bias)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_bias\fP \fBmygpio_gpio_parse_bias\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_event_request\fP (enum \fBmygpio_event_request\fP event_request)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_request\fP \fBmygpio_gpio_parse_event_request\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_event_clock\fP (enum \fBmygpio_event_clock\fP clock)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_clock\fP \fBmygpio_gpio_parse_event_clock\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_drive\fP (enum \fBmygpio_drive\fP drive)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_drive\fP \fBmygpio_gpio_parse_drive\fP (const char *str)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+myGPIOd client library 
+
+Do not include this header directly\&. Use \fBlibmygpio/libmygpio\&.h\fP instead\&. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

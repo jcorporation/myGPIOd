@@ -1,0 +1,54 @@
+# Configuration for an input gpio
+# Copy it to <gpio number>.in
+
+# The events to request
+#event_request = both
+#event_request = falling
+#event_request = rising
+
+# Sets the GPIO active state
+# Valid values: true, false
+# - true = GPIO considered active, if it is low
+# - false = GPIO considered active, if it is high
+active_low = false
+#active_low = true
+
+# Sets the internal pull-up or pull-down resistor
+# Valid values: as-is, disable, pull-down, pull-up
+# - as-is = do not change it
+# - disable = disables the internal resistor
+# - pull-down = pulls the gpio down
+# - pull-up = pulls the gpio up
+bias = as-is
+#bias = disable
+#bias = pull-down
+#bias = pull-up
+
+# Debounce setting
+# Valid values: debounce period in microseconds
+debounce = 0
+
+# Event clock
+# Valid values: monotonic, realtime, hte
+event_clock = monotonic
+
+# Action for rising event
+# Multiple lines are supported
+#action_rising = system:/bin/true
+
+# Action for falling event
+# Multiple lines are supported
+#action_falling = system:/bin/true
+
+# Long press support
+# long_press_event and long_press_timeout must be set
+# Event for the long press handler
+#long_press_event = falling
+#long_press_event = rising
+
+# Timeout in milliseconds after long press action is executed
+#long_press_timeout = 2000
+
+# The long press action
+# Multiple lines are supported
+#long_press_action = system:/bin/true

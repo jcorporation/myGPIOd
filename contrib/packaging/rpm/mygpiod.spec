@@ -7,11 +7,11 @@
 #
 
 Name:           mygpiod
-Version:        0.3.1
+Version:        0.4.0
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
-Summary:        A small daemon to call scripts on GPIO events. 
+Summary:        A lightweight gpio controlling daemon.
 Url:            https://jcorporation.github.io/myGPIOd/
 Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
@@ -20,28 +20,29 @@ BuildRequires:  unzip
 BuildRequires:  libgpiod-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-%global debug_package %{nil}
-
 %description 
-myGPIOd is a small daemon to call scripts on GPIO events. 
+myGPIOd is a lightweight gpio controlling daemon.
 
 %if 0%{?disturl:1}
   # build debug package in obs
   %debug_package
 %endif
 
+%package devel
+Summary: Development package for %{name}
+
+%description devel
+Files for development with %{name}.
+
 %prep 
 %setup -q -n %{name}-%{version}
 
 %build
-mkdir release
-cd release || exit 1
-cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_STRIP_BINARY=OFF ..
-make
+cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo  .
+make -C release
 
 %install
-cd release || exit 1
-make install DESTDIR=%{buildroot}
+make -C release install DESTDIR=%{buildroot}
 
 %post
 echo "Checking status of mygpiod system user and group"
@@ -52,12 +53,24 @@ echo "Modify /etc/mygpiod.conf to suit your needs"
 true
 
 %files 
-%defattr(-,root,root,-)
-%doc README.md LICENSE.md
-/usr/bin/mygpiod
+%license LICENSE.md
+%doc LICENSE.md
+%doc README.md
+%doc CHANGELOG.md
+%doc PROTOCOL.md
+%{_bindir}/mygpiod
+%{_bindir}/mygpioc
+%{_libdir}/libmygpio.so*
 /usr/lib/systemd/system/mygpiod.service
 %config(noreplace) /etc/mygpiod.conf
+%config() /etc/mygpiod.d/*
+%{_mandir}/man1/mygpio*
+
+%files devel
+%{_datadir}/pkgconfig/libmygpio.pc
+%{_includedir}/libmygpio/*
+%{_mandir}/man3/libmygpio_*
 
 %changelog
-* Wed Dec 13 2023 Juergen Mang <mail@jcgames.de> 0.3.1-0
+* Tue Dec 19 2023 Juergen Mang <mail@jcgames.de> 0.4.0-0
 - Version from master

@@ -1,0 +1,79 @@
+.TH "libmygpio/include/libmygpio/libmygpio_gpio_struct.h" 3 "Tue Dec 19 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio/include/libmygpio/libmygpio_gpio_struct.h \- myGPIOd client library  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdbool\&.h>\fP
+.br
+
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBmygpio_gpio_direction\fP { \fBMYGPIO_GPIO_DIRECTION_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_DIRECTION_IN\fP, \fBMYGPIO_GPIO_DIRECTION_OUT\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP { \fBMYGPIO_GPIO_VALUE_UNKNOWN\fP = -1, \fBMYGPIO_GPIO_VALUE_INACTIVE\fP, \fBMYGPIO_GPIO_VALUE_ACTIVE\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_bias\fP { \fBMYGPIO_BIAS_UNKNOWN\fP = -1, \fBMYGPIO_BIAS_AS_IS\fP, \fBMYGPIO_BIAS_DISABLED\fP, \fBMYGPIO_BIAS_PULL_DOWN\fP, \fBMYGPIO_BIAS_PULL_UP\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_request\fP { \fBMYGPIO_EVENT_REQUEST_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_REQUEST_FALLING\fP, \fBMYGPIO_EVENT_REQUEST_RISING\fP, \fBMYGPIO_EVENT_REQUEST_BOTH\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_clock\fP { \fBMYGPIO_EVENT_CLOCK_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_CLOCK_MONOTONIC\fP, \fBMYGPIO_EVENT_CLOCK_REALTIME\fP, \fBMYGPIO_EVENT_CLOCK_HTE\fP }"
+.br
+.ti -1c
+.RI "enum \fBmygpio_drive\fP { \fBMYGPIO_DRIVE_UNKNOWN\fP = -1, \fBMYGPIO_DRIVE_PUSH_PULL\fP, \fBMYGPIO_DRIVE_OPEN_DRAIN\fP, \fBMYGPIO_DRIVE_OPEN_SOURCE\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "unsigned \fBmygpio_gpio_get_gpio\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_direction\fP \fBmygpio_gpio_get_direction\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP \fBmygpio_gpio_get_value\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpio_in_get_active_low\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_bias\fP \fBmygpio_gpio_in_get_bias\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_request\fP \fBmygpio_gpio_in_get_event_request\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpio_in_get_is_debounced\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "int \fBmygpio_gpio_in_get_debounce_period_us\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_clock\fP \fBmygpio_gpio_in_get_event_clock\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_drive\fP \fBmygpio_gpio_out_get_drive\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
+.RI "void \fBmygpio_free_gpio\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+myGPIOd client library 
+
+Do not include this header directly\&. Use \fBlibmygpio/libmygpio\&.h\fP instead\&. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

@@ -1,0 +1,229 @@
+.TH "libmygpio_parser" 3 "Tue Dec 19 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_parser \- Parser
+.PP
+ \- This module provides parsing and lookup functions for GPIO settings\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_direction\fP (enum \fBmygpio_gpio_direction\fP direction)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_direction\fP \fBmygpio_gpio_parse_direction\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_value\fP (enum \fBmygpio_gpio_value\fP value)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_value\fP \fBmygpio_gpio_parse_value\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_bias\fP (enum \fBmygpio_gpio_bias\fP bias)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_gpio_bias\fP \fBmygpio_gpio_parse_bias\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_event_request\fP (enum \fBmygpio_event_request\fP event_request)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_request\fP \fBmygpio_gpio_parse_event_request\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_event_clock\fP (enum \fBmygpio_event_clock\fP clock)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_event_clock\fP \fBmygpio_gpio_parse_event_clock\fP (const char *str)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_gpio_lookup_drive\fP (enum \fBmygpio_drive\fP drive)"
+.br
+.ti -1c
+.RI "enum \fBmygpio_drive\fP \fBmygpio_gpio_parse_drive\fP (const char *str)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides parsing and lookup functions for GPIO settings\&. 
+
+
+.SH "Function Documentation"
+.PP 
+.SS "const char * mygpio_gpio_lookup_bias (enum \fBmygpio_gpio_bias\fP bias)"
+Lookups the name for the gpio bias\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbias\fP the gpio bias\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio bias name 
+.RE
+.PP
+
+.SS "const char * mygpio_gpio_lookup_direction (enum \fBmygpio_gpio_direction\fP direction)"
+Lookups the name for the gpio direction\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdirection\fP the gpio direction\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio direction name 
+.RE
+.PP
+
+.SS "const char * mygpio_gpio_lookup_drive (enum \fBmygpio_drive\fP drive)"
+Lookups the name for the gpio drive setting\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdrive\fP the gpio drive\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio drive name 
+.RE
+.PP
+
+.SS "const char * mygpio_gpio_lookup_event_clock (enum \fBmygpio_event_clock\fP clock)"
+Lookups the name for the gpio event clock\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIclock\fP the gpio clock\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio clock name 
+.RE
+.PP
+
+.SS "const char * mygpio_gpio_lookup_event_request (enum \fBmygpio_event_request\fP event_request)"
+Lookups the name for an event request\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent_request\fP the gpio event request\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio event request name 
+.RE
+.PP
+
+.SS "const char * mygpio_gpio_lookup_value (enum \fBmygpio_gpio_value\fP value)"
+Lookups the name for the gpio value\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIvalue\fP the gpio value\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio value name 
+.RE
+.PP
+
+.SS "enum \fBmygpio_gpio_bias\fP mygpio_gpio_parse_bias (const char * str)"
+Parses a string to a gpio bias\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP string to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio bias or GPIO_BIAS_UNKNOWN on error 
+.RE
+.PP
+
+.SS "enum \fBmygpio_gpio_direction\fP mygpio_gpio_parse_direction (const char * str)"
+Parses a string to the gpio direction\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP string to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+direction of the gpio 
+.RE
+.PP
+
+.SS "enum \fBmygpio_drive\fP mygpio_gpio_parse_drive (const char * str)"
+Parses a string to a gpio drive\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP string to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio bias or MYGPIO_DRIVE_UNKNOWN on error 
+.RE
+.PP
+
+.SS "enum \fBmygpio_event_clock\fP mygpio_gpio_parse_event_clock (const char * str)"
+Parses a string to a gpio event clock\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP string to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio event clock or MYGPIO_EVENT_CLOCK_UNKNOWN on error 
+.RE
+.PP
+
+.SS "enum \fBmygpio_event_request\fP mygpio_gpio_parse_event_request (const char * str)"
+Parses a string to an event request\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP string to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio event request or GPIO_EVENT_REQUEST_UNKNOWN on error 
+.RE
+.PP
+
+.SS "enum \fBmygpio_gpio_value\fP mygpio_gpio_parse_value (const char * str)"
+Parses a string to a gpio value\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP string to parse 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+gpio value or GPIO_VALUE_UNKNOWN on error 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

@@ -2,12 +2,14 @@ Source: mygpiod
 Section: misc
 Priority: optional
 Maintainer: Juergen Mang <mail@jcgames.de>
-Build-Depends: debhelper (>= 10), cmake, libgpiod-dev
+Build-Depends: debhelper (>= 10), cmake
 Standards-Version: 4.1.2
 Homepage: https://jcorporation.github.io/myGPIOd/
 
 Package: mygpiod
 Architecture: any
-Depends: libc6, libgpiod2
-Description: Small daemon to call scripts on GPIO events.
- myGPIOd is a small daemon to call scripts on GPIO events.
+Depends: libc6
+Description: Lightweight gpio controlling daemon
+ myGPIOd is a lightweight gpio controlling daemon.
+ It has no dependencies but the libgpiod2 library version 2.
+ It consists of a daemon, a client library and a command line tool.

@@ -1,0 +1,13 @@
+# Configuration for an output gpio
+# Copy it to <gpio number>.out
+
+# Set drive
+# Valid values: push-pull, open-drain, open-source
+drive = push-pull
+#drive = open-drain
+#drive = open-source
+
+# Value to set
+# Valid values: active, inactive
+value = inactive
+#value = active

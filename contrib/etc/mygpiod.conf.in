@@ -1,26 +1,27 @@
-#Example mygpiod.conf
+# Example mygpiod.conf
 #
-#myGPIOd @CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@
-#https://github.com/jcorporation/myGPIOd
+# myGPIOd @PROJECT_VERSION@
+# https://github.com/jcorporation/myGPIOd
 #
-#logging
-#0 = emerg, 1 = alert, 2 = crit, 3 = error, 4 = warn, 5 = notice, 6 = info, 7 = debug
-loglevel=5
-syslog=false
+# Logging
+# Valid values:
+# emerg, alert, crit, error, warn, notice, info, debug
+loglevel = info
 
-#gpio chip number
-chip=0
+# Log destination
+# Valid values: true, false
+# - false = log to stdout
+# - true = log to syslog
+syslog = false
 
-#trigger events
-edge=falling
-#edge=rising
-#edge=both
-active_low=true
-#active_low=false
-bias=as-is
-#bias=disable
-#bias=pull-down
-#bias=pull-up
+# Path to the server socket
+socket = /run/mygpiod/socket
 
-#gpio,edge,script
-#3,falling,echo "test 3"
+# Timeout for client connections in seconds
+timeout = 60
+
+# GPIO chip device
+chip = /dev/gpiochip0
+
+# Directory for single gpio configuration files
+gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d

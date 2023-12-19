@@ -1,0 +1,42 @@
+.TH "libmygpio_protocol" 3 "Tue Dec 19 2023" "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_protocol \- Protocol
+.PP
+ \- This module provides generic myGPIOd protocol functions\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBmygpio_response_end\fP (struct \fBt_mygpio_connection\fP *connection)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides generic myGPIOd protocol functions\&. 
+
+
+.SH "Function Documentation"
+.PP 
+.SS "bool mygpio_response_end (struct \fBt_mygpio_connection\fP * connection)"
+Finishes reading the response from myGPIOd and empties the input buffer\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.
