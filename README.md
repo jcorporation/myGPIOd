@@ -100,6 +100,8 @@ This example configuration does the following:
   - Calls `/usr/local/bin/poweroff.sh` on a short press (falling)
 - Configures gpio 5 as output:
   - Sets the value to active on start
+- Configures gpio 6 as output:
+  - Sets the value to inactive on start
 
 **/etc/mygpiod.conf**
 ```
@@ -121,13 +123,14 @@ active_low = false
 bias = pull-up
 
 # Short press does a poweroff
+# The rising event is not triggered if GPIO 6 is pressed longer than 2000 ms.
 action_rising = system:/usr/local/bin/poweroff.sh
 
-# Reboot on long press and activate a LED while GPIO 6 is pressed
-# set gpio 6 active on falling
+# Reboot on long press and activate a LED for maximal 2s while GPIO 6 is pressed
+# Set GPIO 6 active on falling
 action_falling = gpioset:6 active
 
-# enable long press for falling
+# Enable long press for falling
 long_press_event = falling
 long_press_timeout = 2000
 long_press_action = gpiotoggle:6
