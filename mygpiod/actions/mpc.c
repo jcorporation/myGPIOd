@@ -72,11 +72,11 @@ static void run_mpc(const char *cmd) {
     // Use default connection settings
     struct mpd_connection *conn = mpd_connection_new(NULL, 0, 0);
     if (conn == NULL) {
-		MYGPIOD_LOG_ERROR("MPD Connection: Out of memory");
+        MYGPIOD_LOG_ERROR("MPD Connection: Out of memory");
         sdsfreesplitres(args, count);
         free(tokens);
-		exit(EXIT_FAILURE);
-	}
+        exit(EXIT_FAILURE);
+    }
     if (mpd_connection_get_error(conn) != MPD_ERROR_SUCCESS) {
         MYGPIOD_LOG_ERROR("MPD Connection error: %s", mpd_connection_get_error_message(conn));
         mpd_connection_free(conn);
