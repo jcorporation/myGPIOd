@@ -17,11 +17,12 @@
 /**
  * Runs an executable or script in a new process
  * @param cmd command to execute
+ * @returns true on success, else false
  */
 bool action_system(const char *cmd) {
     errno = 0;
-    int rc = fork();
-    if (rc == 0) {
+    int pid = fork();
+    if (pid == 0) {
         // this is the child process
         errno = 0;
         execl(cmd, cmd, (char *)NULL);
@@ -30,11 +31,11 @@ bool action_system(const char *cmd) {
         exit(EXIT_FAILURE);
     }
     else {
-        if (rc == -1) {
+        if (pid == -1) {
             MYGPIOD_LOG_ERROR("Could not fork: %s", strerror(errno));
             return false;
         }
-        MYGPIOD_LOG_DEBUG("Forked process with id %d", rc);
+        MYGPIOD_LOG_DEBUG("Forked process with pid %d", pid);
         return true;
     }
 }

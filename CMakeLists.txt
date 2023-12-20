@@ -11,7 +11,7 @@ cmake_policy(SET CMP0003 NEW)
 # myGPIO is written in C
 # supported compilers: gcc, clang
 project (mygpiod
-  VERSION 0.4.0
+  VERSION 0.5.0
   LANGUAGES C
 )
 
@@ -33,13 +33,15 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "")
 set(CMAKE_C_FLAGS_MINSIZEREL "")
 
 # available options
+option(MYGPIOD_ENABLE_ACTION_MPC "Includes the mpc action, requires libmpdclient, default ON" "ON")
+option(MYGPIOD_ENABLE_ACTION_HTTP "Includes the http action, requires libcurl, default ON" "ON")
 option(MYGPIOD_DOC "Installs documentation, default ON" "ON")
 option(MYGPIOD_MANPAGES "Creates and installs manpages" "ON")
 option(MYGPIOD_STARTUP_SCRIPT "Installs the startup script, default ON" "ON")
-option(MYGPIOD_CLIENT "Includes the myGPIOd client, default ON" "ON")
-option(MYGPIOD_DAEMON "Includes the myGPIOd daemon, default ON" "ON")
-option(MYGPIOD_HEADER "Includes the myGPIOd headers, default ON" "ON")
-option(MYGPIOD_LIBRARY "Includes the myGPIOd library, default ON" "ON")
+option(MYGPIOD_CLIENT "Builds the myGPIOd client, default ON" "ON")
+option(MYGPIOD_DAEMON "Builds the myGPIOd daemon, default ON" "ON")
+option(MYGPIOD_HEADER "Installs the myGPIOd headers, default ON" "ON")
+option(MYGPIOD_LIBRARY "Builds the myGPIOd library, default ON" "ON")
 # sanitizer options
 option(MYGPIOD_ENABLE_ASAN "Enables build with address sanitizer, default OFF" "OFF")
 option(MYGPIOD_ENABLE_TSAN "Enables build with thread sanitizer, default OFF" "OFF")
@@ -61,6 +63,27 @@ if (MYGPIOD_DAEMON)
     message("Found libgpiod version: ${LIBGPIOD_VERSION}")
     message(FATAL_ERROR "Required libgpiod version >= 2.0.0")
   endif()
+endif()
+
+# find optional dependencies
+if (MYGPIOD_ENABLE_ACTION_MPC)
+  find_package(LIBMPDCLIENT)
+  if (NOT LIBMPDCLIENT_FOUND)
+    message("MPC action is disabled because libmpdclient was not found")
+    set(MYGPIOD_ENABLE_ACTION_MPC "OFF")
+  endif()
+else()
+  message("MPC action is disabled by user")
+endif()
+
+if (MYGPIOD_ENABLE_ACTION_HTTP)
+  find_package(CURL)
+  if (NOT CURL_FOUND)
+    message("HTTP action is disabled because curl was not found")
+    set(MYGPIOD_ENABLE_ACTION_HTTP "OFF")
+  endif()
+else()
+  message("HTTP action is disabled by user")
 endif()
 
 # configure some files - version and path information

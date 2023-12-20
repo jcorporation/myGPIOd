@@ -14,14 +14,15 @@ endif()
 
 target_include_directories(mygpiod
   PRIVATE 
-    ${PROJECT_BINARY_DIR}
-    ${PROJECT_SOURCE_DIR}
+    "${PROJECT_BINARY_DIR}"
+    "${PROJECT_SOURCE_DIR}"
+    "${LIBGPIOD_INCLUDE_DIRS}"
 )
 
 target_sources(mygpiod PRIVATE
   main.c
-  actions/system.c
   actions/gpio.c
+  actions/system.c
   event_loop/event_loop.c
   event_loop/signal_handler.c
   gpio/action.c
@@ -38,6 +39,7 @@ target_sources(mygpiod PRIVATE
   lib/log.c
   lib/timer.c
   lib/util.c
+  server/event.c
   server/gpio.c
   server/idle.c
   server/protocol.c
@@ -50,5 +52,31 @@ target_link_libraries(mygpiod
   sds
   mygpio-common
 )
+
+if (MYGPIOD_ENABLE_ACTION_MPC)
+  target_include_directories(mygpiod
+    PRIVATE 
+      "${LIBMPDCLIENT_INCLUDE_DIRS}"
+  )
+  target_sources(mygpiod PRIVATE
+    actions/http.c
+  )
+  target_link_libraries(mygpiod
+    "${LIBMPDCLIENT_LIBRARIES}"
+  )
+endif()
+
+if (MYGPIOD_ENABLE_ACTION_HTTP)
+  target_include_directories(mygpiod
+  PRIVATE 
+    "${LIBCURL_INCLUDE_DIRS}"
+  )
+  target_sources(mygpiod PRIVATE
+    actions/mpc.c
+  )
+  target_link_libraries(mygpiod
+    "${CURL_LIBRARIES}"
+  )
+endif()
 
 install(TARGETS mygpiod DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})

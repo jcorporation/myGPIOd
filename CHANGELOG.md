@@ -4,6 +4,16 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.5.0 (not yet released)
+
+### Changelog
+
+- Feat: New MPD action
+- Feat: New HTTP action
+- Fix: Memory leak in gpio set actions
+
+***
+
 ## myGPIOd v0.4.0 (2023-12-19)
 
 This is a complete rewrite of myGPIOd. It is now based on libgpiod v2.

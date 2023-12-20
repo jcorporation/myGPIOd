@@ -47,6 +47,14 @@ const char *lookup_action(enum mygpiod_actions action) {
             return "gpioset";
         case MYGPIOD_ACTION_GPIO_TOGGLE:
             return "gpiotoggle";
+        #ifdef MYGPIOD_ENABLE_ACTION_MPC
+            case MYGPIOD_ACTION_MPC:
+                return "mpc";
+        #endif
+        #ifdef MYGPIOD_ENABLE_ACTION_HTTP
+            case MYGPIOD_ACTION_HTTP:
+                return "http";
+        #endif
         case MYGPIOD_ACTION_UNKNOWN:
             return "";
     }
@@ -70,6 +78,16 @@ enum mygpiod_actions parse_action(const char *str) {
     if (strcasecmp(str, "gpiotoggle") == 0) {
         return MYGPIOD_ACTION_GPIO_TOGGLE;
     }
+    #ifdef MYGPIOD_ENABLE_ACTION_MPC
+        if (strcasecmp(str, "mpc") == 0) {
+            return MYGPIOD_ACTION_MPC;
+        }
+    #endif
+    #ifdef MYGPIOD_ENABLE_ACTION_HTTP
+        if (strcasecmp(str, "http") == 0) {
+            return MYGPIOD_ACTION_HTTP;
+        }
+    #endif
     errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse action value, setting unknown");
     return MYGPIOD_ACTION_UNKNOWN;

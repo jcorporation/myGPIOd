@@ -9,6 +9,7 @@
 
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/util.h"
+#include "mygpiod/server/event.h"
 #include "mygpiod/server/gpio.h"
 #include "mygpiod/server/idle.h"
 #include "mygpiod/server/response.h"
@@ -83,6 +84,13 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
             break;
         case CMD_GPIOINFO:
             rc = handle_gpioinfo(&options, config, client_node);
+            break;
+        case CMD_EVENT:
+            #ifdef MYGPIOD_DEBUG
+                rc = handle_event(&options, config, client_node);
+            #else
+                rc = false;
+            #endif
             break;
         case CMD_INVALID:
         case CMD_COUNT:

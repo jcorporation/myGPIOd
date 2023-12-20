@@ -7,6 +7,7 @@
 #ifndef MYGPIOD_LIB_ACTION_H
 #define MYGPIOD_LIB_ACTION_H
 
+#include "compile_time.h"
 #include "dist/sds/sds.h"
 #include "mygpiod/lib/list.h"
 
@@ -17,7 +18,13 @@ enum mygpiod_actions {
     MYGPIOD_ACTION_UNKNOWN = -1,  //!< Unknown action type
     MYGPIOD_ACTION_SYSTEM,        //!< System action
     MYGPIOD_ACTION_GPIO_SET,      //!< Set a GPIO value
-    MYGPIOD_ACTION_GPIO_TOGGLE    //!< Toggle a GPIO value
+    MYGPIOD_ACTION_GPIO_TOGGLE,   //!< Toggle a GPIO value
+    #ifdef MYGPIOD_ENABLE_ACTION_MPC
+        MYGPIOD_ACTION_MPC,       //!< Controls MPD (optional)
+    #endif
+    #ifdef MYGPIOD_ENABLE_ACTION_HTTP
+        MYGPIOD_ACTION_HTTP       //!< Makes an HTTP call (optional)
+    #endif
 };
 
 /**

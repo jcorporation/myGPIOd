@@ -307,6 +307,24 @@ const char *lookup_event_request(enum gpiod_line_edge event) {
 }
 
 /**
+ * Parses the event type.
+ * Sets errno to EINVAL on parser error.
+ * @param str string to parse
+ * @return gpiod_edge_event_type enum
+ */
+enum gpiod_edge_event_type parse_event_type(const char *str) {
+    if (strcasecmp(str, "falling") == 0) {
+        return GPIOD_EDGE_EVENT_FALLING_EDGE;
+    }
+    if (strcasecmp(str, "rising") == 0) {
+        return GPIOD_EDGE_EVENT_RISING_EDGE;
+    }
+    errno = EINVAL;
+    MYGPIOD_LOG_WARN("Could not parse event type, setting falling");
+    return GPIOD_EDGE_EVENT_FALLING_EDGE;
+}
+
+/**
  * Lookups the string for the event type
  * @param event event type
  * @return the name of the event type

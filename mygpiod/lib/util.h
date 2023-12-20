@@ -30,6 +30,7 @@ enum gpiod_line_clock parse_event_clock(const char *str);
 const char *lookup_event_clock(enum gpiod_line_clock clock);
 enum gpiod_line_edge parse_event_request(const char *str);
 const char *lookup_event_request(enum gpiod_line_edge event);
+enum gpiod_edge_event_type  parse_event_type(const char *str);
 const char *lookup_event_type(enum gpiod_edge_event_type event);
 enum gpiod_line_drive parse_drive(const char *str);
 const char *lookup_drive(enum gpiod_line_drive value);

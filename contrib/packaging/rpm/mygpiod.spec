@@ -7,7 +7,7 @@
 #
 
 Name:           mygpiod
-Version:        0.4.0
+Version:        0.5.0
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
@@ -72,5 +72,5 @@ true
 %{_mandir}/man3/libmygpio_*
 
 %changelog
-* Tue Dec 19 2023 Juergen Mang <mail@jcgames.de> 0.4.0-0
+* Wed Dec 20 2023 Juergen Mang <mail@jcgames.de> 0.5.0-0
 - Version from master

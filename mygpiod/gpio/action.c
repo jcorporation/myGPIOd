@@ -8,6 +8,8 @@
 #include "mygpiod/gpio/action.h"
 
 #include "mygpiod/actions/gpio.h"
+#include "mygpiod/actions/http.h"
+#include "mygpiod/actions/mpc.h"
 #include "mygpiod/actions/system.h"
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/lib/action.h"
@@ -169,6 +171,16 @@ static void action_execute(struct t_config *config, struct t_list *actions) {
             case MYGPIOD_ACTION_GPIO_TOGGLE:
                 action_gpiotoggle(config, action->option);
                 break;
+        #ifdef MYGPIOD_ENABLE_ACTION_MPC
+            case MYGPIOD_ACTION_MPC:
+                action_mpc(action->option);
+                break;
+        #endif
+        #ifdef MYGPIOD_ENABLE_ACTION_HTTP
+            case MYGPIOD_ACTION_HTTP:
+                action_http(action->option);
+                break;
+        #endif
             case MYGPIOD_ACTION_UNKNOWN:
                 MYGPIOD_LOG_ERROR("Invalid action");
                 break;

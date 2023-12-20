@@ -35,6 +35,9 @@ Building myGPIOd is straight forward.
 - C build environment
 - cmake >= 3.13
 - libgpiod-dev >= 2.0.0
+- Optional:
+  - libcurl
+  - libmpdclient2
 
 Only the current Fedora release packages the version 2 of libgpiod. For all other distributions, you must compile libgpiod yourself.
 
@@ -79,9 +82,11 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
+| http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Makes an HTTP request. Requires libcurl. |
+| mpc | `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connections from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
 | gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
 | gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
-| system | `<command>` | Executes an executable or script in a new child process. |
+| system | `<command>` | Executes an executable or script in a new child process. No arguments for the command are allowed. |
 
 myGPIOd can take actions on rising, falling and long_press events. Long press is triggered by a falling or rising event and does not disable the triggering event, but the release event. To use a button for normal press and long_press request both events and use one event for long and the other for short press. The example below illustrates this.
 

@@ -17,6 +17,10 @@
 #cmakedefine MYGPIOD_ENABLE_TSAN
 #cmakedefine MYGPIOD_ENABLE_UBSAN
 
+// Features
+#cmakedefine MYGPIOD_ENABLE_ACTION_MPC
+#cmakedefine MYGPIOD_ENABLE_ACTION_HTTP
+
 // Default configuration
 #define CFG_CHIP "/dev/gpiochip0"
 #define CFG_LOGLEVEL LOG_NOTICE

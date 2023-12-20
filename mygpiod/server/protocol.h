@@ -21,6 +21,7 @@
     X(CMD_GPIOSET) \
     X(CMD_GPIOTOGGLE) \
     X(CMD_GPIOINFO) \
+    X(CMD_EVENT) \
     X(CMD_COUNT)
 
 /**
