@@ -13,8 +13,9 @@ This release adds more actions.
 - Feat: New MPD action controls MPD with the help of libmpdclient.
 - Feat: New HTTP action submits arbitrary GET and POST requests.
 - Feat: New myMPD action triggers myMPD scripts through the myMPD api.
+- Upd: Improved build system
 - Fix: Memory leak in gpio set actions
-- Fix: Improved build system
+- Fix: Lookup correct event request
 
 ***
 
@@ -34,8 +35,8 @@ The daemon can be controlled through a simple text based protocol accessible by 
 ### Changelog
 
 - Feat: Add a server socket and define a client protocol to retrieve gpio events and control gpio outputs
-- Feat: simple C client library
-- Feat: command line client
+- Feat: Simple C client library
+- Feat: Command line client
 - Feat: Rework build process to support the standard cmake build types
 - Feat: Distinct actions for gpio events
 - Feat: Long press detection

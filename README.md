@@ -82,7 +82,7 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
-| http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. Requires libcurl. |
+| http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
 | mpc | `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connection settings from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
 | mympd | `{uri}` `{partition}` `{script}` | Calls the myMPD api to execute a script. Requires libcurl. |
 | gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
