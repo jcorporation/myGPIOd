@@ -103,7 +103,7 @@ This example configuration does the following:
   - Calls `/usr/local/bin/poweroff.sh` on a short press (rising)
 - Configures gpio 4 as input:
   - Enables the pull-up resistor on start
-  - Calls `/usr/local/bin/poweroff.sh` on a short press (falling)
+  - Runs the mpd `next` command on a short press (falling)
 - Configures gpio 5 as output:
   - Sets the value to active on start
 - Configures gpio 6 as output:
@@ -148,7 +148,7 @@ long_press_action = system:/usr/local/bin/reboot.sh
 event_request = falling
 active_low = false
 bias = pull-up
-action_falling = system:/usr/local/bin/poweroff.sh
+action_falling = mpc:next
 ```
 
 **/etc/mygpiod.d/5.out**
