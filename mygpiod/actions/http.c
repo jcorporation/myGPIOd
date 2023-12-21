@@ -96,7 +96,7 @@ static void run_http(const char *cmd) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
         if (strncmp(args[3], "<</", 3) == 0) {
             // read file
-            sds file_path = strdup(args[3]);
+            sds file_path = sdsdup(args[3]);
             sdsrange(file_path, 2, -1);
             sdsclear(args[3]);
             int nread;
