@@ -20,10 +20,11 @@ enum mygpiod_actions {
     MYGPIOD_ACTION_GPIO_SET,      //!< Set a GPIO value
     MYGPIOD_ACTION_GPIO_TOGGLE,   //!< Toggle a GPIO value
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
-        MYGPIOD_ACTION_MPC,       //!< Controls MPD (optional)
+        MYGPIOD_ACTION_MPC,       //!< Controls MPD
     #endif
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
-        MYGPIOD_ACTION_HTTP       //!< Makes an HTTP call (optional)
+        MYGPIOD_ACTION_HTTP,      //!< Makes an HTTP call
+        MYGPIOD_ACTION_MYMPD,     //!< Executes a myMPD script
     #endif
 };
 

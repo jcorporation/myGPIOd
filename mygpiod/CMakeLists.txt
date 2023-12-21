@@ -70,6 +70,7 @@ if (MYGPIOD_ENABLE_ACTION_HTTP)
   )
   target_sources(mygpiod PRIVATE
     actions/mpc.c
+    actions/mympd.c
   )
   target_link_libraries(mygpiod
     "${CURL_LIBRARIES}"

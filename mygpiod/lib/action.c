@@ -55,6 +55,8 @@ const char *lookup_action(enum mygpiod_actions action) {
         #ifdef MYGPIOD_ENABLE_ACTION_HTTP
             case MYGPIOD_ACTION_HTTP:
                 return "http";
+            case MYGPIOD_ACTION_MYMPD:
+                return "mympd";
         #endif
         case MYGPIOD_ACTION_UNKNOWN:
             return "";
@@ -87,6 +89,9 @@ enum mygpiod_actions parse_action(const char *str) {
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
         if (strcasecmp(str, "http") == 0) {
             return MYGPIOD_ACTION_HTTP;
+        }
+        if (strcasecmp(str, "mympd") == 0) {
+            return MYGPIOD_ACTION_MYMPD;
         }
     #endif
     errno = EINVAL;

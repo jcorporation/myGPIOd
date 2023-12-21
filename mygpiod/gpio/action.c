@@ -8,8 +8,6 @@
 #include "mygpiod/gpio/action.h"
 
 #include "mygpiod/actions/gpio.h"
-#include "mygpiod/actions/http.h"
-#include "mygpiod/actions/mpc.h"
 #include "mygpiod/actions/system.h"
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/lib/action.h"
@@ -18,6 +16,15 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
 #include "mygpiod/lib/util.h"
+
+#ifdef MYGPIOD_ENABLE_ACTION_MPC
+    #include "mygpiod/actions/mpc.h"
+#endif
+
+#ifdef MYGPIOD_ENABLE_ACTION_HTTP
+    #include "mygpiod/actions/http.h"
+    #include "mygpiod/actions/mympd.h"
+#endif
 
 #include <errno.h>
 #include <gpiod.h>
@@ -179,6 +186,9 @@ static void action_execute(struct t_config *config, struct t_list *actions) {
         #ifdef MYGPIOD_ENABLE_ACTION_HTTP
             case MYGPIOD_ACTION_HTTP:
                 action_http(action->option);
+                break;
+            case MYGPIOD_ACTION_MYMPD:
+                action_mympd(action->option);
                 break;
         #endif
             case MYGPIOD_ACTION_UNKNOWN:
