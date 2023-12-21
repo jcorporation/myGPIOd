@@ -327,9 +327,9 @@ const char *lookup_event_request(enum gpiod_line_edge event) {
         case GPIOD_LINE_EDGE_NONE:
             return "none";
         case GPIOD_LINE_EDGE_RISING:
-            return "falling";
-        case GPIOD_LINE_EDGE_FALLING:
             return "rising";
+        case GPIOD_LINE_EDGE_FALLING:
+            return "falling";
         case GPIOD_LINE_EDGE_BOTH:
             return "both";
     }
