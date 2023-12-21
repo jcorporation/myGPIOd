@@ -155,7 +155,7 @@ static void action_delay(struct t_gpio_in_data *data) {
     if (data->timer_fd > -1) {
         action_delay_abort(data);
     }
-    data->timer_fd = timer_new(data->long_press_timeout_ms);
+    data->timer_fd = timer_new(data->long_press_timeout_ms, 0);
 }
 
 /**

@@ -233,9 +233,9 @@ bool server_client_disconnect(struct t_list *clients, struct t_list_node *node) 
  */
 int server_client_connection_set_timeout(int timeout_fd, int timeout_s) {
     if (timeout_fd > 0) {
-        timer_set(timeout_fd, timeout_s * 1000);
+        timer_set(timeout_fd, timeout_s * 1000, 0);
     }
-    return timer_new(timeout_s * 1000);
+    return timer_new(timeout_s * 1000, 0);
 }
 
 /**
