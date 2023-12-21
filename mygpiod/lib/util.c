@@ -67,6 +67,37 @@ sds sds_getline(sds s, FILE *fp, size_t max, int *nread) {
 }
 
 /**
+ * Reads a whole file in a sds string
+ * @param s an already allocated sds string to append the file content
+ * @param file_path filename to read
+ * @param nread Number of bytes read,
+ *              -1 error reading file
+ * @return pointer to s
+ */
+sds sds_getfile(sds s, const char *file_path, int *nread) {
+    errno = 0;
+    FILE *fp = fopen(file_path, OPEN_FLAGS_READ);
+    if (fp == NULL) {
+        *nread = -1;
+        MYGPIOD_LOG_ERROR("Unable to open file \"%s\": %s", file_path, strerror(errno));
+        return s;
+    }
+    const size_t buffer_size = 10240;
+    s = sdsMakeRoomFor(s, buffer_size);
+    size_t read;
+    while ((read = fread(s + sdslen(s), sizeof(char), buffer_size, fp)) > 0) {
+        sdsIncrLen(s, (ssize_t)read);
+        s = sdsMakeRoomFor(s, buffer_size);
+    }
+    if (ferror(fp)) {
+        MYGPIOD_LOG_ERROR("Error reading file \"%s\"", file_path);
+    }
+    (void) fclose(fp);
+    *nread = (int)sdslen(s);
+    return s;
+}
+
+/**
  * Splits the string into two parts by first occurrence of sep.
  * Trims whitespaces from start and end of the tokens
  * @param s sds string to split

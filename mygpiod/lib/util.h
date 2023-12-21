@@ -21,6 +21,7 @@
 
 void close_fd(int *fd);
 sds sds_getline(sds s, FILE *fp, size_t max, int *nread);
+sds sds_getfile(sds s, const char *file_path, int *nread);
 sds *sds_splitfirst(sds s, char sep, int *count);
 const char *lookup_gpio_value(enum gpiod_line_value value);
 enum gpiod_line_value parse_gpio_value(const char *str);

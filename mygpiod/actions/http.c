@@ -9,6 +9,7 @@
 
 #include "dist/sds/sds.h"
 #include "mygpiod/lib/log.h"
+#include "mygpiod/lib/util.h"
 
 #include <curl/curl.h>
 #include <errno.h>
@@ -64,7 +65,7 @@ static void run_http(const char *cmd) {
     bool has_body = false;
     if (strcasecmp(args[0], "post") == 0) {
         has_body = true;
-        if (count < 4) {
+        if (count != 4) {
             MYGPIOD_LOG_ERROR("Invalid number of arguments");
             sdsfreesplitres(args, count);
             exit(EXIT_FAILURE);
@@ -93,6 +94,18 @@ static void run_http(const char *cmd) {
         }
         sdsfree(header);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
+        if (strncmp(args[3], "<</", 3) == 0) {
+            // read file
+            sds file_path = strdup(args[3]);
+            sdsrange(file_path, 2, -1);
+            sdsclear(args[3]);
+            int nread;
+            args[3] = sds_getfile(args[3], file_path, &nread);
+            sdsfree(file_path);
+            if (nread == -1) {
+                exit(EXIT_FAILURE);
+            }
+        }
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, args[3]);
     }
     char err_buf[CURL_ERROR_SIZE];
@@ -106,12 +119,20 @@ static void run_http(const char *cmd) {
     if (res != CURLE_OK) {
         MYGPIOD_LOG_ERROR("HTTP call failed: %s", curl_easy_strerror(res));
         MYGPIOD_LOG_ERROR("Error: %s", err_buf);
-        MYGPIOD_LOG_ERROR("%s", resp_header);
-        MYGPIOD_LOG_ERROR("%s", resp_body);
+        if (sdslen(resp_header) > 0) {
+            MYGPIOD_LOG_ERROR("%s", resp_header);
+        }
+        if (sdslen(resp_body) > 0) {
+            MYGPIOD_LOG_ERROR("%s", resp_body);
+        }
     }
     else {
-        MYGPIOD_LOG_DEBUG("%s", resp_header);
-        MYGPIOD_LOG_DEBUG("%s", resp_body);
+        if (sdslen(resp_header) > 0) {
+            MYGPIOD_LOG_DEBUG("%s", resp_header);
+        }
+        if (sdslen(resp_body) > 0) {
+            MYGPIOD_LOG_DEBUG("%s", resp_body);
+        }
     }
     sdsfree(resp_header);
     sdsfree(resp_body);
