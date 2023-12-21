@@ -103,14 +103,18 @@ static void run_http(const char *cmd) {
     sdstrim(resp_body, "\r\n");
     resp_header = sdsmapchars(resp_header, "\r\n", "  ", 2);
     resp_body = sdsmapchars(resp_body, "\r\n", "  ", 2);
-    MYGPIOD_LOG_DEBUG("%s", resp_header);
-    MYGPIOD_LOG_DEBUG("%s", resp_body);
-    sdsfree(resp_header);
-    sdsfree(resp_body);
     if (res != CURLE_OK) {
         MYGPIOD_LOG_ERROR("HTTP call failed: %s", curl_easy_strerror(res));
         MYGPIOD_LOG_ERROR("Error: %s", err_buf);
+        MYGPIOD_LOG_ERROR("%s", resp_header);
+        MYGPIOD_LOG_ERROR("%s", resp_body);
     }
+    else {
+        MYGPIOD_LOG_DEBUG("%s", resp_header);
+        MYGPIOD_LOG_DEBUG("%s", resp_body);
+    }
+    sdsfree(resp_header);
+    sdsfree(resp_body);
     curl_global_cleanup();
     sdsfreesplitres(args, count);
     if (res != CURLE_OK) {
