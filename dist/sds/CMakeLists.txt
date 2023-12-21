@@ -4,6 +4,11 @@
 
 add_library(sds "")
 
+target_compile_options(sds
+  PRIVATE
+    "-Wno-conversion"
+)
+
 target_sources(sds
   PRIVATE
     sds.c

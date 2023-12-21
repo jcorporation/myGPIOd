@@ -81,7 +81,7 @@ bool libmygpio_socket_recv_line(int fd, struct t_buf *buf, int timeout_ms) {
     }
 
     while ((nread = recv(fd, buf->buffer + buf->len, 1, flag)) > 0) {
-        buf->len += nread;
+        buf->len += (size_t)nread;
         if (buf->buffer[buf->len - 1] == '\n') {
             buf->len--;
             buf->buffer[buf->len] = '\0';

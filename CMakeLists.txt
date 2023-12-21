@@ -99,6 +99,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_compile_options(
     "-DMYGPIOD_DEBUG=ON"
   )
+  set(MYGPIOD_DEBUG "ON")
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES "(Debug|Release|RelWithDebInfo|MinSizeRel)")
@@ -109,9 +110,11 @@ if(CMAKE_BUILD_TYPE MATCHES "(Debug|Release|RelWithDebInfo|MinSizeRel)")
     "-fstack-protector-strong"
     "-pedantic"
     "-Wall"
+    "-Wconversion"
     "-Werror"
     "-Wextra"
     "-Wformat"
+    "-Wformat=2"
     "-Wformat-security"
     "-Winit-self"
     "-Wmissing-include-dirs"

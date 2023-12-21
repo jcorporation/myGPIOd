@@ -14,6 +14,10 @@
 #include <stdbool.h>
 #include <time.h>
 
+#ifdef MYGPIOD_ENABLE_ACTION_MPC
+    #include <mpd/client.h>
+#endif
+
 /**
  * Config and state data for an input gpio
  */
@@ -49,20 +53,24 @@ struct t_gpio_out_data {
  * Central myGPIOd config and state
  */
 struct t_config {
-    struct t_list gpios_in;   //!< holds the list of gpios to monitor
-    struct t_list gpios_out;  //!< holds the list of gpios to set
-    sds chip_path;            //!< path of the gpio chip device
-    int loglevel;             //!< the loglevel
-    bool syslog;              //!< enable syslog?
-    int signal_fd;            //!< file descriptor for the signal handler
-    sds dir_gpio;             //!< directory for the gpio config files
+    struct t_list gpios_in;               //!< holds the list of gpios to monitor
+    struct t_list gpios_out;              //!< holds the list of gpios to set
+    sds chip_path;                        //!< path of the gpio chip device
+    int loglevel;                         //!< the loglevel
+    bool syslog;                          //!< enable syslog?
+    int signal_fd;                        //!< file descriptor for the signal handler
+    sds dir_gpio;                         //!< directory for the gpio config files
 
-    sds socket_path;          //!< server socket
-    int socket_timeout_s;     //!< socket timeout in seconds
-    struct t_list clients;    //!< list of connected clients
-    unsigned client_id;       //!< uniq client id
+    sds socket_path;                      //!< server socket
+    int socket_timeout_s;                 //!< socket timeout in seconds
+    struct t_list clients;                //!< list of connected clients
+    unsigned client_id;                   //!< uniq client id
 
-    struct gpiod_chip *chip;  //!< gpiod chip object
+    struct gpiod_chip *chip;              //!< gpiod chip object
+
+    #ifdef MYGPIOD_ENABLE_ACTION_MPC
+        struct mpd_connection *mpd_conn;  //!< MPD connection
+    #endif
 };
 
 void config_clear(struct t_config *config);

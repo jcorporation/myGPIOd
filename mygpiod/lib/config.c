@@ -78,6 +78,11 @@ void config_clear(struct t_config *config) {
     FREE_SDS(config->chip_path);
     FREE_SDS(config->dir_gpio);
     FREE_SDS(config->socket_path);
+    #ifdef MYGPIOD_ENABLE_ACTION_MPC
+        if (config->mpd_conn != NULL) {
+            mpd_connection_free(config->mpd_conn);
+        }
+    #endif
 }
 
 //private functions
@@ -104,6 +109,9 @@ static struct t_config *config_new(void) {
     config->socket_timeout_s = CFG_SOCKET_TIMEOUT;
     config->client_id = 0;
     list_init(&config->clients);
+    #ifdef MYGPIOD_ENABLE_ACTION_MPC
+        config->mpd_conn = NULL;
+    #endif
     return config;
 }
 

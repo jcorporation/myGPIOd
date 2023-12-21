@@ -9,11 +9,14 @@
 
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/util.h"
-#include "mygpiod/server/event.h"
 #include "mygpiod/server/gpio.h"
 #include "mygpiod/server/idle.h"
 #include "mygpiod/server/response.h"
 #include "mygpiod/server/socket.h"
+
+#ifdef MYGPIOD_DEBUG
+    #include "mygpiod/server/event.h"
+#endif
 
 #include <ctype.h>
 #include <stdio.h>

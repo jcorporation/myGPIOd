@@ -7,8 +7,10 @@
 #ifndef MYGPIOD_ACTIONS_MPC_H
 #define MYGPIOD_ACTIONS_MPC_H
 
+#include "mygpiod/lib/config.h"
+
 #include <stdbool.h>
 
-bool action_mpc(const char *cmd);
+bool action_mpc(struct t_config *config, const char *cmd);
 
 #endif

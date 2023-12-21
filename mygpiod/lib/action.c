@@ -4,6 +4,7 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+#include "compile_time.h"
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
@@ -89,6 +90,6 @@ enum mygpiod_actions parse_action(const char *str) {
         }
     #endif
     errno = EINVAL;
-    MYGPIOD_LOG_WARN("Could not parse action value, setting unknown");
+    MYGPIOD_LOG_WARN("Could not parse action value \"%s\", setting unknown", str);
     return MYGPIOD_ACTION_UNKNOWN;
 }

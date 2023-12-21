@@ -173,7 +173,7 @@ static void action_execute(struct t_config *config, struct t_list *actions) {
                 break;
         #ifdef MYGPIOD_ENABLE_ACTION_MPC
             case MYGPIOD_ACTION_MPC:
-                action_mpc(action->option);
+                action_mpc(config, action->option);
                 break;
         #endif
         #ifdef MYGPIOD_ENABLE_ACTION_HTTP

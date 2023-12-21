@@ -4,14 +4,6 @@
 
 add_executable(mygpiod "")
 
-if(CMAKE_BUILD_TYPE MATCHES "(Release|Debug)")
-  target_compile_options(mygpiod
-    PRIVATE
-      "-Wconversion"
-      "-Wformat=2"
-  )
-endif()
-
 target_include_directories(mygpiod
   PRIVATE 
     "${PROJECT_BINARY_DIR}"
@@ -39,13 +31,18 @@ target_sources(mygpiod PRIVATE
   lib/log.c
   lib/timer.c
   lib/util.c
-  server/event.c
   server/gpio.c
   server/idle.c
   server/protocol.c
   server/response.c
   server/socket.c
 )
+
+if (MYGPIOD_DEBUG)
+  target_sources(mygpiod PRIVATE
+    server/event.c
+  )
+endif()
 
 target_link_libraries(mygpiod
   gpiod
@@ -68,8 +65,8 @@ endif()
 
 if (MYGPIOD_ENABLE_ACTION_HTTP)
   target_include_directories(mygpiod
-  PRIVATE 
-    "${LIBCURL_INCLUDE_DIRS}"
+    PRIVATE 
+      "${LIBCURL_INCLUDE_DIRS}"
   )
   target_sources(mygpiod PRIVATE
     actions/mpc.c

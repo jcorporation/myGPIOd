@@ -186,7 +186,7 @@ bool mygpio_parse_uint64(const char *str, uint64_t *result, char **rest, uint64_
         else {
             *rest = endptr;
         }
-        *result = (int)v;
+        *result = (uint64_t)v;
         return true;
     }
     return false;
