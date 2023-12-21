@@ -35,7 +35,7 @@ int timer_new(int timeout_ms, int interval_ms) {
 }
 
 /**
- * Sets the relative timeout for a timer fd.
+ * Sets the relative timeout and interval for a timer fd.
  * @param timer_fd timer fd
  * @param timeout_ms relative timeout in milliseconds
  * @param interval_ms interval in milliseconds
@@ -45,8 +45,14 @@ bool timer_set(int timer_fd, int timeout_ms, int interval_ms) {
     struct itimerspec its;
     its.it_value.tv_sec = timeout_ms / 1000;
     its.it_value.tv_nsec = (long)((timeout_ms % 1000) * 1000000);
-    its.it_interval.tv_sec = interval_ms / 1000;
-    its.it_interval.tv_nsec = (long)((interval_ms % 1000) * 1000000);
+    if (interval_ms > 0) {
+        its.it_interval.tv_sec = interval_ms / 1000;
+        its.it_interval.tv_nsec = (long)((interval_ms % 1000) * 1000000);
+    }
+    else {
+        its.it_interval.tv_sec = 0;
+        its.it_interval.tv_nsec = 0;
+    }
     errno = 0;
     if (timerfd_settime(timer_fd, 0, &its, NULL) == -1) {
         MYGPIOD_LOG_ERROR("Can not set expiration for timer: \"%s\"", strerror(errno));

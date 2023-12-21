@@ -1,10 +1,12 @@
 # myGPIOd
 
-myGPIOd is a lightweight GPIO controlling framework. It is written in C and has no dependencies but the libgpiod2 library version 2.
+myGPIOd is a lightweight GPIO controlling framework. It is written in C and has no hard dependencies but the libgpiod2 library version 2.
 
 It consists of a daemon, a client library and a command line tool. It is designed to run on Raspberry PIs and similar devices.
 
 I wrote this tool primarily for [myMPDos](https://github.com/jcorporation/myMPDos) and [myMPD](https://github.com/jcorporation/myMPD).
+
+myGPIOd can communicate natively with MPD and also integrates nicely with all HTTP APIs.
 
 ## Features
 
@@ -12,11 +14,11 @@ I wrote this tool primarily for [myMPDos](https://github.com/jcorporation/myMPDo
   - Call actions on GPIO events
     - rising
     - falling
-    - long press
-  - Set various gpio attributes (bias, debounce, ...)
-  - Set the output value of gpios
+    - long press (with optional interval)
+  - Set various GPIO attributes (bias, debounce, ...)
+  - Set the output value of GPIOs
   - Provides a unix socket with a simple line-based text protocol
-    - List gpio configuration
+    - List GPIO configuration
     - Set and get GPIO values
     - Get notifications of GPIO events
 - **libmygpio - the client library**
@@ -95,19 +97,23 @@ myGPIOd can take actions on rising, falling and long_press events. Long press is
 
 This example configuration does the following:
 
-- Configures gpio 3 as input:
+- Configures GPIO 3 as input:
   - Enables the pull-up resistor on start
   - Sets GPIO 6 to active on falling event
   - Calls `/usr/local/bin/reboot.sh` after a button press (falling) of 2 seconds length
   - Toggles the value of GPIO 6 on long_press
   - Calls `/usr/local/bin/poweroff.sh` on a short press (rising)
-- Configures gpio 4 as input:
+- Configures GPIO 4 as input:
   - Enables the pull-up resistor on start
   - Runs the mpd `next` command on a short press (falling)
-- Configures gpio 5 as output:
+- Configures GPIO 5 as output:
   - Sets the value to active on start
-- Configures gpio 6 as output:
+- Configures GPIO 6 as output:
   - Sets the value to inactive on start
+- Configures GPIO 7 as input:
+  - Enables the pull-up resistor on start
+  - Enabled the long press action for falling event
+  - Increases the mpd volume by 5 % after 100 ms and each 500 ms as long the button is pressed
 
 **/etc/mygpiod.conf**
 ```
@@ -119,7 +125,7 @@ gpio_dir = /etc/mygpiod.d
 
 **/etc/mygpiod.d/3.in**
 ```
-# We request falling and rising events
+# Request falling and rising events
 event_request = both
 
 # Active is high
@@ -139,26 +145,55 @@ action_falling = gpioset:6 active
 # Enable long press for falling
 long_press_event = falling
 long_press_timeout = 2000
+long_press_interval = 0
 long_press_action = gpiotoggle:6
 long_press_action = system:/usr/local/bin/reboot.sh
 ```
 
 **/etc/mygpiod.d/4.in**
 ```
+# Request the falling event
 event_request = falling
-active_low = false
+
+# Enable the internal pull-up resistor
 bias = pull-up
+
+# Use libmpdclient to connect to mpd and send the command `next`
 action_falling = mpc:next
 ```
 
 **/etc/mygpiod.d/5.out**
 ```
+# Set the GPIO to active
 value = active
 ```
 
 **/etc/mygpiod.d/6.out**
 ```
+# Set the GPIO to inactive
 value = inactive
+```
+
+**/etc/mygpiod.d/7.in**
+```
+# Request the falling event
+event_request = falling
+
+# Enable the internal pull-up resistor
+bias = pull-up
+
+# Enable long press action for the falling event
+long_press_event = falling
+
+# Set initial long press timeout to 100 ms
+long_press_timeout = 100
+
+# Set interval to 500 ms, action is repeated in this interval until the value changes again
+long_press_interval = 500
+
+# Use libmpdclient to connect to mpd and send the command `volume +5`
+# This increases the volume by 5 percent
+long_press_action = mpc:volume +5
 ```
 
 ## Protocol

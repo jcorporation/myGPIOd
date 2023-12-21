@@ -31,6 +31,7 @@ struct t_gpio_in_data {
     enum gpiod_line_edge event_request;            //!< events to request for this gpio
     int gpio_fd;                                   //!< gpio file descriptor
     int long_press_timeout_ms;                     //!< timeout for the long press handler in milliseconds
+    int long_press_interval_ms;                    //!< interval for the long press handler in milliseconds
     struct t_list long_press_action;               //!< long press command
     enum gpiod_line_edge long_press_event;         //!< event for the long press handler
     enum gpiod_line_value long_press_value;        //!< initial gpio value for the long press event

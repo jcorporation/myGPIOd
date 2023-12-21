@@ -10,6 +10,7 @@ This release adds more actions.
 
 ### Changelog
 
+- Feat: Add long press interval
 - Feat: New MPD action controls MPD with the help of libmpdclient.
 - Feat: New HTTP action submits arbitrary GET and POST requests.
 - Feat: New myMPD action triggers myMPD scripts through the myMPD api.

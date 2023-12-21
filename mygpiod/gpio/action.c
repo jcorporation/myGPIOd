@@ -130,6 +130,9 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
             MYGPIOD_LOG_DEBUG("Set next event for gpio %u to ignore", gpio);
             data->ignore_event = true;
         }
+        if (data->long_press_interval_ms > 0) {
+            return;
+        }
     }
     // remove timerfd
     action_delay_abort(data);
@@ -155,7 +158,7 @@ static void action_delay(struct t_gpio_in_data *data) {
     if (data->timer_fd > -1) {
         action_delay_abort(data);
     }
-    data->timer_fd = timer_new(data->long_press_timeout_ms, 0);
+    data->timer_fd = timer_new(data->long_press_timeout_ms, data->long_press_interval_ms);
 }
 
 /**

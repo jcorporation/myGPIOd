@@ -49,6 +49,10 @@ event_clock = monotonic
 # Timeout in milliseconds after long press action is executed
 #long_press_timeout = 2000
 
+# Long press action is executed in this interval (milliseconds)
+# Set it to 0 (default), to execute it only once
+#long_press_interval = 500
+
 # The long press action
 # Multiple lines are supported
 #long_press_action = system:/bin/true

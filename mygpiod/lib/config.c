@@ -381,6 +381,12 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         }
         return false;
     }
+    if (strcmp(key, "long_press_interval") == 0) {
+        if (mygpio_parse_int(value, &data->long_press_interval_ms, NULL, 0, 9999) == true) {
+            return errno == 0 ? true : false;
+        }
+        return false;
+    }
     if (strcmp(key, "long_press_event") == 0) {
         data->long_press_event = parse_event_request(value);
         return errno == 0 ? true : false;
@@ -427,6 +433,7 @@ static struct t_gpio_in_data *gpio_in_data_new(void) {
     list_init(&data->action_rising);
     list_init(&data->action_falling);
     data->long_press_timeout_ms = 0;
+    data->long_press_interval_ms = 0;
     list_init(&data->long_press_action);
     data->long_press_event = GPIOD_LINE_EDGE_FALLING;
     data->long_press_value = GPIOD_LINE_VALUE_ERROR;
