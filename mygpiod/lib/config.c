@@ -8,6 +8,7 @@
 #include "mygpiod/lib/config.h"
 
 #include "mygpio-common/util.h"
+#include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/event_loop/signal_handler.h"
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/list.h"

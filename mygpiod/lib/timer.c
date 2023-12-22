@@ -7,8 +7,8 @@
 #include "compile_time.h"
 #include "mygpiod/lib/timer.h"
 
+#include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lib/util.h"
 
 #include <errno.h>
 #include <string.h>
@@ -28,9 +28,9 @@ int timer_new(int timeout_ms, int interval_ms) {
         return -1;
     }
     if (timer_set(timer_fd, timeout_ms, interval_ms) == false) {
-        close(timer_fd);
         return -1;
     }
+    update_pollfds = true;
     return timer_fd;
 }
 

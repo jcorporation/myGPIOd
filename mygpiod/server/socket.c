@@ -8,6 +8,7 @@
 #include "mygpiod/server/socket.h"
 
 #include "dist/sds/sds.h"
+#include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
@@ -191,6 +192,7 @@ struct t_client_data *server_client_connection_new(int client_fd) {
     data->buf_in = sdsempty();
     data->buf_out = sdsempty();
     list_init(&data->waiting_events);
+    update_pollfds = true;
     return data;
 }
 
@@ -205,6 +207,7 @@ void server_client_connection_clear(struct t_list_node *node) {
     FREE_SDS(data->buf_in);
     FREE_SDS(data->buf_out);
     list_clear(&data->waiting_events, event_data_clear);
+    update_pollfds = true;
 }
 
 /**

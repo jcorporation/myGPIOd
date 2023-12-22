@@ -13,6 +13,8 @@
 #include <gpiod.h>
 #include <poll.h>
 
+extern bool update_pollfds;
+
 /**
  * Poll fd types
  */
@@ -36,7 +38,7 @@ enum pfd_types {
  */
 struct t_poll_fds {
     struct pollfd fd[MAX_FDS];  //!< file descriptors
-    int type[MAX_FDS];          //!< type of the corrsponding fd
+    int type[MAX_FDS];          //!< type of the corresponding fd
     unsigned len;               //!< number of file descriptors
 };
 
@@ -44,6 +46,7 @@ bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, int pfd_type, short 
 void event_add_gpio_in_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds);
 void event_add_gpio_out_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds);
 void event_add_client_fds(struct t_config *config, struct t_poll_fds *poll_fds);
+void close_fd(int *fd);
 bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds);
 
 #endif

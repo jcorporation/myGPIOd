@@ -18,19 +18,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-
-/**
- * Closes an open file descriptor.
- * Checks it if is open and sets it to -1.
- * @param fd 
- */
-void close_fd(int *fd) {
-    if (*fd > -1) {
-        close(*fd);
-        *fd = -1;
-    }
-}
 
 /**
  * Getline function that trims whitespace characters.

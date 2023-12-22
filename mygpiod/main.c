@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
     // init struct for event polling
     struct t_poll_fds poll_fds;
     memset(&poll_fds, 0, sizeof(poll_fds));
+    update_pollfds = true;
 
     // open the chip, set output gpios and request input gpios
     if (sdslen(config->chip_path) > 0) {
@@ -115,11 +116,14 @@ int main(int argc, char **argv) {
     // save initial number of fds to poll
     unsigned pfd_len_init = poll_fds.len;
     while (true) {
-        // reset poll_fds length and re-add the timer and client fds
-        poll_fds.len = pfd_len_init;
-        event_add_gpio_in_timer_fds(config, &poll_fds);
-        event_add_gpio_out_timer_fds(config, &poll_fds);
-        event_add_client_fds(config, &poll_fds);
+        if (update_pollfds == true) {
+            // reset poll_fds length and re-add the timer and client fds
+            poll_fds.len = pfd_len_init;
+            event_add_gpio_in_timer_fds(config, &poll_fds);
+            event_add_gpio_out_timer_fds(config, &poll_fds);
+            event_add_client_fds(config, &poll_fds);
+            update_pollfds = false;
+        }
 
         // poll
         MYGPIOD_LOG_DEBUG("Polling %u fds", poll_fds.len);

@@ -7,11 +7,11 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/timer.h"
 
+#include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/action.h"
 #include "mygpiod/gpio/output.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
-#include "mygpiod/lib/util.h"
 
 #include <gpiod.h>
 #include <stdint.h>

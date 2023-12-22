@@ -16,6 +16,12 @@
 
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <unistd.h>
+
+/**
+ * Gobal variable that indicates if the pollfds array must be updated
+ */
+bool update_pollfds;
 
 /**
  * Adds a fd to the list of fds to poll
@@ -86,6 +92,19 @@ void event_add_client_fds(struct t_config *config, struct t_poll_fds *poll_fds) 
             timer_log_next_expire(data->timeout_fd);
         }
         current = current->next;
+    }
+}
+
+/**
+ * Closes an open file descriptor.
+ * Checks if it is open and sets it to -1.
+ * @param fd file descriptor to close
+ */
+void close_fd(int *fd) {
+    if (*fd > -1) {
+        close(*fd);
+        *fd = -1;
+        update_pollfds = true;
     }
 }
 

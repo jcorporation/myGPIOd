@@ -55,15 +55,15 @@ struct t_gpio_out_data {
  * Central myGPIOd config and state
  */
 struct t_config {
-    struct t_list gpios_in;               //!< holds the list of gpios to monitor
-    struct t_list gpios_out;              //!< holds the list of gpios to set
+    struct t_list gpios_in;               //!< holds the list of GPIOs to monitor
+    struct t_list gpios_out;              //!< holds the list of GPIOs to set
     sds chip_path;                        //!< path of the gpio chip device
     int loglevel;                         //!< the loglevel
     bool syslog;                          //!< enable syslog?
     int signal_fd;                        //!< file descriptor for the signal handler
     sds dir_gpio;                         //!< directory for the gpio config files
 
-    sds socket_path;                      //!< server socket
+    sds socket_path;                      //!< server socket filepath
     int socket_timeout_s;                 //!< socket timeout in seconds
     struct t_list clients;                //!< list of connected clients
     unsigned client_id;                   //!< uniq client id
