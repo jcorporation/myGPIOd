@@ -45,6 +45,7 @@ bool timer_set(int timer_fd, int timeout_ms, int interval_ms) {
     struct itimerspec its;
     its.it_value.tv_sec = timeout_ms / 1000;
     its.it_value.tv_nsec = (long)((timeout_ms % 1000) * 1000000);
+    MYGPIOD_LOG_DEBUG("Setting timer: timeout \"%d ms\", interval \"%d ms\"", timeout_ms, interval_ms);
     if (interval_ms > 0) {
         its.it_interval.tv_sec = interval_ms / 1000;
         its.it_interval.tv_nsec = (long)((interval_ms % 1000) * 1000000);

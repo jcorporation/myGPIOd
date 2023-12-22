@@ -65,8 +65,8 @@ bool gpio_out_timer_handle_event(struct t_config *config, int *fd) {
     }
     MYGPIOD_LOG_INFO("Blink event for gpio \"%u\"", node->id);
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
-    gpio_toggle_value_by_line_request(data->request, node->id);   
-    if (timer_repeat(data->timer_fd) == false) {
+    gpio_toggle_value_by_line_request(data->request, node->id);
+    if (timer_repeat(*fd) == false) {
         // Blink only once
         close_fd(&data->timer_fd);
     }
