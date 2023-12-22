@@ -37,16 +37,17 @@ enum pfd_types {
  * Struct to hold poll fd data
  */
 struct t_poll_fds {
-    struct pollfd fd[MAX_FDS];  //!< file descriptors
-    int type[MAX_FDS];          //!< type of the corresponding fd
-    unsigned len;               //!< number of file descriptors
+    struct pollfd fd[MAX_FDS];     //!< file descriptors
+    enum pfd_types type[MAX_FDS];  //!< type of the corresponding fd
+    unsigned len;                  //!< number of file descriptors
 };
 
-bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, int pfd_type, short events);
+bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, enum pfd_types pfd_type, short events);
 void event_add_gpio_in_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds);
 void event_add_gpio_out_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds);
 void event_add_client_fds(struct t_config *config, struct t_poll_fds *poll_fds);
 void close_fd(int *fd);
 bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds);
+const char *lookup_pfd_type(enum pfd_types type);
 
 #endif

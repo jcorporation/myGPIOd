@@ -24,18 +24,43 @@
 bool update_pollfds;
 
 /**
+ * Lookups the poll fds event type as string
+ * @param type poll fd type to lookup
+ * @return poll fd type as string
+ */
+const char *lookup_pfd_type(enum pfd_types type) {
+    switch(type) {
+        case PFD_TYPE_GPIO:
+            return "gpio";
+        case PFD_TYPE_GPIO_IN_TIMER:
+            return "gpio_in_timer";
+        case PFD_TYPE_GPIO_OUT_TIMER:
+            return "gpio_out_timer";
+        case PFD_TYPE_SIGNAL:
+            return "signal";
+        case PFD_TYPE_CONNECT:
+            return "client connect";
+        case PFD_TYPE_CLIENT:
+            return "client socket";
+        case PFD_TYPE_CLIENT_TIMEOUT:
+            return "timeout";
+    }
+    return "unknown";
+}
+
+/**
  * Adds a fd to the list of fds to poll
  * @param poll_fds struct to add the new fd
  * @param fd fd to add
  * @param pfd_type type of poll fd
  * @return true on success, else false
  */
-bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, int pfd_type, short events) {
+bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, enum pfd_types pfd_type, short events) {
     if (poll_fds->len == MAX_FDS) {
         MYGPIOD_LOG_ERROR("Maximum number of poll fds reached");
         return false;
     }
-    MYGPIOD_LOG_DEBUG("Adding poll fd#%u of type %d", poll_fds->len, pfd_type);
+    MYGPIOD_LOG_DEBUG("Adding poll fd#%u of type \"%s\"", poll_fds->len, lookup_pfd_type(pfd_type));
     poll_fds->fd[poll_fds->len].fd = fd;
     poll_fds->fd[poll_fds->len].events = events;
     poll_fds->type[poll_fds->len] = pfd_type;
@@ -116,7 +141,7 @@ void close_fd(int *fd) {
 bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
     for (unsigned i = 0; i < poll_fds->len; i++) {
         if (poll_fds->fd[i].revents) {
-            MYGPIOD_LOG_DEBUG("%u: Event detected of type %d", i, poll_fds->type[i]);
+            MYGPIOD_LOG_DEBUG("%u: Event detected of type \"%s\": %d", i, lookup_pfd_type(poll_fds->type[i]), poll_fds->fd[i].revents);
             switch(poll_fds->type[i]) {
                 case PFD_TYPE_GPIO:
                     gpio_handle_event(config, &poll_fds->fd[i].fd);

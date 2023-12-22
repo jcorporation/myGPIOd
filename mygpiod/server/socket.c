@@ -126,7 +126,10 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
     }
     struct t_client_data *data = (struct t_client_data *)node->data;
 
-    if (client_fd->revents & POLLHUP) {
+    if ((client_fd->revents & POLLHUP) ||
+        (client_fd->revents & POLLERR) ||
+        (client_fd->revents & POLLNVAL))
+    {
         server_client_disconnect(&config->clients, node);
         return true;
     }
@@ -138,7 +141,7 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
             data->buf_in = sdsMakeRoomFor(data->buf_in, BUFFER_SIZE);
             ssize_t nread = read(data->fd, data->buf_in + oldlen, BUFFER_SIZE);
             if (nread <= 0) {
-                MYGPIOD_LOG_ERROR("Client#%u: Could not read from socket", node->id);
+                MYGPIOD_LOG_DEBUG("Client#%u: Could not read from socket", node->id);
                 server_client_disconnect(&config->clients, node);
                 return false;
             }

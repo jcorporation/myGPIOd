@@ -81,7 +81,8 @@ static bool mpc_check_conn(struct t_config *config) {
     fd.events = 0;
     if (poll(&fd, 1, 0) > -1 &&
         !(fd.revents & POLLHUP) &&
-        !(fd.revents & POLLERR))
+        !(fd.revents & POLLERR) &&
+        !(fd.revents & POLLNVAL))
     {
         MYGPIOD_LOG_DEBUG("MPD is connected");
         return true;
