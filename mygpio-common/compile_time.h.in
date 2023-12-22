@@ -36,5 +36,6 @@
 #define WAITING_EVENTS_MAX 10
 #define GPIO_EVENT_BUF_SIZE 32
 #define OPEN_FLAGS_READ "re"
+#define TIMEOUT_MS_MAX 9999
 
 #endif

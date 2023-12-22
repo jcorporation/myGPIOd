@@ -75,7 +75,7 @@ void timer_log_next_expire(int timer_fd) {
         return;
     }
     int64_t timestamp = its.it_value.tv_sec * 1000 + its.it_value.tv_nsec / 1000000;
-    MYGPIOD_LOG_DEBUG("Timer expires in %lld milliseconds", (long long)timestamp);
+    MYGPIOD_LOG_DEBUG("Timer expires in %lld ms", (long long)timestamp);
 }
 
 /**

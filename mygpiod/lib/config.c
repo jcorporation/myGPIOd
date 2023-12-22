@@ -377,13 +377,13 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
         return false;
     }
     if (strcmp(key, "long_press_timeout") == 0) {
-        if (mygpio_parse_int(value, &data->long_press_timeout_ms, NULL, 0, 9999) == true) {
+        if (mygpio_parse_int(value, &data->long_press_timeout_ms, NULL, 0, TIMEOUT_MS_MAX) == true) {
             return errno == 0 ? true : false;
         }
         return false;
     }
     if (strcmp(key, "long_press_interval") == 0) {
-        if (mygpio_parse_int(value, &data->long_press_interval_ms, NULL, 0, 9999) == true) {
+        if (mygpio_parse_int(value, &data->long_press_interval_ms, NULL, 0, TIMEOUT_MS_MAX) == true) {
             return errno == 0 ? true : false;
         }
         return false;

@@ -95,13 +95,13 @@ bool action_gpioblink(struct t_config *config, const char *cmd) {
         return false;
     }
     int timeout;
-    if (mygpio_parse_int(args[0], &timeout, NULL, 0, 9999) == false) {
+    if (mygpio_parse_int(args[0], &timeout, NULL, 0, TIMEOUT_MS_MAX) == false) {
         MYGPIOD_LOG_ERROR("Invalid timeout");
         sdsfreesplitres(args, count);
         return false;
     }
     int interval;
-    if (mygpio_parse_int(args[0], &interval, NULL, 0, 9999) == false) {
+    if (mygpio_parse_int(args[0], &interval, NULL, 0, TIMEOUT_MS_MAX) == false) {
         MYGPIOD_LOG_ERROR("Invalid interval");
         sdsfreesplitres(args, count);
         return false;

@@ -217,12 +217,12 @@ bool handle_gpioblink(struct t_cmd_options *options, struct t_config *config, st
         return false;
     }
     int timeout;
-    if (mygpio_parse_int(options->args[2], &timeout, NULL, 0, 9999) == false) {
+    if (mygpio_parse_int(options->args[2], &timeout, NULL, 0, TIMEOUT_MS_MAX) == false) {
         server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid timeout");
         return false;
     }
     int interval;
-    if (mygpio_parse_int(options->args[3], &interval, NULL, 0, 9999) == false) {
+    if (mygpio_parse_int(options->args[3], &interval, NULL, 0, TIMEOUT_MS_MAX) == false) {
         server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid interval");
         return false;
     }
