@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 // privat definitions
+static bool read_from_timerfd(int *fd);
 static struct t_list_node *get_node_by_gpio_in_timerfd(struct t_list *gpios_in, int *fd);
 static struct t_list_node *get_node_by_gpio_out_timerfd(struct t_list *gpios_out, int *fd);
 
@@ -30,6 +31,9 @@ static struct t_list_node *get_node_by_gpio_out_timerfd(struct t_list *gpios_out
  * @return true on success, else false
  */
 bool gpio_in_timer_handle_event(struct t_config *config, int *fd) {
+    if (read_from_timerfd(fd) == false) {
+        return false;
+    }
     timer_log_next_expire(*fd);
     struct t_list_node *node = get_node_by_gpio_in_timerfd(&config->gpios_in, fd);
     if (node == NULL) {
@@ -50,6 +54,9 @@ bool gpio_in_timer_handle_event(struct t_config *config, int *fd) {
  * @return true on success, else false
  */
 bool gpio_out_timer_handle_event(struct t_config *config, int *fd) {
+    if (read_from_timerfd(fd) == false) {
+        return false;
+    }
     timer_log_next_expire(*fd);
     struct t_list_node *node = get_node_by_gpio_out_timerfd(&config->gpios_out, fd);
     if (node == NULL) {
@@ -67,6 +74,21 @@ bool gpio_out_timer_handle_event(struct t_config *config, int *fd) {
 }
 
 // private functions
+
+/**
+ * Reads the uint64_t value from a timer fd
+ * @param fd fd to read from
+ * @return true on success, else false
+ */
+static bool read_from_timerfd(int *fd) {
+    uint64_t exp;
+    ssize_t s = read(*fd, &exp, sizeof(uint64_t));
+    if (s != sizeof(uint64_t)) {
+        MYGPIOD_LOG_ERROR("Unable reading from timer_fd");
+        return false;
+    }
+    return true;
+}
 
 /**
  * Gets the gpio in node by timer fd
