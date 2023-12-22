@@ -484,6 +484,7 @@ static struct t_gpio_out_data *gpio_out_data_new(void) {
     struct t_gpio_out_data *data = malloc_assert(sizeof(struct t_gpio_out_data));
     data->drive = GPIOD_LINE_DRIVE_PUSH_PULL;
     data->value = GPIOD_LINE_VALUE_INACTIVE;
+    data->timer_fd = -1;
     data->request = NULL;
     return data;
 }
@@ -493,6 +494,7 @@ static struct t_gpio_out_data *gpio_out_data_new(void) {
  * @param data gpio out data to clear
  */
 static void gpio_out_data_clear(struct t_gpio_out_data *data) {
+    close_fd(&data->timer_fd);
     if (data->request != NULL) {
         gpiod_line_request_release(data->request);
     }

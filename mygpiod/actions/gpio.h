@@ -13,5 +13,6 @@
 
 bool action_gpioset(struct t_config *config, const char *cmd);
 bool action_gpiotoggle(struct t_config *config, const char *cmd);
+bool action_gpioblink(struct t_config *config, const char *cmd);
 
 #endif

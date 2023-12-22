@@ -48,6 +48,8 @@ const char *lookup_action(enum mygpiod_actions action) {
             return "gpioset";
         case MYGPIOD_ACTION_GPIO_TOGGLE:
             return "gpiotoggle";
+        case MYGPIOD_ACTION_GPIO_BLINK:
+            return "gpioblink";
         #ifdef MYGPIOD_ENABLE_ACTION_MPC
             case MYGPIOD_ACTION_MPC:
                 return "mpc";
@@ -80,6 +82,9 @@ enum mygpiod_actions parse_action(const char *str) {
     }
     if (strcasecmp(str, "gpiotoggle") == 0) {
         return MYGPIOD_ACTION_GPIO_TOGGLE;
+    }
+    if (strcasecmp(str, "gpioblink") == 0) {
+        return MYGPIOD_ACTION_GPIO_BLINK;
     }
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         if (strcasecmp(str, "mpc") == 0) {

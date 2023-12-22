@@ -34,6 +34,7 @@ static struct t_commands commands[] = {
     { "gpioget", handle_gpioget, 1, 1 },
     { "gpioset", handle_gpioset, 2, 2 },
     { "gpiotoggle", handle_gpiotoggle, 1, 1 },
+    { "gpioblink", handle_gpioblink, 3, 3 },
     { NULL, NULL, 0, 0}
 };
 

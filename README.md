@@ -84,11 +84,12 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
+| gpioblink | `<gpio>` `<timeout>` `<interval>` | Toggle the value of the GPIO in given timeout and interval. Set interval to 0 to blink only once. |
+| gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
+| gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
 | http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
 | mpc | `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connection settings from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
 | mympd | `{uri}` `{partition}` `{script}` | Calls the myMPD api to execute a script. Requires libcurl. |
-| gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
-| gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
 | system | `<command>` | Executes an executable or script in a new child process. No arguments for the command are allowed. |
 
 myGPIOd can take actions on rising, falling and long_press events. Long press is triggered by a falling or rising event and does not disable the triggering event, but the release event. To use a button for normal press and long_press request both events and use one event for long and the other for short press. The example below illustrates this.

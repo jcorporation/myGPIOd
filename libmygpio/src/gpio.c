@@ -41,16 +41,13 @@ enum mygpio_gpio_value mygpio_gpioget(struct t_mygpio_connection *connection, un
 }
 
 /**
- * Sets the value of an output gpio
+ * Sets the value of a configured output gpio
  * @param connection connection struct
  * @param gpio gpio number (0-64)
  * @param value gpio value
  * @return true on success, else false
  */
 bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum mygpio_gpio_value value) {
-    if (gpio > GPIOS_MAX) {
-        return false;
-    }
     return libmygpio_send_line(connection, "gpioset %u %s", gpio, mygpio_gpio_lookup_value(value)) &&
         libmygpio_recv_response_status(connection) &&
         mygpio_response_end(connection);
@@ -63,10 +60,21 @@ bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum 
  * @return true on success, else false.
  */
 bool mygpio_gpiotoggle(struct t_mygpio_connection *connection, unsigned gpio) {
-    if (gpio > GPIOS_MAX) {
-        return false;
-    }
     return libmygpio_send_line(connection, "gpiotoggle %u", gpio) &&
+        libmygpio_recv_response_status(connection) &&
+        mygpio_response_end(connection);
+}
+
+/**
+ * Toggles the value of a configured output GPIO at given timeout and interval.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @param gpio GPIO number
+ * @param timeout_ms timeout in milliseconds
+ * @param interval_ms interval in milliseconds, set it 0 to blink only once.
+ * @return true on success, else false.
+ */
+bool mygpio_gpioblink(struct t_mygpio_connection *connection, unsigned gpio, int timeout, int interval) {
+    return libmygpio_send_line(connection, "gpiotoggle %u %d %d", gpio, timeout, interval) &&
         libmygpio_recv_response_status(connection) &&
         mygpio_response_end(connection);
 }

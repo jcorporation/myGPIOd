@@ -27,6 +27,9 @@ Connection timeout in milliseconds.
 
 .SH COMMANDS
 .TP
+\fBgpioblink <number> <timeout> <interval>\fR
+Toggles the value of an output gpio in the given timeout and interval. Use gpioset or gpiotoggle to disable blinking.
+.TP
 \fBgpioget <number>\fR
 Gets the current value of a gpio.
 .TP

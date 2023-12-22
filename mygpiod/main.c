@@ -115,9 +115,10 @@ int main(int argc, char **argv) {
     // save initial number of fds to poll
     unsigned pfd_len_init = poll_fds.len;
     while (true) {
-        // reset poll_fds length and re-add the timer fds
+        // reset poll_fds length and re-add the timer and client fds
         poll_fds.len = pfd_len_init;
-        event_add_gpio_timer_fds(config, &poll_fds);
+        event_add_gpio_in_timer_fds(config, &poll_fds);
+        event_add_gpio_out_timer_fds(config, &poll_fds);
         event_add_client_fds(config, &poll_fds);
 
         // poll

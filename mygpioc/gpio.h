@@ -14,5 +14,6 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
 int handle_gpioget(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);
 int handle_gpioset(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);
 int handle_gpiotoggle(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);
+int handle_gpioblink(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);
 
 #endif

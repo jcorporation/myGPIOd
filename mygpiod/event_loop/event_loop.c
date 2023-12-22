@@ -38,16 +38,32 @@ bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, int pfd_type, short 
 }
 
 /**
- * Adds the timer fds to the poll_fds
+ * Adds the timer fds from input GPIOs to the poll_fds
  * @param config pointer to config
  * @param poll_fds t_poll_fds struct to populate
  */
-void event_add_gpio_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds) {
+void event_add_gpio_in_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds) {
     struct t_list_node *current = config->gpios_in.head;
     while (current != NULL) {
         struct t_gpio_in_data *data = (struct t_gpio_in_data *)current->data;
         if (data->timer_fd > 0) {
-            event_poll_fd_add(poll_fds, data->timer_fd, PFD_TYPE_GPIO_TIMER, POLLIN | POLLPRI);
+            event_poll_fd_add(poll_fds, data->timer_fd, PFD_TYPE_GPIO_IN_TIMER, POLLIN | POLLPRI);
+        }
+        current = current->next;
+    }
+}
+
+/**
+ * Adds the timer fds from output GPIOs to the poll_fds
+ * @param config pointer to config
+ * @param poll_fds t_poll_fds struct to populate
+ */
+void event_add_gpio_out_timer_fds(struct t_config *config, struct t_poll_fds *poll_fds) {
+    struct t_list_node *current = config->gpios_out.head;
+    while (current != NULL) {
+        struct t_gpio_out_data *data = (struct t_gpio_out_data *)current->data;
+        if (data->timer_fd > 0) {
+            event_poll_fd_add(poll_fds, data->timer_fd, PFD_TYPE_GPIO_OUT_TIMER, POLLIN | POLLPRI);
         }
         current = current->next;
     }
@@ -86,8 +102,11 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
                 case PFD_TYPE_GPIO:
                     gpio_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
-                case PFD_TYPE_GPIO_TIMER:
-                    gpio_timer_handle_event(&poll_fds->fd[i].fd, config, i);
+                case PFD_TYPE_GPIO_IN_TIMER:
+                    gpio_in_timer_handle_event(config, &poll_fds->fd[i].fd);
+                    return true;
+                case PFD_TYPE_GPIO_OUT_TIMER:
+                    gpio_out_timer_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
                 case PFD_TYPE_SIGNAL:
                     return false;

@@ -10,6 +10,7 @@
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
+#include "mygpiod/lib/timer.h"
 #include "mygpiod/lib/util.h"
 
 #include <assert.h>
@@ -113,6 +114,7 @@ bool gpio_set_value(struct t_config *config, unsigned gpio, enum gpiod_line_valu
         return false;
     }
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
+    close_fd(&data->timer_fd);
     return gpiod_line_request_set_value(data->request, gpio, value) == 0
         ? true
         : false;
@@ -131,11 +133,45 @@ bool gpio_toggle_value(struct t_config *config, unsigned gpio) {
         return false;
     }
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
-    // get and toggle the value
-    enum gpiod_line_value value = gpiod_line_request_get_value(data->request, gpio) == GPIOD_LINE_VALUE_INACTIVE
+    close_fd(&data->timer_fd);
+    return gpio_toggle_value_by_line_request(data->request, node->id);
+}
+
+/**
+ * Toggles the current line value of an output gpio
+ * @param line_request the line request of the gpio
+ * @return true on success, else false
+ */
+bool gpio_toggle_value_by_line_request(struct gpiod_line_request *line_request, unsigned gpio) {
+    enum gpiod_line_value value = gpiod_line_request_get_value(line_request, gpio) == GPIOD_LINE_VALUE_INACTIVE
         ? GPIOD_LINE_VALUE_ACTIVE
         : GPIOD_LINE_VALUE_INACTIVE;
-    return gpiod_line_request_set_value(data->request, gpio, value) == 0
+    return gpiod_line_request_set_value(line_request, gpio, value) == 0
         ? true
         : false;
+}
+
+/**
+ * Toggles the value of an output gpio at given interval.
+ * The functions gpio_set_value and gpio_toggle_value are disabling the timer.
+ * @param config pointer to config
+ * @param gpio gpio to blink
+ * @param timeout_ms timeout for blink timer
+ * @param interval_ms interval for blink timer, set it to 0 to blink once
+ * @return true on success, else false
+ */
+bool gpio_blink(struct t_config *config, unsigned gpio, int timeout_ms, int interval_ms) {
+    struct t_list_node *node = list_node_by_id(&config->gpios_out, gpio);
+    if (node == NULL) {
+        MYGPIOD_LOG_ERROR("GPIO %u is not configured as output", gpio);
+        return false;
+    }
+    struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
+    if (gpio_toggle_value_by_line_request(data->request, node->id) == false) {
+        return false;
+    }
+    data->timer_fd = timer_new(timeout_ms, interval_ms);
+    return data->timer_fd == -1
+        ? false
+        : true;
 }

@@ -82,6 +82,9 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
         case CMD_GPIOTOGGLE:
             rc = handle_gpiotoggle(&options, config, client_node);
             break;
+        case CMD_GPIOBLINK:
+            rc = handle_gpioblink(&options, config, client_node);
+            break;
         case CMD_GPIOLIST:
             rc = handle_gpiolist(config, client_node);
             break;

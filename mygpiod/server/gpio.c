@@ -197,3 +197,39 @@ bool handle_gpiotoggle(struct t_cmd_options *options, struct t_config *config, s
     server_response_send(client_data, DEFAULT_MSG_ERROR "Setting GPIO value failed");
     return false;
 }
+
+/**
+ * Handles the gpioblink command
+ * @param options client command
+ * @param config pointer to config
+ * @param client_node client
+ * @return true on success, else false
+ */
+bool handle_gpioblink(struct t_cmd_options *options, struct t_config *config, struct t_list_node *client_node) {
+    struct t_client_data *client_data = (struct t_client_data *)client_node->data;
+    if (options->len != 4) {
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid number of arguments");
+        return false;
+    }
+    unsigned gpio;
+    if (mygpio_parse_uint(options->args[1], &gpio, NULL, 0, GPIOS_MAX) == false) {
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid GPIO number");
+        return false;
+    }
+    int timeout;
+    if (mygpio_parse_int(options->args[2], &timeout, NULL, 0, 9999) == false) {
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid timeout");
+        return false;
+    }
+    int interval;
+    if (mygpio_parse_int(options->args[3], &interval, NULL, 0, 9999) == false) {
+        server_response_send(client_data, DEFAULT_MSG_ERROR "Invalid interval");
+        return false;
+    }
+    if (gpio_blink(config, gpio, timeout, interval) == true) {
+        server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
+        return true;
+    }
+    server_response_send(client_data, DEFAULT_MSG_ERROR "Setting GPIO to blinking");
+    return false;
+}

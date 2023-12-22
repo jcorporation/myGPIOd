@@ -121,6 +121,12 @@ value:{active|inactive}
 END
 ```
 
+### gpioblink {gpio number} {timeout} {interval}
+
+Toggles the value of a configured output gpio at given timeout and interval. Set Interval to 0 to blink only once.
+
+Use the gpioset or gpiotoggle commands to disable blinking.
+
 ### gpioset {gpio number} {active|inactive}
 
 Sets the value of a configured output gpio.

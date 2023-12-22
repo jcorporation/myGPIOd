@@ -76,3 +76,23 @@ void timer_log_next_expire(int timer_fd) {
     int64_t timestamp = its.it_value.tv_sec * 1000 + its.it_value.tv_nsec / 1000000;
     MYGPIOD_LOG_DEBUG("Timer expires in %lld milliseconds", (long long)timestamp);
 }
+
+/**
+ * Checks if the timer is active
+ * @param timer_fd timer fd
+ * @return true = timer is active, false = timer is inactive
+ */
+bool timer_repeat(int timer_fd) {
+    struct itimerspec its;
+    errno = 0;
+    if (timerfd_gettime(timer_fd, &its) == -1) {
+        MYGPIOD_LOG_ERROR("Can not get expiration for timer: \"%s\"", strerror(errno));
+        return false;
+    }
+    if (its.it_value.tv_sec == 0 &&
+        its.it_value.tv_nsec == 0)
+    {
+        return false;
+    }
+    return true;
+}

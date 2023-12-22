@@ -175,3 +175,38 @@ int handle_gpiotoggle(int argc, char **argv, int option_index, struct t_mygpio_c
     mygpio_response_end(conn);
     return EXIT_SUCCESS;
 }
+
+/**
+ * Toggles an output gpio at given timeout and interval.
+ * @param argc argument count
+ * @param argv argument list
+ * @param option_index parsed option index
+ * @param conn connection struct
+ * @return 0 on success, else 1
+ */
+int handle_gpioblink(int argc, char **argv, int option_index, struct t_mygpio_connection *conn) {
+    (void)argc;
+    unsigned gpio;
+    if (mygpio_parse_uint(argv[option_index], &gpio, NULL, 0, GPIOS_MAX) == false) {
+        fprintf(stderr, "Invalid gpio number\n");
+        return EXIT_FAILURE;
+    }
+    int timeout;
+    if (mygpio_parse_int(argv[option_index], &timeout, NULL, 0, 9999) == false) {
+        fprintf(stderr, "Invalid timeout\n");
+        return EXIT_FAILURE;
+    }
+    int interval;
+    if (mygpio_parse_int(argv[option_index], &interval, NULL, 0, 9999) == false) {
+        fprintf(stderr, "Invalid interval\n");
+        return EXIT_FAILURE;
+    }
+    verbose_printf("Sending gpioblink");
+    if (mygpio_gpioblink(conn, gpio, timeout, interval) == false) {
+        fprintf(stderr, "Error: %s\n", mygpio_connection_get_error(conn));
+        mygpio_response_end(conn);
+        return EXIT_FAILURE;
+    }
+    mygpio_response_end(conn);
+    return EXIT_SUCCESS;
+}

@@ -19,6 +19,7 @@ enum mygpiod_actions {
     MYGPIOD_ACTION_SYSTEM,        //!< System action
     MYGPIOD_ACTION_GPIO_SET,      //!< Set a GPIO value
     MYGPIOD_ACTION_GPIO_TOGGLE,   //!< Toggle a GPIO value
+    MYGPIOD_ACTION_GPIO_BLINK,    //!< Blink a GPIO value
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         MYGPIOD_ACTION_MPC,       //!< Controls MPD
     #endif

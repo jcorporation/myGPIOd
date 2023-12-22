@@ -72,3 +72,40 @@ bool action_gpiotoggle(struct t_config *config, const char *cmd) {
     sdsfreesplitres(args, count);
     return gpio_toggle_value(config, gpio);
 }
+
+/**
+ * Blink the value of an output gpio
+ * @param cmd command to parse, format:
+ *            {gpio} {timeout} {interval}
+ * @returns true on success, else false
+ */
+bool action_gpioblink(struct t_config *config, const char *cmd) {
+    int count = 0;
+    sds *args = sdssplitargs(cmd, &count);
+
+    if (count != 3) {
+        MYGPIOD_LOG_ERROR("Invalid number of arguments");
+        sdsfreesplitres(args, count);
+        return false;
+    }
+    unsigned gpio;
+    if (mygpio_parse_uint(args[0], &gpio, NULL, 0, GPIOS_MAX) == false) {
+        MYGPIOD_LOG_ERROR("Invalid gpio number");
+        sdsfreesplitres(args, count);
+        return false;
+    }
+    int timeout;
+    if (mygpio_parse_int(args[0], &timeout, NULL, 0, 9999) == false) {
+        MYGPIOD_LOG_ERROR("Invalid timeout");
+        sdsfreesplitres(args, count);
+        return false;
+    }
+    int interval;
+    if (mygpio_parse_int(args[0], &interval, NULL, 0, 9999) == false) {
+        MYGPIOD_LOG_ERROR("Invalid interval");
+        sdsfreesplitres(args, count);
+        return false;
+    }
+    sdsfreesplitres(args, count);
+    return gpio_blink(config, gpio, timeout, interval);
+}

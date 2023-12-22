@@ -9,6 +9,7 @@
 
 #include "mygpiod/lib/config.h"
 
-bool gpio_timer_handle_event(int *fd, struct t_config *config, unsigned idx);
+bool gpio_in_timer_handle_event(struct t_config *config, int *fd);
+bool gpio_out_timer_handle_event(struct t_config *config, int *fd);
 
 #endif

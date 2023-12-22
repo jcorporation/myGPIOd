@@ -20,6 +20,7 @@
     X(CMD_GPIOGET) \
     X(CMD_GPIOSET) \
     X(CMD_GPIOTOGGLE) \
+    X(CMD_GPIOBLINK) \
     X(CMD_GPIOINFO) \
     X(CMD_EVENT) \
     X(CMD_COUNT)

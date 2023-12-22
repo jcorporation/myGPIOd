@@ -57,6 +57,16 @@ bool mygpio_gpioset(struct t_mygpio_connection *connection, unsigned gpio, enum 
 bool mygpio_gpiotoggle(struct t_mygpio_connection *connection, unsigned gpio);
 
 /**
+ * Toggles the value of a configured output GPIO at given timeout and interval.
+ * @param connection Pointer to the connection struct returned by mygpio_connection_new.
+ * @param gpio GPIO number
+ * @param timeout_ms timeout in milliseconds
+ * @param interval_ms interval in milliseconds, set it 0 to blink only once.
+ * @return true on success, else false.
+ */
+bool mygpio_gpioblink(struct t_mygpio_connection *connection, unsigned gpio, int timeout, int interval);
+
+/**
  * @}
  */
 

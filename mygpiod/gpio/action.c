@@ -181,6 +181,9 @@ static void action_execute(struct t_config *config, struct t_list *actions) {
             case MYGPIOD_ACTION_GPIO_TOGGLE:
                 action_gpiotoggle(config, action->option);
                 break;
+            case MYGPIOD_ACTION_GPIO_BLINK:
+                action_gpioblink(config, action->option);
+                break;
         #ifdef MYGPIOD_ENABLE_ACTION_MPC
             case MYGPIOD_ACTION_MPC:
                 action_mpc(config, action->option);
