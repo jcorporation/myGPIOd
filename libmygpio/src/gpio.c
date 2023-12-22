@@ -10,7 +10,6 @@
 #include "libmygpio/include/libmygpio/libmygpio_protocol.h"
 #include "libmygpio/src/pair.h"
 #include "libmygpio/src/protocol.h"
-#include "mygpio-common/util.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -74,7 +73,7 @@ bool mygpio_gpiotoggle(struct t_mygpio_connection *connection, unsigned gpio) {
  * @return true on success, else false.
  */
 bool mygpio_gpioblink(struct t_mygpio_connection *connection, unsigned gpio, int timeout, int interval) {
-    return libmygpio_send_line(connection, "gpiotoggle %u %d %d", gpio, timeout, interval) &&
+    return libmygpio_send_line(connection, "gpioblink %u %d %d", gpio, timeout, interval) &&
         libmygpio_recv_response_status(connection) &&
         mygpio_response_end(connection);
 }

@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 /**
- * Gobal variable that indicates if the pollfds array must be updated
+ * Global variable that indicates if the poll fds array must be updated
  */
 bool update_pollfds;
 
@@ -39,7 +39,7 @@ const char *lookup_pfd_type(enum pfd_types type) {
         case PFD_TYPE_SIGNAL:
             return "signal";
         case PFD_TYPE_CONNECT:
-            return "client connect";
+            return "server socket";
         case PFD_TYPE_CLIENT:
             return "client socket";
         case PFD_TYPE_CLIENT_TIMEOUT:
