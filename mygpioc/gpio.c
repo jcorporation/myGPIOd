@@ -191,11 +191,13 @@ int handle_gpioblink(int argc, char **argv, int option_index, struct t_mygpio_co
         fprintf(stderr, "Invalid gpio number\n");
         return EXIT_FAILURE;
     }
+    option_index++;
     int timeout;
     if (mygpio_parse_int(argv[option_index], &timeout, NULL, 0, 9999) == false) {
         fprintf(stderr, "Invalid timeout\n");
         return EXIT_FAILURE;
     }
+    option_index++;
     int interval;
     if (mygpio_parse_int(argv[option_index], &interval, NULL, 0, 9999) == false) {
         fprintf(stderr, "Invalid interval\n");
