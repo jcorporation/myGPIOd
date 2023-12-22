@@ -69,8 +69,11 @@ myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
 ### Configuration steps
 
-- Adapt the configuration file `/etc/mygpiod.conf` to your needs.
-- Create GPIO configuration files in the directory `/etc/mygpiod.d`. There are example configuration files for input and output configuration. myGPIOd only accesses GPIOs configured in this files.
+- Adapt the configuration file `/etc/mygpiod.conf` to your needs. All options are documented in the file.
+- Create GPIO configuration files in the directory `/etc/mygpiod.d`. There are documented example configuration files for input and output configuration. myGPIOd only accesses GPIOs configured in this files.
+- GPIO configuration file names: `<gpio number>.<direction>`
+  - `<gpio number>`: This is the line number of the GPIO.
+  - `<direction>`: Configures the GPIO line direction, `<in>` for input and `<out>` for output.
 
 ```sh
 /usr/bin/mygpiod [/etc/mygpiod.conf]
@@ -115,17 +118,30 @@ This example configuration does the following:
   - Enables the pull-up resistor on start
   - Enabled the long press action for falling event
   - Increases the mpd volume by 5 % after 100 ms and each 500 ms as long the button is pressed
+- Configures GPIO 8 as input:
+  - Enables the pull-up resistor on start
+  - On falling event:
+    - Set GPIO 6 for 1000 ms to active
+    - Execute the Jukebox script through the myMPD API
 
 **/etc/mygpiod.conf**
 ```
+# GPIO chip to use
 chip = /dev/gpiochip0
+
+# The loglevel
 loglevel = info
+
+# Log to stdout
 syslog = 0
+
+# Directory for GPIO configuration files
 gpio_dir = /etc/mygpiod.d
 ```
 
 **/etc/mygpiod.d/3.in**
 ```
+# Configuration file for GPIO 3 as input
 # Request falling and rising events
 event_request = both
 
@@ -139,20 +155,30 @@ bias = pull-up
 # The rising event is not triggered if GPIO 6 is pressed longer than 2000 ms.
 action_rising = system:/usr/local/bin/poweroff.sh
 
-# Reboot on long press and activate a LED for maximal 2s while GPIO 6 is pressed
+# Reboot on long press and activate a LED for maximal 2s while GPIO 6 is pressed.
+
 # Set GPIO 6 active on falling
 action_falling = gpioset:6 active
 
-# Enable long press for falling
+# Enable long press for falling.
 long_press_event = falling
+
+# Set the long press timeout to 2000 ms.
 long_press_timeout = 2000
+
+# Disable the long press interval.
 long_press_interval = 0
+
+# First action for long press is to toggle the value of GPIO 6.
 long_press_action = gpiotoggle:6
+
+# Second action for long press is to run a script.
 long_press_action = system:/usr/local/bin/reboot.sh
 ```
 
 **/etc/mygpiod.d/4.in**
 ```
+# Configuration file for GPIO 4 as input
 # Request the falling event
 event_request = falling
 
@@ -165,18 +191,21 @@ action_falling = mpc:next
 
 **/etc/mygpiod.d/5.out**
 ```
+# Configuration file for GPIO 5 as output
 # Set the GPIO to active
 value = active
 ```
 
 **/etc/mygpiod.d/6.out**
 ```
+# Configuration file for GPIO 6 as output
 # Set the GPIO to inactive
 value = inactive
 ```
 
 **/etc/mygpiod.d/7.in**
 ```
+# Configuration file for GPIO 7 as input
 # Request the falling event
 event_request = falling
 
@@ -195,6 +224,20 @@ long_press_interval = 500
 # Use libmpdclient to connect to mpd and send the command `volume +5`
 # This increases the volume by 5 percent
 long_press_action = mpc:volume +5
+```
+
+**/etc/mygpiod.d/8.in**
+```
+# Configuration file for GPIO 8 as input
+# Request the falling event
+event_request = falling
+
+# Enable the internal pull-up resistor
+bias = pull-up
+
+# Execute the Jukebox script through the myMPD API
+action_falling = gpioblink:6 1000 0
+action_falling = mympd:https://127.0.0.1 default Jukebox
 ```
 
 ## Protocol
