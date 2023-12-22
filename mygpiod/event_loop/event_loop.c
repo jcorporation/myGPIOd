@@ -147,10 +147,14 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
                     gpio_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
                 case PFD_TYPE_GPIO_IN_TIMER:
-                    gpio_in_timer_handle_event(config, &poll_fds->fd[i].fd);
+                    if (poll_fds->fd[i].revents & POLLIN) {
+                        gpio_in_timer_handle_event(config, &poll_fds->fd[i].fd);
+                    }
                     return true;
                 case PFD_TYPE_GPIO_OUT_TIMER:
-                    gpio_out_timer_handle_event(config, &poll_fds->fd[i].fd);
+                    if (poll_fds->fd[i].revents & POLLIN) {
+                        gpio_out_timer_handle_event(config, &poll_fds->fd[i].fd);
+                    }
                     return true;
                 case PFD_TYPE_SIGNAL:
                     return false;
