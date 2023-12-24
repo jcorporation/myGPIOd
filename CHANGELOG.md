@@ -4,7 +4,7 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.5.0 (not yet released)
+## myGPIOd v0.5.0 (2023-12-24)
 
 This release adds more actions.
 
@@ -16,7 +16,7 @@ This release adds more actions.
 - Feat: New HTTP action submits arbitrary GET and POST requests.
 - Feat: New myMPD action triggers myMPD scripts through the myMPD api.
 - Upd: Improved build system.
-- Fix: Memory leak in gpio set actions.
+- Fix: Memory leak in GPIO set actions.
 - Fix: Lookup correct event request.
 
 ***
