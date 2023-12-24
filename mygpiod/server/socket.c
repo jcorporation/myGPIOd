@@ -126,12 +126,17 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
     }
     struct t_client_data *data = (struct t_client_data *)node->data;
 
-    if ((client_fd->revents & POLLHUP) ||
-        (client_fd->revents & POLLERR) ||
-        (client_fd->revents & POLLNVAL))
-    {
+    if (client_fd->revents & POLLHUP) {
+        MYGPIOD_LOG_DEBUG("Client#%u: POLLHUP received", node->id);
         server_client_disconnect(&config->clients, node);
         return true;
+    }
+    if ((client_fd->revents & POLLERR) ||
+        (client_fd->revents & POLLNVAL))
+    {
+        MYGPIOD_LOG_WARN("Client#%u: Socket error", node->id);
+        server_client_disconnect(&config->clients, node);
+        return false;
     }
 
     switch(data->state) {
@@ -179,6 +184,7 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
             return true;
         }
     }
+    MYGPIOD_LOG_WARN("Unknown client socket state: \"%d\"", data->state);
     return false;
 }
 
@@ -272,7 +278,7 @@ bool server_client_timeout(struct t_list *clients, int *timeout_fd) {
 // private functions
 
 /**
- * Gets the gpio in node by timerfd
+ * Gets the client node by timer_fd
  * @param clients list of clients
  * @param fd client fd
  * @return the list node or NULL on error
@@ -290,9 +296,9 @@ static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd)
 }
 
 /**
- * Gets the client node by timeout fd
+ * Gets the client node by timeout_fd
  * @param clients list of clients
- * @param fd timeout fd
+ * @param fd timeout_fd
  * @return the list node or NULL on error
  */
 static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd) {
