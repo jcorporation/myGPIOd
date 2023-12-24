@@ -1,4 +1,4 @@
-.TH "libmygpio/include/libmygpio/libmygpio_gpio.h" 3 "Wed Dec 20 2023" "libmygpio" \" -*- nroff -*-
+.TH "libmygpio/include/libmygpio/libmygpio_gpio.h" 3 "Sun Dec 24 2023" "libmygpio" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -23,6 +23,9 @@ libmygpio/include/libmygpio/libmygpio_gpio.h \- myGPIOd client library
 .br
 .ti -1c
 .RI "bool \fBmygpio_gpiotoggle\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio)"
+.br
+.ti -1c
+.RI "bool \fBmygpio_gpioblink\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio, int timeout_ms, int interval_ms)"
 .br
 .in -1c
 .SH "Detailed Description"

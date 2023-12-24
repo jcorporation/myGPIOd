@@ -64,7 +64,7 @@ bool mygpio_gpiotoggle(struct t_mygpio_connection *connection, unsigned gpio);
  * @param interval_ms interval in milliseconds, set it 0 to blink only once.
  * @return true on success, else false.
  */
-bool mygpio_gpioblink(struct t_mygpio_connection *connection, unsigned gpio, int timeout, int interval);
+bool mygpio_gpioblink(struct t_mygpio_connection *connection, unsigned gpio, int timeout_ms, int interval_ms);
 
 /**
  * @}

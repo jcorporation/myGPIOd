@@ -1,4 +1,4 @@
-.TH "libmygpio_gpio_functions" 3 "Wed Dec 20 2023" "libmygpio" \" -*- nroff -*-
+.TH "libmygpio_gpio_functions" 3 "Sun Dec 24 2023" "libmygpio" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -21,6 +21,9 @@ libmygpio_gpio_functions \- GPIO functions
 .ti -1c
 .RI "bool \fBmygpio_gpiotoggle\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio)"
 .br
+.ti -1c
+.RI "bool \fBmygpio_gpioblink\fP (struct \fBt_mygpio_connection\fP *connection, unsigned gpio, int timeout_ms, int interval_ms)"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -29,6 +32,26 @@ This module provides functions to set and get values of a GPIO\&.
 
 .SH "Function Documentation"
 .PP 
+.SS "bool mygpio_gpioblink (struct \fBt_mygpio_connection\fP * connection, unsigned gpio, int timeout_ms, int interval_ms)"
+Toggles the value of a configured output GPIO at given timeout and interval\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.br
+\fIgpio\fP GPIO number 
+.br
+\fItimeout_ms\fP timeout in milliseconds 
+.br
+\fIinterval_ms\fP interval in milliseconds, set it 0 to blink only once\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false\&. 
+.RE
+.PP
+
 .SS "enum \fBmygpio_gpio_value\fP mygpio_gpioget (struct \fBt_mygpio_connection\fP * connection, unsigned gpio)"
 Returns the current value of a configured input or output GPIO\&. 
 .PP
