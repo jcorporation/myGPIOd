@@ -13,7 +13,7 @@ libmygpio_idle_event \- Idle events
 
 .in +1c
 .ti -1c
-.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_FALLING\fP, \fBMYGPIO_EVENT_RISING\fP, \fBMYGPIO_EVENT_LONG_PRESS\fP }"
+.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_FALLING\fP, \fBMYGPIO_EVENT_RISING\fP, \fBMYGPIO_EVENT_LONG_PRESS\fP, \fBMYGPIO_EVENT_LONG_PRESS_RELEASE\fP }"
 .br
 .in -1c
 .SS "Functions"
@@ -77,6 +77,9 @@ rising
 .TP
 \fB\fIMYGPIO_EVENT_LONG_PRESS \fP\fP
 long_press 
+.TP
+\fB\fIMYGPIO_EVENT_LONG_PRESS_RELEASE \fP\fP
+long_press release 
 .SH "Function Documentation"
 .PP 
 .SS "void mygpio_free_idle_event (struct \fBt_mygpio_idle_event\fP * event)"

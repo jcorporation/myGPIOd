@@ -372,7 +372,7 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
     if (strcmp(key, "action_rising") == 0) {
         struct t_action *action_data = action_node_data_from_value(value);
         if (action_data != NULL) {
-            return list_push(&data->action_rising, data->action_falling.length, action_data);
+            return list_push(&data->action_rising, data->action_rising.length, action_data);
         }
         return false;
     }
@@ -395,7 +395,14 @@ static bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_da
     if (strcmp(key, "long_press_action") == 0) {
         struct t_action *action_data = action_node_data_from_value(value);
         if (action_data != NULL) {
-            return list_push(&data->long_press_action, data->action_falling.length, action_data);
+            return list_push(&data->long_press_action, data->long_press_action.length, action_data);
+        }
+        return false;
+    }
+    if (strcmp(key, "long_press_release_action") == 0) {
+        struct t_action *action_data = action_node_data_from_value(value);
+        if (action_data != NULL) {
+            return list_push(&data->long_press_release_action, data->long_press_release_action.length, action_data);
         }
         return false;
     }
@@ -436,6 +443,7 @@ static struct t_gpio_in_data *gpio_in_data_new(void) {
     data->long_press_timeout_ms = 0;
     data->long_press_interval_ms = 0;
     list_init(&data->long_press_action);
+    list_init(&data->long_press_release_action);
     data->long_press_event = GPIOD_LINE_EDGE_FALLING;
     data->long_press_value = GPIOD_LINE_VALUE_ERROR;
     data->ignore_event = false;
@@ -466,6 +474,7 @@ static void gpio_in_data_clear(struct t_gpio_in_data *data) {
     list_clear(&data->action_falling, node_data_action_clear);
     list_clear(&data->action_rising, node_data_action_clear);
     list_clear(&data->long_press_action, node_data_action_clear);
+    list_clear(&data->long_press_release_action, node_data_action_clear);
 }
 
 /**

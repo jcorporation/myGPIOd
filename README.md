@@ -67,7 +67,7 @@ This builds and installs the `mygpiod` daemon, `mygpioc` command line tool, the 
 
 myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
-### Configuration steps
+## Configuration steps
 
 - Adapt the configuration file `/etc/mygpiod.conf` to your needs. All options are documented in the file.
 - Create GPIO configuration files in the directory `/etc/mygpiod.d`. There are documented example configuration files for input and output configuration. myGPIOd only accesses GPIOs configured in this files.
@@ -81,7 +81,18 @@ myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
 The cmake install script creates a startup script for systemd, openrc or sysVinit.
 
-## Events and actions
+## Events
+
+Events are triggered through changes of input GPIO values.
+
+| EVENT | DESCRIPTION |
+| ----- | ----------- |
+| falling | State of GPIO has changed from active to inactive. |
+| rising | State of GPIO has changed from inactive to active. |
+| long_press | GPIO was pressed long. Event is triggered after configurable delay. |
+| long_press_release | GPIO changing it's state after a long press event. |
+
+## Actions
 
 Each event can have multiple actions. Actions and its arguments are delimited by a colon, arguments are delimited by space.
 
@@ -105,7 +116,7 @@ This example configuration does the following:
   - Enables the pull-up resistor on start
   - Sets GPIO 6 to active on falling event
   - Calls `/usr/local/bin/reboot.sh` after a button press (falling) of 2 seconds length
-  - Toggles the value of GPIO 6 on long_press
+  - Toggles the value of GPIO 6 on release event of the long press event
   - Calls `/usr/local/bin/poweroff.sh` on a short press (rising)
 - Configures GPIO 4 as input:
   - Enables the pull-up resistor on start
@@ -169,11 +180,11 @@ long_press_timeout = 2000
 # Disable the long press interval.
 long_press_interval = 0
 
-# First action for long press is to toggle the value of GPIO 6.
-long_press_action = gpiotoggle:6
-
-# Second action for long press is to run a script.
+# Action for long press is to run a script.
 long_press_action = system:/usr/local/bin/reboot.sh
+
+# Action for releasing the button after a long press is to toggle the value of GPIO 6.
+long_press_release_action = gpiotoggle:6
 ```
 
 **/etc/mygpiod.d/4.in**

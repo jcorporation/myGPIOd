@@ -56,3 +56,7 @@ event_clock = monotonic
 # The long press action
 # Multiple lines are supported
 #long_press_action = system:/bin/true
+
+# The long press release action
+# Multiple lines are supported
+#long_press_release_action = system:/bin/true

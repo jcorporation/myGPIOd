@@ -8,6 +8,8 @@ https://github.com/jcorporation/myGPIOd
 
 ### Changelog
 
+- Feat: Add long_press_release event for input GPIOs.
+
 ***
 
 ## myGPIOd v0.5.0 (2023-12-24)

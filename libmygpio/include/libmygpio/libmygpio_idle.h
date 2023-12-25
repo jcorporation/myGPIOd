@@ -43,10 +43,11 @@ struct t_mygpio_idle_event;
  * Possible event types
  */
 enum mygpio_event {
-    MYGPIO_EVENT_UNKNOWN = -1,  //!< unknown
-    MYGPIO_EVENT_FALLING,       //!< falling
-    MYGPIO_EVENT_RISING,        //!< rising
-    MYGPIO_EVENT_LONG_PRESS     //!< long_press
+    MYGPIO_EVENT_UNKNOWN = -1,       //!< unknown
+    MYGPIO_EVENT_FALLING,            //!< falling
+    MYGPIO_EVENT_RISING,             //!< rising
+    MYGPIO_EVENT_LONG_PRESS,         //!< long_press
+    MYGPIO_EVENT_LONG_PRESS_RELEASE  //!< long_press release
 };
 
 /**

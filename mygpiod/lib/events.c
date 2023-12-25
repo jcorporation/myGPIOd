@@ -71,6 +71,8 @@ const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
             return "rising";
         case MYGPIOD_EVENT_LONG_PRESS:
             return "long_press";
+        case MYGPIOD_EVENT_LONG_PRESS_RELEASE:
+            return "long_press_release";
     }
     return "";
 }
