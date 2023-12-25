@@ -4,6 +4,12 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.6.0 (not yet released)
+
+### Changelog
+
+***
+
 ## myGPIOd v0.5.0 (2023-12-24)
 
 This release adds more actions.
