@@ -67,6 +67,12 @@ This builds and installs the `mygpiod` daemon, `mygpioc` command line tool, the 
 
 myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
+```sh
+/usr/bin/mygpiod [/etc/mygpiod.conf]
+```
+
+The cmake install script creates a startup script for systemd, openrc or sysVinit.
+
 ### Configuration steps
 
 - Adapt the configuration file `/etc/mygpiod.conf` to your needs. All options are documented in the file.
@@ -74,12 +80,6 @@ myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 - GPIO configuration file names: `<gpio number>.<direction>`
   - `<gpio number>`: This is the line number of the GPIO.
   - `<direction>`: Configures the GPIO line direction, `<in>` for input and `<out>` for output.
-
-```sh
-/usr/bin/mygpiod [/etc/mygpiod.conf]
-```
-
-The cmake install script creates a startup script for systemd, openrc or sysVinit.
 
 ## Events and actions
 
