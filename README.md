@@ -63,6 +63,40 @@ This builds and installs the `mygpiod` daemon, `mygpioc` command line tool, the 
 
 myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
+```sh
+/usr/bin/mygpiod [/etc/mygpiod.conf]
+```
+
+The cmake install script creates a startup script for systemd, openrc or sysVinit.
+
+### Docker
+
+Example docker compose file to start myGPIOd.
+
+```yml
+---
+version: "3.x"
+services:
+  mygpiod:
+    image: ghcr.io/jcorporation/mygpiod/mygpiod
+    container_name: mygpiod
+    network_mode: "host"
+    user: 1000:1000
+    environment:
+      - MPD_HOST=localhost
+    volumes:
+      - /dev/gpiochip0:/dev/gpiochip0
+      - /etc/mygpiod.conf:/etc/mygpiod.conf
+      - /etc/mygpiod.d/:/etc/mygpiod.d/
+    restart: unless-stopped
+```
+
+To run `mygpioc` in the already running mygpiod container:
+
+```sh
+docker exec mygpiod mygpioc gpiolist
+```
+
 ## Configuration steps
 
 - Adapt the configuration file `/etc/mygpiod.conf` to your needs. All options are documented in the file.
@@ -70,12 +104,6 @@ myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 - GPIO configuration file names: `<gpio number>.<direction>`
   - `<gpio number>`: This is the line number of the GPIO.
   - `<direction>`: Configures the GPIO line direction, `<in>` for input and `<out>` for output.
-
-```sh
-/usr/bin/mygpiod [/etc/mygpiod.conf]
-```
-
-The cmake install script creates a startup script for systemd, openrc or sysVinit.
 
 ## Events
 
@@ -259,7 +287,7 @@ socat unix-client:/run/mygpiod/socket stdio
 
 ## Command line client
 
-The `mygpioc` command line client connects to the socket to control myGPIOd.
+The `mygpioc` command line client connects to the socket `/run/mygpiod/socket` to control myGPIOd.
 
 ```sh
 mygpioc -h
