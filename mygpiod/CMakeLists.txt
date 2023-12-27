@@ -45,7 +45,7 @@ if (MYGPIOD_DEBUG)
 endif()
 
 target_link_libraries(mygpiod
-  gpiod
+  "${LIBGPIOD_LIBRARIES}"
   sds
   mygpio-common
 )
@@ -56,7 +56,7 @@ if (MYGPIOD_ENABLE_ACTION_MPC)
       "${LIBMPDCLIENT_INCLUDE_DIRS}"
   )
   target_sources(mygpiod PRIVATE
-    actions/http.c
+    actions/mpc.c
   )
   target_link_libraries(mygpiod
     "${LIBMPDCLIENT_LIBRARIES}"
@@ -69,7 +69,7 @@ if (MYGPIOD_ENABLE_ACTION_HTTP)
       "${LIBCURL_INCLUDE_DIRS}"
   )
   target_sources(mygpiod PRIVATE
-    actions/mpc.c
+    actions/http.c
     actions/mympd.c
   )
   target_link_libraries(mygpiod

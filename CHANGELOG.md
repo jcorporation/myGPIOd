@@ -9,6 +9,9 @@ https://github.com/jcorporation/myGPIOd
 ### Changelog
 
 - Feat: Add long_press_release event for input GPIOs.
+- Feat: Include a static version of libgpiod if not found as shared library.
+- Feat: Improve packaging for various distributions
+- Feat: Add docker image
 
 ***
 

@@ -17,7 +17,17 @@ Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
+BuildRequires:  libmpdclient-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  autoconf-archive
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+%if 0%{?fedora} >= 39
 BuildRequires:  libgpiod-devel
+%else
+BuildRequires:  git
+%endif
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description 
@@ -65,6 +75,7 @@ true
 %config(noreplace) /etc/mygpiod.conf
 %config() /etc/mygpiod.d/*
 %{_mandir}/man1/mygpio*
+%{_defaultdocdir}/mygpiod/*
 
 %files devel
 %{_datadir}/pkgconfig/libmygpio.pc

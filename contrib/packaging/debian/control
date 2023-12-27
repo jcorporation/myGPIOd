@@ -2,7 +2,7 @@ Source: mygpiod
 Section: misc
 Priority: optional
 Maintainer: Juergen Mang <mail@jcgames.de>
-Build-Depends: debhelper (>= 10), cmake
+Build-Depends: debhelper (>= 10), cmake, autoconf-archive, git, pkgconf, libmpdclient-dev, libcurl4-gnutls-dev
 Standards-Version: 4.1.2
 Homepage: https://jcorporation.github.io/myGPIOd/
 
