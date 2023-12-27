@@ -1,0 +1,18 @@
+name: release_minimal
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: installdeps
+      run: sudo apt-get -y install cmake build-essential autoconf-archive automake git pkgconf
+    - name: build
+      run: |
+        cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_ENABLE_ACTION_MPC=OFF -DMYGPIOD_ENABLE_ACTION_HTTP=OFF .
+        make -C release
+    - name: install
+      run: sudo make -C release install
