@@ -1,14 +1,14 @@
-#
 # SPDX-License-Identifier: GPL-3.0-or-later
 # myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
-#
 
 post_install() {
   post_upgrade;
 }
 
 post_upgrade() {
+  /sbin/ldconfig
+
   echo "Checking status of mygpiod system user and group"
   getent group gpio > /dev/null || groupadd -r gpio
   getent passwd mygpiod > /dev/null || useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
@@ -17,4 +17,8 @@ post_upgrade() {
   echo "Modify /etc/mygpiod.conf to suit your needs."
 
   exit 0
+}
+
+post_remove() {
+  /sbin/ldconfig
 }
