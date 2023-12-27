@@ -53,6 +53,11 @@ make -C release
 
 %install
 make -C release install DESTDIR=%{buildroot}
+if [ "%{_defaultdocdir}" == "/usr/share/doc/packages" ]
+then
+  install -d "%{buildroot}%{_defaultdocdir}"
+  mv -v "%{buildroot}/usr/share/doc/mygpiod" "%{buildroot}%{_defaultdocdir}/mygpiod"
+fi
 
 %post
 echo "Checking status of mygpiod system user and group"
