@@ -303,4 +303,4 @@ The `mygpioc` command line client is also based on this library.
 
 ## Copyright
 
-2020-2023 Juergen Mang <mail@jcgames.de>
+2020-2024 Juergen Mang <mail@jcgames.de>
