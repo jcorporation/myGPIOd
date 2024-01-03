@@ -42,7 +42,7 @@ Summary: Development package for %{name}
 %description devel
 Files for development with %{name}.
 
-%prep 
+%prep
 %setup -q -n %{name}-%{version}
 
 %build
@@ -92,5 +92,5 @@ true
 %{_mandir}/man3/libmygpio_*
 
 %changelog
-* Mon Dec 25 2023 Juergen Mang <mail@jcgames.de> 0.6.0-0
+* Wed Jan 03 2024 Juergen Mang <mail@jcgames.de> 0.6.0-0
 - Version from master
