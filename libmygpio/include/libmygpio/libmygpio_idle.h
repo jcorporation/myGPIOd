@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- libmygpio (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ libmygpio (c) 2020-2024 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -43,10 +43,11 @@ struct t_mygpio_idle_event;
  * Possible event types
  */
 enum mygpio_event {
-    MYGPIO_EVENT_UNKNOWN = -1,  //!< unknown
-    MYGPIO_EVENT_FALLING,       //!< falling
-    MYGPIO_EVENT_RISING,        //!< rising
-    MYGPIO_EVENT_LONG_PRESS     //!< long_press
+    MYGPIO_EVENT_UNKNOWN = -1,       //!< unknown
+    MYGPIO_EVENT_FALLING,            //!< falling
+    MYGPIO_EVENT_RISING,             //!< rising
+    MYGPIO_EVENT_LONG_PRESS,         //!< long_press
+    MYGPIO_EVENT_LONG_PRESS_RELEASE  //!< long_press release
 };
 
 /**

@@ -28,6 +28,12 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
 - **mygpioc - the command line client**
   - Connects to the mygpiod socket to control the various functions.
 
+## Installation
+
+- Build it yourself.
+- Use the [docker image](https://github.com/jcorporation?tab=packages&repo_name=myGPIOd).
+- Use [prebuild packages](https://download.opensuse.org/repositories/home:/jcorporation/).
+
 ## Build
 
 Building myGPIOd is straight forward.
@@ -41,17 +47,7 @@ Building myGPIOd is straight forward.
   - libcurl
   - libmpdclient2
 
-Only the current Fedora release packages the version 2 of libgpiod. For all other distributions, you must compile libgpiod yourself.
-
-### Build libgpiod
-
-Install it in `/usr/local` to avoid conflicts with an already installed libgpiod version.
-
-1. Get latest release tarball from [kernel.org git](https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/)
-2. Extract myGPIOd tarball and change path to this directory
-3. Run autotools: `./autogen.sh --enable-tools=yes --prefix=/usr/local`
-4. Build: `make`
-5. Install (as root): `make install`
+Only the current Fedora release packages the version 2 of libgpiod. If libgpiod version 2 is not found, the cmake script compiles it as a static library.
 
 ### Build myGPIOd
 
@@ -73,7 +69,35 @@ myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
 The cmake install script creates a startup script for systemd, openrc or sysVinit.
 
-### Configuration steps
+### Docker
+
+Example docker compose file to start myGPIOd.
+
+```yml
+---
+version: "3.x"
+services:
+  mygpiod:
+    image: ghcr.io/jcorporation/mygpiod/mygpiod
+    container_name: mygpiod
+    network_mode: "host"
+    user: 1000:1000
+    environment:
+      - MPD_HOST=localhost
+    volumes:
+      - /dev/gpiochip0:/dev/gpiochip0
+      - /etc/mygpiod.conf:/etc/mygpiod.conf
+      - /etc/mygpiod.d/:/etc/mygpiod.d/
+    restart: unless-stopped
+```
+
+To run `mygpioc` in the already running mygpiod container:
+
+```sh
+docker exec mygpiod mygpioc gpiolist
+```
+
+## Configuration steps
 
 - Adapt the configuration file `/etc/mygpiod.conf` to your needs. All options are documented in the file.
 - Create GPIO configuration files in the directory `/etc/mygpiod.d`. There are documented example configuration files for input and output configuration. myGPIOd only accesses GPIOs configured in this files.
@@ -81,7 +105,18 @@ The cmake install script creates a startup script for systemd, openrc or sysVini
   - `<gpio number>`: This is the line number of the GPIO.
   - `<direction>`: Configures the GPIO line direction, `<in>` for input and `<out>` for output.
 
-## Events and actions
+## Events
+
+Events are triggered through changes of input GPIO values.
+
+| EVENT | DESCRIPTION |
+| ----- | ----------- |
+| falling | State of GPIO has changed from active to inactive. |
+| rising | State of GPIO has changed from inactive to active. |
+| long_press | GPIO was pressed long. Event is triggered after configurable delay. |
+| long_press_release | GPIO changing it's state after a long press event. |
+
+## Actions
 
 Each event can have multiple actions. Actions and its arguments are delimited by a colon, arguments are delimited by space.
 
@@ -105,7 +140,7 @@ This example configuration does the following:
   - Enables the pull-up resistor on start
   - Sets GPIO 6 to active on falling event
   - Calls `/usr/local/bin/reboot.sh` after a button press (falling) of 2 seconds length
-  - Toggles the value of GPIO 6 on long_press
+  - Toggles the value of GPIO 6 on release event of the long press event
   - Calls `/usr/local/bin/poweroff.sh` on a short press (rising)
 - Configures GPIO 4 as input:
   - Enables the pull-up resistor on start
@@ -169,11 +204,11 @@ long_press_timeout = 2000
 # Disable the long press interval.
 long_press_interval = 0
 
-# First action for long press is to toggle the value of GPIO 6.
-long_press_action = gpiotoggle:6
-
-# Second action for long press is to run a script.
+# Action for long press is to run a script.
 long_press_action = system:/usr/local/bin/reboot.sh
+
+# Action for releasing the button after a long press is to toggle the value of GPIO 6.
+long_press_release_action = gpiotoggle:6
 ```
 
 **/etc/mygpiod.d/4.in**
@@ -252,7 +287,7 @@ socat unix-client:/run/mygpiod/socket stdio
 
 ## Command line client
 
-The `mygpioc` command line client connects to the socket to control myGPIOd.
+The `mygpioc` command line client connects to the socket `/run/mygpiod/socket` to control myGPIOd.
 
 ```sh
 mygpioc -h
@@ -268,4 +303,4 @@ The `mygpioc` command line client is also based on this library.
 
 ## Copyright
 
-2020-2023 Juergen Mang <mail@jcgames.de>
+2020-2024 Juergen Mang <mail@jcgames.de>

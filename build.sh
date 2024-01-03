@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 
@@ -198,6 +198,8 @@ pkgdebian() {
   check_cmd dpkg-buildpackage
   prepare
   cp -a contrib/packaging/debian .
+  install -d debian/mygpiod/DEBIAN
+  cp debian/triggers debian/mygpiod/DEBIAN
   export LC_TIME="en_GB.UTF-8"
   tar -czf "../mygpiod_${VERSION}.orig.tar.gz" -- *
 
@@ -221,7 +223,7 @@ pkgdebian() {
   if check_cmd lintian
   then
     echo "Checking package with lintian"
-    lintian "$PACKAGE"
+    lintian "$PACKAGE" || true
   else
     echo "WARNING: lintian not found, can't check package"
   fi
@@ -314,21 +316,22 @@ pkgosc() {
   cd "$STARTPATH" || exit 1
   cp "package/build/mygpiod-${VERSION}.tar.gz" "osc/$OSC_REPO/"
   
-  #if [ -f /etc/debian_version ]
-  #then
-  #  pkgdebian
-  #fi
+  if [ -f /etc/debian_version ]
+  then
+    pkgdebian
+  fi
 
   cd "$STARTPATH/osc" || exit 1
-  #if [ -f /etc/debian_version ]
-  #then
-  #  cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
-  #  cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
-  #  cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
-  #fi
+  if [ -f /etc/debian_version ]
+  then
+    cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
+    cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
+    cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
+  fi
   cp ../contrib/packaging/rpm/mygpiod.spec "$OSC_REPO/"
   cp ../contrib/packaging/arch/PKGBUILD "$OSC_REPO/"
   cp ../contrib/packaging/arch/archlinux.install "$OSC_REPO/"
+  cp ../libgpiod-2.1.tar.gz "$OSC_REPO/"
 
   cd "$OSC_REPO" || exit 1
   osc addremove
@@ -337,40 +340,10 @@ pkgosc() {
   osc commit -m "Update"
 }
 
-installdeps() {
-  echo "Platform: $(uname -m)"
-  if [ -f /etc/debian_version ]
-  then
-    #debian
-    apt-get update
-    apt-get install -y --no-install-recommends gcc cmake build-essential
-    echo "Debian has no native libgpiod v2 package, you must build it yourself."
-  elif [ -f /etc/arch-release ]
-  then
-    #arch
-    pacman -S gcc cmake
-    echo "Arch has no native libgpiod v2 package, you must build it yourself."
-  elif [ -f /etc/alpine-release ]
-  then
-    #alpine
-    apk add cmake alpine-sdk linux-headers
-    echo "Alpine Linux has no native libgpiod v2 package, you must build it yourself."
-  elif [ -f /etc/SuSE-release ]
-  then
-    #suse
-    zypper install gcc cmake unzip
-    echo "SuSe has no native libgpiod v2 package, you must build it yourself."
-  elif [ -f /etc/redhat-release ]
-  then
-    #fedora
-    yum install gcc cmake unzip libgpiod-devel
-  else 
-    echo "Unsupported distribution detected."
-    echo "You should manually install:"
-    echo "  - gcc"
-    echo "  - cmake"
-    echo "  - libgpiod v2"
-  fi
+pkgdocker() {
+  check_cmd docker
+  prepare
+  docker build --rm -t mygpiod -f "contrib/packaging/docker/Dockerfile" .
 }
 
 uninstall() {
@@ -451,9 +424,6 @@ case "$ACTION" in
   debug|asan|tsan|ubsan)
     builddebug
   ;;
-  installdeps)
-    installdeps
-  ;;
   cleanup)
     cleanup
     cleanuposc
@@ -472,6 +442,9 @@ case "$ACTION" in
   ;;
   pkgarch)
     pkgarch
+  ;;
+  pkgdocker)
+    pkgdocker
   ;;
   setversion)
     setversion
@@ -504,7 +477,6 @@ case "$ACTION" in
     echo "  asan|tsan|ubsan:  builds debug files in directory debug"
     echo "                    linked with the sanitizer"
     echo "  check:            runs clang-tidy on source files"
-    echo "  installdeps:      installs build and run dependencies"
     echo ""
     echo "Cleanup options:"
     echo "  cleanup:          cleanup source tree"
@@ -529,6 +501,7 @@ case "$ACTION" in
     echo "  pkgosc:           updates the open build service repository"
     echo "                    following environment variables are respected"
     echo "                      - OSC_REPO=\"home:jcorporation/myGPIOd\""
+    echo "  pkgdocker:        creates the docker image"
     echo ""
     echo "Misc options:"
     echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"

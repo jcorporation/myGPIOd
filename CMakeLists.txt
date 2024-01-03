@@ -1,17 +1,20 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 
 # minimal cmake version needed for new option handling
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 cmake_policy(SET CMP0003 NEW)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+  cmake_policy(SET CMP0135 NEW)
+endif()
 
 # myGPIO is written in C
 # supported compilers: gcc, clang
 project (mygpiod
-  VERSION 0.5.0
+  VERSION 0.6.0
   LANGUAGES C
 )
 
@@ -42,6 +45,7 @@ option(MYGPIOD_CLIENT "Builds the myGPIOd client, default ON" "ON")
 option(MYGPIOD_DAEMON "Builds the myGPIOd daemon, default ON" "ON")
 option(MYGPIOD_HEADER "Installs the myGPIOd headers, default ON" "ON")
 option(MYGPIOD_LIBRARY "Builds the myGPIOd library, default ON" "ON")
+option(MYGPIOD_STATIC_LIBGPIOD "Builds the libgpiod v2 as static library, default OFF" "OFF")
 # sanitizer options
 option(MYGPIOD_ENABLE_ASAN "Enables build with address sanitizer, default OFF" "OFF")
 option(MYGPIOD_ENABLE_TSAN "Enables build with thread sanitizer, default OFF" "OFF")
@@ -58,10 +62,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
 # find required dependencies
 if (MYGPIOD_DAEMON)
-  find_package(LIBGPIOD REQUIRED)
-  if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
-    message("Found libgpiod version: ${LIBGPIOD_VERSION}")
-    message(FATAL_ERROR "Required libgpiod version >= 2.0.0")
+  if(NOT MYGPIOD_STATIC_LIBGPIOD)
+    find_package(LIBGPIOD)
+    if (LIBGPIOD_FOUND)
+      message("Found libgpiod version is: ${LIBGPIOD_VERSION}")
+      if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
+        message("Required libgpiod version >= 2.0.0")
+        set(LIBGPIOD_FOUND "OFF")
+      endif()
+    endif()
+  endif()
+  if (NOT LIBGPIOD_FOUND)
+    include("cmake/InstallLIBGPIOD.cmake")
   endif()
 endif()
 

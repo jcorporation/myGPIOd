@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -26,13 +26,14 @@ struct t_gpio_in_data {
     bool active_low;                               //!< active state is low?
     unsigned long debounce_period_us;              //!< debounce period in microseconds
     enum gpiod_line_clock event_clock;             //!< the source clock for event timestamps
-    struct t_list action_rising;                   //!< command for rising event
-    struct t_list action_falling;                  //!< command for falling event
+    struct t_list action_rising;                   //!< list of actions for rising event
+    struct t_list action_falling;                  //!< list of actions for falling event
     enum gpiod_line_edge event_request;            //!< events to request for this gpio
     int gpio_fd;                                   //!< gpio file descriptor
     int long_press_timeout_ms;                     //!< timeout for the long press handler in milliseconds
     int long_press_interval_ms;                    //!< interval for the long press handler in milliseconds
-    struct t_list long_press_action;               //!< long press command
+    struct t_list long_press_action;               //!< list of action for long press
+    struct t_list long_press_release_action;       //!< list of actioin for long press release
     enum gpiod_line_edge long_press_event;         //!< event for the long press handler
     enum gpiod_line_value long_press_value;        //!< initial gpio value for the long press event
     bool ignore_event;                             //!< internal state for long press handler

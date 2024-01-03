@@ -20,19 +20,6 @@ jobs:
         language: [ 'cpp' ]
 
     steps:
-    - name: Install libgpiod v2
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install wget build-essential autoconf-archive automake
-        wget https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/snapshot/libgpiod-2.1.tar.gz
-        tar -xzf libgpiod-2.1.tar.gz
-        cd libgpiod-2.1
-        ./autogen.sh --prefix=/usr
-        make
-        sudo make install
-        cd ..
-        rm -rf libgpiod-2.1 libgpiod-2.1.tar.gz
-        
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -44,8 +31,8 @@ jobs:
 
     - name: Compile
       run: |
-        sudo ./build.sh installdeps 
-        ./build.sh debug 
+        sudo apt-get -y install cmake build-essential autoconf-archive automake git pkgconf libmpdclient-dev libcurl4-gnutls-dev
+        ./build.sh debug
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

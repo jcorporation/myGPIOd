@@ -1,1 +1,3 @@
 /etc/mygpiod.conf
+/etc/mygpiod.d/gpio-in.example
+/etc/mygpiod.d/gpio-out.example

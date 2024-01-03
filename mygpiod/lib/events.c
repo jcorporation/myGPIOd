@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -71,6 +71,8 @@ const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
             return "rising";
         case MYGPIOD_EVENT_LONG_PRESS:
             return "long_press";
+        case MYGPIOD_EVENT_LONG_PRESS_RELEASE:
+            return "long_press_release";
     }
     return "";
 }

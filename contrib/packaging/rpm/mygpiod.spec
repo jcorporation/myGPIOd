@@ -1,13 +1,11 @@
-#
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 # Maintainer: Juergen Mang <mail@jcgames.de>
-#
 
 Name:           mygpiod
-Version:        0.5.0
+Version:        0.6.0
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
@@ -17,7 +15,17 @@ Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
+BuildRequires:  libmpdclient-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  autoconf-archive
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+%if 0%{?fedora} >= 39
 BuildRequires:  libgpiod-devel
+%else
+BuildRequires:  git
+%endif
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description 
@@ -34,7 +42,7 @@ Summary: Development package for %{name}
 %description devel
 Files for development with %{name}.
 
-%prep 
+%prep
 %setup -q -n %{name}-%{version}
 
 %build
@@ -43,14 +51,23 @@ make -C release
 
 %install
 make -C release install DESTDIR=%{buildroot}
+if [ "%{_defaultdocdir}" == "/usr/share/doc/packages" ]
+then
+  install -d "%{buildroot}%{_defaultdocdir}"
+  mv -v "%{buildroot}/usr/share/doc/mygpiod" "%{buildroot}%{_defaultdocdir}/mygpiod"
+fi
 
 %post
+/sbin/ldconfig
 echo "Checking status of mygpiod system user and group"
 getent group mygpiod > /dev/null || groupadd -r mygpiod
 getent passwd mygpiod > /dev/null || useradd -r -g mygpiod -s /bin/false -d /var/lib/mygpiod mygpiod
 echo "myGPIOd installed"
 echo "Modify /etc/mygpiod.conf to suit your needs"
 true
+
+%postun
+/sbin/ldconfig
 
 %files 
 %license LICENSE.md
@@ -63,14 +80,17 @@ true
 %{_libdir}/libmygpio.so*
 /usr/lib/systemd/system/mygpiod.service
 %config(noreplace) /etc/mygpiod.conf
+%config() /etc/mygpiod.d
 %config() /etc/mygpiod.d/*
 %{_mandir}/man1/mygpio*
+%{_defaultdocdir}/mygpiod/*
 
 %files devel
 %{_datadir}/pkgconfig/libmygpio.pc
+%{_includedir}/libmygpio
 %{_includedir}/libmygpio/*
 %{_mandir}/man3/libmygpio_*
 
 %changelog
-* Sun Dec 24 2023 Juergen Mang <mail@jcgames.de> 0.5.0-0
+* Wed Jan 03 2024 Juergen Mang <mail@jcgames.de> 0.6.0-0
 - Version from master

@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- libmygpio (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ libmygpio (c) 2020-2024 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -32,6 +32,9 @@ enum mygpio_event mygpio_parse_event(const char *str) {
     if (strcmp(str, "long_press") == 0) {
         return MYGPIO_EVENT_LONG_PRESS;
     }
+    if (strcmp(str, "long_press_release") == 0) {
+        return MYGPIO_EVENT_LONG_PRESS_RELEASE;
+    }
     return MYGPIO_EVENT_UNKNOWN;
 }
 
@@ -48,6 +51,8 @@ const char *mygpio_lookup_event(enum mygpio_event event) {
             return "rising";
         case MYGPIO_EVENT_LONG_PRESS:
             return "long_press";
+        case MYGPIO_EVENT_LONG_PRESS_RELEASE:
+            return "long_press_release";
         case MYGPIO_EVENT_UNKNOWN:
             return "unknown";
     }

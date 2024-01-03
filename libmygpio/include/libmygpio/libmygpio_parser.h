@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- libmygpio (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ libmygpio (c) 2020-2024 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 

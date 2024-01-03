@@ -4,6 +4,19 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.6.0 (2023-01-03)
+
+This release improves mainly the packaging of myGPIOd.
+
+### Changelog
+
+- Feat: Add long_press_release event for input GPIOs.
+- Feat: Include a static version of libgpiod if shared library is not found.
+- Feat: Improve packaging for various distributions
+- Feat: Add docker image
+
+***
+
 ## myGPIOd v0.5.0 (2023-12-24)
 
 This release adds more actions.

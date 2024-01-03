@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2023 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -54,10 +54,12 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
         enum gpiod_edge_event_type event_type, struct t_gpio_in_data *data)
 {
     if (data->ignore_event == true) {
-        // long_press event has fired for this gpio, ignore the release event
-        MYGPIOD_LOG_INFO("Ignoring event: \"%s\" gpio: \"%u\" timestamp: \"%llu ns\"",
-            lookup_event_type(event_type), gpio, (long long unsigned)timestamp);
         data->ignore_event = false;
+        // long_press event has fired for this gpio
+        MYGPIOD_LOG_INFO("Event: \"long_press_release\" gpio: \"%u\" timestamp: \"%llu ns\"",
+            gpio, (long long unsigned)timestamp);
+        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS_RELEASE, timestamp);
+        action_execute(config, &data->long_press_release_action);
         return;
     }
 
