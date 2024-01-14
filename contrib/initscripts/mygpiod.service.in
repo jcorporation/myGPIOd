@@ -1,29 +1,32 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
+# myMPD (c) 2020-2024 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/mygpiod
 
 [Unit]
 Description=myGPIOd server daemon
+Documentation=man:mygpiod(1)
 Requires=local-fs.target
 
 [Service]
+DynamicUser=yes
 ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/mygpiod
-Type=simple
-
-User=mygpiod
-Group=gpio
-
-RuntimeDirectory=mygpiod
-
-# disallow writing to /usr, /bin, /sbin, ...
-ProtectSystem=yes
-
-# more paranoid security settings
-ProtectKernelTunables=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateDevices=no
+ProtectClock=yes
 ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
 ProtectKernelModules=yes
-RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ProtectKernelTunables=yes
+ProtectProc=invisible
+RestrictRealtime=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_UNIX
 RestrictNamespaces=yes
+RuntimeDirectory=mygpiod
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
 
 [Install]
 WantedBy=multi-user.target

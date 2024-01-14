@@ -59,9 +59,6 @@ fi
 
 %post
 /sbin/ldconfig
-echo "Checking status of mygpiod system user and group"
-getent group mygpiod > /dev/null || groupadd -r mygpiod || true
-getent passwd mygpiod > /dev/null || useradd -r -g mygpiod -s /bin/false -d /var/lib/mygpiod mygpiod || true
 echo "myGPIOd installed"
 echo "Modify /etc/mygpiod.conf to suit your needs"
 true

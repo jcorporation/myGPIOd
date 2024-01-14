@@ -69,6 +69,23 @@ myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
 The cmake install script creates a startup script for systemd, openrc or sysVinit.
 
+### Systemd
+
+You must enable and start the service manually. Use `systemctl enable mygpiod` to enable myGPIOd at startup and `systemctl start mygpiod` to start myGPIOd now.
+
+myGPIOd logs to STDERR, you can see the live logs with `journalctl -fu mygpiod`.
+
+The default myGPIOd service unit uses the `DynamicUser=` directive, therefore no static mygpiod user is created. If you want to change the group membership of this dynamic user, you must add an override.
+
+**Example: add the mygpiod user to the gpio group**
+
+```sh
+mkdir /etc/systemd/system/mygpiod.service.d
+echo -e '[Service]\nSupplementaryGroups=gpio' > /etc/systemd/system/mygpiod.service.d/gpio-group.conf
+```
+
+- **Note:** The default systemd service unit supports only systemd v235 and above.
+
 ### Docker
 
 Example docker compose file to start myGPIOd.
