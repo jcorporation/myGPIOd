@@ -5,7 +5,7 @@
 # Maintainer: Juergen Mang <mail@jcgames.de>
 
 Name:           mygpiod
-Version:        0.6.0
+Version:        0.7.0
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
@@ -92,5 +92,5 @@ true
 %{_mandir}/man3/libmygpio_*
 
 %changelog
-* Wed Jan 03 2024 Juergen Mang <mail@jcgames.de> 0.6.0-0
+* Sun Jan 14 2024 Juergen Mang <mail@jcgames.de> 0.7.0-0
 - Version from master
