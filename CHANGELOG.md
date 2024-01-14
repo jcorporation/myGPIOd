@@ -4,6 +4,17 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.7.0 (not yet released)
+
+Describe release.
+
+### Changelog
+
+- Upd: add systems usage
+- Feat: harden systemd unit #13
+
+***
+
 ## myGPIOd v0.6.0 (2023-01-03)
 
 This release improves mainly the packaging of myGPIOd.
