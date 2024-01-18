@@ -10,8 +10,8 @@ Describe release.
 
 ### Changelog
 
-- Upd: add systems usage
-- Feat: harden systemd unit #13
+- Upd: Add systemd usage
+- Feat: Harden systemd unit #13
 
 ***
 
