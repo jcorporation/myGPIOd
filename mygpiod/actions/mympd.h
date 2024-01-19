@@ -10,5 +10,6 @@
 #include <stdbool.h>
 
 bool action_mympd(const char *cmd);
+bool action_mympd2(const char *uri, const char *partition, const char *script);
 
 #endif

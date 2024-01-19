@@ -20,6 +20,7 @@
 // Features
 #cmakedefine MYGPIOD_ENABLE_ACTION_MPC
 #cmakedefine MYGPIOD_ENABLE_ACTION_HTTP
+#cmakedefine MYGPIOD_ENABLE_ACTION_LUA
 
 // Default configuration
 #define CFG_CHIP "/dev/gpiochip0"

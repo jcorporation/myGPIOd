@@ -15,6 +15,14 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
     - rising
     - falling
     - long press (with optional interval)
+    - long press release
+  - Integrated actions
+    - GPIO settings
+    - HTTP requests
+    - Lua scripting
+    - MPD client
+    - myMPD client
+    - System commands
   - Set various GPIO attributes (bias, debounce, ...)
   - Set the output value of GPIOs
   - Provides a unix socket with a simple line-based text protocol
@@ -46,6 +54,7 @@ Building myGPIOd is straight forward.
 - Optional:
   - libcurl
   - libmpdclient2
+  - lua >= 5.3.0
 
 Only the current Fedora release packages the version 2 of libgpiod. If libgpiod version 2 is not found, the cmake script compiles it as a static library.
 
@@ -143,11 +152,47 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 | gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
 | gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
 | http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
+| lua | `{lua function}` [`{option1}` `{option2}` ...] | Calls a user defined lua function. |
 | mpc | `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connection settings from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
-| mympd | `{uri}` `{partition}` `{script}` | Calls the myMPD api to execute a script. Requires libcurl. |
-| system | `<command>` | Executes an executable or script in a new child process. No arguments for the command are allowed. |
+| mympd | `{uri}` `{partition}` `{script}` | Calls the myMPD api to execute a script in a new child process. Requires libcurl. |
+| system | `{command}` | Executes an executable or script in a new child process. No arguments are allowed. |
 
 myGPIOd can take actions on rising, falling and long_press events. Long press is triggered by a falling or rising event and does not disable the triggering event, but the release event. To use a button for normal press and long_press request both events and use one event for long and the other for short press. The example below illustrates this.
+
+### Lua
+
+The lua action calls user defined lua functions. The lua script itself is loaded on startup of myGPIOd (`lua_file` configuration setting). All lua functions in this file are registered and can be called with the lua action.
+
+myGPIOd registers custom lua functions to provide access to the actions.
+
+| Lua function | Description |
+| ------------ | ----------- |
+| `gpioBlink({GPIO}, {timeout}, {interval})` | Toggle the value of the GPIO in given timeout and interval. |
+| `gpioGet({GPIO})` | Returns the GPIO state: 1 = active, 0 = inactive |
+| `gpioSet({GPIO}, {1\|0})` | Sets the state of an output GPIO: 1 = active, 0 = inactive |
+| `gpioToggle({GPIO})` | Toggles the state of an output GPIO: 1 = active, 0 = inactive |
+| `http({GET\|POST}, {uri}, {content-type}, {postdata})` | Submits a HTTP request in a new child process. |
+| `mpc({mpd protocol command})` | Runs a mpd protocol command |
+| `mympd({uri}, {partition}, {script})` | Calls the myMPD api to execute a script in a new child process. |
+| `system({command})` | Executes an executable or script in a new child process. |
+
+**Example gpio config**
+```
+# Call the lua function `testFunc` with the argument `testArg` on rising event.
+action_rising = lua:testFunc testArg
+```
+
+**Example lua file**
+```lua
+function testFunc(arg1)
+  -- get the argument
+  print("Arg1:"..arg1)
+  -- get value of GPIO 4
+  v = gpioGet(4)
+  -- set value of GPIO 5 to high
+  gpioSet(5, 1)
+end
+```
 
 ## Example configuration
 

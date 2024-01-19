@@ -27,6 +27,10 @@
     #include "mygpiod/actions/mympd.h"
 #endif
 
+#ifdef MYGPIOD_ENABLE_ACTION_LUA
+    #include "mygpiod/actions/lua.h"
+#endif
+
 #include <errno.h>
 #include <gpiod.h>
 #include <stdio.h>
@@ -198,6 +202,11 @@ static void action_execute(struct t_config *config, struct t_list *actions) {
                 break;
             case MYGPIOD_ACTION_MYMPD:
                 action_mympd(action->option);
+                break;
+        #endif
+        #ifdef MYGPIOD_ENABLE_ACTION_LUA
+            case MYGPIOD_ACTION_LUA:
+                action_lua(config, action->option);
                 break;
         #endif
             case MYGPIOD_ACTION_UNKNOWN:

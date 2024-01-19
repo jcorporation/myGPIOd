@@ -6,12 +6,13 @@ https://github.com/jcorporation/myGPIOd
 
 ## myGPIOd v0.7.0 (not yet released)
 
-Describe release.
+This release adds lua scripting functionality for actions. The new lua action calls preloaded lua functions.
 
 ### Changelog
 
-- Upd: Add systemd usage
+- Feat: Add lua action
 - Feat: Harden systemd unit #13
+- Upd: Add systemd usage
 
 ***
 

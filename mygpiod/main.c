@@ -9,6 +9,7 @@
 
 #include "compile_time.h"
 #include "dist/sds/sds.h"
+#include "mygpiod/actions/lua.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/chip.h"
 #include "mygpiod/gpio/input.h"
@@ -83,6 +84,13 @@ int main(int argc, char **argv) {
         openlog(MYGPIOD_NAME, LOG_CONS, LOG_DAEMON);
         log_to_syslog = true;
     }
+
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        if (init_luavm(config) == false) {
+            rc = EXIT_FAILURE;
+            goto out;
+        }
+    #endif
 
     // init struct for event polling
     struct t_poll_fds poll_fds;

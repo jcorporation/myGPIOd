@@ -12,7 +12,7 @@ jobs:
       run: sudo apt-get -y install cmake build-essential autoconf-archive automake git pkgconf
     - name: build
       run: |
-        cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_ENABLE_ACTION_MPC=OFF -DMYGPIOD_ENABLE_ACTION_HTTP=OFF .
+        cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_ENABLE_ACTION_MPC=OFF -DMYGPIOD_ENABLE_ACTION_HTTP=OFF -DMYGPIOD_ENABLE_ACTION_LUA=OFF .
         make -C release
     - name: install
       run: sudo make -C release install

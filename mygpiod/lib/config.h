@@ -18,6 +18,10 @@
     #include <mpd/client.h>
 #endif
 
+#ifdef MYGPIOD_ENABLE_ACTION_LUA
+    #include <lua.h>
+#endif
+
 /**
  * Config and state data for an input gpio
  */
@@ -73,6 +77,11 @@ struct t_config {
 
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         struct mpd_connection *mpd_conn;  //!< MPD connection
+    #endif
+
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        sds lua_file;                     //!< Lua file to load
+        lua_State* lua_vm;                //!< Lua VM
     #endif
 };
 

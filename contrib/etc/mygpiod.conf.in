@@ -23,5 +23,8 @@ timeout = 60
 # GPIO chip device
 chip = /dev/gpiochip0
 
+# File with user defined lua functions
+#lua_file = 
+
 # Directory for single gpio configuration files
 gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d

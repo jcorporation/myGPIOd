@@ -60,6 +60,10 @@ const char *lookup_action(enum mygpiod_actions action) {
             case MYGPIOD_ACTION_MYMPD:
                 return "mympd";
         #endif
+        #ifdef MYGPIOD_ENABLE_ACTION_LUA
+            case MYGPIOD_ACTION_LUA:
+                return "lua";
+        #endif
         case MYGPIOD_ACTION_UNKNOWN:
             return "";
     }
@@ -97,6 +101,11 @@ enum mygpiod_actions parse_action(const char *str) {
         }
         if (strcasecmp(str, "mympd") == 0) {
             return MYGPIOD_ACTION_MYMPD;
+        }
+    #endif
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        if (strcasecmp(str, "lua") == 0) {
+            return MYGPIOD_ACTION_LUA;
         }
     #endif
     errno = EINVAL;

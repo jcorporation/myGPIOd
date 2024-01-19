@@ -84,6 +84,12 @@ void config_clear(struct t_config *config) {
             mpd_connection_free(config->mpd_conn);
         }
     #endif
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        if (config->lua_vm != NULL) {
+            lua_close(config->lua_vm);
+        }
+        FREE_SDS(config->lua_file);
+    #endif
 }
 
 //private functions
@@ -112,6 +118,10 @@ static struct t_config *config_new(void) {
     list_init(&config->clients);
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         config->mpd_conn = NULL;
+    #endif
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        config->lua_vm = NULL;
+        config->lua_file = sdsempty();
     #endif
     return config;
 }
@@ -262,6 +272,12 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         }
         return false;
     }
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        if (strcmp(key, "lua_file") == 0) {
+            config->lua_file = sdscatsds(config->lua_file, value);
+            return true;
+        }
+    #endif
     return false;
 }
 

@@ -39,8 +39,9 @@ target_sources(mygpiod PRIVATE
 )
 
 if (MYGPIOD_DEBUG)
-  target_sources(mygpiod PRIVATE
-    server/event.c
+  target_sources(mygpiod
+    PRIVATE
+      server/event.c
   )
 endif()
 
@@ -68,12 +69,27 @@ if (MYGPIOD_ENABLE_ACTION_HTTP)
     PRIVATE 
       "${LIBCURL_INCLUDE_DIRS}"
   )
-  target_sources(mygpiod PRIVATE
-    actions/http.c
-    actions/mympd.c
+  target_sources(mygpiod
+    PRIVATE
+      actions/http.c
+      actions/mympd.c
   )
   target_link_libraries(mygpiod
     "${CURL_LIBRARIES}"
+  )
+endif()
+
+if(MYGPIOD_ENABLE_ACTION_LUA)
+  target_include_directories(mygpiod
+    PRIVATE 
+      "${LUA_INCLUDE_DIR}"
+  )
+  target_sources(mygpiod
+    PRIVATE
+      actions/lua.c
+  )
+  target_link_libraries(mygpiod
+    "${LUA_LIBRARIES}"
   )
 endif()
 

@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 /**
- * Execute a myMPD script through the myMPD api
+ * Execute a myMPD script through the myMPD api.
  * @param cmd command to parse, format:
  *            {uri} {partition} {script}
  * @returns true on success, else false
@@ -31,11 +31,24 @@ bool action_mympd(const char *cmd) {
         sdsfreesplitres(args, count);
         exit(EXIT_FAILURE);
     }
-    sds mympd_cmd = sdscatfmt(sdsempty(), "POST %S/api/%S application/json "
+    return action_mympd2(args[0], args[1], args[2]);
+}
+
+/**
+ * Execute a myMPD script through the myMPD api.
+ * @param uri myMPD uri
+ * @param partition MPD partition
+ * @param script script name
+ * @returns true on success, else false
+ */
+bool action_mympd2(const char *uri, const char *partition, const char *script) {
+    sds full_uri = sdscatfmt(sdsempty(), "%S/api/%S", uri, partition);
+    sds postdata = sdscatfmt(sdsempty(),
         "\"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"id\\\":0,\\\"method\\\":\\\"MYMPD_API_SCRIPT_EXECUTE\\\","
         "\\\"params\\\":{\\\"script\\\":\\\"%S\\\",\\\"arguments\\\":{}}}\"",
-        args[0], args[1], args[2]);
-    bool rc = action_http(mympd_cmd);
-    sdsfree(mympd_cmd);
+        script);
+    bool rc = action_http2("POST", full_uri, "application/json", postdata);
+    sdsfree(full_uri);
+    sdsfree(postdata);
     return rc;
 }
