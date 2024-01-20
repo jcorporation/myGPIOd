@@ -163,7 +163,8 @@ myGPIOd can take actions on rising, falling and long_press events. Long press is
 
 The lua action calls user defined lua functions. The lua script itself is loaded on startup of myGPIOd (`lua_file` configuration setting). All lua functions in this file are registered and can be called with the lua action.
 
-Lua scripts are executed in the main thread, therefor lua scripts can block it.
+- Lua scripts are executed in the main thread, therefor lua scripts can block it.
+- The lua functions should not return any value.
 
 myGPIOd registers custom lua functions to provide access to the actions. The functions return 0 on success, else 1.
 
@@ -174,7 +175,7 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 | `gpioSet({GPIO}, {1\|0})` | Sets the state of an output GPIO: 1 = active, 0 = inactive |
 | `gpioToggle({GPIO})` | Toggles the state of an output GPIO. |
 | `http({GET\|POST}, {uri}, {content-type}, {postdata})` | Submits a HTTP request in a new child process. This is an async function. |
-| `mpc({mpd protocol command})` | Runs a mpd protocol command |
+| `mpc({mpd protocol command})` | Runs a mpd protocol command. |
 | `mympd({uri}, {partition}, {script})` | Calls the myMPD api to execute a script in a new child process. This is an async function. |
 | `system({command})` | Executes an executable or script in a new child process. This is an async function. |
 
