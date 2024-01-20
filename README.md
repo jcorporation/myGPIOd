@@ -163,7 +163,7 @@ myGPIOd can take actions on rising, falling and long_press events. Long press is
 
 The lua action calls user defined lua functions. The lua script itself is loaded on startup of myGPIOd (`lua_file` configuration setting). All lua functions in this file are registered and can be called with the lua action.
 
-myGPIOd registers custom lua functions to provide access to the actions.
+myGPIOd registers custom lua functions to provide access to the actions. The functions return 0 on success, else 1.
 
 | Lua function | Description |
 | ------------ | ----------- |
@@ -171,10 +171,10 @@ myGPIOd registers custom lua functions to provide access to the actions.
 | `gpioGet({GPIO})` | Returns the GPIO state: 1 = active, 0 = inactive |
 | `gpioSet({GPIO}, {1\|0})` | Sets the state of an output GPIO: 1 = active, 0 = inactive |
 | `gpioToggle({GPIO})` | Toggles the state of an output GPIO: 1 = active, 0 = inactive |
-| `http({GET\|POST}, {uri}, {content-type}, {postdata})` | Submits a HTTP request in a new child process. |
+| `http({GET\|POST}, {uri}, {content-type}, {postdata})` | Submits a HTTP request in a new child process. This is an async function. |
 | `mpc({mpd protocol command})` | Runs a mpd protocol command |
-| `mympd({uri}, {partition}, {script})` | Calls the myMPD api to execute a script in a new child process. |
-| `system({command})` | Executes an executable or script in a new child process. |
+| `mympd({uri}, {partition}, {script})` | Calls the myMPD api to execute a script in a new child process. This is an async function. |
+| `system({command})` | Executes an executable or script in a new child process. This is an async function. |
 
 **Example gpio config**
 ```
@@ -184,13 +184,17 @@ action_rising = lua:testFunc testArg
 
 **Example lua file**
 ```lua
-function testFunc(arg1)
-  -- get the argument
-  print("Arg1:"..arg1)
-  -- get value of GPIO 4
-  v = gpioGet(4)
-  -- set value of GPIO 5 to high
-  gpioSet(5, 1)
+function changeMPDvolume()
+  -- This example function can be used to change the MPD volume with a rotary encoder
+  -- Get value of the GPIOs
+  clk = gpioGet(4)
+  dt = gpioGet(5)
+  -- Check rotation direction
+  if clk == dt then
+    mpc("volume 5")
+  else
+    mpc("volume -5")
+  end
 end
 ```
 
