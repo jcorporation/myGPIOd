@@ -13,6 +13,7 @@ This release adds lua scripting functionality for actions. The new lua action ca
 - Feat: Add lua action
 - Feat: Harden systemd unit #13
 - Upd: Add systemd usage
+- Fix: Update poll fds after writing
 
 ***
 

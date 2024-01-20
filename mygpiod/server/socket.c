@@ -144,6 +144,7 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
         case CLIENT_SOCKET_STATE_IDLE: {
             size_t oldlen = sdslen(data->buf_in);
             data->buf_in = sdsMakeRoomFor(data->buf_in, BUFFER_SIZE);
+            MYGPIOD_LOG_DEBUG("Reading from socket");
             ssize_t nread = read(data->fd, data->buf_in + oldlen, BUFFER_SIZE);
             if (nread <= 0) {
                 MYGPIOD_LOG_DEBUG("Client#%u: Could not read from socket", node->id);
@@ -177,8 +178,10 @@ bool server_client_connection_handle(struct t_config *config, struct pollfd *cli
             }
             data->bytes_out += result;
             if ((size_t)result == max_bytes) {
+                MYGPIOD_LOG_DEBUG("Finished writing to socket");
                 data->state = CLIENT_SOCKET_STATE_READING;
                 data->events = POLLIN;
+                update_pollfds = true;
                 sdsclear(data->buf_out);
             }
             return true;
