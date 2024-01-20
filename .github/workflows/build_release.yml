@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: installdeps
-      run: sudo apt-get -y install cmake build-essential autoconf-archive automake git pkgconf libmpdclient-dev libcurl4-gnutls-dev
+      run: sudo apt-get -y install cmake build-essential autoconf-archive automake git pkgconf libmpdclient-dev libcurl4-gnutls-dev liblua5.4-dev
     - name: build
       run: |
         cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .

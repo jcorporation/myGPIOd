@@ -21,6 +21,7 @@ BuildRequires:  autoconf-archive
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  lua-devel
 %if 0%{?fedora} >= 39
 BuildRequires:  libgpiod-devel
 %else
