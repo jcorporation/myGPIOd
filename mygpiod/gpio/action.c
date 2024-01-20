@@ -73,11 +73,10 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
     if (event_type == GPIOD_EDGE_EVENT_FALLING_EDGE) {
         event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, timestamp);
         if (data->action_falling.length > 0) {
-            if (data->event_request == GPIOD_LINE_EDGE_FALLING ||
-                data->event_request == GPIOD_LINE_EDGE_BOTH)
-            {
-                action_execute(config, &data->action_falling);
-            }
+            action_execute(config, &data->action_falling);
+        }
+        else {
+            MYGPIOD_LOG_DEBUG("No action configured");
         }
         // long press
         if (data->long_press_event == GPIOD_LINE_EDGE_FALLING &&
@@ -90,11 +89,10 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
     else {
         event_enqueue(config, gpio, MYGPIOD_EVENT_RISING, timestamp);
         if (data->action_rising.length > 0) {
-            if (data->event_request == GPIOD_LINE_EDGE_RISING ||
-                data->event_request == GPIOD_LINE_EDGE_BOTH)
-            {
-                action_execute(config, &data->action_rising);
-            }
+            action_execute(config, &data->action_rising);
+        }
+        else {
+            MYGPIOD_LOG_DEBUG("No action configured");
         }
         // long press
         if (data->long_press_event == GPIOD_LINE_EDGE_RISING &&
