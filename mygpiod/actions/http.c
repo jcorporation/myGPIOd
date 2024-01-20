@@ -164,6 +164,14 @@ static bool call_curl(const char *method, const char *uri, const char *content_t
     sdstrim(resp_body, "\r\n");
     resp_header = sdsmapchars(resp_header, "\r\n", "  ", 2);
     resp_body = sdsmapchars(resp_body, "\r\n", "  ", 2);
+    if (sdslen(resp_header) > 1023) {
+        sdsrange(resp_header, 0, 1020);
+        resp_header = sdscatlen(resp_header, "...", 3);
+    }
+    if (sdslen(resp_body) > 1023) {
+        sdsrange(resp_body, 0, 1020);
+        resp_body = sdscatlen(resp_body, "...", 3);
+    }
     if (res != CURLE_OK) {
         MYGPIOD_LOG_ERROR("HTTP call failed: %s", curl_easy_strerror(res));
         MYGPIOD_LOG_ERROR("Error: %s", err_buf);
