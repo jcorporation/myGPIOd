@@ -39,7 +39,7 @@ void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_ty
         MYGPIOD_LOG_DEBUG("Enqueuing event %s at gpio %u for client#%u", mygpiod_event_name(event_type), gpio, current->id);
         list_push(&data->waiting_events, gpio, event_data);
         if (data->state == CLIENT_SOCKET_STATE_IDLE) {
-            send_idle_events(current);
+            send_idle_events(current, false);
         }
         else if (data->waiting_events.length > WAITING_EVENTS_MAX) {
             struct t_list_node *first = list_shift(&data->waiting_events);

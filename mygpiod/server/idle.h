@@ -11,6 +11,6 @@
 
 bool handle_idle(struct t_list_node *client_node);
 bool handle_noidle(struct t_config *config, struct t_list_node *client_node);
-bool send_idle_events(struct t_list_node *client_node);
+bool send_idle_events(struct t_list_node *client_node, bool send_ok);
 
 #endif

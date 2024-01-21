@@ -35,12 +35,13 @@ Closes the connection.
 
 Enables the idle mode for the connection. In this mode the client waits for gpio events. This command disables the connection timeout.
 
-The command returns as soon as an event occurs. It returns immediately if there are events occurred while the client was not in idle mode.
+The command returns as soon as an event occurs. It returns immediately if there are events occurred while the client was not in idle mode. myGPIOd stores only the last 10 events while not in idle mode.
 
 Only the `noidle` command is allowed while the client is in idle mode.
 
+**Response**
+
 ```
-OK
 gpio:{gpio number}
 event:{falling|rising|long_press}
 timestamp_ms:{milliseconds}
@@ -54,7 +55,18 @@ END
 
 Exits the idle mode and allows the client to send commands. It responds with the accumulated events.
 
-myGPIOD stores only the last 10 events while not in idle mode.
+**Response**
+
+```
+OK
+gpio:{gpio number}
+event:{falling|rising|long_press}
+timestamp_ms:{milliseconds}
+gpio:{gpio number}
+event:{falling|rising|long_press}
+timestamp_ms:{milliseconds}
+END
+```
 
 ## Events
 

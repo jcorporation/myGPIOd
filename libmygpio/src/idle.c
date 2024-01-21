@@ -89,10 +89,7 @@ bool mygpio_wait_idle(struct t_mygpio_connection *connection, int timeout) {
     pfds[0].fd = mygpio_connection_get_fd(connection);
     pfds[0].events = POLLIN;
     int events = poll(pfds, 1, timeout);
-    if (events > 0) {
-        return libmygpio_recv_response_status(connection);
-    }
-    return false;
+    return events > 0 ? true : false;
 }
 
 /**

@@ -30,7 +30,7 @@ bool handle_idle(struct t_list_node *client_node) {
         client_data->state = CLIENT_SOCKET_STATE_IDLE;
         return true;
     }
-    return send_idle_events(client_node);
+    return send_idle_events(client_node, false);
 }
 
 /**
@@ -46,7 +46,7 @@ bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
         server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
         return true;
     }
-    return send_idle_events(client_node);
+    return send_idle_events(client_node, true);
 }
 
 /**
@@ -54,12 +54,14 @@ bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
  * @param client_node list node holding the client data
  * @return true on success, else false
  */
-bool send_idle_events(struct t_list_node *client_node) {
+bool send_idle_events(struct t_list_node *client_node, bool send_ok) {
     MYGPIOD_LOG_INFO("Client#%u: Sending idle events", client_node->id);
     struct t_client_data *client_data = (struct t_client_data *)client_node->data;
 
     server_response_start(client_data);
-    server_response_append(client_data, "%s", DEFAULT_MSG_OK);
+    if (send_ok == true) {
+        server_response_append(client_data, "%s", DEFAULT_MSG_OK);
+    }
     struct t_list_node *current = client_data->waiting_events.head;
     while (current != NULL) {
         struct t_event_data *event_data = (struct t_event_data *)current->data;
