@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <time.h>
 
-void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
+void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns,
         enum gpiod_edge_event_type event_type, struct t_gpio_in_data *data);
 void action_delay_abort(struct t_gpio_in_data *data);
 void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t_config *config);

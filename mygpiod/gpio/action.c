@@ -54,24 +54,24 @@ static void action_execute(struct t_config *config, struct t_list *actions);
  * @param event_type the event type
  * @param data gpio config data
  */
-void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
+void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns,
         enum gpiod_edge_event_type event_type, struct t_gpio_in_data *data)
 {
     if (data->ignore_event == true) {
         data->ignore_event = false;
         // long_press event has fired for this gpio
         MYGPIOD_LOG_INFO("Event: \"long_press_release\" gpio: \"%u\" timestamp: \"%llu ns\"",
-            gpio, (long long unsigned)timestamp);
-        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS_RELEASE, timestamp);
+            gpio, (long long unsigned)timestamp_ns);
+        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS_RELEASE, timestamp_ns);
         action_execute(config, &data->long_press_release_action);
         return;
     }
 
     MYGPIOD_LOG_INFO("Event: \"%s\" gpio: \"%u\" timestamp: \"%llu ns\"",
-        lookup_event_type(event_type), gpio, (long long unsigned)timestamp);
+        lookup_event_type(event_type), gpio, (long long unsigned)timestamp_ns);
 
     if (event_type == GPIOD_EDGE_EVENT_FALLING_EDGE) {
-        event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, timestamp);
+        event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, timestamp_ns);
         if (data->action_falling.length > 0) {
             action_execute(config, &data->action_falling);
         }
@@ -87,7 +87,7 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp,
         }
     }
     else {
-        event_enqueue(config, gpio, MYGPIOD_EVENT_RISING, timestamp);
+        event_enqueue(config, gpio, MYGPIOD_EVENT_RISING, timestamp_ns);
         if (data->action_rising.length > 0) {
             action_execute(config, &data->action_rising);
         }
@@ -116,19 +116,19 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
     if (gpio_get_value(config, gpio) == data->long_press_value) {
         struct timespec ts;
         switch (data->event_clock) {
+            case GPIOD_LINE_CLOCK_HTE:
+                //TODO: howto handle this?
             case GPIOD_LINE_CLOCK_REALTIME:
                 clock_gettime(CLOCK_REALTIME, &ts);
                 break;
-            case GPIOD_LINE_CLOCK_HTE:
-                //TODO: howto handle this?
             case GPIOD_LINE_CLOCK_MONOTONIC:
                 clock_gettime(CLOCK_MONOTONIC, &ts);
                 break;
         }
-        uint64_t timestamp = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
+        uint64_t timestamp_ns = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
         MYGPIOD_LOG_INFO("Event: \"long_press\" gpio: \"%u\" timestamp: \"%llu ns\"",
-            gpio, (long long unsigned)timestamp);
-        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, timestamp);
+            gpio, (long long unsigned)timestamp_ns);
+        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, timestamp_ns);
         action_execute(config, &data->long_press_action);
         if (data->event_request == GPIOD_LINE_EDGE_BOTH) {
             // ignore the release event

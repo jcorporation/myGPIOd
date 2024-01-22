@@ -52,10 +52,10 @@ bool handle_event(struct t_cmd_options *options, struct t_config *config, struct
     struct t_gpio_in_data *data = node->data;
 
     struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    uint64_t timestamp = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
+    clock_gettime(CLOCK_REALTIME, &ts);
+    uint64_t timestamp_ns = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
 
-    action_handle(config, gpio, timestamp, event_type, data);
+    action_handle(config, gpio, timestamp_ns, event_type, data);
     server_response_send(client_data, DEFAULT_MSG_OK "\n" DEFAULT_MSG_END);
     return true;
 }
