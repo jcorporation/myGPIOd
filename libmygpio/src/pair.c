@@ -24,6 +24,9 @@ static struct t_mygpio_pair *libmygpio_parse_pair(const char *line);
  * @return the pair or NULL on error or response end
  */
 struct t_mygpio_pair *mygpio_recv_pair(struct t_mygpio_connection *connection) {
+    if (mygpio_connection_check(connection) == false) {
+        return NULL;
+    }
     libmygpio_socket_recv_line(connection->fd, &connection->buf_in, 0);
     if (connection->buf_in.len == 0) {
         return NULL;

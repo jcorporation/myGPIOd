@@ -61,6 +61,16 @@ void mygpio_connection_free(struct t_mygpio_connection *connection) {
 }
 
 /**
+ * Checks the connection state
+ * @param connection connection struct
+ * @return true on success, else false
+ */
+bool mygpio_connection_check(struct t_mygpio_connection *connection) {
+    return connection->state == MYGPIO_STATE_OK &&
+        connection->fd > -1;
+}
+
+/**
  * Sets connection state and error message
  * @param connection connection struct
  * @param state state enum

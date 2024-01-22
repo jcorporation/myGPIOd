@@ -98,13 +98,17 @@ int main(int argc, char **argv) {
     update_pollfds = true;
 
     // open the chip, set output gpios and request input gpios
-    if (sdslen(config->chip_path) > 0) {
-        if (gpio_open_chip(config) == false ||
-            gpio_set_outputs(config) == false ||
-            gpio_request_inputs(config, &poll_fds) == false)
-        {
-            goto out;
-        }
+    if (sdslen(config->chip_path) == 0) {
+        MYGPIOD_LOG_EMERG("No GPIO chip configured");
+        rc = EXIT_FAILURE;
+        goto out;
+    }
+
+    if (gpio_open_chip(config) == false ||
+        gpio_set_outputs(config) == false ||
+        gpio_request_inputs(config, &poll_fds) == false)
+    {
+        goto out;
     }
 
     // add signal fd

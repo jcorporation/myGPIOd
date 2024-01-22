@@ -144,8 +144,8 @@ void log_log(int level, const char *file, int line, const char *fmt, ...) {
     vprintf(fmt, args);
     va_end(args);
     #pragma GCC diagnostic pop
-    printf("\n");
     if (log_on_tty == 1) {
         printf("\033[0m");
     }
+    printf("\n");
 }

@@ -32,6 +32,9 @@ static bool libmygpio_parse_version(const char *str, struct t_mygpio_connection 
  * @return true on success, else false
  */
 bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt, ...) {
+    if (mygpio_connection_check(connection) == false) {
+        return false;
+    }
     va_list args;
     va_start(args, fmt);
     int written = vsnprintf(connection->buf_out.buffer, BUFFER_SIZE_MAX, fmt, args);
@@ -57,8 +60,11 @@ bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt
  * @return true on success, else false
  */
 bool libmygpio_recv_response_status(struct t_mygpio_connection *connection) {
-    if (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, connection->timeout_ms) == false) {
+    if (mygpio_connection_check(connection) == false ||
+        libmygpio_socket_recv_line(connection->fd, &connection->buf_in, connection->timeout_ms) == false)
+    {
         LIBMYGPIO_LOG("Error receiving line");
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Error receiving line");
         return false;
     }
     if (strcmp(connection->buf_in.buffer, "OK") == 0) {
@@ -107,6 +113,9 @@ bool libmygpio_recv_version(struct t_mygpio_connection *connection) {
  * @return true on success, else false
  */
 bool mygpio_response_end(struct t_mygpio_connection *connection) {
+    if (mygpio_connection_check(connection) == false) {
+        return false;
+    }
     while (libmygpio_socket_recv_line(connection->fd, &connection->buf_in, 0) == true) {
         if (strcmp(connection->buf_in.buffer, "END") == 0) {
             libmygpio_buf_init(&connection->buf_in);

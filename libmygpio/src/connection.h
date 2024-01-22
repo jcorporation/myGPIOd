@@ -23,5 +23,6 @@ struct t_mygpio_connection {
 
 void libmygpio_connection_set_state(struct t_mygpio_connection *connection,
         enum mygpio_conn_state state, const char *message);
+bool mygpio_connection_check(struct t_mygpio_connection *connection);
 
 #endif

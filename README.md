@@ -148,7 +148,7 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
-| gpioblink | `<gpio>` `<timeout>` `<interval>` | Toggle the value of the GPIO in given timeout and interval. Set interval to 0 to blink only once. |
+| gpioblink | `<gpio>` `<timeout_ms>` `<interval_ms>` | Toggle the value of the GPIO in given timeout and interval. Set interval to 0 to blink only once. |
 | gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
 | gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
 | http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
@@ -170,7 +170,7 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 
 | Lua function | Description |
 | ------------ | ----------- |
-| `gpioBlink({GPIO}, {timeout}, {interval})` | Toggle the value of the GPIO in given timeout and interval. |
+| `gpioBlink({GPIO}, {timeout_ms}, {interval_ms})` | Toggle the value of the GPIO in given timeout and interval. |
 | `gpioGet({GPIO})` | Returns the GPIO state: 1 = active, 0 = inactive |
 | `gpioSet({GPIO}, {1\|0})` | Sets the state of an output GPIO: 1 = active, 0 = inactive |
 | `gpioToggle({GPIO})` | Toggles the state of an output GPIO. |
