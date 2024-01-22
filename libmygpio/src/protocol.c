@@ -40,13 +40,13 @@ bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt
         written >= BUFFER_SIZE_MAX)
     {
         libmygpio_buf_init(&connection->buf_out);
-        libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Buffer write error");
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Buffer write error");
         return false;
     }
     connection->buf_out.len = (size_t)written;
     bool rc = libmygpio_socket_send_line(connection->fd, &connection->buf_out);
     if (rc == false) {
-        libmygpio_connection_set_state(connection, MYGPIO_STATE_ERROR, "Socket write error");
+        libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Socket write error");
     }
     return rc;
 }
