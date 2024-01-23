@@ -18,6 +18,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+/**
+ * Returns a timestamp with nanoseconcs precision
+ * @param event_clock clock to use
+ * @return timestamp
+ */
+uint64_t get_timestamp_ns(enum gpiod_line_clock event_clock) {
+    struct timespec ts;
+    switch (event_clock) {
+        case GPIOD_LINE_CLOCK_HTE:
+            //TODO: howto handle this?
+        case GPIOD_LINE_CLOCK_REALTIME:
+            clock_gettime(CLOCK_REALTIME, &ts);
+            break;
+        case GPIOD_LINE_CLOCK_MONOTONIC:
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+            break;
+    }
+    return (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
+}
 
 /**
  * Getline function that trims whitespace characters.
