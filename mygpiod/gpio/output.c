@@ -9,6 +9,7 @@
 
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/lib/config.h"
+#include "mygpiod/lib/events.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
@@ -102,7 +103,8 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
 }
 
 /**
- * Sets the current line value of an output gpio
+ * Sets the current line value of an output gpio and
+ * clears the blink timer.
  * @param config pointer to config
  * @param gpio gpio to set the value
  * @param value value to set
@@ -116,13 +118,33 @@ bool gpio_set_value(struct t_config *config, unsigned gpio, enum gpiod_line_valu
     }
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
     close_fd(&data->timer_fd);
-    return gpiod_line_request_set_value(data->request, gpio, value) == 0
-        ? true
-        : false;
+    return gpio_set_value_by_line_request(config, data->request, gpio, value);
 }
 
 /**
- * Toggles the current line value of an output gpio
+ * Toggles the current line value of an output gpio and
+ * emits an event.
+ * @param config pointer to config
+ * @param line_request the line request of the gpio
+ * @param gpio gpio to set the value
+ * @param value value to set
+ * @return true on success, else false
+ */
+bool gpio_set_value_by_line_request(struct t_config *config, struct gpiod_line_request *line_request, unsigned gpio, enum gpiod_line_value value) {
+    int rc = gpiod_line_request_set_value(line_request, gpio, value);
+    if (rc == 0) {
+        enum mygpiod_event_types event = value == GPIOD_LINE_VALUE_ACTIVE
+            ? MYGPIOD_EVENT_RISING
+            : MYGPIOD_EVENT_FALLING;
+        uint64_t timestamp_ns = get_timestamp_ns(GPIOD_LINE_CLOCK_REALTIME);
+        event_enqueue(config, gpio, event, timestamp_ns);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Toggles the current line value of an output gpio.
  * @param config pointer to config
  * @param gpio gpio to set the value
  * @return true on success, else false
@@ -135,21 +157,21 @@ bool gpio_toggle_value(struct t_config *config, unsigned gpio) {
     }
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
     close_fd(&data->timer_fd);
-    return gpio_toggle_value_by_line_request(data->request, node->id);
+    return gpio_toggle_value_by_line_request(config, data->request, node->id);
 }
 
 /**
- * Toggles the current line value of an output gpio
+ * Toggles the current line value of an output gpio.
+ * @param config pointer to config
  * @param line_request the line request of the gpio
+ * @param gpio gpio to set the value
  * @return true on success, else false
  */
-bool gpio_toggle_value_by_line_request(struct gpiod_line_request *line_request, unsigned gpio) {
+bool gpio_toggle_value_by_line_request(struct t_config *config, struct gpiod_line_request *line_request, unsigned gpio) {
     enum gpiod_line_value value = gpiod_line_request_get_value(line_request, gpio) == GPIOD_LINE_VALUE_INACTIVE
         ? GPIOD_LINE_VALUE_ACTIVE
         : GPIOD_LINE_VALUE_INACTIVE;
-    return gpiod_line_request_set_value(line_request, gpio, value) == 0
-        ? true
-        : false;
+    return gpio_set_value_by_line_request(config, line_request, gpio, value);
 }
 
 /**
@@ -168,7 +190,7 @@ bool gpio_blink(struct t_config *config, unsigned gpio, int timeout_ms, int inte
         return false;
     }
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
-    if (gpio_toggle_value_by_line_request(data->request, node->id) == false) {
+    if (gpio_toggle_value_by_line_request(config, data->request, node->id) == false) {
         return false;
     }
     data->timer_fd = timer_new(timeout_ms, interval_ms);

@@ -114,18 +114,7 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns
 void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t_config *config) {
     // check if gpio value has not changed
     if (gpio_get_value(config, gpio) == data->long_press_value) {
-        struct timespec ts;
-        switch (data->event_clock) {
-            case GPIOD_LINE_CLOCK_HTE:
-                //TODO: howto handle this?
-            case GPIOD_LINE_CLOCK_REALTIME:
-                clock_gettime(CLOCK_REALTIME, &ts);
-                break;
-            case GPIOD_LINE_CLOCK_MONOTONIC:
-                clock_gettime(CLOCK_MONOTONIC, &ts);
-                break;
-        }
-        uint64_t timestamp_ns = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
+        uint64_t timestamp_ns = get_timestamp_ns(data->event_clock);
         MYGPIOD_LOG_INFO("Event: \"long_press\" gpio: \"%u\" timestamp: \"%llu ns\"",
             gpio, (long long unsigned)timestamp_ns);
         event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, timestamp_ns);
