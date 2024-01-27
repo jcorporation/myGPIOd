@@ -132,7 +132,6 @@ int main(int argc, char **argv) {
         printf("Error: %s\n", mygpio_connection_get_error(conn));
         mygpio_connection_clear_error(conn);
     }
-    mygpio_response_end(conn);
 
     // Toggle the value of GPIO number 6
     printf("Sending gpiotoggle 6\n");
@@ -140,7 +139,6 @@ int main(int argc, char **argv) {
         printf("Error: %s\n", mygpio_connection_get_error(conn));
         mygpio_connection_clear_error(conn);
     }
-    mygpio_response_end(conn);
 
     // Close the connection
     printf("Closing connection\n");
