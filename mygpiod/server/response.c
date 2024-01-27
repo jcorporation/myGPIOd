@@ -7,6 +7,8 @@
 #include "compile_time.h"
 #include "mygpiod/server/response.h"
 
+#include "mygpiod/event_loop/event_loop.h"
+
 /**
  * Starts a new response by clearing the output buffer.
  * It sends the response from buf_out to the client.
@@ -39,6 +41,7 @@ void server_response_end(struct t_client_data *client_data) {
     client_data->state = CLIENT_SOCKET_STATE_WRITING;
     client_data->bytes_out = 0;
     client_data->events = POLLOUT;
+    update_pollfds = true;
 }
 
 /**
