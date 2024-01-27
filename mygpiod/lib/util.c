@@ -27,18 +27,25 @@
  */
 uint64_t get_timestamp_ns(enum gpiod_line_clock event_clock) {
     struct timespec ts;
+    errno = 0;
     switch (event_clock) {
         case GPIOD_LINE_CLOCK_HTE:
             //TODO: howto handle this?
         case GPIOD_LINE_CLOCK_REALTIME:
-            clock_gettime(CLOCK_REALTIME, &ts);
+            if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+                MYGPIOD_LOG_ERROR("Unable to get timestamp: %s", strerror(errno));
+                return 0;
+            }
             break;
         case GPIOD_LINE_CLOCK_MONOTONIC:
-            clock_gettime(CLOCK_MONOTONIC, &ts);
+            if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1) {
+                MYGPIOD_LOG_ERROR("Unable to get timestamp: %s", strerror(errno));
+                return 0;
+            }
             break;
     }
     uint64_t ts_ns = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
-    MYGPIOD_LOG_DEBUG("Timestamp: %llu", (long long unsigned)ts_ns);
+    MYGPIOD_LOG_DEBUG("Timestamp: %llu ns, clock %s", (long long unsigned)ts_ns, lookup_event_clock(event_clock));
     return ts_ns;
 }
 
