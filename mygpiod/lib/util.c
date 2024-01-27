@@ -44,8 +44,7 @@ uint64_t get_timestamp_ns(enum gpiod_line_clock event_clock) {
             }
             break;
     }
-    uint64_t ts_ns = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
-    MYGPIOD_LOG_DEBUG("Timestamp: %llu ns, clock %s", (long long unsigned)ts_ns, lookup_event_clock(event_clock));
+    uint64_t ts_ns = (uint64_t)ts.tv_sec * (uint64_t)1000000000 + (uint64_t)ts.tv_nsec;
     return ts_ns;
 }
 
