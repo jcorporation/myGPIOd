@@ -21,7 +21,7 @@
 #include <time.h>
 
 /**
- * Returns a timestamp with nanoseconcs precision
+ * Returns a timestamp with nanoseconds precision
  * @param event_clock clock to use
  * @return timestamp
  */
@@ -37,7 +37,9 @@ uint64_t get_timestamp_ns(enum gpiod_line_clock event_clock) {
             clock_gettime(CLOCK_MONOTONIC, &ts);
             break;
     }
-    return (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
+    uint64_t ts_ns = (uint64_t)(ts.tv_sec * 1000000000 + ts.tv_nsec);
+    MYGPIOD_LOG_DEBUG("Timestamp: %llu", (long long unsigned)ts_ns);
+    return ts_ns;
 }
 
 /**
