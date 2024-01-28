@@ -178,7 +178,7 @@ check() {
         --config-file="$STARTPATH/.clang-tidy" {} \; >> ../clang-tidy.out  2>/dev/null
     cat ../clang-tidy.out
   else
-    echo "clang-tidy not found"  
+    echo "clang-tidy not found"
   fi
 }
 
