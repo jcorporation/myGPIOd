@@ -33,6 +33,7 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int t
     connection->version[2] = 0;
     connection->error = NULL;
     connection->timeout_ms = timeout_ms;
+    connection->state = MYGPIO_STATE_OK;
     connection->fd = libmygpio_socket_connect(socket_path);
     if (connection->fd == -1) {
         libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Connection failed");
@@ -45,7 +46,6 @@ struct t_mygpio_connection *mygpio_connection_new(const char *socket_path, int t
         libmygpio_connection_set_state(connection, MYGPIO_STATE_FATAL, "Handshake failed");
         return connection;
     }
-    libmygpio_connection_set_state(connection, MYGPIO_STATE_OK, NULL);
     return connection;
 }
 
