@@ -4,7 +4,7 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.7.0 (not yet released)
+## myGPIOd v0.7.0 (2023-01-28)
 
 This release adds lua scripting functionality for actions. The new lua action calls preloaded lua functions.
 
