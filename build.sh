@@ -81,7 +81,7 @@ buildrelease() {
 
 addmygpioduser() {
   echo "Checking status of mygpiod system user"
-  if ! getent passwd mympd > /dev/null
+  if ! getent passwd mygpiod > /dev/null
   then
     if check_cmd_silent useradd
     then
