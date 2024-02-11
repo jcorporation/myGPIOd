@@ -10,6 +10,8 @@ Describe release.
 
 ### Changelog
 
+- Fix: relax security configuration of systemd service unit to allow loading shared libraries
+
 ***
 
 ## myGPIOd v0.7.0 (2023-01-28)
