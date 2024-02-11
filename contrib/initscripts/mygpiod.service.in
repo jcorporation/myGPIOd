@@ -24,6 +24,7 @@ RestrictRealtime=yes
 RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_UNIX
 RestrictNamespaces=yes
 RuntimeDirectory=mygpiod
+RuntimeDirectoryMode=0750
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 
