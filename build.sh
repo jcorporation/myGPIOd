@@ -85,13 +85,16 @@ addmygpioduser() {
   then
     if check_cmd_silent useradd
     then
+      groupadd -r mygpiod || true
       groupadd -r gpio || true
-      useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
+      useradd -r -g mygpiod -G gpio -s /bin/false -d /var/lib/mygpiod mygpiod
     elif check_cmd_silent adduser
     then
       #alpine
+      addgroup -S mygpiod || true
       addgroup -S gpio || true
-      adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -G gpio -g myGPIOd mygpiod
+      adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -G mygpiod -g myGPIOd mygpiod
+      adduser mygpiod gpio
     else
       echo "Can not add user mygpiod"
       return 1
