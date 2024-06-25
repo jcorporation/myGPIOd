@@ -292,7 +292,12 @@ pkgarch() {
 }
 
 pkgosc() {
-  check_cmd osc
+  [ -z "${OSC_BIN+x}" ] && OSC_BIN="$HOME/python-venv/bin/osc"
+  if [ ! -x "$OSC_BIN" ]
+  then
+    echo_error "Command osc not found: $HOME/python-venv/bin/osc"
+    exit 1
+  fi
   cleanup
   cleanuposc
   if [ -z "${OSC_REPO+x}" ]
@@ -307,7 +312,7 @@ pkgosc() {
   
   mkdir osc
   cd osc || exit 1  
-  osc checkout "$OSC_REPO"
+  $OSC_BIN checkout "$OSC_REPO"
   rm -f "$OSC_REPO"/*
   
   cd "$STARTPATH" || exit 1
@@ -334,10 +339,10 @@ pkgosc() {
   cp ../libgpiod-2.1.tar.gz "$OSC_REPO/"
 
   cd "$OSC_REPO" || exit 1
-  osc addremove
-  osc st
-  osc vc -m "Update"
-  osc commit -m "Update"
+  $OSC_BIN addremove
+  $OSC_BIN st
+  $OSC_BIN vc -m "Update"
+  $OSC_BIN commit -m "Update"
 }
 
 pkgdocker() {
