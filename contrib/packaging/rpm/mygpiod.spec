@@ -32,11 +32,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description 
 myGPIOd is a lightweight gpio controlling daemon.
 
-%if 0%{?disturl:1}
-  # build debug package in obs
-  %debug_package
-%endif
-
 %package devel
 Summary: Development package for %{name}
 
