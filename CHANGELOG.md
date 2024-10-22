@@ -10,6 +10,7 @@ Describe release.
 
 ### Changelog
 
+- Upd: libgpiod v2.2
 - Fix: relax security configuration of systemd service unit to allow loading shared libraries
 
 ***

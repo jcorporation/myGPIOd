@@ -339,7 +339,7 @@ pkgosc() {
   cp ../contrib/packaging/rpm/mygpiod.spec "$OSC_REPO/"
   cp ../contrib/packaging/arch/PKGBUILD "$OSC_REPO/"
   cp ../contrib/packaging/arch/archlinux.install "$OSC_REPO/"
-  cp ../libgpiod-2.1.tar.gz "$OSC_REPO/"
+  cp ../libgpiod-2.2.tar.gz "$OSC_REPO/"
 
   cd "$OSC_REPO" || exit 1
   $OSC_BIN addremove
