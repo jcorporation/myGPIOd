@@ -3,7 +3,7 @@ message("Installing libgpiod from source")
 include(FetchContent)
 
 set(INSTALL ${PROJECT_BINARY_DIR})
-set(DOWNLOAD_VERSION "2.1")
+set(DOWNLOAD_VERSION "2.2")
 
 list(APPEND CMAKE_PREFIX_PATH ${INSTALL})
 find_package(PkgConfig REQUIRED)
@@ -22,7 +22,7 @@ else()
     )
 endif()
 
-FetchContent_Populate(libgpiod)
+FetchContent_MakeAvailable(libgpiod)
 
 set(ENV${CC} ${CMAKE_C_COMPILER})
 
