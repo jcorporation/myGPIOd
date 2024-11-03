@@ -6,7 +6,7 @@ https://github.com/jcorporation/myGPIOd
 
 ## myGPIOd v0.8.0 (2024-11-03)
 
-Describe release.
+This is a small maintenance release.
 
 ### Changelog
 
