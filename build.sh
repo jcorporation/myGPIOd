@@ -81,17 +81,20 @@ buildrelease() {
 
 addmygpioduser() {
   echo "Checking status of mygpiod system user"
-  if ! getent passwd mympd > /dev/null
+  if ! getent passwd mygpiod > /dev/null
   then
     if check_cmd_silent useradd
     then
+      groupadd -r mygpiod || true
       groupadd -r gpio || true
-      useradd -r -g gpio -s /bin/false -d /var/lib/mygpiod mygpiod
+      useradd -r -g mygpiod -G gpio -s /bin/false -d /var/lib/mygpiod mygpiod
     elif check_cmd_silent adduser
     then
       #alpine
+      addgroup -S mygpiod || true
       addgroup -S gpio || true
-      adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -G gpio -g myGPIOd mygpiod
+      adduser -S -D -H -h /var/lib/mygpiod -s /sbin/nologin -G mygpiod -g myGPIOd mygpiod
+      adduser mygpiod gpio
     else
       echo "Can not add user mygpiod"
       return 1
@@ -336,7 +339,7 @@ pkgosc() {
   cp ../contrib/packaging/rpm/mygpiod.spec "$OSC_REPO/"
   cp ../contrib/packaging/arch/PKGBUILD "$OSC_REPO/"
   cp ../contrib/packaging/arch/archlinux.install "$OSC_REPO/"
-  cp ../libgpiod-2.1.tar.gz "$OSC_REPO/"
+  cp ../libgpiod-2.2.tar.gz "$OSC_REPO/"
 
   cd "$OSC_REPO" || exit 1
   $OSC_BIN addremove

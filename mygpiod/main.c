@@ -23,6 +23,7 @@
 #include <poll.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef MYGPIOD_ENABLE_ASAN
@@ -45,6 +46,9 @@ const char *__asan_default_options(void) {
 
 int main(int argc, char **argv) {
     int rc = EXIT_SUCCESS;
+
+    //only owner and group should have rw access
+    umask(0007);
 
     log_on_tty = isatty(fileno(stdout))
         ? true

@@ -4,6 +4,17 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.8.0 (2024-11-03)
+
+Describe release.
+
+### Changelog
+
+- Upd: libgpiod v2.2
+- Fix: relax security configuration of systemd service unit to allow loading shared libraries
+
+***
+
 ## myGPIOd v0.7.0 (2023-01-28)
 
 This release adds lua scripting functionality for actions. The new lua action calls preloaded lua functions.
