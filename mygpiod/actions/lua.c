@@ -237,7 +237,7 @@ int lua_mpc(lua_State *lua_vm) {
 
 #ifdef MYGPIOD_ENABLE_ACTION_HTTP
 /**
- * Calls the myMPD api to execute a script in a new child process.
+ * Calls the myGPIOd api to execute a script in a new child process.
  * @param lua_vm pointer to lua vm
  * @return 1 on success, else 0
  */

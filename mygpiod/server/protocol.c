@@ -139,7 +139,7 @@ enum cmd_ids get_cmd_id(const char *cmd) {
 
 /**
  * Converts the mympd_cmd_ids enum to the string
- * @param cmd_id myMPD API method
+ * @param cmd_id myGPIOd API method
  * @return the API method as string
  */
 const char *get_cmd_name(enum cmd_ids cmd_id) {

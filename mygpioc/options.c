@@ -53,7 +53,7 @@ void print_usage(void) {
 
 /**
  * Handles the command line arguments
- * @param config pointer to myMPD static configuration
+ * @param config pointer to myGPIOd static configuration
  * @param argc from main function
  * @param argv from main function
  * @return optind

@@ -4,7 +4,7 @@ myGPIOd is a lightweight GPIO controlling framework. It is written in C and has 
 
 It consists of a daemon, a client library and a command line tool. It is designed to run on Raspberry PIs and similar devices.
 
-I wrote this tool primarily for [myMPDos](https://github.com/jcorporation/myMPDos) and [myMPD](https://github.com/jcorporation/myMPD).
+I wrote this tool primarily for [myGPIOdos](https://github.com/jcorporation/myGPIOdos) and [myGPIOd](https://github.com/jcorporation/myGPIOd).
 
 myGPIOd can communicate natively with MPD and also integrates nicely with all HTTP APIs.
 
@@ -21,7 +21,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
     - HTTP requests
     - Lua scripting
     - MPD client
-    - myMPD client
+    - myGPIOd client
     - System commands
   - Set various GPIO attributes (bias, debounce, ...)
   - Set the output value of GPIOs
@@ -154,7 +154,7 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 | http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
 | lua | `{lua function}` [`{option1}` `{option2}` ...] | Calls a user defined lua function. |
 | mpc | `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connection settings from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
-| mympd | `{uri}` `{partition}` `{script}` | Calls the myMPD api to execute a script in a new child process. Requires libcurl. |
+| mympd | `{uri}` `{partition}` `{script}` | Calls the myGPIOd api to execute a script in a new child process. Requires libcurl. |
 | system | `{command}` | Executes an executable or script in a new child process. No arguments are allowed. |
 
 myGPIOd can take actions on rising, falling and long_press events. Long press is triggered by a falling or rising event and does not disable the triggering event, but the release event. To use a button for normal press and long_press request both events and use one event for long and the other for short press. The example below illustrates this.
@@ -176,7 +176,7 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 | `gpioToggle({GPIO})` | Toggles the state of an output GPIO. |
 | `http({GET\|POST}, {uri}, {content-type}, {postdata})` | Submits a HTTP request in a new child process. This is an async function. |
 | `mpc({mpd protocol command})` | Runs a mpd protocol command. |
-| `mympd({uri}, {partition}, {script})` | Calls the myMPD api to execute a script in a new child process. This is an async function. |
+| `mympd({uri}, {partition}, {script})` | Calls the myGPIOd api to execute a script in a new child process. This is an async function. |
 | `system({command})` | Executes an executable or script in a new child process. This is an async function. |
 
 **Example gpio config**
@@ -226,7 +226,7 @@ This example configuration does the following:
   - Enables the pull-up resistor on start
   - On falling event:
     - Set GPIO 6 for 1000 ms to active
-    - Execute the Jukebox script through the myMPD API
+    - Execute the Jukebox script through the myGPIOd API
 
 **/etc/mygpiod.conf**
 ```
@@ -339,7 +339,7 @@ event_request = falling
 # Enable the internal pull-up resistor
 bias = pull-up
 
-# Execute the Jukebox script through the myMPD API
+# Execute the Jukebox script through the myGPIOd API
 action_falling = gpioblink:6 1000 0
 action_falling = mympd:https://127.0.0.1 default Jukebox
 ```

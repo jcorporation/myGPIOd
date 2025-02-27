@@ -25,7 +25,7 @@ enum mygpiod_actions {
     #endif
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
         MYGPIOD_ACTION_HTTP,      //!< Makes an HTTP call
-        MYGPIOD_ACTION_MYMPD,     //!< Executes a myMPD script
+        MYGPIOD_ACTION_MYMPD,     //!< Executes a myGPIOd script
     #endif
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         MYGPIOD_ACTION_LUA,       //!< Executes a lua function

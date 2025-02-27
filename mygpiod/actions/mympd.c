@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 /**
- * Execute a myMPD script through the myMPD api.
+ * Execute a myGPIOd script through the myGPIOd api.
  * @param cmd command to parse, format:
  *            {uri} {partition} {script}
  * @returns true on success, else false
@@ -35,8 +35,8 @@ bool action_mympd(const char *cmd) {
 }
 
 /**
- * Execute a myMPD script through the myMPD api.
- * @param uri myMPD uri
+ * Execute a myGPIOd script through the myGPIOd api.
+ * @param uri myGPIOd uri
  * @param partition MPD partition
  * @param script script name
  * @returns true on success, else false

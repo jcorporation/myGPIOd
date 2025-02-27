@@ -60,7 +60,7 @@ This release adds more actions.
 - Feat: Add blink interval for output GPIOs.
 - Feat: New MPD action controls MPD with the help of libmpdclient.
 - Feat: New HTTP action submits arbitrary GET and POST requests.
-- Feat: New myMPD action triggers myMPD scripts through the myMPD api.
+- Feat: New myGPIOd action triggers myGPIOd scripts through the myGPIOd api.
 - Upd: Improved build system.
 - Fix: Memory leak in GPIO set actions.
 - Fix: Lookup correct event request.
