@@ -10,6 +10,8 @@ This is a small maintenance release.
 
 ### Changelog
 
+- Fix: Simplify Debian packaging
+
 ***
 
 ## myGPIOd v0.8.0 (2024-11-03)
