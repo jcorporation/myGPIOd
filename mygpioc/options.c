@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2024 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -30,7 +30,7 @@ static struct option long_options[] = {
 void print_usage(void) {
     fprintf(stderr, "\nUsage: mygpioc [options] <command> [<arguments>]\n\n"
                     "myGPIOc %s\n"
-                    "(c) 2020-2024 Juergen Mang <mail@jcgames.de>\n"
+                    "(c) 2020-2025 Juergen Mang <mail@jcgames.de>\n"
                     "https://github.com/jcorporation/myGPIOd\n\n"
                     "Options:\n"
                     "  -h, --help                               Displays this help\n"
