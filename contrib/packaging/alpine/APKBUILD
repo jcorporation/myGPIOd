@@ -5,7 +5,7 @@
 # Maintainer: Juergen Mang <mail@jcgames.de>
 
 pkgname=mygpiod
-pkgver=0.8.0
+pkgver=0.8.1
 pkgrel=0
 pkgdesc="Lightweight gpio controlling daemon"
 url="https://jcorporation.github.io/myGPIOd/"

@@ -4,6 +4,14 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.8.1 (not yet released)
+
+This is a small maintenance release.
+
+### Changelog
+
+***
+
 ## myGPIOd v0.8.0 (2024-11-03)
 
 This is a small maintenance release.
