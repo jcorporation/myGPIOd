@@ -10,7 +10,6 @@ binary:
 	mkdir -p debian/mygpiod/DEBIAN
 	cp debian/postinst debian/mygpiod/DEBIAN
 	cp debian/conffiles debian/mygpiod/DEBIAN
-	echo 10 > debian/compat
 	dh_installdocs
 	dh_installchangelogs
 	dh_compress
