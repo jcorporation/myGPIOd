@@ -3,19 +3,9 @@ export DH_VERBOSE = 1
 
 BUILDDIR = release
 
-build-arch: build
-
-build-indep: build
-
-build:
+binary: 
 	cmake -B $(BUILDDIR) -DCMAKE_INSTALL_PREFIX:PATH=/usr -DMYGPIOD_STATIC_LIBGPIOD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo .
 	make -C $(BUILDDIR)
-
-binary: binary-indep binary-arch
-
-binary-indep:
-
-binary-arch:
 	make -C $(BUILDDIR) install DESTDIR=../debian/mygpiod
 	mkdir -p debian/mygpiod/DEBIAN
 	cp debian/postinst debian/mygpiod/DEBIAN
