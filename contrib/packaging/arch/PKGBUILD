@@ -6,7 +6,7 @@
 
 pkgname=mygpiod
 _pkgname=myGPIOd
-pkgver=0.8.1
+pkgver=0.8.2
 pkgrel=1
 pkgdesc="lightweight gpio controlling daemon"
 arch=('x86_64' 'armv7h' 'aarch64')
