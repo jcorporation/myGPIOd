@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     if (setvbuf(stdout, NULL, _IOLBF, 0) != 0 ||
         setvbuf(stderr, NULL, _IOLBF, 0) != 0)
     {
-        MYMPD_LOG_EMERG(NULL, "Could not set stdout and stderr buffer");
+        MYGPIOD_LOG_EMERG("Could not set stdout and stderr buffer");
         goto out;
     }
 
