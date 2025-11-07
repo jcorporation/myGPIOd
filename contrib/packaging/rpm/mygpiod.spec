@@ -85,5 +85,5 @@ true
 %{_mandir}/man3/libmygpio_*
 
 %changelog
-* Mon Nov 03 2025 Juergen Mang <mail@jcgames.de> 0.8.2-0
+* Fri Nov 07 2025 Juergen Mang <mail@jcgames.de> 0.8.2-0
 - Version from master

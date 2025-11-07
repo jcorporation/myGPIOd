@@ -4,11 +4,13 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.8.2 (not yet released)
+## myGPIOd v0.8.2 (2025-11-07)
 
 This is a small maintenance release.
 
 ### Changelog
+
+- Fix: Set output buffers for stdout logging
 
 ***
 
