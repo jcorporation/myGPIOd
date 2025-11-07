@@ -89,6 +89,14 @@ int main(int argc, char **argv) {
         log_to_syslog = true;
     }
 
+    // Set output buffers
+    if (setvbuf(stdout, NULL, _IOLBF, 0) != 0 ||
+        setvbuf(stderr, NULL, _IOLBF, 0) != 0)
+    {
+        MYMPD_LOG_EMERG(NULL, "Could not set stdout and stderr buffer");
+        goto out;
+    }
+
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         if (init_luavm(config) == false) {
             rc = EXIT_FAILURE;
