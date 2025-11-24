@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: installdeps
       run: sudo apt-get -y install cmake build-essential autoconf-archive automake git pkgconf
     - name: build
