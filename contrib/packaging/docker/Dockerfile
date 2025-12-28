@@ -7,7 +7,7 @@ COPY . /myGPIOd/
 WORKDIR /myGPIOd
 RUN <<EOF
 set +ex
-apk add --no-cache lua5.4-dev libmpdclient-dev curl-dev linux-headers alpine-sdk cmake autoconf automake libtool linux-headers autoconf-archive
+apk add --no-cache lua5.4-dev libmpdclient-dev curl-dev linux-headers alpine-sdk cmake libgpiod-dev linux-headers autoconf-archive
 cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_MANPAGES=OFF -DMYGPIOD_DOC=OFF .
 cmake --build release
 
