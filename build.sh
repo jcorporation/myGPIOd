@@ -76,7 +76,7 @@ buildrelease() {
     -DCMAKE_INSTALL_PREFIX:PATH=/usr \
     -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
     .
-  make -j4 -C release
+  cmake --build release
 }
 
 addmygpioduser() {
@@ -105,9 +105,8 @@ addmygpioduser() {
 
 installrelease() {
   echo "Installing myGPIOd"
-  cd release || exit 1  
   [ -z "${DESTDIR+x}" ] && DESTDIR=""
-  make install DESTDIR="$DESTDIR"
+  DESTDIR="$DESTDIR" cmake --install release
   addmygpioduser
   echo "mygpiod installed"
   echo "Modify mygpiod.conf to suit your needs."
@@ -128,7 +127,7 @@ builddebug() {
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     $CMAKE_SANITIZER_OPTIONS \
     .
-  make -j4 -C debug VERBOSE=1
+  VERBOSE=1 cmake --build debug
   echo "Linking compilation database"
   sed -e 's/\\t/ /g' -e 's/-Wformat-overflow=2//g' -e 's/-fsanitize=bounds-strict//g' debug/compile_commands.json > mygpiod/compile_commands.json
   cp mygpiod/compile_commands.json libmygpio

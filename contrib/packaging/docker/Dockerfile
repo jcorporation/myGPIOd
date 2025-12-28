@@ -5,9 +5,13 @@
 FROM alpine:latest as build
 COPY . /myGPIOd/
 WORKDIR /myGPIOd
-RUN apk add --no-cache lua5.4-dev libmpdclient-dev curl-dev linux-headers alpine-sdk cmake autoconf automake libtool linux-headers autoconf-archive
-RUN cmake -B "release" -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_MANPAGES=OFF -DMYGPIOD_DOC=OFF .
-RUN make -j4 -C "release"
+RUN <<EOF
+set +ex
+apk add --no-cache lua5.4-dev libmpdclient-dev curl-dev linux-headers alpine-sdk cmake autoconf automake libtool linux-headers autoconf-archive
+cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_MANPAGES=OFF -DMYGPIOD_DOC=OFF .
+cmake --build release
+
+EOF
 
 FROM alpine:latest
 RUN apk add --no-cache libmpdclient curl lua5.4
