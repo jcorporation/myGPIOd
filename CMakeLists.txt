@@ -255,7 +255,13 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
   add_link_options(
     "-pie"
-    "-Wl,-z,relro,-z,now,--gc-sections,--as-needed"
+    "-Wl,-z,nodlopen"
+    "-Wl,-z,noexecstack"
+    "-Wl,-z,relro"
+    "-Wl,-z,now"
+    "-Wl,--as-needed"
+    "-Wl,--no-copy-dt-needed-entries"
+    "-Wl,--gc-sections"
   )
   if(CMAKE_BUILD_TYPE MATCHES "(Release|MinSizeRel)")
     message("Generating stripped binary")
