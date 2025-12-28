@@ -11,8 +11,13 @@ pkgdesc="Lightweight gpio controlling daemon"
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
 license="GPL-3.0-or-later"
-depends="libmpdclient curl lua5.4"
-makedepends="cmake lua5.4-dev libmpdclient-dev curl-dev"
+depends=""
+makedepends="cmake
+	curl-dev
+	libmpdclient-dev
+	lua5.4-dev
+	samurai
+	"
 install="$pkgname.pre-install $pkgname.post-install"
 source="mygpiod_$pkgver.orig.tar.gz"
 builddir="$srcdir"
