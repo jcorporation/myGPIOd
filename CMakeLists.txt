@@ -132,6 +132,7 @@ if(CMAKE_BUILD_TYPE MATCHES "(Debug|Release|RelWithDebInfo|MinSizeRel)")
   add_compile_options(
     "-fdata-sections"
     "-ffunction-sections"
+    "-fPIC"
     "-fstack-protector-strong"
     "-pedantic"
     "-Wall"
