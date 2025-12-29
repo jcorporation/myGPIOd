@@ -10,7 +10,8 @@ This is a small maintenance release.
 
 ### Changelog
 
-- Add dependency to libgpiod system package
+- Upd: Add dependency to libgpiod system package
+- Fix: Build with ninja
 
 ***
 
