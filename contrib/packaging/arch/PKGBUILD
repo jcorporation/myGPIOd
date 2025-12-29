@@ -39,5 +39,5 @@ build() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  install -vDm 644 "${srcdir}"/README.md -t "$pkgdir/usr/share/doc/$pkgname/"
+  install -vDm 644 "${srcdir}/${pkgname}-${pkgver}"/README.md -t "$pkgdir/usr/share/doc/$pkgname/"
 }
