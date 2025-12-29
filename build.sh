@@ -273,8 +273,7 @@ pkgrpm() {
 
 pkgarch() {
   check_cmd makepkg
-  prepare
-  tar -czf "mygpiod_${VERSION}.orig.tar.gz" -- *
+  pkgrpm "taronly"
   cp contrib/packaging/arch/* .
   makepkg
   if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
@@ -294,11 +293,13 @@ pkgarch() {
 }
 
 pkgosc() {
-  [ -z "${OSC_BIN+x}" ] && OSC_BIN="$HOME/python-venv/bin/osc"
-  if [ ! -x "$OSC_BIN" ]
+  if [ -z "${OSC_BIN+x}" ]
   then
-    echo_error "Command osc not found: $HOME/python-venv/bin/osc"
-    exit 1
+    if ! OSC_BIN=$(command -v osc)
+    then
+      echo_error "Command osc not found"
+      exit 1
+    fi
   fi
   cleanup
   cleanuposc
@@ -319,26 +320,40 @@ pkgosc() {
   
   cd "$STARTPATH" || exit 1
   pkgrpm taronly
-
-  cd "$STARTPATH" || exit 1
-  cp "package/build/mygpiod-${VERSION}.tar.gz" "osc/$OSC_REPO/"
-  
-  if [ -f /etc/debian_version ]
-  then
-    pkgdebian
-  fi
-
   cd "$STARTPATH/osc" || exit 1
-  if [ -f /etc/debian_version ]
-  then
-    cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
-    cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
-    cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
-  fi
+  cp "../package/build/mygpiod-${VERSION}.tar.gz" "$OSC_REPO/"
   cp ../contrib/packaging/rpm/mygpiod.spec "$OSC_REPO/"
   cp ../contrib/packaging/arch/PKGBUILD "$OSC_REPO/"
   cp ../contrib/packaging/arch/archlinux.install "$OSC_REPO/"
-  cp ../libgpiod-2.2.tar.gz "$OSC_REPO/"
+
+  cp ../contrib/packaging/debian/changelog "$OSC_REPO/debian.changelog"
+  cp ../contrib/packaging/debian/control "$OSC_REPO/debian.control"
+  cp ../contrib/packaging/debian/rules "$OSC_REPO/debian.rules"
+
+  cat > "$OSC_REPO/mympd.dsc" << EOL
+Format: 3.0 (quilt)
+Source: mygpiod
+Binary: mygpiod
+Architecture: any
+Version: 0.8.2-1
+Maintainer: Juergen Mang <mail@jcgames.de>
+Homepage: https://jcorporation.github.io/myGPIOd/
+Standards-Version: 4.1.2
+Build-Depends: debhelper (>= 10),
+               cmake,
+               debhelper-compat (= 13),
+               git,
+               pkgconf,
+               libmpdclient-dev,
+               libcurl4-gnutls-dev,
+               liblua5.4-dev | liblua5.3-dev,
+               libgpiod-dev
+Package-List:
+ mygpiod deb misc optional arch=any
+Files:
+ 817492d742be04350ba4b6944716ceb8 9195448 mygpiod-${VERSION}.tar.gz
+ decb76e62538ad2cb8e4c34bfc1908f1 1904 mygpiod-${VERSION}-1.diff.tar.gz
+EOL
 
   cd "$OSC_REPO" || exit 1
   $OSC_BIN addremove

@@ -5,7 +5,6 @@ Maintainer: Juergen Mang <mail@jcgames.de>
 Build-Depends: debhelper (>= 10),
                cmake,
                debhelper-compat (= 13),
-               autoconf-archive,
                git,
                pkgconf,
                libmpdclient-dev,
