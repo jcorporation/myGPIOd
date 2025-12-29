@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: installdeps
-      run: sudo apt-get -y install cmake build-essential autoconf-archive automake git pkgconf
+      run: sudo apt-get -y install cmake build-essential git pkgconf libgpiod-dev
     - name: build
       run: |
         cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_ENABLE_ACTION_MPC=OFF -DMYGPIOD_ENABLE_ACTION_HTTP=OFF -DMYGPIOD_ENABLE_ACTION_LUA=OFF .
