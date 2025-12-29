@@ -250,7 +250,6 @@ endif()
 
 if(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
   add_link_options(
-    "-pie"
     "-Wl,-z,nodlopen"
     "-Wl,-z,noexecstack"
     "-Wl,-z,relro"

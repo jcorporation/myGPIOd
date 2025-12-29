@@ -11,37 +11,45 @@ target_include_directories(mygpiod
     "${LIBGPIOD_INCLUDE_DIRS}"
 )
 
-target_sources(mygpiod PRIVATE
-  main.c
-  actions/gpio.c
-  actions/system.c
-  event_loop/event_loop.c
-  event_loop/signal_handler.c
-  gpio/action.c
-  gpio/chip.c
-  gpio/event.c
-  gpio/gpio.c
-  gpio/input.c
-  gpio/output.c
-  gpio/timer.c
-  lib/action.c
-  lib/config.c
-  lib/events.c 
-  lib/list.c
-  lib/log.c
-  lib/timer.c
-  lib/util.c
-  server/gpio.c
-  server/idle.c
-  server/protocol.c
-  server/response.c
-  server/socket.c
+target_sources(mygpiod
+  PRIVATE
+    main.c
+    actions/gpio.c
+    actions/system.c
+    event_loop/event_loop.c
+    event_loop/signal_handler.c
+    gpio/action.c
+    gpio/chip.c
+    gpio/event.c
+    gpio/gpio.c
+    gpio/input.c
+    gpio/output.c
+    gpio/timer.c
+    lib/action.c
+    lib/config.c
+    lib/events.c
+    lib/list.c
+    lib/log.c
+    lib/timer.c
+    lib/util.c
+    server/gpio.c
+    server/idle.c
+    server/protocol.c
+    server/response.c
+    server/socket.c
 )
 
 if (MYGPIOD_DEBUG)
   target_sources(mygpiod
     PRIVATE
       server/event.c
+  )
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
+  target_link_options(mygpiod
+    PUBLIC
+      "-pie"
   )
 endif()
 

@@ -2,19 +2,18 @@
 # myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/mygpiod
 
-FROM alpine:latest as build
+FROM alpine:latest AS build
 COPY . /myGPIOd/
-WORKDIR /myGPIOd
+WORKDIR /
 RUN <<EOF
 set +ex
-apk add --no-cache lua5.4-dev libmpdclient-dev curl-dev linux-headers alpine-sdk cmake libgpiod-dev linux-headers autoconf-archive
-cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_MANPAGES=OFF -DMYGPIOD_DOC=OFF .
-cmake --build release
-
+apk add --no-cache lua5.4-dev libmpdclient-dev curl-dev linux-headers alpine-sdk cmake libgpiod-dev linux-headers samurai
+cmake -B "myGPIOd/release" -G Ninja -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release "myGPIOd"
+cmake --build "myGPIOd/release"
 EOF
 
 FROM alpine:latest
-RUN apk add --no-cache libmpdclient curl lua5.4
+RUN apk add --no-cache libmpdclient curl lua5.4 libgpiod
 COPY --from=build /myGPIOd/release/bin/mygpiod /usr/bin/
 COPY --from=build /myGPIOd/release/bin/mygpioc /usr/bin/
 COPY --from=build /myGPIOd/release/libmygpio/libmygpio.so /usr/lib/

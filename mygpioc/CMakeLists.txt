@@ -19,6 +19,13 @@ target_sources(mygpioc
     util.c
 )
 
+if(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
+  target_link_options(mygpioc
+    PUBLIC
+      "-pie"
+  )
+endif()
+
 target_link_directories(mygpioc
   PRIVATE
     "${PROJECT_BINARY_DIR}/libmygpio"
