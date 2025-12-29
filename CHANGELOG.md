@@ -4,6 +4,16 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.8.3 (not yet released)
+
+This is a small maintenance release.
+
+### Changelog
+
+- Add dependency to libgpiod system package
+
+***
+
 ## myGPIOd v0.8.2 (2025-11-07)
 
 This is a small maintenance release.

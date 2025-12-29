@@ -5,15 +5,14 @@
 # Maintainer: Juergen Mang <mail@jcgames.de>
 
 pkgname=mygpiod
-pkgver=0.8.2
+pkgver=0.8.3
 pkgrel=0
 pkgdesc="Lightweight gpio controlling daemon"
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
 license="GPL-3.0-or-later"
 depends=""
-makedepends="
-	cmake
+makedepends="cmake
 	curl-dev
 	libgpiod-dev
 	libmpdclient-dev

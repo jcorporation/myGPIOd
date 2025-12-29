@@ -81,16 +81,16 @@ Drive setting for an output GPIO\&.
 \fBEnumerator\fP
 .in +1c
 .TP
-\fB\fIMYGPIO_DRIVE_UNKNOWN \fP\fP
+\f(BIMYGPIO_DRIVE_UNKNOWN \fP
 Unknown drive setting\&. 
 .TP
-\fB\fIMYGPIO_DRIVE_PUSH_PULL \fP\fP
+\f(BIMYGPIO_DRIVE_PUSH_PULL \fP
 Drive setting is push-pull\&. 
 .TP
-\fB\fIMYGPIO_DRIVE_OPEN_DRAIN \fP\fP
+\f(BIMYGPIO_DRIVE_OPEN_DRAIN \fP
 Drive setting is open-drain\&. 
 .TP
-\fB\fIMYGPIO_DRIVE_OPEN_SOURCE \fP\fP
+\f(BIMYGPIO_DRIVE_OPEN_SOURCE \fP
 Drive setting is open-source\&. 
 .SS "enum \fBmygpio_event_clock\fP"
 Clock setting for an input GPIO\&. 
@@ -98,16 +98,16 @@ Clock setting for an input GPIO\&.
 \fBEnumerator\fP
 .in +1c
 .TP
-\fB\fIMYGPIO_EVENT_CLOCK_UNKNOWN \fP\fP
+\f(BIMYGPIO_EVENT_CLOCK_UNKNOWN \fP
 Unknown event clock setting\&. 
 .TP
-\fB\fIMYGPIO_EVENT_CLOCK_MONOTONIC \fP\fP
+\f(BIMYGPIO_EVENT_CLOCK_MONOTONIC \fP
 Monotonic clock\&. 
 .TP
-\fB\fIMYGPIO_EVENT_CLOCK_REALTIME \fP\fP
+\f(BIMYGPIO_EVENT_CLOCK_REALTIME \fP
 Realtime clock\&. 
 .TP
-\fB\fIMYGPIO_EVENT_CLOCK_HTE \fP\fP
+\f(BIMYGPIO_EVENT_CLOCK_HTE \fP
 Hardware timestamp engine\&. 
 .SS "enum \fBmygpio_event_request\fP"
 Events requested for an input GPIO\&. 
@@ -115,16 +115,16 @@ Events requested for an input GPIO\&.
 \fBEnumerator\fP
 .in +1c
 .TP
-\fB\fIMYGPIO_EVENT_REQUEST_UNKNOWN \fP\fP
+\f(BIMYGPIO_EVENT_REQUEST_UNKNOWN \fP
 Unknown event request setting\&. 
 .TP
-\fB\fIMYGPIO_EVENT_REQUEST_FALLING \fP\fP
+\f(BIMYGPIO_EVENT_REQUEST_FALLING \fP
 Request falling events\&. 
 .TP
-\fB\fIMYGPIO_EVENT_REQUEST_RISING \fP\fP
+\f(BIMYGPIO_EVENT_REQUEST_RISING \fP
 Request rising events\&. 
 .TP
-\fB\fIMYGPIO_EVENT_REQUEST_BOTH \fP\fP
+\f(BIMYGPIO_EVENT_REQUEST_BOTH \fP
 Request falling and rising events\&. 
 .SS "enum \fBmygpio_gpio_bias\fP"
 Bias setting for an input GPIO\&. 
@@ -132,19 +132,19 @@ Bias setting for an input GPIO\&.
 \fBEnumerator\fP
 .in +1c
 .TP
-\fB\fIMYGPIO_BIAS_UNKNOWN \fP\fP
+\f(BIMYGPIO_BIAS_UNKNOWN \fP
 Unknown bias setting\&. 
 .TP
-\fB\fIMYGPIO_BIAS_AS_IS \fP\fP
+\f(BIMYGPIO_BIAS_AS_IS \fP
 Do not touch the bias state\&. 
 .TP
-\fB\fIMYGPIO_BIAS_DISABLED \fP\fP
+\f(BIMYGPIO_BIAS_DISABLED \fP
 Disable the bias\&. 
 .TP
-\fB\fIMYGPIO_BIAS_PULL_DOWN \fP\fP
+\f(BIMYGPIO_BIAS_PULL_DOWN \fP
 Pull-down the GPIO\&. 
 .TP
-\fB\fIMYGPIO_BIAS_PULL_UP \fP\fP
+\f(BIMYGPIO_BIAS_PULL_UP \fP
 Pull-up the GPIO\&. 
 .SS "enum \fBmygpio_gpio_direction\fP"
 The direction of a GPIO\&. 
@@ -152,13 +152,13 @@ The direction of a GPIO\&.
 \fBEnumerator\fP
 .in +1c
 .TP
-\fB\fIMYGPIO_GPIO_DIRECTION_UNKNOWN \fP\fP
+\f(BIMYGPIO_GPIO_DIRECTION_UNKNOWN \fP
 Unknown GPIO direction\&. 
 .TP
-\fB\fIMYGPIO_GPIO_DIRECTION_IN \fP\fP
+\f(BIMYGPIO_GPIO_DIRECTION_IN \fP
 Input direction, myGPIOd can read events from this GPIO\&. 
 .TP
-\fB\fIMYGPIO_GPIO_DIRECTION_OUT \fP\fP
+\f(BIMYGPIO_GPIO_DIRECTION_OUT \fP
 Output direction, myGPIOd can set the value to: MYGPIO_GPIO_VALUE_ACTIVE or MYGPIO_GPIO_VALUE_INACTIVE\&. 
 .SS "enum \fBmygpio_gpio_value\fP"
 The value of a GPIO\&. 
@@ -166,13 +166,13 @@ The value of a GPIO\&.
 \fBEnumerator\fP
 .in +1c
 .TP
-\fB\fIMYGPIO_GPIO_VALUE_UNKNOWN \fP\fP
+\f(BIMYGPIO_GPIO_VALUE_UNKNOWN \fP
 Unknown GPIO value\&. 
 .TP
-\fB\fIMYGPIO_GPIO_VALUE_INACTIVE \fP\fP
+\f(BIMYGPIO_GPIO_VALUE_INACTIVE \fP
 GPIO state is inactive\&. 
 .TP
-\fB\fIMYGPIO_GPIO_VALUE_ACTIVE \fP\fP
+\f(BIMYGPIO_GPIO_VALUE_ACTIVE \fP
 GPIO state is active\&. 
 .SH "Function Documentation"
 .PP 
@@ -195,7 +195,7 @@ Returns the GPIO direction from struct \fBt_mygpio_gpio\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-GPIO direction, one of enum mygpio_gpio_direction\&. 
+GPIO direction, one of enum \fBmygpio_gpio_direction\fP\&. 
 .RE
 .PP
 
@@ -223,7 +223,7 @@ Returns the GPIO value from struct \fBt_mygpio_gpio\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-GPIO value, one of enum mygpio_gpio_value\&. 
+GPIO value, one of enum \fBmygpio_gpio_value\fP\&. 
 .RE
 .PP
 
@@ -251,7 +251,7 @@ Returns the GPIO bias from struct \fBt_mygpio_gpio\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-GPIO bias, one of enum mygpio_gpio_bias\&. 
+GPIO bias, one of enum \fBmygpio_gpio_bias\fP\&. 
 .RE
 .PP
 
@@ -279,7 +279,7 @@ Returns the GPIO event clock from struct \fBt_mygpio_gpio\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-GPIO event clock, one of enum mygpio_event_clock\&. 
+GPIO event clock, one of enum \fBmygpio_event_clock\fP\&. 
 .RE
 .PP
 
@@ -321,7 +321,7 @@ Returns the GPIO drive setting from struct \fBt_mygpio_gpio\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-GPIO drive setting, one of enum mygpio_drive\&. 
+GPIO drive setting, one of enum \fBmygpio_drive\fP\&. 
 .RE
 .PP
 
