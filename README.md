@@ -4,7 +4,7 @@ myGPIOd is a lightweight GPIO controlling framework. It is written in C and has 
 
 It consists of a daemon, a client library and a command line tool. It is designed to run on Raspberry PIs and similar devices.
 
-I wrote this tool primarily for [myGPIOdos](https://github.com/jcorporation/myGPIOdos) and [myGPIOd](https://github.com/jcorporation/myGPIOd).
+I wrote this tool primarily for [myMPDos](https://github.com/jcorporation/myGPIOdos) and [myMPD](https://github.com/jcorporation/myGPIOd).
 
 myGPIOd can communicate natively with MPD and also integrates nicely with all HTTP APIs.
 
@@ -21,7 +21,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
     - HTTP requests
     - Lua scripting
     - MPD client
-    - myGPIOd client
+    - myMPD client
     - System commands
   - Set various GPIO attributes (bias, debounce, ...)
   - Set the output value of GPIOs
@@ -55,8 +55,6 @@ Building myGPIOd is straight forward.
   - libcurl
   - libmpdclient2
   - lua >= 5.3.0
-
-Only the current Fedora release packages the version 2 of libgpiod. If libgpiod version 2 is not found, the cmake script compiles it as a static library.
 
 ### Build myGPIOd
 
@@ -101,17 +99,16 @@ Example docker compose file to start myGPIOd.
 
 ```yml
 ---
-version: "3.x"
 services:
   mygpiod:
     image: ghcr.io/jcorporation/mygpiod/mygpiod
     container_name: mygpiod
-    network_mode: "host"
     user: 1000:1000
     environment:
       - MPD_HOST=localhost
-    volumes:
+    devices:
       - /dev/gpiochip0:/dev/gpiochip0
+    volumes:
       - /etc/mygpiod.conf:/etc/mygpiod.conf
       - /etc/mygpiod.d/:/etc/mygpiod.d/
     restart: unless-stopped
@@ -154,7 +151,7 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 | http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
 | lua | `{lua function}` [`{option1}` `{option2}` ...] | Calls a user defined lua function. |
 | mpc | `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connection settings from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
-| mympd | `{uri}` `{partition}` `{script}` | Calls the myGPIOd api to execute a script in a new child process. Requires libcurl. |
+| mympd | `{uri}` `{partition}` `{script}` | Calls the myMPD api in a new child process to execute a myMPD script. Requires libcurl. |
 | system | `{command}` | Executes an executable or script in a new child process. No arguments are allowed. |
 
 myGPIOd can take actions on rising, falling and long_press events. Long press is triggered by a falling or rising event and does not disable the triggering event, but the release event. To use a button for normal press and long_press request both events and use one event for long and the other for short press. The example below illustrates this.
