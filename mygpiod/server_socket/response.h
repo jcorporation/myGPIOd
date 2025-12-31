@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_SERVER_RESPONSE_H
 #define MYGPIOD_SERVER_RESPONSE_H
 
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/socket.h"
 
 // Socket server default responses
 #define DEFAULT_MSG_ERROR "ERROR:"

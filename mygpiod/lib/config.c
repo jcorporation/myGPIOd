@@ -15,7 +15,7 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/util.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include <ctype.h>
 #include <dirent.h>

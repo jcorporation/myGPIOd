@@ -12,7 +12,7 @@
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include <fcntl.h>
 #include <sys/socket.h>

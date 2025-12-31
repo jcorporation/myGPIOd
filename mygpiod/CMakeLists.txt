@@ -32,17 +32,17 @@ target_sources(mygpiod
     lib/log.c
     lib/timer.c
     lib/util.c
-    server/gpio.c
-    server/idle.c
-    server/protocol.c
-    server/response.c
-    server/socket.c
+    server_socket/gpio.c
+    server_socket/idle.c
+    server_socket/protocol.c
+    server_socket/response.c
+    server_socket/socket.c
 )
 
 if (MYGPIOD_DEBUG)
   target_sources(mygpiod
     PRIVATE
-      server/event.c
+      server_socket/event.c
   )
 endif()
 

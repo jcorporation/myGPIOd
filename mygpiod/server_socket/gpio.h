@@ -8,7 +8,7 @@
 #define MYGPIOD_SERVER_GPIO_H
 
 #include "mygpiod/lib/config.h"
-#include "mygpiod/server/protocol.h"
+#include "mygpiod/server_socket/protocol.h"
 
 #include <stdbool.h>
 

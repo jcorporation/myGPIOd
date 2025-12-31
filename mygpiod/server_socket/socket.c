@@ -5,7 +5,7 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include "dist/sds/sds.h"
 #include "mygpiod/event_loop/event_loop.h"
@@ -15,8 +15,8 @@
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/timer.h"
 #include "mygpiod/lib/util.h"
-#include "mygpiod/server/protocol.h"
-#include "mygpiod/server/response.h"
+#include "mygpiod/server_socket/protocol.h"
+#include "mygpiod/server_socket/response.h"
 
 #include <errno.h>
 #include <fcntl.h>

@@ -5,7 +5,7 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/server/response.h"
+#include "mygpiod/server_socket/response.h"
 
 #include "mygpiod/event_loop/event_loop.h"
 

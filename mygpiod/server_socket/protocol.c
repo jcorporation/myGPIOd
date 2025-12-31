@@ -5,17 +5,17 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/server/protocol.h"
+#include "mygpiod/server_socket/protocol.h"
 
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/util.h"
-#include "mygpiod/server/gpio.h"
-#include "mygpiod/server/idle.h"
-#include "mygpiod/server/response.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/gpio.h"
+#include "mygpiod/server_socket/idle.h"
+#include "mygpiod/server_socket/response.h"
+#include "mygpiod/server_socket/socket.h"
 
 #ifdef MYGPIOD_DEBUG
-    #include "mygpiod/server/event.h"
+    #include "mygpiod/server_socket/event.h"
 #endif
 
 #include <ctype.h>

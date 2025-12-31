@@ -5,13 +5,13 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/server/event.h"
+#include "mygpiod/server_socket/event.h"
 
 #include "mygpio-common/util.h"
 #include "mygpiod/gpio/action.h"
 #include "mygpiod/lib/util.h"
-#include "mygpiod/server/response.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/response.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include <ctype.h>
 #include <errno.h>

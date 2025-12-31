@@ -5,12 +5,12 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/server/idle.h"
+#include "mygpiod/server_socket/idle.h"
 
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/log.h"
-#include "mygpiod/server/response.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/response.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include <stdio.h>
 #include <stdlib.h>

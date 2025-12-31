@@ -5,14 +5,14 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/server/gpio.h"
+#include "mygpiod/server_socket/gpio.h"
 
 #include "mygpio-common/util.h"
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/output.h"
 #include "mygpiod/lib/util.h"
-#include "mygpiod/server/response.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/response.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include <ctype.h>
 #include <errno.h>
