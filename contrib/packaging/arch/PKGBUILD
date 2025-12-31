@@ -6,7 +6,7 @@
 
 pkgname=mygpiod
 _pkgname=myGPIOd
-pkgver=0.8.3
+pkgver=0.9.0
 pkgrel=1
 pkgdesc="lightweight gpio controlling daemon"
 arch=('x86_64' 'armv7h' 'aarch64')
@@ -39,5 +39,5 @@ build() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  install -vDm 644 "${srcdir}/${pkgname}-${pkgver}"/README.md -t "$pkgdir/usr/share/doc/$pkgname/"
+  install -vDm 644 "${srcdir}"/README.md -t "$pkgdir/usr/share/doc/$pkgname/"
 }
