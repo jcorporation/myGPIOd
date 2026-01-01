@@ -11,7 +11,6 @@
 
 /**
  * Starts a new response by clearing the output buffer.
- * It sends the response from buf_out to the client.
  * @param data pointer to client data
  */
 void server_response_start(struct t_client_data *client_data) {
