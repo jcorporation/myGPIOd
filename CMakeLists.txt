@@ -71,6 +71,16 @@ if(MYGPIOD_DAEMON)
   else()
     message(FATAL_ERROR "Required dependency libgpiod not found.")
   endif()
+
+  find_package(LIBMHD)
+  if (LIBMHD_FOUND)
+    message("Found libmicrohttpd version is: ${LIBMHD_VERSION}")
+    if(NOT LIBMHD_VERSION VERSION_GREATER_EQUAL "1.0.0")
+      message(FATAL_ERROR "Required libmicrohttpd version >= 1.0.0")
+    endif()
+  else()
+    message(FATAL_ERROR "Required dependency libmicrohttpd not found.")
+  endif()
 endif()
 
 # find optional dependencies

@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <gpiod.h>
 #include <limits.h>
+#include <microhttpd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -90,6 +91,9 @@ void config_clear(struct t_config *config) {
         }
         FREE_SDS(config->lua_file);
     #endif
+    if (config->httpd != NULL) {
+        MHD_stop_daemon(config->httpd);
+    }
 }
 
 //private functions
@@ -123,6 +127,9 @@ static struct t_config *config_new(void) {
         config->lua_vm = NULL;
         config->lua_file = sdsempty();
     #endif
+
+    config->http_port = 8081;
+    config->httpd = NULL;
     return config;
 }
 
@@ -268,6 +275,13 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     if (strcmp(key, "timeout") == 0) {
         if (mygpio_parse_int(value, &config->socket_timeout_s, NULL, 10, 120) == true) {
             MYGPIOD_LOG_DEBUG("Setting timeout to \"%d\" seconds", config->socket_timeout_s);
+            return true;
+        }
+        return false;
+    }
+    if (strcmp(key, "http_port") == 0) {
+        if (mygpio_parse_uint(value, &config->http_port, NULL, 1025, 65535) == true) {
+            MYGPIOD_LOG_DEBUG("Setting http port to \"%u\" seconds", config->http_port);
             return true;
         }
         return false;

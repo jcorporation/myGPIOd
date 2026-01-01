@@ -73,6 +73,9 @@ struct t_config {
     struct t_list clients;                //!< list of connected clients
     unsigned client_id;                   //!< uniq client id
 
+    struct MHD_Daemon *httpd;             //!< HTTPD object
+    unsigned http_port;                   //!< HTTPD listening port
+
     struct gpiod_chip *chip;              //!< gpiod chip object
 
     #ifdef MYGPIOD_ENABLE_ACTION_MPC

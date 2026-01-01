@@ -18,6 +18,7 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/util.h"
+#include "mygpiod/server_http/httpd.h"
 #include "mygpiod/server_socket/socket.h"
 
 #include <poll.h>
@@ -132,6 +133,11 @@ int main(int argc, char **argv) {
         goto out;
     }
     event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI);
+
+    // create http server
+    config->httpd = httpd_start(config);
+    const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
+    event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
 
     // main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");

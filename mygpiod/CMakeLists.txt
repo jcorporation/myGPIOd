@@ -9,6 +9,7 @@ target_include_directories(mygpiod
     "${PROJECT_BINARY_DIR}"
     "${PROJECT_SOURCE_DIR}"
     "${LIBGPIOD_INCLUDE_DIRS}"
+    "${LIBMHD_INCLUDE_DIRS}"
 )
 
 target_sources(mygpiod
@@ -32,6 +33,7 @@ target_sources(mygpiod
     lib/log.c
     lib/timer.c
     lib/util.c
+    server_http/httpd.c
     server_socket/gpio.c
     server_socket/idle.c
     server_socket/protocol.c
@@ -55,6 +57,7 @@ endif()
 
 target_link_libraries(mygpiod
   "${LIBGPIOD_LIBRARIES}"
+  "${LIBMHD_LIBRARIES}"
   sds
   mygpio-common
 )
