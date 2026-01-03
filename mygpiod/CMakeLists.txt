@@ -39,7 +39,6 @@ target_sources(mygpiod
     server_http/rest_api_gpio.c
     server_http/rest_api.c
     server_http/util.c
-    server_http/websocket.c
     server_http/webui.c
     server_socket/gpio.c
     server_socket/idle.c

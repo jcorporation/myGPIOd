@@ -12,6 +12,12 @@
 #include <microhttpd.h>
 #include <string.h>
 
+/**
+ * Serves the files for the WebUI
+ * @param connection HTTP connection
+ * @param url URL
+ * @return enum MHD_Result 
+ */
 enum MHD_Result webui_handler(struct MHD_Connection *connection, const char *url) {
     unsigned http_response_code = MHD_HTTP_OK;
     struct MHD_Response *response;

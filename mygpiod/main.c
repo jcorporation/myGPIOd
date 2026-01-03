@@ -127,19 +127,21 @@ int main(int argc, char **argv) {
     event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI);
 
     // create http server
-    config->httpd = httpd_start(config);
-    if (config->httpd == NULL) {
-        MYGPIOD_LOG_EMERG("Failure starting http server.");
-        goto out;
+    if (config->http_port > 0) {
+        config->httpd = httpd_start(config);
+        if (config->httpd == NULL) {
+            MYGPIOD_LOG_EMERG("Failure starting http server.");
+            goto out;
+        }
+        const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
+        if (httpd_fd == NULL ||
+            httpd_fd->epoll_fd == -1)
+        {
+            MYGPIOD_LOG_EMERG("Failure getting MHD epoll fd.");
+            goto out;
+        }
+        event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
     }
-    const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
-    if (httpd_fd == NULL ||
-        httpd_fd->epoll_fd == -1)
-    {
-        MYGPIOD_LOG_EMERG("Failure getting MHD epoll fd.");
-        goto out;
-    }
-    event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
 
     // main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");

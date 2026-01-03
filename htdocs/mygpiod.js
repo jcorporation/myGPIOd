@@ -21,65 +21,6 @@ function setError(msg) {
     document.getElementById('lastError').textContent = msg;
 }
 
-// Connect to the websocket and set event listeners.
-function socketConnect() {
-    document.getElementById('websocketState').textContent = 'Connecting';
-    if (socket != null) {
-        socket.onclose = function() {};
-        socket.close();
-        socket = null;
-    }
-    socket = new WebSocket(getUri('ws') + '/ws');
-    socket.onopen = function() {
-        document.getElementById('websocketState').textContent = 'Connected';
-    }
-    socket.onclose = function() {
-        socket = null;
-        document.getElementById('websocketState').textContent = 'Disconnected';
-    }
-    socket.onmessage = function(msg) {
-        parseWebsocketMsg(msg.data);
-    }
-}
-
-// Parses the websocket message.
-function parseWebsocketMsg(data) {
-    let obj;
-    try {
-        obj = JSON.parse(data);
-        document.getElementById('websocketState').textContent = 'Connected';
-    }
-    catch(error) {
-        document.getElementById('websocketState').textContent = 'Unable to parse event';
-        console.error(error);
-        return;
-    }
-    // update GPIO list
-    updateGPIOvalue(obj.gpio);
-    // append event
-    const tr = document.createElement('tr');
-    const tdGPIO = document.createElement('td');
-    tdGPIO.textContent = obj.gpio;
-    const tdEvent = document.createElement('td');
-    tdEvent.textContent = obj.event;
-    const tdTimestamp = document.createElement('td');
-    tdTimestamp.textContent = obj.ts_ms;
-    tr.appendChild(tdGPIO);
-    tr.appendChild(tdEvent);
-    tr.appendChild(tdTimestamp);
-    const eventsEl = document.getElementById('events');
-    eventsEl.prepend(tr);
-    // enforce event list size
-    if (eventsEl.childElementCount > 10) {
-        eventsEl.removeChild(eventsEl.lastChild);
-    }
-}
-
-// Clears the events table.
-function clearEvents() {
-    document.getElementById('events').textContent = '';
-}
-
 // Gets and updates the value of a GPIO.
 function updateGPIOvalue(gpio) {
     const tr = document.getElementById('gpio' + gpio);
@@ -253,16 +194,6 @@ socketConnect();
 getGPIOs()
 
 // Refresh button event listeners
-document.getElementById('websocketReconnect').addEventListener('click', function(event) {
-    event.preventDefault();
-    socketConnect();
-}, false);
-
-document.getElementById('clearEvents').addEventListener('click', function(event) {
-    event.preventDefault();
-    clearEvents();
-}, false);
-
 document.getElementById('gpioRefresh').addEventListener('click', function(event) {
     event.preventDefault();
     getGPIOs();

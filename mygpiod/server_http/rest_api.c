@@ -8,7 +8,6 @@
 #include "mygpiod/server_http/rest_api.h"
 
 #include "dist/sds/sds.h"
-#include "lib/action.h"
 #include "mygpio-common/util.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/sds_extras.h"
@@ -18,7 +17,14 @@
 #include <microhttpd.h>
 #include <string.h>
 
-static bool match_uri_gpio(const char *uri,
+/**
+ * Parses REST API request url
+ * @param url URL
+ * @param pattern Pattern to match 
+ * @param gpio Pointer to GPIO variable to populate
+ * @return true on success, else false
+ */
+static bool match_url_gpio(const char *url,
                            const char *pattern,
                            unsigned *gpio)
 {
@@ -29,15 +35,15 @@ static bool match_uri_gpio(const char *uri,
         if (pattern[i] == '*') {
             break;
         }
-        if (pattern[i] != uri[i]) {
+        if (pattern[i] != url[i]) {
             return false;
         }
     }
     // Catch gpio number
     sds match = sdsempty();
     size_t j = i;
-    for (; uri[j] != '\0' && uri[j] != '/'; j++) {
-        match = sds_catchar(match, uri[j]);
+    for (; url[j] != '\0' && url[j] != '/'; j++) {
+        match = sds_catchar(match, url[j]);
     }
     if (mygpio_parse_uint(match, gpio, NULL, 1, GPIOS_MAX) == false) {
         FREE_SDS(match);
@@ -47,13 +53,22 @@ static bool match_uri_gpio(const char *uri,
     // Match suffix
     i++;
     for (; i < pattern_len; i++, j++) {
-        if (pattern[i] != uri[j]) {
+        if (pattern[i] != url[j]) {
             return false;
         }
     }
     return true;
 }
 
+/**
+ * Handler for REST API Requests
+ * @param connection HTTP connection
+ * @param url URL
+ * @param method_str HTTP method
+ * @param upload_data POST data
+ * @param config Pointer to config
+ * @return enum MHD_Result 
+ */
 enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
                                  const char *url,
                                  const char *method_str,
@@ -67,19 +82,19 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     if (method == HTTP_GET && strcmp(url, "/api/gpio") == 0) {
         buffer = rest_api_gpio_get(config, buffer, &rc);
     }
-    else if (method == HTTP_GET && match_uri_gpio(url, "/api/gpio/*", &gpio_nr)) {
+    else if (method == HTTP_GET && match_url_gpio(url, "/api/gpio/*", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_get(config, buffer, gpio_nr, &rc);
     }
-    else if (method == HTTP_OPTIONS && match_uri_gpio(url, "/api/gpio/*", &gpio_nr)) {
+    else if (method == HTTP_OPTIONS && match_url_gpio(url, "/api/gpio/*", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_options(config, buffer, gpio_nr, &rc);
     }
-    else if (method == HTTP_POST && match_uri_gpio(url, "/api/gpio/*/blink", &gpio_nr)) {
+    else if (method == HTTP_POST && match_url_gpio(url, "/api/gpio/*/blink", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_blink(config, buffer, gpio_nr, upload_data, &rc);
     }
-    else if (method == HTTP_POST && match_uri_gpio(url, "/api/gpio/*/set", &gpio_nr)) {
+    else if (method == HTTP_POST && match_url_gpio(url, "/api/gpio/*/set", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_set(config, buffer, gpio_nr, upload_data, &rc);
     }
-    else if (method == HTTP_POST && match_uri_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
+    else if (method == HTTP_POST && match_url_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_toggle(config, buffer, gpio_nr, &rc);
     }
     else {

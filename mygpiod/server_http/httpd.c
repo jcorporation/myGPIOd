@@ -9,12 +9,23 @@
 
 #include "mygpiod/lib/log.h"
 #include "mygpiod/server_http/rest_api.h"
-#include "mygpiod/server_http/websocket.h"
 #include "mygpiod/server_http/webui.h"
 
 #include <microhttpd.h>
 #include <string.h>
 
+/**
+ * Central HTTP Request Handler
+ * @param cls Not used
+ * @param connection HTTP connection
+ * @param url URL
+ * @param method HTTP method
+ * @param version HTTP version
+ * @param upload_data POST data
+ * @param upload_data_size POST data size
+ * @param ptr Pointer to config
+ * @return enum MHD_Result 
+ */
 static enum MHD_Result request_handler(void *cls,
                                        struct MHD_Connection *connection,
                                        const char *url,
@@ -25,7 +36,6 @@ static enum MHD_Result request_handler(void *cls,
                                        void **ptr)
 {
     (void)cls;
-    (void)url;
     (void)version;
     (void)upload_data_size;
     struct t_config *config =  (struct t_config *)ptr;
@@ -35,15 +45,17 @@ static enum MHD_Result request_handler(void *cls,
     if (strncmp(url, "/api/", 5) == 0) {
         rc = rest_api_handler(connection, url, method, upload_data, config);
     }
-    else if (strncmp(url, "/ws", 3) == 0) {
-        rc = websocket_handler(connection, config);
-    }
     else {
         rc = webui_handler(connection, url);
     }
     return rc;
 }
 
+/**
+ * Creates the microhttpd server
+ * @param config Pointer to config
+ * @return struct MHD_Daemon* 
+ */
 struct MHD_Daemon *httpd_start(struct t_config *config) {
     MYGPIOD_LOG_INFO("Listening on port %u for http requests.", config->http_port);
     unsigned mhd_flags = MHD_USE_EPOLL | \
