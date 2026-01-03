@@ -58,7 +58,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/resp_error'
-    
+
     options:
       tags:
         - gpio
