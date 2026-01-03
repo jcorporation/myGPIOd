@@ -33,7 +33,7 @@ function refreshGPIO(event) {
 // Executes the toggle GPIO action.
 function toggleGPIO(event) {
     const gpio = event.target.closest('tr').data.gpio;
-    httpRequest('PATCH', '/api/gpio/' + gpio + '/toggle', null);
+    httpRequest('PATCH', '/api/gpio/' + gpio + '/toggle', getGPIOs);
 }
 
 // Shows the modal for the set GPIO action.
@@ -48,7 +48,7 @@ function setGPIO() {
     const gpio = document.getElementById('modalGPIOsetGPIO').value;
     const valueEl = document.getElementById('modalGPIOsetValue');
     const value = valueEl.options[valueEl.selectedIndex].value;
-    httpRequest('PATCH', '/api/gpio/' + gpio + '/set?value=' + value, null);
+    httpRequest('PATCH', '/api/gpio/' + gpio + '/set?value=' + value, getGPIOs);
 }
 
 // Shows the modal for the blink GPIO action.
@@ -63,7 +63,7 @@ function blinkGPIO() {
     const gpio = document.getElementById('modalGPIOblinkGPIO').value;
     const timeout = document.getElementById('modalGPIOblinkTimeout').value;
     const interval = document.getElementById('modalGPIOblinkInterval').value;
-    httpRequest('PATCH', '/api/gpio/' + gpio + '/blink?timeout=' + timeout + '&interval=' + interval, null);
+    httpRequest('PATCH', '/api/gpio/' + gpio + '/blink?timeout=' + timeout + '&interval=' + interval, getGPIOs);
 }
 
 // Gets the details of a GPIO and displays it in a modal.
