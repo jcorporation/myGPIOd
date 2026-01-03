@@ -46,21 +46,11 @@ const char *__asan_default_options(void) {
 #endif
 
 int main(int argc, char **argv) {
+    // Set initial states
     int rc = EXIT_SUCCESS;
-
-    //only owner and group should have rw access
-    umask(0007);
-
-    log_on_tty = isatty(fileno(stdout))
-        ? true
-        : false;
-    log_to_syslog = false;
-
-    #ifdef MYGPIOD_DEBUG
-        set_loglevel(LOG_DEBUG);
-    #else
-        set_loglevel(CFG_LOGLEVEL);
-    #endif
+    logline = sdsempty();
+    log_init();
+    umask(0007);  //only owner and group should have rw access
 
     MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIO_VERSION);
     MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
@@ -85,9 +75,11 @@ int main(int argc, char **argv) {
     #endif
 
     // open syslog connection
-    if (config->syslog == true) {
+    if (config->syslog == true &&
+        log_type != LOG_TO_SYSTEMD)
+    {
         openlog(MYGPIOD_NAME, LOG_CONS, LOG_DAEMON);
-        log_to_syslog = true;
+        log_type = LOG_TO_SYSLOG;
     }
 
     // Set output buffers
@@ -192,5 +184,6 @@ out:
     if (rc == EXIT_SUCCESS) {
         MYGPIOD_LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
     }
+    FREE_SDS(logline);
     return rc;
 }
