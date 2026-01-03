@@ -12,6 +12,7 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_http/rest_api_gpio.h"
+#include "mygpiod/server_http/rest_api_raspberry.h"
 #include "mygpiod/server_http/util.h"
 
 #include <microhttpd.h>
@@ -95,6 +96,18 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     }
     else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_toggle(config, buffer, gpio_nr, &rc);
+    }
+    else if (method == HTTP_GET && strcmp(url, "/api/vcio/temp") == 0) {
+        buffer = rest_api_raspberry_vcio(buffer, "measure_temp", &rc);
+    }
+    else if (method == HTTP_GET && strcmp(url, "/api/vcio/volts") == 0) {
+        buffer = rest_api_raspberry_vcio(buffer, "measure_volts core", &rc);
+    }
+    else if (method == HTTP_GET && strcmp(url, "/api/vcio/clock") == 0) {
+        buffer = rest_api_raspberry_vcio(buffer, "measure_clock arm", &rc);
+    }
+    else if (method == HTTP_GET && strcmp(url, "/api/vcio/throttled") == 0) {
+        buffer = rest_api_raspberry_vcio(buffer, "get_throttled", &rc);
     }
     else {
         // Request was not handled

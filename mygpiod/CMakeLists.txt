@@ -35,8 +35,10 @@ target_sources(mygpiod
     lib/log.c
     lib/sds_extras.c
     lib/timer.c
+    raspberry/vcgencmd.c
     server_http/httpd.c
     server_http/rest_api_gpio.c
+    server_http/rest_api_raspberry.c
     server_http/rest_api.c
     server_http/util.c
     server_http/webui.c

@@ -4,12 +4,13 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.8.3 (not yet released)
+## myGPIOd v0.9.0 (not yet released)
 
-This is a small maintenance release.
+This release introduces a very simple REST-API to control GPIOs.
 
 ### Changelog
 
+- Feat: REST-API
 - Upd: Add dependency to libgpiod system package
 - Fix: Build with ninja
 
