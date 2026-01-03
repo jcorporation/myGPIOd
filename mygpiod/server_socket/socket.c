@@ -13,8 +13,8 @@
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
+#include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/lib/timer.h"
-#include "mygpiod/lib/util.h"
 #include "mygpiod/server_socket/protocol.h"
 #include "mygpiod/server_socket/response.h"
 

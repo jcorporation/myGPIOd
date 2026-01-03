@@ -10,8 +10,8 @@
 #include "dist/sds/sds.h"
 #include "mygpio-common/util.h"
 #include "mygpiod/gpio/output.h"
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lib/util.h"
 
 #include <errno.h>
 #include <stdlib.h>

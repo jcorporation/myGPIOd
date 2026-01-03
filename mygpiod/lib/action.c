@@ -8,7 +8,7 @@
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
-#include "mygpiod/lib/util.h"
+#include "mygpiod/lib/sds_extras.h"
 
 #include <errno.h>
 #include <strings.h>

@@ -9,17 +9,15 @@
 
 #include "mygpio-common/util.h"
 #include "mygpiod/gpio/action.h"
-#include "mygpiod/lib/util.h"
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/server_socket/response.h"
 #include "mygpiod/server_socket/socket.h"
 
-#include <ctype.h>
 #include <errno.h>
-#include <stdio.h>
 #include <string.h>
 
 /**
- * Emmits a syntetic event calling action_handle.
+ * Emits a synthetic event calling action_handle.
  * This protocol command is only enabled in debug builds.
  * @param options client command
  * @param config pointer to config

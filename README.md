@@ -51,6 +51,8 @@ Building myGPIOd is straight forward.
 - C build environment
 - cmake >= 3.13
 - libgpiod-dev >= 2.0.0
+- microhttpd
+- json-c
 - Optional:
   - libcurl
   - libmpdclient2

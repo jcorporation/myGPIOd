@@ -12,9 +12,7 @@
 #include "mygpiod/lib/log.h"
 
 #include <curl/curl.h>
-#include <errno.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 /**

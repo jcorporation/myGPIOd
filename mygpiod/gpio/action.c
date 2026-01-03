@@ -11,12 +11,12 @@
 #include "mygpiod/actions/system.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/gpio.h"
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
-#include "mygpiod/lib/util.h"
 
 #ifdef MYGPIOD_ENABLE_ACTION_MPC
     #include "mygpiod/actions/mpc.h"
@@ -31,11 +31,7 @@
     #include "mygpiod/actions/lua.h"
 #endif
 
-#include <errno.h>
 #include <gpiod.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
 

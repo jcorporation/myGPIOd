@@ -7,13 +7,12 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/input.h"
 
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lib/util.h"
 
 #include <assert.h>
-#include <errno.h>
 #include <gpiod.h>
 #include <string.h>
 

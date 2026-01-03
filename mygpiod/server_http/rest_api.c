@@ -1,0 +1,101 @@
+/*
+ SPDX-License-Identifier: GPL-3.0-or-later
+ myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ https://github.com/jcorporation/myGPIOd
+*/
+
+#include "compile_time.h"
+#include "mygpiod/server_http/rest_api.h"
+
+#include "dist/sds/sds.h"
+#include "lib/action.h"
+#include "mygpio-common/util.h"
+#include "mygpiod/lib/log.h"
+#include "mygpiod/lib/sds_extras.h"
+#include "mygpiod/server_http/rest_api_gpio.h"
+#include "mygpiod/server_http/util.h"
+
+#include <microhttpd.h>
+#include <string.h>
+
+static bool match_uri_gpio(const char *uri,
+                           const char *pattern,
+                           unsigned *gpio)
+{
+    size_t pattern_len = strlen(pattern);
+    // Match prefix
+    size_t i = 0;
+    for (; i < pattern_len; i++) {
+        if (pattern[i] == '*') {
+            break;
+        }
+        if (pattern[i] != uri[i]) {
+            return false;
+        }
+    }
+    // Catch gpio number
+    sds match = sdsempty();
+    size_t j = i;
+    for (; uri[j] != '\0' && uri[j] != '/'; j++) {
+        match = sds_catchar(match, uri[j]);
+    }
+    if (mygpio_parse_uint(match, gpio, NULL, 1, GPIOS_MAX) == false) {
+        FREE_SDS(match);
+        return false;
+    }
+    FREE_SDS(match);
+    // Match suffix
+    i++;
+    for (; i < pattern_len; i++, j++) {
+        if (pattern[i] != uri[j]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
+                                 const char *url,
+                                 const char *method_str,
+                                 const char *upload_data,
+                                 struct t_config *config)
+{
+    sds buffer = sdsempty();
+    bool rc = false;
+    enum http_method method = parse_method(method_str);
+    unsigned gpio_nr = UINT_MAX;
+    if (method == HTTP_GET && strcmp(url, "/api/gpio") == 0) {
+        buffer = rest_api_gpio_get(config, buffer, &rc);
+    }
+    else if (method == HTTP_GET && match_uri_gpio(url, "/api/gpio/*", &gpio_nr)) {
+        buffer = rest_api_gpio_gpio_get(config, buffer, gpio_nr, &rc);
+    }
+    else if (method == HTTP_OPTIONS && match_uri_gpio(url, "/api/gpio/*", &gpio_nr)) {
+        buffer = rest_api_gpio_gpio_options(config, buffer, gpio_nr, &rc);
+    }
+    else if (method == HTTP_POST && match_uri_gpio(url, "/api/gpio/*/blink", &gpio_nr)) {
+        buffer = rest_api_gpio_gpio_blink(config, buffer, gpio_nr, upload_data, &rc);
+    }
+    else if (method == HTTP_POST && match_uri_gpio(url, "/api/gpio/*/set", &gpio_nr)) {
+        buffer = rest_api_gpio_gpio_set(config, buffer, gpio_nr, upload_data, &rc);
+    }
+    else if (method == HTTP_POST && match_uri_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
+        buffer = rest_api_gpio_gpio_toggle(config, buffer, gpio_nr, &rc);
+    }
+    else {
+        // Request was not handled
+        MYGPIOD_LOG_ERROR("Invalid API request: %s %s", method_str, url);
+        rc = false;
+        buffer = sdscat(buffer,"{\"error\":\"Invalid API request\"}");
+    }
+
+    unsigned http_response_code = rc == false
+        ? MHD_HTTP_INTERNAL_SERVER_ERROR
+        : MHD_HTTP_OK;
+    struct MHD_Response *response = MHD_create_response_from_buffer(sdslen(buffer), (void *)buffer, MHD_RESPMEM_MUST_COPY);
+    MHD_add_response_header(response, "Content-Type", "application/json");
+    enum MHD_Result result = MHD_queue_response(connection, http_response_code, response);
+    MHD_destroy_response(response);
+    FREE_SDS(buffer);
+    return result;
+}

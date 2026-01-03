@@ -10,13 +10,11 @@
 #include "mygpio-common/util.h"
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/output.h"
-#include "mygpiod/lib/util.h"
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/server_socket/response.h"
 #include "mygpiod/server_socket/socket.h"
 
-#include <ctype.h>
 #include <errno.h>
-#include <stdio.h>
 #include <string.h>
 
 /**

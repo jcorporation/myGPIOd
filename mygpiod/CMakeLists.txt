@@ -26,14 +26,21 @@ target_sources(mygpiod
     gpio/input.c
     gpio/output.c
     gpio/timer.c
+    gpio/util.c
     lib/action.c
     lib/config.c
     lib/events.c
+    lib/json_print.c
     lib/list.c
     lib/log.c
+    lib/sds_extras.c
     lib/timer.c
-    lib/util.c
     server_http/httpd.c
+    server_http/rest_api_gpio.c
+    server_http/rest_api.c
+    server_http/util.c
+    server_http/websocket.c
+    server_http/webui.c
     server_socket/gpio.c
     server_socket/idle.c
     server_socket/protocol.c
@@ -60,6 +67,7 @@ target_link_libraries(mygpiod
   "${LIBMHD_LIBRARIES}"
   sds
   mygpio-common
+  json-c::json-c
 )
 
 if (MYGPIOD_ENABLE_ACTION_MPC)

@@ -1,0 +1,140 @@
+<!--
+ SPDX-License-Identifier: GPL-3.0-or-later
+ myGPIOweb (c) 2024-2025 Juergen Mang <mail@jcgames.de>
+ https://github.com/jcorporation/myGPIOweb
+-->
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>myGPIOweb</title>
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <link href="mygpiod.css" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand fixed-top">
+      <a class="navbar-brand ms-3" href="index.html">myGPIOd</a>
+    </nav>
+  </header>
+  <main class="container-fluid">
+    <div class="card mb-3">
+      <div class="card-header">Configured GPIOs<a id="gpioRefresh" href="#" class="float-end" title="Refresh all">&#x1F5D8</a></div>
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr><th>GPIO</th><th>Direction</th><th>State</th><th></th></tr>
+          </thead>
+          <tbody id="gpios"></tbody>
+        </table>
+      </div>
+      <div class="card-footer"><small id="lastError"></small></div>
+    </div>
+    <div class="card">
+      <div class="card-header">Events<span class="float-end">
+        <a id="clearEvents" href="#" title="Clear">&#x239A</a>&nbsp;&nbsp;
+        <a id="websocketReconnect" href="#" class="reload" title="Reconnect">&#x1F5D8</a>
+      </span></div>
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr><th>GPIO</th><th>Event</th><th>Timestamp</th></tr>
+          </thead>
+          <tbody id="events"></tbody>
+        </table>
+      </div>
+      <div class="card-footer"><small id="websocketState"></small></div>
+    </div>
+  </main>
+
+  <div class="modal fade" id="modalGPIOinfo" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">GPIO Info</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table">
+            <tbody id="modalGPIOinfoList"></tbody>
+          </table>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalGPIOset" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Set GPIO</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label" for="modalGPIOsetGPIO">GPIO</label>
+            <div class="col-sm-8">
+              <input id="modalGPIOsetGPIO" class="form-control" readonly="readonly">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label" for="modalGPIOsetValue">Value</label>
+            <div class="col-sm-8">
+              <select class="form-control" id="modalGPIOsetValue">
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="modalGPIOsetSet">Set</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalGPIOblink" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Blink GPIO</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label" for="modalGPIOblinkGPIO">GPIO</label>
+            <div class="col-sm-8">
+              <input id="modalGPIOblinkGPIO" class="form-control" readonly="readonly">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label" for="modalGPIOblinkTimeout">Timeout (ms)</label>
+            <div class="col-sm-8">
+              <input id="modalGPIOblinkTimeout" class="form-control">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label" for="modalGPIOblinkInterval">Interval (ms)</label>
+            <div class="col-sm-8">
+              <input id="modalGPIOblinkInterval" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="modalGPIOblinkSet">Set</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="bootstrap-native.min.js"></script>
+  <script src="mygpiod.js"></script>
+</body>
+</html>

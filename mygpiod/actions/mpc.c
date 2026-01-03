@@ -11,7 +11,6 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 
-#include <errno.h>
 #include <mpd/client.h>
 #include <poll.h>
 #include <string.h>

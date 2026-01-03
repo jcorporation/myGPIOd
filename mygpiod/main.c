@@ -17,7 +17,7 @@
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
-#include "mygpiod/lib/util.h"
+#include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_http/httpd.h"
 #include "mygpiod/server_socket/socket.h"
 
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
         gpio_set_outputs(config) == false ||
         gpio_request_inputs(config, &poll_fds) == false)
     {
-        goto out;
+        //goto out;
     }
 
     // add signal fd
@@ -136,7 +136,17 @@ int main(int argc, char **argv) {
 
     // create http server
     config->httpd = httpd_start(config);
+    if (config->httpd == NULL) {
+        MYGPIOD_LOG_EMERG("Failure starting http server.");
+        goto out;
+    }
     const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
+    if (httpd_fd == NULL ||
+        httpd_fd->epoll_fd == -1)
+    {
+        MYGPIOD_LOG_EMERG("Failure getting MHD epoll fd.");
+        goto out;
+    }
     event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
 
     // main event handling loop

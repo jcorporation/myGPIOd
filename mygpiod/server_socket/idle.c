@@ -12,7 +12,6 @@
 #include "mygpiod/server_socket/response.h"
 #include "mygpiod/server_socket/socket.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 /**

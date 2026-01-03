@@ -8,7 +8,7 @@
 #include "mygpiod/server_socket/protocol.h"
 
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lib/util.h"
+#include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_socket/gpio.h"
 #include "mygpiod/server_socket/idle.h"
 #include "mygpiod/server_socket/response.h"
@@ -18,8 +18,6 @@
     #include "mygpiod/server_socket/event.h"
 #endif
 
-#include <ctype.h>
-#include <stdio.h>
 #include <string.h>
 
 // private definitions

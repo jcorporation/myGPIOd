@@ -9,7 +9,7 @@
 
 #include "dist/sds/sds.h"
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lib/util.h"
+#include "mygpiod/lib/sds_extras.h"
 
 #include <curl/curl.h>
 #include <errno.h>

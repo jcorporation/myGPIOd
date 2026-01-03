@@ -62,7 +62,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
 # find required dependencies
 if(MYGPIOD_DAEMON)
-  find_package(LIBGPIOD)
+  find_package(LIBGPIOD REQUIRED)
   if (LIBGPIOD_FOUND)
     message("Found libgpiod version is: ${LIBGPIOD_VERSION}")
     if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
@@ -72,7 +72,7 @@ if(MYGPIOD_DAEMON)
     message(FATAL_ERROR "Required dependency libgpiod not found.")
   endif()
 
-  find_package(LIBMHD)
+  find_package(LIBMHD REQUIRED)
   if (LIBMHD_FOUND)
     message("Found libmicrohttpd version is: ${LIBMHD_VERSION}")
     if(NOT LIBMHD_VERSION VERSION_GREATER_EQUAL "1.0.0")
@@ -81,6 +81,8 @@ if(MYGPIOD_DAEMON)
   else()
     message(FATAL_ERROR "Required dependency libmicrohttpd not found.")
   endif()
+
+  find_package(json-c REQUIRED)
 endif()
 
 # find optional dependencies
@@ -123,6 +125,7 @@ endif()
 
 # configure some files - version and path information
 configure_file(mygpio-common/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
+configure_file(mygpiod/server_http/embedded_files.c.in ${PROJECT_BINARY_DIR}/embedded_files.c)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
 configure_file(contrib/initscripts/mygpiod.service.in contrib/initscripts/mygpiod.service @ONLY)
 configure_file(contrib/initscripts/mygpiod.sysVinit.in contrib/initscripts/mygpiod.sysVinit @ONLY)

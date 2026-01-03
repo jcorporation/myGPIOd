@@ -7,24 +7,24 @@
 #include "compile_time.h"
 #include "mygpiod/lib/config.h"
 
+#include "dist/sds/sds.h"
 #include "mygpio-common/util.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/event_loop/signal_handler.h"
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
-#include "mygpiod/lib/util.h"
+#include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_socket/socket.h"
 
-#include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
 #include <gpiod.h>
 #include <limits.h>
 #include <microhttpd.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 

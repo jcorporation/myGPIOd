@@ -10,7 +10,6 @@
 #include "mygpiod/lib/mem.h"
 
 #include <stddef.h>
-#include <stdlib.h>
 
 /**
  * Initializes the list.

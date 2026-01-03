@@ -1,0 +1,18 @@
+/*
+ SPDX-License-Identifier: GPL-3.0-or-later
+ myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ https://github.com/jcorporation/mygpiod
+*/
+
+#define INCBIN_PREFIX
+#define INCBIN_STYLE INCBIN_STYLE_SNAKE
+
+#include "compile_time.h"
+#include "dist/incbin/incbin.h"
+
+//compressed assets
+INCBIN(bootstrap_native_min_js, "${CMAKE_SOURCE_DIR}/htdocs/bootstrap-native.min.js");
+INCBIN(bootstrap_min_css, "${CMAKE_SOURCE_DIR}/htdocs/bootstrap.min.css");
+INCBIN(index_html, "${CMAKE_SOURCE_DIR}/htdocs/index.html");
+INCBIN(mygpiod_css, "${CMAKE_SOURCE_DIR}/htdocs/mygpiod.css");
+INCBIN(mygpiod_js, "${CMAKE_SOURCE_DIR}/htdocs/mygpiod.js");
