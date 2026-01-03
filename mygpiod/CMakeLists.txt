@@ -66,7 +66,6 @@ target_link_libraries(mygpiod
   "${LIBMHD_LIBRARIES}"
   sds
   mygpio-common
-  json-c::json-c
 )
 
 if (MYGPIOD_ENABLE_ACTION_MPC)

@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
   title: myGPIOweb - OpenAPI 3.0
-  description: |-
-    REST API of myGPIOweb.
-    - [GitHub Repository](https://github.com/jcorporation/myGPIOweb)
-  version: 0.1.0
+  contact:
+    url: https://github.com/jcorporation/myGPIOd
+  description: REST API of myGPIOd
+  version: 0.2.0
 servers:
   - url: http://localhost:8000/api
 tags:
@@ -15,7 +15,8 @@ paths:
     get:
       tags:
         - gpio
-      summary: List all configured GPIOs
+      description: List all configured GPIOs
+      operationId: gpio_get
       responses:
         '200':
           description: Successful operation
@@ -42,7 +43,8 @@ paths:
     get:
       tags:
         - gpio
-      summary: Get the GPIOs current value
+      description: Get the GPIOs current value
+      operationId: gpio_gpio_get
       responses:
         '200':
           description: Successful operation
@@ -60,7 +62,8 @@ paths:
     options:
       tags:
         - gpio
-      summary: Get the GPIO settings
+      description: Get the GPIO settings
+      operationId: gpio_gpio_options
       responses:
         '200':
           description: Successful operation
@@ -84,15 +87,28 @@ paths:
           type: number
           minimum: 0
           maximum: 99
-    post:
+    patch:
       tags:
         - gpio
-      summary: Blink the value of an output GPIO
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/req_gpioblink'
+      description: Blink the value of an output GPIO
+      operationId: gpio_gpio_blink_patch
+      parameters:
+        - name: timeout
+          in: query
+          required: true
+          description: GPIO blink timeout in ms
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100000
+        - name: interval
+          in: query
+          required: true
+          description: GPIO blink interval in ms
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100000
       responses:
         '200':
           description: Successful operation
@@ -116,15 +132,20 @@ paths:
           type: number
           minimum: 0
           maximum: 99
-    post:
+    patch:
       tags:
         - gpio
-      summary: Set the value of an output GPIO
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/req_gpioset'
+      description: Set the value of an output GPIO
+      operationId: gpio_gpio_set_patch
+      parameters:
+        - in: query
+          name: value
+          schema:
+            type: string
+            oneOf:
+              - $ref: '#/components/schemas/gpio_value'
+          required: true
+          description: GPIO active state
       responses:
         '200':
           description: Successful operation
@@ -148,15 +169,11 @@ paths:
           type: number
           minimum: 0
           maximum: 99
-    post:
+    patch:
       tags:
         - gpio
-      summary: Toggle the value of an output GPIO
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/req_gpiotoggle'
+      description: Toggle the value of an output GPIO
+      operationId: gpio_gpio_toggle_patch
       responses:
         '200':
           description: Successful operation
@@ -196,28 +213,6 @@ components:
     gpio_event_clock:
       type: string
       enum: [monotonic, realtime, hte]
-
-    req_gpioblink:
-      type: object
-      properties:
-        timeout:
-          type: number
-          description: Initial timeout in ms
-        interval:
-          type: number
-          description: Interval in ms
-
-    req_gpioset:
-      type: object
-      properties:
-        value:
-          type: string
-          description: GPIO active state
-          oneOf:
-            - $ref: '#/components/schemas/gpio_value'
-
-    req_gpiotoggle:
-      type: object
 
     resp_error:
       type: object

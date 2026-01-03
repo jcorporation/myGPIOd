@@ -6,13 +6,8 @@ const modalGPIOsetInit = BSN.Modal.getInstance(document.getElementById('modalGPI
 const modalGPIOblinkInit = BSN.Modal.getInstance(document.getElementById('modalGPIOblink'));
 
 // Calculates the uri for websocket and http requests.
-function getUri(proto) {
-    const protocol = proto === 'ws'
-        ? window.location.protocol === 'https:'
-            ? 'wss:'
-            : 'ws:'
-        : window.location.protocol;
-    return protocol + '//' + window.location.hostname +
+function getUri() {
+    return window.location.protocol + '//' + window.location.hostname +
         (window.location.port !== '' ? ':' + window.location.port : '');
 }
 
@@ -24,7 +19,7 @@ function setError(msg) {
 // Gets and updates the value of a GPIO.
 function updateGPIOvalue(gpio) {
     const tr = document.getElementById('gpio' + gpio);
-    httpRequest('GET', '/api/gpio/' + gpio, null, function(data) {
+    httpRequest('GET', '/api/gpio/' + gpio, function(data) {
         tr.childNodes[2].textContent = data.value;
     });
 }
@@ -37,11 +32,8 @@ function refreshGPIO(event) {
 
 // Executes the toggle GPIO action.
 function toggleGPIO(event) {
-    const body = JSON.stringify({
-        "action": "gpiotoggle"
-    });
     const gpio = event.target.closest('tr').data.gpio;
-    httpRequest('POST', '/api/gpio/' + gpio, body, null);
+    httpRequest('PATCH', '/api/gpio/' + gpio + '/toggle', null);
 }
 
 // Shows the modal for the set GPIO action.
@@ -56,11 +48,7 @@ function setGPIO() {
     const gpio = document.getElementById('modalGPIOsetGPIO').value;
     const valueEl = document.getElementById('modalGPIOsetValue');
     const value = valueEl.options[valueEl.selectedIndex].value;
-    const body = JSON.stringify({
-        "action": "gpioset",
-        "value": value
-    });
-    httpRequest('POST', '/api/gpio/' + gpio, body, null);
+    httpRequest('PATCH', '/api/gpio/' + gpio + '/set?value=' + value, null);
 }
 
 // Shows the modal for the blink GPIO action.
@@ -73,14 +61,9 @@ function showModalBlinkGPIO(event) {
 // Executes the blink GPIO action.
 function blinkGPIO() {
     const gpio = document.getElementById('modalGPIOblinkGPIO').value;
-    const timeout = Number(document.getElementById('modalGPIOblinkTimeout').value)
-    const interval = Number(document.getElementById('modalGPIOblinkInterval').value)
-    const body = JSON.stringify({
-        "action": "gpioblink",
-        "timeout": timeout,
-        "interval": interval
-    });
-    httpRequest('POST', '/api/gpio/' + gpio, body, null);
+    const timeout = document.getElementById('modalGPIOblinkTimeout').value;
+    const interval = document.getElementById('modalGPIOblinkInterval').value;
+    httpRequest('PATCH', '/api/gpio/' + gpio + '/blink?timeout=' + timeout + '&interval=' + interval, null);
 }
 
 // Gets the details of a GPIO and displays it in a modal.
@@ -88,7 +71,7 @@ function infoGPIO(event) {
     const gpioInfoEl = document.getElementById('modalGPIOinfoList');
     gpioInfoEl.textContent = '';
     const gpio = event.target.closest('tr').data.gpio;
-    httpRequest('OPTIONS', '/api/gpio/' + gpio, null, function(data) {
+    httpRequest('OPTIONS', '/api/gpio/' + gpio, function(data) {
         const keys = Object.keys(data.data);
         for (const key of keys) {
             const tr = document.createElement('tr');
@@ -135,7 +118,7 @@ function getGPIOactions(direction) {
 function getGPIOs() {
     const gpiosEl = document.getElementById('gpios');
     gpiosEl.textContent = '';
-    httpRequest('GET', '/api/gpio', null, function(data) {
+    httpRequest('GET', '/api/gpio', function(data) {
         for (let i = 0; i < data.entries; i++) {
             const tr = document.createElement('tr');
             for (const k of ['gpio', 'direction', 'value']) {
@@ -152,8 +135,8 @@ function getGPIOs() {
 }
 
 // Makes an http request and calls the callback function on success.
-async function httpRequest(method, path, body, callback) {
-    const uri = getUri('http') + path;
+async function httpRequest(method, path, callback) {
+    const uri = getUri() + path;
     let response = null;
     try {
         response = await fetch(uri, {
@@ -161,8 +144,7 @@ async function httpRequest(method, path, body, callback) {
             mode: 'same-origin',
             credentials: 'same-origin',
             cache: 'no-store',
-            redirect: 'follow',
-            body: body
+            redirect: 'follow'
         });
     }
     catch(error) {

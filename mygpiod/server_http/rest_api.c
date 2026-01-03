@@ -72,7 +72,6 @@ static bool match_url_gpio(const char *url,
 enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
                                  const char *url,
                                  const char *method_str,
-                                 const char *upload_data,
                                  struct t_config *config)
 {
     sds buffer = sdsempty();
@@ -88,13 +87,13 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     else if (method == HTTP_OPTIONS && match_url_gpio(url, "/api/gpio/*", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_options(config, buffer, gpio_nr, &rc);
     }
-    else if (method == HTTP_POST && match_url_gpio(url, "/api/gpio/*/blink", &gpio_nr)) {
-        buffer = rest_api_gpio_gpio_blink(config, buffer, gpio_nr, upload_data, &rc);
+    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/blink", &gpio_nr)) {
+        buffer = rest_api_gpio_gpio_blink(config, buffer, gpio_nr, connection, &rc);
     }
-    else if (method == HTTP_POST && match_url_gpio(url, "/api/gpio/*/set", &gpio_nr)) {
-        buffer = rest_api_gpio_gpio_set(config, buffer, gpio_nr, upload_data, &rc);
+    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/set", &gpio_nr)) {
+        buffer = rest_api_gpio_gpio_set(config, buffer, gpio_nr, connection, &rc);
     }
-    else if (method == HTTP_POST && match_url_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
+    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_toggle(config, buffer, gpio_nr, &rc);
     }
     else {

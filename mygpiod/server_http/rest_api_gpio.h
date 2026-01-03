@@ -10,6 +10,8 @@
 #include "lib/action.h"
 #include "mygpiod/lib/config.h"
 
+#include <microhttpd.h>
+
 sds rest_api_gpio_get(struct t_config *config,
                       sds buffer,
                       bool *rc);
@@ -24,12 +26,12 @@ sds rest_api_gpio_gpio_options(struct t_config *config,
 sds rest_api_gpio_gpio_blink(struct t_config *config,
                              sds buffer,
                              unsigned gpio_nr,
-                             const char *upload_data,
+                             struct MHD_Connection *connection,
                              bool *rc);
 sds rest_api_gpio_gpio_set(struct t_config *config,
                             sds buffer,
                             unsigned gpio_nr,
-                            const char *upload_data,
+                            struct MHD_Connection *connection,
                             bool *rc);
 sds rest_api_gpio_gpio_toggle(struct t_config *config,
                             sds buffer,

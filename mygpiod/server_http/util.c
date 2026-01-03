@@ -21,8 +21,8 @@ enum http_method parse_method(const char *method) {
     if (strcmp(method, "OPTIONS") == 0) {
         return HTTP_OPTIONS;
     }
-    if (strcmp(method, "POST") == 0) {
-        return HTTP_POST;
+    if (strcmp(method, "PATCH") == 0) {
+        return HTTP_PATCH;
     }
     return HTTP_UNKNOWN;
 }

@@ -81,8 +81,6 @@ if(MYGPIOD_DAEMON)
   else()
     message(FATAL_ERROR "Required dependency libmicrohttpd not found.")
   endif()
-
-  find_package(json-c REQUIRED)
 endif()
 
 # find optional dependencies

@@ -14,7 +14,6 @@
 enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
                                  const char *url,
                                  const char *method_str,
-                                 const char *upload_data,
                                  struct t_config *config);
 
 #endif

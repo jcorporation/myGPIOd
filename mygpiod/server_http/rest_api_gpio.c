@@ -7,15 +7,13 @@
 #include "compile_time.h"
 #include "mygpiod/server_http/rest_api_gpio.h"
 
+#include "mygpio-common/util.h"
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/output.h"
 #include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/json_print.h"
 
 #include <errno.h>
-#include <json-c/json.h>
-#include <json-c/json_object.h>
-#include <json-c/json_tokener.h>
 #include <stdlib.h>
 
 /**
@@ -158,44 +156,27 @@ sds rest_api_gpio_gpio_options(struct t_config *config,
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
- * @param upload_data HTTP post data
  * @param rc pointer to bool to set the result code
  * @return sds pointer to buffer
  */
 sds rest_api_gpio_gpio_blink(struct t_config *config,
                              sds buffer,
                              unsigned gpio_nr,
-                             const char *upload_data,
+                             struct MHD_Connection *connection,
                              bool *rc)
 {
-    struct json_object *obj = json_tokener_parse(upload_data);
-    if (obj == NULL) {
-        *rc = false;
-        return sdscat(buffer, "{\"error\":\"JSON parsing error\"}");
-    }
 
-    struct json_object *timeout;
-    if (json_pointer_get(obj, "/timeout", &timeout) != 0) {
-        *rc = false;
-        json_object_put(obj);
-        return sdscat(buffer,"{\"error\":\"Timeout not found\"}");
-    }
-    int timeout_i = json_object_get_int(timeout);
-
-    struct json_object *interval;
-    if (json_pointer_get(obj, "/interval", &interval) != 0) {
-        *rc = false;
-        json_object_put(obj);
-        return sdscat(buffer,"{\"error\":\"Interval not found\"}");
-    }
-    int interval_i = json_object_get_int(interval);
-    json_object_put(obj);
-
-    if (timeout_i < 0 || timeout_i > INT_MAX ||
-        interval_i < 0 || interval_i > INT_MAX)
+    const char *timeout = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "timeout");
+    const char *interval = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "interval");
+    int timeout_i;
+    int interval_i;
+    if (timeout == NULL ||
+        interval == NULL ||
+        mygpio_parse_int(timeout, &timeout_i, NULL, 0, INT_MAX) == false ||
+        mygpio_parse_int(interval, &interval_i, NULL, 0, INT_MAX) == false)
     {
         *rc = false;
-        return sdscat(buffer,"{\"error\":\"Invalid timeout or interval\"}");
+        return sdscat(buffer,"{\"error\":\"Parameter \"timeout\" or \"interval\" not found or invalid\"}");
     }
 
     *rc = gpio_blink(config, gpio_nr, timeout_i, interval_i);
@@ -220,28 +201,19 @@ sds rest_api_gpio_gpio_blink(struct t_config *config,
 sds rest_api_gpio_gpio_set(struct t_config *config,
                             sds buffer,
                             unsigned gpio_nr,
-                            const char *upload_data,
+                            struct MHD_Connection *connection,
                             bool *rc)
 {
-    struct json_object *obj = json_tokener_parse(upload_data);
-    if (obj == NULL) {
+    const char *value = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "value");
+    if (value == NULL) {
         *rc = false;
-        return sdscat(buffer, "{\"error\":\"JSON parsing error\"}");
-    }
-
-    struct json_object *value;
-    if (json_pointer_get(obj, "/value", &value) != 0) {
-        *rc = false;
-        json_object_put(obj);
-        return sdscat(buffer,"{\"error\":\"Value not found\"}");
+        return sdscat(buffer,"{\"error\":\"Parameter \"value\" not found\"}");
     }
 
     errno = 0;
-    enum gpiod_line_value line_value = parse_gpio_value(json_object_get_string(value));
-    json_object_put(obj);
+    enum gpiod_line_value line_value = parse_gpio_value(value);
     if (errno == EINVAL) {
         *rc = false;
-        json_object_put(obj);
         return sdscat(buffer,"{\"error\":\"Invalid value\"}");
     }
 

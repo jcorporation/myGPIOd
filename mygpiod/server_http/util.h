@@ -11,7 +11,7 @@ enum http_method {
     HTTP_UNKNOWN = -1,
     HTTP_GET,
     HTTP_OPTIONS,
-    HTTP_POST,
+    HTTP_PATCH,
 };
 
 enum http_method parse_method(const char *method);

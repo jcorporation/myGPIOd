@@ -40,13 +40,14 @@ static enum MHD_Result request_handler(void *cls,
 {
     (void)cls;
     (void)version;
+    (void)upload_data;
     (void)upload_data_size;
     struct t_config *config =  (struct t_config *)ptr;
 
     MYGPIOD_LOG_DEBUG("HTTP request: %s %s", method, url);
     enum MHD_Result rc = MHD_NO;
     if (strncmp(url, "/api/", 5) == 0) {
-        rc = rest_api_handler(connection, url, method, upload_data, config);
+        rc = rest_api_handler(connection, url, method, config);
     }
     else {
         rc = webui_handler(connection, url);
