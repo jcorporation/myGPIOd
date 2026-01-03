@@ -16,6 +16,7 @@ target_sources(mygpioc
     gpio.c
     idle.c
     options.c
+    raspberry_vcio.c
     util.c
 )
 

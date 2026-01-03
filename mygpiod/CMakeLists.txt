@@ -45,6 +45,7 @@ target_sources(mygpiod
     server_socket/gpio.c
     server_socket/idle.c
     server_socket/protocol.c
+    server_socket/raspberry.c
     server_socket/response.c
     server_socket/socket.c
 )

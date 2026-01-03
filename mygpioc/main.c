@@ -10,6 +10,7 @@
 #include "mygpioc/gpio.h"
 #include "mygpioc/idle.h"
 #include "mygpioc/options.h"
+#include "mygpioc/raspberry_vcio.h"
 #include "mygpioc/util.h"
 
 #include <stdio.h>
@@ -35,6 +36,10 @@ static struct t_commands commands[] = {
     { "gpioset", handle_gpioset, 2, 2 },
     { "gpiotoggle", handle_gpiotoggle, 1, 1 },
     { "gpioblink", handle_gpioblink, 3, 3 },
+    { "vciotemp", handle_vciotemp, 0, 0},
+    { "vciovolts", handle_vciovolts, 0, 0},
+    { "vcioclock", handle_vcioclock, 0, 0},
+    { "vciothrottled", handle_vciothrottled, 0, 0},
     { NULL, NULL, 0, 0}
 };
 
@@ -69,7 +74,7 @@ int main(int argc, char **argv) {
     const char *command_string = argv[option_index];
     option_index++;
     const struct t_commands *command = get_command(command_string, argc, option_index);
-    if (command == NULL) {
+    if (command->command == NULL) {
         print_usage();
         clear_options(&options);
         return EXIT_FAILURE;

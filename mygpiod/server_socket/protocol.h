@@ -23,6 +23,10 @@
     X(CMD_GPIOBLINK) \
     X(CMD_GPIOINFO) \
     X(CMD_EVENT) \
+    X(CMD_VCIOTEMP) \
+    X(CMD_VCIOVOLTS) \
+    X(CMD_VCIOCLOCK) \
+    X(CMD_VCIOTHROTTLED) \
     X(CMD_COUNT)
 
 /**

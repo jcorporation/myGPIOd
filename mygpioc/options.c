@@ -46,6 +46,10 @@ void print_usage(void) {
                     "  gpioset <number> <active|inactive>       Sets the value of an output gpio\n"
                     "  gpiotoggle <number>                      Toggles the value of an output gpio\n"
                     "  idle [<timeout>]                         Waits for idle events, timeout is in milliseconds\n"
+                    "  vciotemp                                 Gets the temperature from /dev/vcio\n"
+                    "  vciovolts                                Gets the core voltage from /dev/vcio\n"
+                    "  vcioclock                                Gets the core clock from /dev/vcio\n"
+                    "  vciothrottled                            Gets the throttled mask from /dev/vcio\n"
                     "\n",
         MYGPIO_VERSION
     );

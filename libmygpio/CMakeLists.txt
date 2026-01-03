@@ -22,6 +22,7 @@ target_sources(mygpio
     src/parser.c
     src/pair.c
     src/protocol.c
+    src/raspberry_vcio.c
     src/socket.c
     src/util.c
 )

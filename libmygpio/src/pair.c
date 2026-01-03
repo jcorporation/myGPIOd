@@ -61,6 +61,9 @@ struct t_mygpio_pair *mygpio_recv_pair_name(struct t_mygpio_connection *connecti
  * @param pair pair to free
  */
 void mygpio_free_pair(struct t_mygpio_pair *pair) {
+    if (pair == NULL) {
+        return;
+    }
     pair->name = NULL;
     pair->value = NULL;
     free(pair);

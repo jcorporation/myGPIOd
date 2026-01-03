@@ -11,8 +11,10 @@
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_socket/gpio.h"
 #include "mygpiod/server_socket/idle.h"
+#include "mygpiod/server_socket/raspberry.h"
 #include "mygpiod/server_socket/response.h"
 #include "mygpiod/server_socket/socket.h"
+#include "protocol.h"
 
 #ifdef MYGPIOD_DEBUG
     #include "mygpiod/server_socket/event.h"
@@ -95,6 +97,18 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
             #else
                 rc = false;
             #endif
+            break;
+        case CMD_VCIOTEMP:
+            rc = handle_raspberry_vcio(client_node, "measure_temp");
+            break;
+        case CMD_VCIOVOLTS:
+            rc = handle_raspberry_vcio(client_node, "measure_volts core");
+            break;
+        case CMD_VCIOCLOCK:
+            rc = handle_raspberry_vcio(client_node, "measure_clock arm");
+            break;
+        case CMD_VCIOTHROTTLED:
+            rc = handle_raspberry_vcio(client_node, "get_throttled");
             break;
         case CMD_INVALID:
         case CMD_COUNT:
