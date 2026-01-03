@@ -21,7 +21,7 @@ bool gpio_open_chip(struct t_config *config) {
     MYGPIOD_LOG_INFO("Opening chip \"%s\"", config->chip_path);
     config->chip = gpiod_chip_open(config->chip_path);
     if (config->chip == NULL) {
-        MYGPIOD_LOG_ERROR("Error opening chip");
+        MYGPIOD_LOG_EMERG("Error opening chip");
         return false;
     }
     return true;

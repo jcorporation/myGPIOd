@@ -29,6 +29,8 @@
 #define CFG_GPIO_DIR "/etc/mygpiod.d"
 #define CFG_SOCKET_PATH "/run/mygpiod/socket"
 #define CFG_SOCKET_TIMEOUT 60 //seconds
+#define CFG_HTTP_IP "127.0.0.1"
+#define CFG_HTTP_PORT 8081
 
 // Other defaults
 #define CLIENT_CONNECTIONS_MAX 10

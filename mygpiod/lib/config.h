@@ -74,6 +74,7 @@ struct t_config {
     unsigned client_id;                   //!< uniq client id
 
     struct MHD_Daemon *httpd;             //!< HTTPD object
+    sds http_ip;                          //!< HTTPD listening ip
     unsigned http_port;                   //!< HTTPD listening port
 
     struct gpiod_chip *chip;              //!< gpiod chip object

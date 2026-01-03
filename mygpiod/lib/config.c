@@ -80,6 +80,7 @@ void config_clear(struct t_config *config) {
     FREE_SDS(config->chip_path);
     FREE_SDS(config->dir_gpio);
     FREE_SDS(config->socket_path);
+    FREE_SDS(config->http_ip);
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         if (config->mpd_conn != NULL) {
             mpd_connection_free(config->mpd_conn);
@@ -128,7 +129,8 @@ static struct t_config *config_new(void) {
         config->lua_file = sdsempty();
     #endif
 
-    config->http_port = 8081;
+    config->http_ip = sdsnew(CFG_HTTP_IP);
+    config->http_port = CFG_HTTP_PORT;
     config->httpd = NULL;
     return config;
 }
@@ -278,6 +280,12 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
             return true;
         }
         return false;
+    }
+    if (strcmp(key, "http_ip") == 0) {
+        sdsclear(config->http_ip);
+        config->http_ip = sdscat(config->http_ip, value);
+        MYGPIOD_LOG_DEBUG("Setting http_ip to \"%s\"", config->http_ip);
+        return true;
     }
     if (strcmp(key, "http_port") == 0) {
         if (mygpio_parse_uint(value, &config->http_port, NULL, 1025, 65535) == true) {

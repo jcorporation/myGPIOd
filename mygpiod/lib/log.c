@@ -203,6 +203,7 @@ void mygpiod_log(int level, const char *file, int line, const char *fmt, ...) {
         logline = sdscatlen(logline, "...", 3);
     }
 
+    sdstrim(logline, "\n");
     if (log_type == LOG_TO_TTY) {
         logline = sdscat(logline, "\033[0m\n");
     }

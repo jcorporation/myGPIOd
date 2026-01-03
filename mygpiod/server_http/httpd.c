@@ -11,8 +11,11 @@
 #include "mygpiod/server_http/rest_api.h"
 #include "mygpiod/server_http/webui.h"
 
+#include <arpa/inet.h>
 #include <microhttpd.h>
+#include <netinet/in.h>
 #include <string.h>
+
 
 /**
  * Central HTTP Request Handler
@@ -51,6 +54,14 @@ static enum MHD_Result request_handler(void *cls,
     return rc;
 }
 
+void error_log(void *arg, const char *fmt, va_list ap) {
+    (void)arg;
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    MYGPIOD_LOG_ERROR(fmt, ap);
+    #pragma GCC diagnostic pop
+}
+
 /**
  * Creates the microhttpd server
  * @param config Pointer to config
@@ -60,15 +71,22 @@ struct MHD_Daemon *httpd_start(struct t_config *config) {
     MYGPIOD_LOG_INFO("Listening on port %u for http requests.", config->http_port);
     unsigned mhd_flags = MHD_USE_EPOLL | \
                          MHD_USE_ERROR_LOG | \
-                         MHD_USE_DUAL_STACK | \
                          MHD_USE_PEDANTIC_CHECKS | \
                          MHD_USE_TCP_FASTOPEN | \
                          MHD_ALLOW_UPGRADE;
+    
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons((__uint16_t)config->http_port);            // Convert port number to network byte order
+    inet_pton(AF_INET, config->http_ip, &server_addr.sin_addr); // Specify IP address
+
     return MHD_start_daemon(mhd_flags,
                             (uint16_t)config->http_port,
                             NULL,
                             NULL,
                             &request_handler,
                             config,
+                            MHD_OPTION_EXTERNAL_LOGGER, &error_log, NULL,
+                            MHD_OPTION_SOCK_ADDR, &server_addr,
                             MHD_OPTION_END);
 }
