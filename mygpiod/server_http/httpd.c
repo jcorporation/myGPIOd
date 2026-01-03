@@ -36,13 +36,13 @@ static enum MHD_Result request_handler(void *cls,
                                        const char *version,
                                        const char *upload_data,
                                        size_t *upload_data_size,
-                                       void **ptr)
+                                       void **con_cls)
 {
-    (void)cls;
     (void)version;
     (void)upload_data;
     (void)upload_data_size;
-    struct t_config *config =  (struct t_config *)ptr;
+    (void)con_cls;
+    struct t_config *config = (struct t_config *)cls;
 
     MYGPIOD_LOG_DEBUG("HTTP request: %s %s", method, url);
     enum MHD_Result rc = MHD_NO;
@@ -55,7 +55,13 @@ static enum MHD_Result request_handler(void *cls,
     return rc;
 }
 
-void error_log(void *arg, const char *fmt, va_list ap) {
+/**
+ * Errorlog handler
+ * @param arg Not used
+ * @param fmt Format string
+ * @param ap Variadic values
+ */
+static void error_log(void *arg, const char *fmt, va_list ap) {
     (void)arg;
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -86,7 +92,7 @@ struct MHD_Daemon *httpd_start(struct t_config *config) {
                             NULL,
                             NULL,
                             &request_handler,
-                            &config,
+                            config,
                             MHD_OPTION_EXTERNAL_LOGGER, &error_log, NULL,
                             MHD_OPTION_SOCK_ADDR, &server_addr,
                             MHD_OPTION_END);
