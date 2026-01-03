@@ -78,7 +78,7 @@ struct MHD_Daemon *httpd_start(struct t_config *config) {
     
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons((__uint16_t)config->http_port);            // Convert port number to network byte order
+    server_addr.sin_port = htons((uint16_t)config->http_port);            // Convert port number to network byte order
     inet_pton(AF_INET, config->http_ip, &server_addr.sin_addr); // Specify IP address
 
     return MHD_start_daemon(mhd_flags,
