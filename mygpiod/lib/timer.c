@@ -74,7 +74,7 @@ void timer_log_next_expire(int timer_fd) {
         MYGPIOD_LOG_ERROR("Can not get expiration for timer: \"%s\"", strerror(errno));
         return;
     }
-    int64_t timestamp = its.it_value.tv_sec * 1000 + its.it_value.tv_nsec / 1000000;
+    int64_t timestamp = (its.it_value.tv_sec * 1000) + (its.it_value.tv_nsec / 1000000);
     MYGPIOD_LOG_DEBUG("Timer expires in %lld ms", (long long)timestamp);
 }
 

@@ -196,17 +196,14 @@ endif()
 set(ASAN_FLAGS
   "-fsanitize=address"
   "-fsanitize=leak"
-  "-latomic"
 )
 
 set(UBSAN_FLAGS
   "-fsanitize=undefined"
-  "-latomic"
 )
 
 set(TSAN_FLAGS
   "-fsanitize=thread"
-  "-latomic"
 )
 
 if(MYGPIOD_ENABLE_ASAN)

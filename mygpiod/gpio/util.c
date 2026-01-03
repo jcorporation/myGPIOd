@@ -43,7 +43,7 @@ uint64_t get_timestamp_ns(enum gpiod_line_clock event_clock) {
             }
             break;
     }
-    uint64_t ts_ns = (uint64_t)ts.tv_sec * (uint64_t)1000000000 + (uint64_t)ts.tv_nsec;
+    uint64_t ts_ns = (uint64_t)(ts.tv_sec * 1000000000) + (uint64_t)ts.tv_nsec;
     return ts_ns;
 }
 
