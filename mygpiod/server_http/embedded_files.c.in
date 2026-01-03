@@ -16,3 +16,4 @@ INCBIN(bootstrap_min_css, "${CMAKE_SOURCE_DIR}/htdocs/bootstrap.min.css");
 INCBIN(index_html, "${CMAKE_SOURCE_DIR}/htdocs/index.html");
 INCBIN(mygpiod_css, "${CMAKE_SOURCE_DIR}/htdocs/mygpiod.css");
 INCBIN(mygpiod_js, "${CMAKE_SOURCE_DIR}/htdocs/mygpiod.js");
+INCBIN(openapi_yml, "${CMAKE_SOURCE_DIR}/openapi.yml");

@@ -54,6 +54,7 @@ option(MYGPIOD_ENABLE_UBSAN "Enables build with undefined behavior sanitizer, de
 # cmake modules
 include(CheckCCompilerFlag)
 include(CheckCSourceCompiles)
+include(CheckPrototypeDefinition)
 include(CheckIPOSupported)
 include(GNUInstallDirs)
 
@@ -120,6 +121,15 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
     set(MYGPIOD_ENABLE_ACTION_LUA "OFF")
   endif()
 endif()
+
+# Workaround for musl libc
+check_prototype_definition(
+    ioctl
+    "int ioctl(int fd, int request, ...)"
+    0
+    "sys/ioctl.h"
+    HAVE_IOCTL_WITH_INT_REQUEST
+)
 
 # configure some files - version and path information
 configure_file(mygpio-common/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)

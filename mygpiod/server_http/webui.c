@@ -43,6 +43,10 @@ enum MHD_Result webui_handler(struct MHD_Connection *connection, const char *url
         response = MHD_create_response_from_buffer(mygpiod_js_size, (void *)mygpiod_js_data, MHD_RESPMEM_PERSISTENT);
         MHD_add_response_header(response, "Content-Type", "application/javascript");
     }
+    else if (strcmp(url, "/openapi.yml") == 0) {
+        response = MHD_create_response_from_buffer(openapi_yml_size, (void *)openapi_yml_data, MHD_RESPMEM_PERSISTENT);
+        MHD_add_response_header(response, "Content-Type", "text/yaml");
+    }
     else {
         http_response_code = MHD_HTTP_NOT_FOUND;
         const char *error = "File not found.";

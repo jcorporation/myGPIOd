@@ -10,6 +10,8 @@ servers:
 tags:
   - name: gpio
     description: GPIO
+  - name: vcio
+    description: Raspberry Video Core
 paths:
   /gpio:
     get:
@@ -188,6 +190,86 @@ paths:
               schema:
                 $ref: '#/components/schemas/resp_error'
 
+  /vcio/temp:
+    get:
+      tags:
+        - vcio
+      description: Returns raspberry temperature
+      operationId: vcio_temp_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_message'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio/volts:
+    get:
+      tags:
+        - vcio
+      description: Returns raspberry core voltage
+      operationId: vcio_volts_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_message'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio/clock:
+    get:
+      tags:
+        - vcio
+      description: Returns raspberry core clock
+      operationId: vcio_clock_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_message'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio/throttled:
+    get:
+      tags:
+        - vcio
+      description: Returns raspberry throttling mask
+      operationId: vcio_throttled_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_message'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
 components:
   schemas:
     gpio_value:
@@ -224,9 +306,16 @@ components:
     resp_ok:
       type: object
       properties:
-        error:
+        message:
           type: string
           description: OK message
+
+    resp_message:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Generic response message
 
     resp_gpiolist:
       type: object

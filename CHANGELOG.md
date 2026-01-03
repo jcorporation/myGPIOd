@@ -6,11 +6,12 @@ https://github.com/jcorporation/myGPIOd
 
 ## myGPIOd v0.9.0 (not yet released)
 
-This release introduces a very simple REST-API to control GPIOs.
+This release introduces a simple REST-API to control GPIOs.
 
 ### Changelog
 
 - Feat: REST-API
+- Feat: Integrate Raspberry vcgencmd commands for temp, volts, clock and throttled
 - Upd: Add dependency to libgpiod system package
 - Fix: Build with ninja
 
