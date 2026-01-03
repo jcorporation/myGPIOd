@@ -171,10 +171,6 @@ async function httpRequest(method, path, callback) {
     }
 }
 
-// Main
-socketConnect();
-getGPIOs()
-
 // Refresh button event listeners
 document.getElementById('gpioRefresh').addEventListener('click', function(event) {
     event.preventDefault();
@@ -191,3 +187,6 @@ document.getElementById('modalGPIOsetSet').addEventListener('click', function(ev
     setGPIO();
     modalGPIOsetInit.hide();
 }, false);
+
+// Main
+getGPIOs()
