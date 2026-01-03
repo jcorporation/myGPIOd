@@ -86,7 +86,7 @@ struct MHD_Daemon *httpd_start(struct t_config *config) {
                             NULL,
                             NULL,
                             &request_handler,
-                            config,
+                            &config,
                             MHD_OPTION_EXTERNAL_LOGGER, &error_log, NULL,
                             MHD_OPTION_SOCK_ADDR, &server_addr,
                             MHD_OPTION_END);

@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
         gpio_set_outputs(config) == false ||
         gpio_request_inputs(config, &poll_fds) == false)
     {
-        //goto out;
+        goto out;
     }
 
     // add signal fd
