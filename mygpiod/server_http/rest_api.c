@@ -13,7 +13,6 @@
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_http/rest_api_gpio.h"
 #include "mygpiod/server_http/rest_api_raspberry.h"
-#include "mygpiod/server_http/util.h"
 
 #include <microhttpd.h>
 #include <string.h>
@@ -72,12 +71,11 @@ static bool match_url_gpio(const char *url,
  */
 enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
                                  const char *url,
-                                 const char *method_str,
+                                 enum http_method method,
                                  struct t_config *config)
 {
     sds buffer = sdsempty();
     bool rc = false;
-    enum http_method method = parse_method(method_str);
     unsigned gpio_nr = UINT_MAX;
     if (method == HTTP_GET && strcmp(url, "/api/gpio") == 0) {
         buffer = rest_api_gpio_get(config, buffer, &rc);
@@ -97,6 +95,9 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_toggle(config, buffer, gpio_nr, &rc);
     }
+    else if (method == HTTP_GET && strcmp(url, "/api/vcio") == 0) {
+        buffer = rest_api_raspberry_vcio_all(buffer, &rc);
+    }
     else if (method == HTTP_GET && strcmp(url, "/api/vcio/temp") == 0) {
         buffer = rest_api_raspberry_vcio(buffer, "measure_temp", &rc);
     }
@@ -111,7 +112,7 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     }
     else {
         // Request was not handled
-        MYGPIOD_LOG_ERROR("Invalid API request: %s %s", method_str, url);
+        MYGPIOD_LOG_ERROR("HTTP: Invalid API request: %s %s", http_lookup_method(method), url);
         rc = false;
         buffer = sdscat(buffer,"{\"error\":\"Invalid API request\"}");
     }

@@ -146,3 +146,53 @@ Sets the value of a configured output gpio.
 ### gpiotoggle {gpio number}
 
 Toggles the value of a configured output gpio.
+
+## VCIO commands
+
+### vciotemp
+
+Gets the temperature from /dev/vcio.
+
+**Response**
+
+```
+OK
+Value: 36.7'C
+END
+```
+
+### vciovolts
+
+Gets the core voltage from /dev/vcio.
+
+**Response**
+
+```
+OK
+Value: 0.7500V
+END
+```
+
+### vcioclock
+
+Gets the clock speed from /dev/vcio.
+
+**Response**
+
+```
+OK
+Value: 1600017024
+END
+```
+
+### vciothrottled
+
+Gets the throttled mask from /dev/vcio.
+
+**Response**
+
+```
+OK
+Value: 0x0
+END
+```

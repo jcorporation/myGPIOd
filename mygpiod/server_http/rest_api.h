@@ -8,12 +8,13 @@
 #define MYGPIOD_SERVER_HTTPD_REST_API_H
 
 #include "mygpiod/lib/config.h"
+#include "mygpiod/server_http/util.h"
 
 #include <microhttpd.h>
 
 enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
                                  const char *url,
-                                 const char *method_str,
+                                 enum http_method method,
                                  struct t_config *config);
 
 #endif

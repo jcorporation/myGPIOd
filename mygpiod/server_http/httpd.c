@@ -7,8 +7,10 @@
 #include "compile_time.h"
 #include "mygpiod/server_http/httpd.h"
 
+#include "lib/sds_extras.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/server_http/rest_api.h"
+#include "mygpiod/server_http/util.h"
 #include "mygpiod/server_http/webui.h"
 
 #include <arpa/inet.h>
@@ -22,7 +24,7 @@
  * @param cls Not used
  * @param connection HTTP connection
  * @param url URL
- * @param method HTTP method
+ * @param method_str HTTP method
  * @param version HTTP version
  * @param upload_data POST data
  * @param upload_data_size POST data size
@@ -32,7 +34,7 @@
 static enum MHD_Result request_handler(void *cls,
                                        struct MHD_Connection *connection,
                                        const char *url,
-                                       const char *method,
+                                       const char *method_str,
                                        const char *version,
                                        const char *upload_data,
                                        size_t *upload_data_size,
@@ -41,18 +43,35 @@ static enum MHD_Result request_handler(void *cls,
     (void)version;
     (void)upload_data;
     (void)upload_data_size;
-    (void)con_cls;
-    struct t_config *config = (struct t_config *)cls;
+    static int dummy; // Used to detect second call
 
-    MYGPIOD_LOG_DEBUG("HTTP request: %s %s", method, url);
-    enum MHD_Result rc = MHD_NO;
+    // The first call is with headers only, do not respond
+    if (&dummy != *con_cls) {
+        *con_cls = &dummy;
+        return MHD_YES;
+    }
+
+    enum http_method method = http_parse_method(method_str);
+    // Restrict allowed HTTP methods
+    switch(method) {
+        case HTTP_GET:
+        case HTTP_OPTIONS:
+        case HTTP_PATCH:
+            break;
+        default: {
+            return http_respond(connection, 405, "text/plain; charset=utf-8", "405 Method Not Allowed");
+        }
+    }
+
+    // Second call - process the request
+    MYGPIOD_LOG_DEBUG("HTTP: %s %s", method_str, url);
+    struct t_config *config = (struct t_config *)cls;
+    // REST API
     if (strncmp(url, "/api/", 5) == 0) {
-        rc = rest_api_handler(connection, url, method, config);
+        return rest_api_handler(connection, url, method, config);
     }
-    else {
-        rc = webui_handler(connection, url);
-    }
-    return rc;
+    // Serve embedded files
+    return webui_handler(connection, url);
 }
 
 /**
@@ -63,10 +82,9 @@ static enum MHD_Result request_handler(void *cls,
  */
 static void error_log(void *arg, const char *fmt, va_list ap) {
     (void)arg;
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wformat-nonliteral"
-    MYGPIOD_LOG_ERROR(fmt, ap);
-    #pragma GCC diagnostic pop
+    sds error = sdscatvprintf(sdsempty(), fmt, ap);
+    MYGPIOD_LOG_ERROR("HTTP: %s", error);
+    FREE_SDS(error);
 }
 
 /**
@@ -75,7 +93,7 @@ static void error_log(void *arg, const char *fmt, va_list ap) {
  * @return struct MHD_Daemon* 
  */
 struct MHD_Daemon *httpd_start(struct t_config *config) {
-    MYGPIOD_LOG_INFO("Listening on port %u for http requests.", config->http_port);
+    MYGPIOD_LOG_INFO("HTTP: Listening on %s:%u", config->http_ip, config->http_port);
     unsigned mhd_flags = MHD_USE_EPOLL | \
                          MHD_USE_ERROR_LOG | \
                          MHD_USE_PEDANTIC_CHECKS | \
@@ -84,7 +102,7 @@ struct MHD_Daemon *httpd_start(struct t_config *config) {
     
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons((uint16_t)config->http_port);            // Convert port number to network byte order
+    server_addr.sin_port = htons((uint16_t)config->http_port);  // Convert port number to network byte order
     inet_pton(AF_INET, config->http_ip, &server_addr.sin_addr); // Specify IP address
 
     return MHD_start_daemon(mhd_flags,

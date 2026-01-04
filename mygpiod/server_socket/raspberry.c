@@ -8,12 +8,8 @@
 #include "mygpiod/server_socket/raspberry.h"
 
 #include "mygpiod/lib/sds_extras.h"
-#include "mygpio-common/util.h"
 #include "mygpiod/raspberry/vcgencmd.h"
 #include "mygpiod/server_socket/response.h"
-#include "mygpiod/server_socket/socket.h"
-
-#include <string.h>
 
 /**
  * Handles the gpioget command

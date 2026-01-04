@@ -190,11 +190,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/resp_error'
 
+  /vcio:
+    get:
+      tags:
+        - vcio
+      description: Returns Raspberry /dev/vcio values
+      operationId: vcio_all
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_vcio'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
   /vcio/temp:
     get:
       tags:
         - vcio
-      description: Returns raspberry temperature
+      description: Returns Raspberry temperature
       operationId: vcio_temp_get
       responses:
         '200':
@@ -214,7 +234,7 @@ paths:
     get:
       tags:
         - vcio
-      description: Returns raspberry core voltage
+      description: Returns Raspberry core voltage
       operationId: vcio_volts_get
       responses:
         '200':
@@ -234,7 +254,7 @@ paths:
     get:
       tags:
         - vcio
-      description: Returns raspberry core clock
+      description: Returns Raspberry core clock
       operationId: vcio_clock_get
       responses:
         '200':
@@ -254,7 +274,7 @@ paths:
     get:
       tags:
         - vcio
-      description: Returns raspberry throttling mask
+      description: Returns Raspberry throttling mask
       operationId: vcio_throttled_get
       responses:
         '200':
@@ -316,6 +336,25 @@ components:
         message:
           type: string
           description: Generic response message
+
+    resp_vcio:
+      type: object
+      properties:
+        message:
+          type: object
+          properties:
+            temp:
+              type: string
+              description: Temperature
+            volts:
+              type: string
+              description: Core voltage
+            clock:
+              type: string
+              description: Core clock
+            throttled:
+              type: string
+              description: Throttled mask
 
     resp_gpiolist:
       type: object

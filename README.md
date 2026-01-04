@@ -25,10 +25,12 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
     - System commands
   - Set various GPIO attributes (bias, debounce, ...)
   - Set the output value of GPIOs
+  - Get info from Raspberry PI Video Core (/dev/vcio)
   - Provides a unix socket with a simple line-based text protocol
     - List GPIO configuration
     - Set and get GPIO values
     - Get notifications of GPIO events
+  - Provides a REST-API endpoint
 - **libmygpio - the client library**
   - Simple C client library
   - High level API
@@ -51,8 +53,7 @@ Building myGPIOd is straight forward.
 - C build environment
 - cmake >= 3.13
 - libgpiod-dev >= 2.0.0
-- microhttpd
-- json-c
+- libmicrohttpd
 - Optional:
   - libcurl
   - libmpdclient2
@@ -119,7 +120,7 @@ services:
 To run `mygpioc` in the already running mygpiod container:
 
 ```sh
-docker exec mygpiod mygpioc gpiolist
+docker exec -it mygpiod mygpioc gpiolist
 ```
 
 ## Configuration steps
@@ -352,6 +353,26 @@ myGPIOd can be controlled and queried through a simple line-based text protocol.
 ```sh
 socat unix-client:/run/mygpiod/socket stdio
 ```
+
+## REST-API
+
+The default REST-API port is `8081`.
+
+- [OpenAPI-Documentation](openapi.yml)
+
+| Path | Method | Command |
+| ---- | ------ | ----------- |
+| `/api/gpio` | GET | gpiolist |
+| `/api/gpio/{gpio number}` | GET | gpioget |
+| `/api/gpio/{gpio number}` | OPTIONS | gpioinfo |
+| `/api/gpio/{gpio number}/blink?interval={interval}&timeout={timeout}` | PATCH | gpioblink |
+| `/api/gpio/{gpio number}/set/?value={active,inactive}` | PATCH | gpioset |
+| `/api/gpio/{gpio number}/toggle` | PATCH | gpiotoggle |
+| `/api/vcio` | GET | Gets all vcio values. |
+| `/api/vcio/temp` | GET | vciotemp |
+| `/api/vcio/volts` | GET | vciovolts |
+| `/api/vcio/clock` | GET | vcioclock |
+| `/api/vcio/throttled` | GET | vciothrottled |
 
 ## Command line client
 

@@ -127,6 +127,20 @@ static int gencmd(int file_desc, const char *command, sds *buffer) {
 }
 
 /**
+ * Returns the index of first char occurrence
+ * @param buffer 
+ * @param c 
+ * @return ssize_t 
+ */
+static ssize_t index_of(sds buffer, char c) {
+    char *e = strchr(buffer, c);
+    if (e == NULL) {
+        return -1;
+    }
+    return (ssize_t)(e - buffer);
+}
+
+/**
  * Reads values from /dev/vcio
  * @param command Command to submit
  * @param buffer Already allocated buffer for the result
@@ -141,6 +155,11 @@ sds vcgencmd(const char *command, sds buffer, bool *rc) {
     }
     int ret = gencmd(mb, command, &buffer);
     if (ret == 0) {
+        ssize_t start = index_of(buffer, '=');
+        if (start > -1 && start + 1 < (ssize_t)sdslen(buffer)) {
+            start++;
+            sdsrange(buffer, start, -1);
+        }
         *rc = true;
     }
     else {
