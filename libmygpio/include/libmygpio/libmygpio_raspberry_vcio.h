@@ -15,8 +15,6 @@
 
 #include "libmygpio_gpio_struct.h"
 
-#include <stdbool.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,7 +22,7 @@ extern "C" {
 struct t_mygpio_connection;
 
 /**
- * @defgroup libmygpio_raspberry_vcio_functions
+ * @defgroup libmygpio_raspberry_vcio Functions
  *
  * @brief This module provides functions to get values from /dev/vcio from Raspberry devices
  *

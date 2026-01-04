@@ -15,15 +15,11 @@ Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
+BuildRequires:  libmicrohttpd-devel
 BuildRequires:  libmpdclient-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libgpiod-devel
 BuildRequires:  lua-devel
-%if 0%{?fedora} >= 39
-BuildRequires:  libgpiod-devel
-%else
-BuildRequires:  git
-%endif
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description 
@@ -80,6 +76,7 @@ true
 %{_includedir}/libmygpio
 %{_includedir}/libmygpio/*
 %{_mandir}/man3/libmygpio_*
+%{_mandir}/man3/t_mygpio*
 
 %changelog
 * __DATE_F1__ Juergen Mang <mail@jcgames.de> __VERSION__-0

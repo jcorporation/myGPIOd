@@ -345,6 +345,7 @@ Build-Depends: debhelper (>= 10),
                git,
                pkgconf,
                libmpdclient-dev,
+               libmicrohttpd-dev,
                libcurl4-gnutls-dev,
                liblua5.4-dev | liblua5.3-dev,
                libgpiod-dev

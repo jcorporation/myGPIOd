@@ -12,7 +12,7 @@ pkgdesc="lightweight gpio controlling daemon"
 arch=('x86_64' 'armv7h' 'aarch64')
 url="https://jcorporation.github.io/myGPIOd/"
 license=('GPL')
-depends=('libmpdclient' 'curl' 'lua' 'libgpiod')
+depends=('libmicrohttpd' 'libmpdclient' 'curl' 'lua' 'libgpiod')
 makedepends=('cmake' 'gzip')
 optdepends=()
 provides=()
@@ -39,5 +39,4 @@ build() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  install -vDm 644 "${srcdir}"/README.md -t "$pkgdir/usr/share/doc/$pkgname/"
 }

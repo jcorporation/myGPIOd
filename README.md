@@ -1,6 +1,6 @@
 # myGPIOd
 
-myGPIOd is a lightweight GPIO controlling framework. It is written in C and has no hard dependencies but the libgpiod2 library version 2.
+myGPIOd is a lightweight GPIO controlling framework. It is written in C and depends on [libgpiod version 2.x.x](https://libgpiod.readthedocs.io/).
 
 It consists of a daemon, a client library and a command line tool. It is designed to run on Raspberry PIs and similar devices.
 
@@ -31,6 +31,8 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
     - Set and get GPIO values
     - Get notifications of GPIO events
   - Provides a REST-API endpoint
+    - List GPIO configuration
+    - Set and get GPIO values
 - **libmygpio - the client library**
   - Simple C client library
   - High level API
@@ -52,7 +54,7 @@ Building myGPIOd is straight forward.
 
 - C build environment
 - cmake >= 3.13
-- libgpiod-dev >= 2.0.0
+- libgpiod >= 2.0.0
 - libmicrohttpd
 - Optional:
   - libcurl
@@ -66,8 +68,8 @@ This builds and installs the `mygpiod` daemon, `mygpioc` command line tool, the 
 1. Get myGPIOd tarball from [GitHub](https://github.com/jcorporation/myGPIOd/releases/latest)
 2. Extract myGPIOd tarball and change path to this directory
 3. Run cmake: `cmake -B build -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .`
-4. Build: `make -C build`
-5. Install (as root): `make -C build install`
+4. Build: `cmake --build build`
+5. Install (as root): `cmake --install build`
 
 ## Run
 
@@ -101,20 +103,24 @@ echo -e '[Service]\nSupplementaryGroups=gpio' > /etc/systemd/system/mygpiod.serv
 Example docker compose file to start myGPIOd.
 
 ```yml
----
 services:
   mygpiod:
     image: ghcr.io/jcorporation/mygpiod/mygpiod
     container_name: mygpiod
-    user: 1000:1000
+    restart: unless-stopped
     environment:
-      - MPD_HOST=localhost
+      TZ: Europe/Berlin
+      MPD_HOST: 192.168.1.1
+    user: 1000:1000
+    group_add:
+      - gpio
+      - video
     devices:
       - /dev/gpiochip0:/dev/gpiochip0
+      - /dev/vcio:/dev/vcio
     volumes:
       - /etc/mygpiod.conf:/etc/mygpiod.conf
       - /etc/mygpiod.d/:/etc/mygpiod.d/
-    restart: unless-stopped
 ```
 
 To run `mygpioc` in the already running mygpiod container:

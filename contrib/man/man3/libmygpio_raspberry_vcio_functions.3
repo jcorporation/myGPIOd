@@ -1,0 +1,44 @@
+.TH "libmygpio_raspberry_vcio_functions" 3 "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_raspberry_vcio_functions \- Libmygpio_raspberry_vcio_functions
+.PP
+ \- This module provides functions to get values from /dev/vcio from Raspberry devices\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "struct t_mygpio_pair * \fBmygpio_vcio\fP (struct \fBt_mygpio_connection\fP *connection, const char *command)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides functions to get values from /dev/vcio from Raspberry devices\&. 
+
+
+.SH "Function Documentation"
+.PP 
+.SS "struct t_mygpio_pair * mygpio_vcio (struct \fBt_mygpio_connection\fP * connection, const char * command)"
+Returns values reported by /dev/vcio 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP Pointer to the connection struct returned by mygpio_connection_new\&. 
+.br
+\fIcommand\fP On of: vciotemp, vciovolts, vcioclock, vciothrottled 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Current temperature or NULL on error 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

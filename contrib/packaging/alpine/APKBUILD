@@ -15,6 +15,7 @@ depends=""
 makedepends="cmake
 	curl-dev
 	libgpiod-dev
+	libmicrohttpd-dev
 	libmpdclient-dev
 	lua5.4-dev
 	samurai

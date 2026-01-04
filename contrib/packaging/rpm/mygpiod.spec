@@ -15,6 +15,7 @@ Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
+BuildRequires:  libmicrohttpd-devel
 BuildRequires:  libmpdclient-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libgpiod-devel
@@ -80,6 +81,7 @@ true
 %{_includedir}/libmygpio
 %{_includedir}/libmygpio/*
 %{_mandir}/man3/libmygpio_*
+%{_mandir}/man3/t_mygpio*
 
 %changelog
 * Wed Dec 31 2025 Juergen Mang <mail@jcgames.de> 0.9.0-0
