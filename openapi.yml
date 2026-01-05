@@ -330,13 +330,6 @@ components:
           type: string
           description: OK message
 
-    resp_message:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Generic response message
-    
     resp_value:
       type: object
       properties:
