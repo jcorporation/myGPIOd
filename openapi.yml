@@ -222,7 +222,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/resp_message'
+                $ref: '#/components/schemas/resp_value'
         '500':
           description: Error
           content:
@@ -242,7 +242,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/resp_message'
+                $ref: '#/components/schemas/resp_value'
         '500':
           description: Error
           content:
@@ -262,7 +262,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/resp_message'
+                $ref: '#/components/schemas/resp_value'
         '500':
           description: Error
           content:
@@ -282,7 +282,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/resp_message'
+                $ref: '#/components/schemas/resp_value'
         '500':
           description: Error
           content:
@@ -336,11 +336,18 @@ components:
         message:
           type: string
           description: Generic response message
+    
+    resp_value:
+      type: object
+      properties:
+        value:
+          type: string
+          description: Value
 
     resp_vcio:
       type: object
       properties:
-        message:
+        values:
           type: object
           properties:
             temp:

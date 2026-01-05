@@ -26,7 +26,7 @@ sds rest_api_raspberry_vcio(sds buffer,
 {
     sds result = vcgencmd(command, sdsempty(), rc);
     if (*rc == true) {
-        buffer = sdscat(buffer, "{\"message\":");
+        buffer = sdscat(buffer, "{\"value\":");
         buffer = sds_catjson(buffer, result);
         buffer = sdscatlen(buffer, "}", 1);
     }
@@ -62,7 +62,7 @@ sds rest_api_raspberry_vcio_all(sds buffer,
         NULL
     };
     sds result;
-    buffer = sdscat(buffer, "{\"message\":{");
+    buffer = sdscat(buffer, "{\"values\":{");
     const char **p = commands;
     unsigned i = 0;
     while(*p != NULL) {
