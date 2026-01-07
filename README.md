@@ -398,4 +398,4 @@ The `mygpioc` command line client is also based on this library.
 
 ## Copyright
 
-2020-2025 Juergen Mang <mail@jcgames.de>
+2020-2026 Juergen Mang <mail@jcgames.de>
