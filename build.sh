@@ -335,7 +335,7 @@ Format: 3.0 (quilt)
 Source: mygpiod
 Binary: mygpiod
 Architecture: any
-Version: 0.8.2-1
+Version: ${VERSION}-1
 Maintainer: Juergen Mang <mail@jcgames.de>
 Homepage: https://jcorporation.github.io/myGPIOd/
 Standards-Version: 4.1.2
