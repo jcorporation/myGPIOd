@@ -33,6 +33,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
   - Provides a REST-API endpoint
     - List GPIO configuration
     - Set and get GPIO values
+  - Provides a long poll endpoint to receive GPIO events
 - **libmygpio - the client library**
   - Simple C client library
   - High level API
@@ -350,16 +351,6 @@ action_falling = gpioblink:6 1000 0
 action_falling = mympd:https://127.0.0.1 default Jukebox
 ```
 
-## Protocol
-
-myGPIOd can be controlled and queried through a simple line-based text protocol.
-
-- [Protocol specification](PROTOCOL.md)
-
-```sh
-socat unix-client:/run/mygpiod/socket stdio
-```
-
 ## REST-API
 
 The default REST-API port is `8081`.
@@ -379,6 +370,31 @@ The default REST-API port is `8081`.
 | `/api/vcio/volts` | GET | vciovolts |
 | `/api/vcio/clock` | GET | vcioclock |
 | `/api/vcio/throttled` | GET | vciothrottled |
+
+## Long poll endpoint
+
+This endpoint can be used to poll for GPIO events. It responds as sooon an event occurs.
+
+URI: `/poll`
+
+```sh
+curl -s http://172.0.0.1:8081/poll | jq '.'
+{
+  "gpio": 15,
+  "event": "rising",
+  "timestamp_ms": 1768080661383
+}
+```
+
+## Protocol
+
+myGPIOd can be controlled and queried through a simple line-based text protocol.
+
+- [Protocol specification](PROTOCOL.md)
+
+```sh
+socat unix-client:/run/mygpiod/socket stdio
+```
 
 ## Command line client
 
