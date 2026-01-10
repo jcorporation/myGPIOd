@@ -7,6 +7,7 @@
 #include "compile_time.h"
 #include "mygpiod/server_http/httpd.h"
 
+#include "lib/mem.h"
 #include "lib/sds_extras.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/server_http/rest_api.h"
@@ -18,18 +19,17 @@
 #include <netinet/in.h>
 #include <string.h>
 
-
 /**
  * Central HTTP Request Handler
- * @param cls Not used
+ * @param cls User data
  * @param connection HTTP connection
  * @param url URL
  * @param method_str HTTP method
  * @param version HTTP version
  * @param upload_data POST data
  * @param upload_data_size POST data size
- * @param ptr Pointer to config
- * @return enum MHD_Result 
+ * @param con_cls Connection specific user data
+ * @return enum MHD_Result
  */
 static enum MHD_Result request_handler(void *cls,
                                        struct MHD_Connection *connection,
@@ -42,13 +42,35 @@ static enum MHD_Result request_handler(void *cls,
 {
     (void)version;
     (void)upload_data;
-    (void)upload_data_size;
-    static int dummy; // Used to detect second call
 
-    // The first call is with headers only, do not respond
-    if (&dummy != *con_cls) {
-        *con_cls = &dummy;
+    // The first call is with headers only, do not respond,
+    // but allocate connection specific user data
+    if (*con_cls == NULL) {
+        MYGPIOD_LOG_DEBUG("HTTP: Headers received for %s %s", method_str, url);
+        struct t_request_data *request_data = malloc_assert(sizeof(struct t_request_data));
+        request_data->connection = connection;
+        request_data->resume_buffer = NULL;
+        *con_cls = request_data;
         return MHD_YES;
+    }
+    struct t_request_data *request_data = (struct t_request_data *)*con_cls;
+
+    // Ignoring post data
+    if (*upload_data_size) {
+        MYGPIOD_LOG_DEBUG("HTTP: Ignoring POST data for %s %s (%lu bytes)", method_str, url, (unsigned long)upload_data_size);
+        *upload_data_size = 0;
+        return MHD_YES;
+    }
+
+    // Resumed connection
+    if (request_data->resume_buffer != NULL) {
+        MYGPIOD_LOG_DEBUG("HTTP: Resuming connection for %s %s", method_str, url);
+        struct MHD_Response *response = MHD_create_response_from_buffer(sdslen(request_data->resume_buffer),
+                (void *)request_data->resume_buffer, MHD_RESPMEM_PERSISTENT);
+        MHD_add_response_header(response, "Content-Type", "application/json");
+        enum MHD_Result result = MHD_queue_response(connection, 200, response);
+        MHD_destroy_response(response);
+        return result;
     }
 
     // Second call - process the request
@@ -66,11 +88,21 @@ static enum MHD_Result request_handler(void *cls,
 
     MYGPIOD_LOG_DEBUG("HTTP: %s %s", method_str, url);
     struct t_config *config = (struct t_config *)cls;
-    // REST API
+    // REST-API
     if (strncmp(url, "/api/", 5) == 0) {
+        MYGPIOD_LOG_DEBUG("HTTP: Calling REST-API handler for %s %s", method_str, url);
         return rest_api_handler(connection, url, method, config);
     }
+    // Long polling: Suspend connection until an GPIO event occurs
+    if (strcmp(url, "/poll") == 0) {
+        MYGPIOD_LOG_DEBUG("HTTP: Suspending connection for %s %s", method_str, url);
+        MHD_set_connection_option(connection, MHD_CONNECTION_OPTION_TIMEOUT, 0);
+        MHD_suspend_connection(connection);
+        list_push(&config->suspended, 0, request_data);
+        return MHD_YES;
+    }
     // Serve embedded files
+    MYGPIOD_LOG_DEBUG("HTTP: Serve embedded files for %s %s", method_str, url);
     return webui_handler(connection, url);
 }
 
@@ -98,7 +130,7 @@ struct MHD_Daemon *httpd_start(struct t_config *config) {
                          MHD_USE_ERROR_LOG | \
                          MHD_USE_PEDANTIC_CHECKS | \
                          MHD_USE_TCP_FASTOPEN | \
-                         MHD_ALLOW_UPGRADE;
+                         MHD_ALLOW_SUSPEND_RESUME;
     
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
@@ -113,5 +145,6 @@ struct MHD_Daemon *httpd_start(struct t_config *config) {
                             config,
                             MHD_OPTION_EXTERNAL_LOGGER, &error_log, NULL,
                             MHD_OPTION_SOCK_ADDR, &server_addr,
+                            MHD_OPTION_NOTIFY_COMPLETED, &http_connection_done, NULL,
                             MHD_OPTION_END);
 }

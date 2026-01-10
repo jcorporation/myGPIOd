@@ -60,6 +60,7 @@ struct t_gpio_out_data {
  * Central myGPIOd config and state
  */
 struct t_config {
+    // Configuration
     struct t_list gpios_in;               //!< holds the list of GPIOs to monitor
     struct t_list gpios_out;              //!< holds the list of GPIOs to set
     sds chip_path;                        //!< path of the gpio chip device
@@ -68,21 +69,27 @@ struct t_config {
     int signal_fd;                        //!< file descriptor for the signal handler
     sds dir_gpio;                         //!< directory for the gpio config files
 
+    // Socket Server
     sds socket_path;                      //!< server socket filepath
     int socket_timeout_s;                 //!< socket timeout in seconds
-    struct t_list clients;                //!< list of connected clients
+    struct t_list clients;                //!< list of connected socket clients
     unsigned client_id;                   //!< uniq client id
 
+    // HTTP Server
     struct MHD_Daemon *httpd;             //!< HTTPD object
     sds http_ip;                          //!< HTTPD listening ip
     unsigned http_port;                   //!< HTTPD listening port
+    struct t_list suspended;              //!< List of suspended HTTP connections
 
+    // GPIOd
     struct gpiod_chip *chip;              //!< gpiod chip object
 
+    // MPD
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         struct mpd_connection *mpd_conn;  //!< MPD connection
     #endif
 
+    // Lua
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         sds lua_file;                     //!< Lua file to load
         lua_State* lua_vm;                //!< Lua VM

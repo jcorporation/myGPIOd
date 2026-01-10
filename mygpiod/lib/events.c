@@ -7,9 +7,11 @@
 #include "compile_time.h"
 #include "mygpiod/lib/events.h"
 
+#include "lib/list.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
+#include "mygpiod/server_http/util.h"
 #include "mygpiod/server_socket/idle.h"
 #include "mygpiod/server_socket/socket.h"
 
@@ -32,6 +34,7 @@ static struct t_event_data *event_data_new(enum mygpiod_event_types mygpiod_even
 void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_types event_type,
         uint64_t timestamp)
 {
+    // Socket clients
     struct t_list_node *current = config->clients.head;
     while (current != NULL) {
         struct t_client_data *data = (struct t_client_data *)current->data;
@@ -47,6 +50,14 @@ void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_ty
         }
         current = current->next;
     }
+
+    // HTTP long polling
+    current = config->suspended.head;
+    while (current != NULL) {
+        http_connection_resume((struct t_request_data *)current->data, gpio, event_type, timestamp);
+        current = current->next;
+    }
+    list_clear(&config->suspended, NULL);
 }
 
 /**

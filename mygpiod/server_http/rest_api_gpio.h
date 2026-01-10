@@ -7,7 +7,6 @@
 #ifndef MYGPIOD_SERVER_HTTPD_REST_API_GPIO_H
 #define MYGPIOD_SERVER_HTTPD_REST_API_GPIO_H
 
-#include "lib/action.h"
 #include "mygpiod/lib/config.h"
 
 #include <microhttpd.h>
@@ -29,13 +28,13 @@ sds rest_api_gpio_gpio_blink(struct t_config *config,
                              struct MHD_Connection *connection,
                              bool *rc);
 sds rest_api_gpio_gpio_set(struct t_config *config,
-                            sds buffer,
-                            unsigned gpio_nr,
-                            struct MHD_Connection *connection,
-                            bool *rc);
+                           sds buffer,
+                           unsigned gpio_nr,
+                           struct MHD_Connection *connection,
+                           bool *rc);
 sds rest_api_gpio_gpio_toggle(struct t_config *config,
-                            sds buffer,
-                            unsigned gpio_nr,
-                            bool *rc);
+                              sds buffer,
+                              unsigned gpio_nr,
+                              bool *rc);
 
 #endif

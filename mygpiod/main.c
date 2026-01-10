@@ -168,20 +168,36 @@ int main(int argc, char **argv) {
             update_pollfds = false;
         }
 
-        // poll
+        // Poll
         MYGPIOD_LOG_DEBUG("Polling %u fds", poll_fds.len);
-        int cnt = poll(poll_fds.fd, poll_fds.len, -1);
+        // Use timeout from MHD
+        // This is required for MHD connection suspend and resume
+        int timeout;
+        MHD_UNSIGNED_LONG_LONG to;
+        if (MHD_get_timeout (config->httpd, &to) != MHD_YES) {
+            timeout = -1;
+        }
+        else {
+            timeout = (to < INT_MAX - 1) ? (int) to : (INT_MAX - 1);
+        }
+        int cnt = poll(poll_fds.fd, poll_fds.len, timeout);
         if (cnt < 0) {
             MYGPIOD_LOG_ERROR("Failure polling fds");
             rc = EXIT_FAILURE;
             goto out;
         }
+        // MHD must be always called, even on poll timeout
+        if (MHD_run(config->httpd) != MHD_YES) {
+            MYGPIOD_LOG_ERROR("Failure running MHD");
+            rc = EXIT_FAILURE;
+            goto out;
+        }
+        // No waiting events
         if (cnt == 0) {
             MYGPIOD_LOG_DEBUG("Poll timeout");
             continue;
         }
-
-        // read and delegate events
+        // Read and delegate events
         if (event_read_delegate(config, &poll_fds) == false) {
             break;
         }

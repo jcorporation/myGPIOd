@@ -18,6 +18,7 @@
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_socket/socket.h"
+#include "server_http/util.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -93,7 +94,14 @@ void config_clear(struct t_config *config) {
         FREE_SDS(config->lua_file);
     #endif
     if (config->httpd != NULL) {
+        struct t_list_node *current = config->suspended.head;
+        while (current != NULL) {
+            struct t_request_data *request_data = (struct t_request_data *)current->data;
+            MHD_resume_connection(request_data->connection);
+            current = current->next;
+        }
         MHD_stop_daemon(config->httpd);
+        list_clear(&config->suspended, NULL);
     }
 }
 
@@ -132,6 +140,7 @@ static struct t_config *config_new(void) {
     config->http_ip = sdsnew(CFG_HTTP_IP);
     config->http_port = CFG_HTTP_PORT;
     config->httpd = NULL;
+    list_init(&config->suspended);
     return config;
 }
 

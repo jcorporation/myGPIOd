@@ -37,6 +37,20 @@
       </div>
       <div class="card-footer"><small id="lastError"></small></div>
     </div>
+    <div class="card">
+      <div class="card-header">Events<span class="float-end">
+        <a id="clearEvents" href="#" title="Clear" class="me-2"></a>
+      </div>
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr><th>GPIO</th><th>Event</th><th>Timestamp</th></tr>
+          </thead>
+          <tbody id="events"></tbody>
+        </table>
+      </div>
+      <div class="card-footer"><small id="pollError"></small></div>
+    </div>
   </main>
 
   <div class="modal fade" id="modalGPIOinfo" tabindex="-1">

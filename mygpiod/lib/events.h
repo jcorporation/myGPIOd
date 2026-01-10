@@ -8,17 +8,9 @@
 #define MYGPIOD_EVENTS_H
 
 #include "mygpiod/lib/config.h"
-#include <inttypes.h>
+#include "mygpiod/lib/event_types.h"
 
-/**
- * myGPIOD event types
- */
-enum mygpiod_event_types {
-    MYGPIOD_EVENT_FALLING,
-    MYGPIOD_EVENT_RISING,
-    MYGPIOD_EVENT_LONG_PRESS,
-    MYGPIOD_EVENT_LONG_PRESS_RELEASE
-};
+#include <inttypes.h>
 
 /**
  * Event data

@@ -237,9 +237,9 @@ sds rest_api_gpio_gpio_set(struct t_config *config,
  * @return sds pointer to buffer
  */
 sds rest_api_gpio_gpio_toggle(struct t_config *config,
-                            sds buffer,
-                            unsigned gpio_nr,
-                            bool *rc)
+                              sds buffer,
+                              unsigned gpio_nr,
+                              bool *rc)
 {
     *rc = gpio_toggle_value(config, gpio_nr);
     if (*rc == true) {
