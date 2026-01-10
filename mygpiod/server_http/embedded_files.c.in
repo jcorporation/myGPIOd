@@ -13,6 +13,7 @@
 //compressed assets
 INCBIN(bootstrap_native_min_js, "${CMAKE_SOURCE_DIR}/htdocs/bootstrap-native.min.js");
 INCBIN(bootstrap_min_css, "${CMAKE_SOURCE_DIR}/htdocs/bootstrap.min.css");
+INCBIN(favicon_svg, "${CMAKE_SOURCE_DIR}/htdocs/favicon.svg");
 INCBIN(index_html, "${CMAKE_SOURCE_DIR}/htdocs/index.html");
 INCBIN(mygpiod_css, "${CMAKE_SOURCE_DIR}/htdocs/mygpiod.css");
 INCBIN(mygpiod_js, "${CMAKE_SOURCE_DIR}/htdocs/mygpiod.js");

@@ -120,10 +120,9 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     unsigned http_response_code = rc == false
         ? MHD_HTTP_INTERNAL_SERVER_ERROR
         : MHD_HTTP_OK;
-    struct MHD_Response *response = MHD_create_response_from_buffer(sdslen(buffer), (void *)buffer, MHD_RESPMEM_MUST_COPY);
+    struct MHD_Response *response = MHD_create_response_from_buffer_with_free_callback(sdslen(buffer), (void *)buffer, http_response_free);
     MHD_add_response_header(response, "Content-Type", "application/json");
     enum MHD_Result result = MHD_queue_response(connection, http_response_code, response);
     MHD_destroy_response(response);
-    FREE_SDS(buffer);
     return result;
 }

@@ -16,6 +16,7 @@ enum http_method {
     HTTP_PATCH,
 };
 
+void http_response_free(void *cls);
 enum MHD_Result http_respond(struct MHD_Connection *connection,
                              unsigned int status_code,
                              const char *content_type,

@@ -51,6 +51,7 @@ static enum MHD_Result request_handler(void *cls,
         return MHD_YES;
     }
 
+    // Second call - process the request
     enum http_method method = http_parse_method(method_str);
     // Restrict allowed HTTP methods
     switch(method) {
@@ -63,7 +64,6 @@ static enum MHD_Result request_handler(void *cls,
         }
     }
 
-    // Second call - process the request
     MYGPIOD_LOG_DEBUG("HTTP: %s %s", method_str, url);
     struct t_config *config = (struct t_config *)cls;
     // REST API

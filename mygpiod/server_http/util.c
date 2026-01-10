@@ -7,8 +7,26 @@
 #include "compile_time.h"
 #include "mygpiod/server_http/util.h"
 
+#include "dist/sds/sds.h"
+
 #include <string.h>
 
+/**
+ * Callback of type #include "dist/sds/sds.h"
+ * @param cls SDS buffer to free
+ */
+void http_response_free(void *cls) {
+    sdsfree((sds)cls);
+}
+
+/**
+ * Simple HTTP response
+ * @param connection MHD connection
+ * @param status_code HTTP status code
+ * @param content_type HTTP Content-type
+ * @param message HTTP body
+ * @return enum MHD_Result
+ */
 enum MHD_Result http_respond(struct MHD_Connection *connection,
                              unsigned int status_code,
                              const char *content_type,
