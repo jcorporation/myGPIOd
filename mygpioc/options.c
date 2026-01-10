@@ -71,7 +71,8 @@ int handle_options(int argc, char **argv, struct t_options *options) {
                 exit(EXIT_SUCCESS);
                 break;
             case 's':
-                options->socket = optarg;
+                free(options->socket);
+                options->socket = strdup(optarg);
                 break;
             case 't':
                 if (mygpio_parse_int(optarg, &options->timeout_ms, NULL, 1, 1000000) == false) {
