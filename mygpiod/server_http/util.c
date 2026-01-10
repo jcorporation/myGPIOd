@@ -87,11 +87,6 @@ void http_connection_resume(struct t_request_data *request_data,
                             enum mygpiod_event_types event_type,
                             uint64_t timestamp)
 {
-    const union MHD_ConnectionInfo *conn_info = MHD_get_connection_info(request_data->connection, MHD_CONNECTION_INFO_CONNECTION_SUSPENDED);
-    if (conn_info == MHD_NO) {
-        MYGPIOD_LOG_ERROR("Connection is not suspended");
-        return;
-    }
     request_data->resume_buffer = sdscatprintf(sdsempty(), "{\"gpio\":%u,\"event\":\"%s\",\"timestamp_ms\":%llu}",
         gpio,
         mygpiod_event_name(event_type),

@@ -53,22 +53,22 @@ static enum MHD_Result request_handler(void *cls,
         request_data->resume_buffer = NULL;
         request_data->conn_id = config->http_conn_id;
         *con_cls = request_data;
-        MYGPIOD_LOG_DEBUG("HTTP: Headers received for %u %s %s", config->http_conn_id, method_str, url);
+        MYGPIOD_LOG_DEBUG("HTTP connection %u: Headers received for %s %s", request_data->conn_id, method_str, url);
         return MHD_YES;
     }
     struct t_request_data *request_data = (struct t_request_data *)*con_cls;
 
     // Ignoring post data
     if (*upload_data_size) {
-        MYGPIOD_LOG_DEBUG("HTTP: Ignoring POST data for %u %s %s (%lu bytes)",
-                config->http_conn_id, method_str, url, (unsigned long)upload_data_size);
+        MYGPIOD_LOG_DEBUG("HTTP connection %u: Ignoring POST data for %s %s (%lu bytes)",
+                request_data->conn_id, method_str, url, (unsigned long)upload_data_size);
         *upload_data_size = 0;
         return MHD_YES;
     }
 
     // Resumed connection
     if (request_data->resume_buffer != NULL) {
-        MYGPIOD_LOG_DEBUG("HTTP: Resuming connection for %u %s %s", config->http_conn_id, method_str, url);
+        MYGPIOD_LOG_DEBUG("HTTP connection %u: Resuming connection for %s %s", request_data->conn_id, method_str, url);
         struct MHD_Response *response = MHD_create_response_from_buffer(sdslen(request_data->resume_buffer),
                 (void *)request_data->resume_buffer, MHD_RESPMEM_PERSISTENT);
         MHD_add_response_header(response, "Content-Type", "application/json");
@@ -90,22 +90,22 @@ static enum MHD_Result request_handler(void *cls,
         }
     }
 
-    MYGPIOD_LOG_DEBUG("HTTP: %s %s", method_str, url);
+    MYGPIOD_LOG_DEBUG("HTTP connection %u: %s %s", request_data->conn_id, method_str, url);
     // REST-API
     if (strncmp(url, "/api/", 5) == 0) {
-        MYGPIOD_LOG_DEBUG("HTTP: Calling REST-API handler for %u %s %s", config->http_conn_id, method_str, url);
-        return rest_api_handler(connection, url, method, config);
+        MYGPIOD_LOG_DEBUG("HTTP connection %u: Calling REST-API handler for %s %s", request_data->conn_id, method_str, url);
+        return rest_api_handler(connection, request_data->conn_id, url, method, config);
     }
     // Long polling: Suspend connection until an GPIO event occurs
     if (strcmp(url, "/poll") == 0) {
-        MYGPIOD_LOG_DEBUG("HTTP: Suspending connection for %u %s %s", config->http_conn_id, method_str, url);
+        MYGPIOD_LOG_DEBUG("HTTP connection %u: Suspending connection for %s %s", request_data->conn_id, method_str, url);
         MHD_set_connection_option(connection, MHD_CONNECTION_OPTION_TIMEOUT, 0);
         MHD_suspend_connection(connection);
         list_push(&config->http_suspended, 0, request_data);
         return MHD_YES;
     }
     // Serve embedded files
-    MYGPIOD_LOG_DEBUG("HTTP: Serve embedded files for %u %s %s", config->http_conn_id, method_str, url);
+    MYGPIOD_LOG_DEBUG("HTTP connection %u: Serve embedded files for %s %s", request_data->conn_id, method_str, url);
     return webui_handler(connection, url);
 }
 

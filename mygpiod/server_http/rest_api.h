@@ -13,6 +13,7 @@
 #include <microhttpd.h>
 
 enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
+                                 unsigned http_conn_id,
                                  const char *url,
                                  enum http_method method,
                                  struct t_config *config);

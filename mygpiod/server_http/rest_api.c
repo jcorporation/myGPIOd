@@ -70,6 +70,7 @@ static bool match_url_gpio(const char *url,
  * @return enum MHD_Result 
  */
 enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
+                                 unsigned http_conn_id,
                                  const char *url,
                                  enum http_method method,
                                  struct t_config *config)
@@ -112,7 +113,7 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     }
     else {
         // Request was not handled
-        MYGPIOD_LOG_ERROR("HTTP: Invalid API request: %u %s %s", config->http_conn_id, http_lookup_method(method), url);
+        MYGPIOD_LOG_ERROR("HTTP connection %u: Invalid API request: %s %s", http_conn_id, http_lookup_method(method), url);
         rc = false;
         buffer = sdscat(buffer,"{\"error\":\"Invalid API request\"}");
     }
