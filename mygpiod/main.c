@@ -50,16 +50,25 @@ int main(int argc, char **argv) {
     int rc = EXIT_SUCCESS;
     logline = sdsempty();
     log_init();
-    umask(0007);  //only owner and group should have rw access
+    umask(0077);  // Only owner should have rw access
 
+    // Handle command line parameter
+    if (argc == 2 && strcmp(argv[1], "-h") == 0) {
+        printf("myGPIOD %s\n", MYGPIO_VERSION);
+        printf("Usage: mygpiod [configuration file]\n");
+        printf("Default configuration file: /etc/mygpiod.conf\n");
+        return 1;
+    }
+
+    // First argument is the configuration file
+    sds config_file = argc == 2
+        ? sdsnew(argv[1])
+        : sdsnew("/etc/mygpiod.conf");
+
+    // Startup notice
     MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIO_VERSION);
     MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
     MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_api_version());
-
-    // Handle command line parameter
-    sds config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
-        ? sdsnew(argv[1])
-        : sdsnew("/etc/mygpiod.conf");
 
     // Read config
     struct t_config *config = get_config(config_file);
