@@ -125,7 +125,7 @@ function getGPIOactions(direction) {
 // Gets the list of GPIOs and populates the GPIO table.
 function getGPIOs() {
     const gpiosEl = document.getElementById('gpios');
-    gpiosEl.textContent = '';
+    const rows = gpiosEl.querySelectorAll('tr');
     httpRequest('GET', '/api/gpio', function(data) {
         for (let i = 0; i < data.entries; i++) {
             const tr = document.createElement('tr');
@@ -137,7 +137,12 @@ function getGPIOs() {
             tr.data = data.data[i];
             tr.appendChild(getGPIOactions(data.data[i].direction));
             tr.setAttribute('id', 'gpio' + data.data[i].gpio);
-            gpiosEl.appendChild(tr);
+            if (rows[i]) {
+                rows[i].replaceWith(tr);
+            }
+            else {
+                gpiosEl.appendChild(tr);
+            }
         }
     });
 }
