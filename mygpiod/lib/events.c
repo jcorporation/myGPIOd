@@ -52,12 +52,12 @@ void event_enqueue(struct t_config *config, unsigned gpio, enum mygpiod_event_ty
     }
 
     // HTTP long polling
-    current = config->suspended.head;
+    current = config->http_suspended.head;
     while (current != NULL) {
         http_connection_resume((struct t_request_data *)current->data, gpio, event_type, timestamp);
         current = current->next;
     }
-    list_clear(&config->suspended, NULL);
+    list_clear(&config->http_suspended, NULL);
 }
 
 /**

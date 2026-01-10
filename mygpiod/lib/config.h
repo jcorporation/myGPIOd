@@ -79,7 +79,8 @@ struct t_config {
     struct MHD_Daemon *httpd;             //!< HTTPD object
     sds http_ip;                          //!< HTTPD listening ip
     unsigned http_port;                   //!< HTTPD listening port
-    struct t_list suspended;              //!< List of suspended HTTP connections
+    struct t_list http_suspended;         //!< List of suspended HTTP connections
+    unsigned http_conn_id;           //!< Uniq HTTP connection id
 
     // GPIOd
     struct gpiod_chip *chip;              //!< gpiod chip object

@@ -94,14 +94,14 @@ void config_clear(struct t_config *config) {
         FREE_SDS(config->lua_file);
     #endif
     if (config->httpd != NULL) {
-        struct t_list_node *current = config->suspended.head;
+        struct t_list_node *current = config->http_suspended.head;
         while (current != NULL) {
             struct t_request_data *request_data = (struct t_request_data *)current->data;
             MHD_resume_connection(request_data->connection);
             current = current->next;
         }
         MHD_stop_daemon(config->httpd);
-        list_clear(&config->suspended, NULL);
+        list_clear(&config->http_suspended, NULL);
     }
 }
 
@@ -140,7 +140,8 @@ static struct t_config *config_new(void) {
     config->http_ip = sdsnew(CFG_HTTP_IP);
     config->http_port = CFG_HTTP_PORT;
     config->httpd = NULL;
-    list_init(&config->suspended);
+    list_init(&config->http_suspended);
+    config->http_conn_id = 0;
     return config;
 }
 

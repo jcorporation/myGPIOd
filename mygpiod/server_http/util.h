@@ -27,8 +27,9 @@ enum http_method {
  * MHD connection specific data
  */
 struct t_request_data {
-    sds resume_buffer;                         //!< Message buffer for resumed connections
-    struct MHD_Connection *connection;         //!< Pointer to MHD connection
+    sds resume_buffer;                  //!< Message buffer for resumed connections
+    struct MHD_Connection *connection;  //!< Pointer to MHD connection
+    unsigned conn_id;              //!< Uniq connection id
 };
 
 void http_response_free(void *cls);
