@@ -131,7 +131,10 @@ check_prototype_definition(
     HAVE_IOCTL_WITH_INT_REQUEST
 )
 
-# configure some files - version and path information
+# Remove files that should not be cached between builds
+file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/mygpiod/CMakeFiles/mygpiod.dir/server_http/webui.c.o")
+
+# Configure some files - version and path information
 configure_file(mygpio-common/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
 configure_file(mygpiod/server_http/embedded_files.c.in ${PROJECT_BINARY_DIR}/embedded_files.c)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
