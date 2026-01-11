@@ -74,7 +74,9 @@ int main(int argc, char **argv) {
     const char *command_string = argv[option_index];
     option_index++;
     const struct t_commands *command = get_command(command_string, argc, option_index);
-    if (command->command == NULL) {
+    if (command == NULL ||
+        command->command == NULL)
+    {
         print_usage();
         clear_options(&options);
         return EXIT_FAILURE;
