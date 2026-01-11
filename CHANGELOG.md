@@ -4,7 +4,7 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.9.0 (not yet released)
+## myGPIOd v0.9.0 (2026-01-11)
 
 This release introduces a simple REST-API to control GPIOs.
 
