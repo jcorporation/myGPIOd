@@ -9,10 +9,13 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: installdeps
-      run: sudo apt-get -y install cmake build-essential git pkgconf libmpdclient-dev libcurl4-gnutls-dev liblua5.4-dev libgpiod-dev
+      run: |
+        sudo tee /etc/apt/sources.list.d/bookworm-backports.list <<< "deb http://ftp.de.debian.org/debian bookworm-backports main"
+        sudo apt-get update
+        sudo apt-get -y install cmake build-essential git  libgpiod-dev libmpdclient-dev libcurl4-gnutls-dev pkgconf
     - name: build
       run: |
         cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .
-        make -C release
+        cmake --build release
     - name: install
-      run: sudo make -C release install
+      run: sudo cmake --install release
