@@ -1,7 +1,7 @@
 myGPIO Library: libmygpio
 =========================
 
-The client library is documented in the header files. The generated documentation is also `online <https://jcorporation.github.io/myGPIOd/doxygen/>`__.
+The client library is documented in the header files. The generated documentation is also `online <https://jcorporation.github.io/myGPIOd/doxygen/html/>`__.
 
 The `mygpioc` command line client is based on this library.
 
