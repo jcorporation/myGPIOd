@@ -96,6 +96,7 @@ int main(int argc, char **argv) {
         setvbuf(stderr, NULL, _IOLBF, 0) != 0)
     {
         MYGPIOD_LOG_EMERG("Could not set stdout and stderr buffer");
+        rc = EXIT_FAILURE;
         goto out;
     }
 
@@ -122,6 +123,7 @@ int main(int argc, char **argv) {
         gpio_set_outputs(config) == false ||
         gpio_request_inputs(config, &poll_fds) == false)
     {
+        rc = EXIT_FAILURE;
         goto out;
     }
 
@@ -131,6 +133,7 @@ int main(int argc, char **argv) {
     // create server socket
     int server_fd = server_socket_create(config);
     if (server_fd == -1) {
+        rc = EXIT_FAILURE;
         goto out;
     }
     event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI);
@@ -140,6 +143,7 @@ int main(int argc, char **argv) {
         config->httpd = httpd_start(config);
         if (config->httpd == NULL) {
             MYGPIOD_LOG_EMERG("Failure starting http server.");
+            rc = EXIT_FAILURE;
             goto out;
         }
         const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
@@ -147,6 +151,7 @@ int main(int argc, char **argv) {
             httpd_fd->epoll_fd == -1)
         {
             MYGPIOD_LOG_EMERG("Failure getting MHD epoll fd.");
+            rc = EXIT_FAILURE;
             goto out;
         }
         event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
