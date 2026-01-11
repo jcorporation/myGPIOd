@@ -20,11 +20,6 @@ BuildRequires:  libmpdclient-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libgpiod-devel
 BuildRequires:  lua-devel
-%if 0%{?fedora} >= 39
-BuildRequires:  libgpiod-devel
-%else
-BuildRequires:  git
-%endif
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description 
@@ -65,7 +60,6 @@ true
 %doc LICENSE.md
 %doc README.md
 %doc CHANGELOG.md
-%doc PROTOCOL.md
 %{_bindir}/mygpiod
 %{_bindir}/mygpioc
 %{_libdir}/libmygpio.so*
@@ -81,8 +75,7 @@ true
 %{_includedir}/libmygpio
 %{_includedir}/libmygpio/*
 %{_mandir}/man3/libmygpio_*
-%{_mandir}/man3/t_mygpio*
 
 %changelog
-* Wed Dec 31 2025 Juergen Mang <mail@jcgames.de> 0.9.0-0
+* Sat Jan 10 2026 Juergen Mang <mail@jcgames.de> 0.9.0-0
 - Version from master

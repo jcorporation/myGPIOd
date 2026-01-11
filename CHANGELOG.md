@@ -10,8 +10,9 @@ This release introduces a simple REST-API to control GPIOs.
 
 ### Changelog
 
+- Feat: Add documentation site
 - Feat: REST-API
-- Feat: Integrate Raspberry vcgencmd commands for temp, volts, clock and throttled
+- Feat: Integrate Raspberry `vcgencmd` commands for temp, volts, clock and throttled
 - Upd: Add dependency to libgpiod system package
 - Fix: Build with ninja
 
@@ -23,7 +24,7 @@ This is a small maintenance release.
 
 ### Changelog
 
-- Fix: Set output buffers for stdout logging
+- Fix: Set output buffers for STDOUT logging
 
 ***
 
@@ -83,9 +84,9 @@ This release adds more actions.
 
 - Feat: Add long press interval for input GPIOs.
 - Feat: Add blink interval for output GPIOs.
-- Feat: New MPD action controls MPD with the help of libmpdclient.
+- Feat: New MPD action controls MPD with the help of libmpdclient2.
 - Feat: New HTTP action submits arbitrary GET and POST requests.
-- Feat: New myGPIOd action triggers myGPIOd scripts through the myGPIOd api.
+- Feat: New myGPIOd action triggers myGPIOd scripts through the myGPIOd API.
 - Upd: Improved build system.
 - Fix: Memory leak in GPIO set actions.
 - Fix: Lookup correct event request.
@@ -98,7 +99,7 @@ This is a complete rewrite of myGPIOd. It is now based on libgpiod v2.
 
 This release ships in addition to the myGPIOd daemon a simple C client library and a command line tool.
 
-The daemon can be controlled through a simple text based protocol accessible by a unix socket.
+The daemon can be controlled through a simple text based protocol accessible by a Unix socket.
 
 ### Notes
 
@@ -127,7 +128,7 @@ This release fixes a bug in the Alpine Linux package.
 
 ## myGPIOd v0.3.0 (2023-10-09)
 
-This release adds bias support and requires therefor gpiod >= 1.5.0.
+This release adds bias support and requires therefor libgpiod >= 1.5.0.
 
 ***
 

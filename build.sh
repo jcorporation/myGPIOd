@@ -61,12 +61,7 @@ setversion() {
     sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE_F1__/$DATE_F1/g" -e "s/__DATE_F2__/$DATE_F2/g" \
         -e "s/__DATE_F3__/$DATE_F3/g" "$F.in" > "$F"
   done
-  echo "Generating man pages"
-  rm -f contrib/man/man3/*.3
-  doxygen
-  mv contrib/man/man3/t_mygpio_connection.3 contrib/man/man3/libmygpio_t_mygpio_connection.3 
-  mv contrib/man/man3/t_mygpio_gpio.3 contrib/man/man3/libmygpio_t_mygpio_gpio.3 
-  mv contrib/man/man3/t_mygpio_idle_event.3 contrib/man/man3/libmygpio_t_mygpio_idle_event.3 
+  printf "%s" "This documentation is for myGPIOd version ${VERSION}." > docs/_includes/version
 }
 
 buildrelease() {
@@ -422,6 +417,45 @@ purge() {
   return 0
 }
 
+run_doxygen() {
+  DOC_DEST=$1
+  if ! check_cmd doxygen
+  then
+    return 1
+  fi
+  echo "Running doxygen"
+  install -d "$DOC_DEST/html/doxygen"
+  (
+    cat Doxyfile
+    echo "OUTPUT_DIRECTORY = $DOC_DEST/html/doxygen"
+    echo "MAN_OUTPUT = $STARTPATH/contrib/man"
+  ) | doxygen -
+  mv contrib/man/man3/t_mygpio_connection.3 contrib/man/man3/libmygpio_t_mygpio_connection.3 
+  mv contrib/man/man3/t_mygpio_gpio.3 contrib/man/man3/libmygpio_t_mygpio_gpio.3 
+  mv contrib/man/man3/t_mygpio_idle_event.3 contrib/man/man3/libmygpio_t_mygpio_idle_event.3 
+}
+
+create_doc() {
+  DOC_DEST=$1
+  install -d "$DOC_DEST" || return 1
+  if ! check_cmd python3
+  then
+    echo "Python3 not installed, can not create documentation"
+    return 1
+  fi
+  ./build.sh api_doc "$DOC_DEST"
+  python3 -m venv /tmp/python-venv/
+  /tmp/python-venv/bin/python3 -m pip install --upgrade pip
+  /tmp/python-venv/bin/pip install sphinx sphinx-book-theme sphinx-copybutton
+  /tmp/python-venv/bin/sphinx-build -M html docs "$DOC_DEST"
+}
+
+serve_doc() {
+  DOC_DEST=$1
+  /tmp/python-venv/bin/pip install sphinx-autobuild
+  /tmp/python-venv/bin/sphinx-autobuild -M html docs "$DOC_DEST"
+}
+
 #get action
 if [ -z "${1+x}" ]
 then
@@ -485,6 +519,35 @@ case "$ACTION" in
     uninstall
     purge
   ;;
+  api_doc|man)
+    if [ -z "${2+x}" ]
+    then
+      echo "Usage: $0 $1 <destination folder>"
+      exit 1
+    fi
+    if ! run_doxygen "$2"
+    then
+      echo "Could not create libmygpio API documentation"
+      exit 1
+    fi
+    ;;
+  doc)
+    if [ -z "${2+x}" ]
+    then
+      echo "Usage: $0 $1 <destination folder>"
+      exit 1
+    fi
+    create_doc "$2"
+    ;;
+  serve_doc)
+    if [ -z "${2+x}" ]
+    then
+      echo "Usage: $0 $1 <destination folder>"
+      exit 1
+    fi
+    create_doc "$2"
+    serve_doc "$2"
+    ;;
   *)
     echo "Usage: $0 <option>"
     echo "Version: ${VERSION}"
@@ -525,6 +588,11 @@ case "$ACTION" in
     echo "                    following environment variables are respected"
     echo "                      - OSC_REPO=\"home:jcorporation/myGPIOd\""
     echo "  pkgdocker:        creates the docker image"
+    echo ""
+    echo "Documentation options"
+    echo "  api_doc|man:      generates the api documentation and manpages for libmygpio"
+    echo "  doc:              generates the html documentation"
+    echo "  serve_doc:        generates the html documentation and runs a development server"
     echo ""
     echo "Misc options:"
     echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"

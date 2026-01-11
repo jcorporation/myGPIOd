@@ -60,7 +60,6 @@ true
 %doc LICENSE.md
 %doc README.md
 %doc CHANGELOG.md
-%doc PROTOCOL.md
 %{_bindir}/mygpiod
 %{_bindir}/mygpioc
 %{_libdir}/libmygpio.so*
@@ -76,7 +75,6 @@ true
 %{_includedir}/libmygpio
 %{_includedir}/libmygpio/*
 %{_mandir}/man3/libmygpio_*
-%{_mandir}/man3/t_mygpio*
 
 %changelog
 * __DATE_F1__ Juergen Mang <mail@jcgames.de> __VERSION__-0
