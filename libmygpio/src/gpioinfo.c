@@ -46,6 +46,7 @@ struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connecti
     int debounce_period_us = 0;
     enum mygpio_event_clock event_clock = MYGPIO_EVENT_CLOCK_UNKNOWN;
     enum mygpio_drive drive = MYGPIO_DRIVE_UNKNOWN;
+    char *name;
 
     struct t_mygpio_pair *pair;
     if ((pair = mygpio_recv_pair_name(connection, "gpio")) == NULL) {
@@ -135,11 +136,18 @@ struct t_mygpio_gpio *mygpio_recv_gpio_info(struct t_mygpio_connection *connecti
         mygpio_free_pair(pair);
     }
 
+    if ((pair = mygpio_recv_pair_name(connection, "name")) == NULL) {
+        return NULL;
+    }
+    name = strdup(pair->value);
+    mygpio_free_pair(pair);
+
     struct t_mygpio_gpio *gpio = mygpio_gpio_new(direction);
     assert(gpio);
     gpio->gpio = gpio_nr;
     gpio->direction = direction;
     gpio->value = value;
+    gpio->name = name;
     if (direction == MYGPIO_GPIO_DIRECTION_IN) {
         gpio->in->active_low = active_low;
         gpio->in->bias = bias;

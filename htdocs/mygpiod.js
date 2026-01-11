@@ -132,7 +132,7 @@ function getGPIOs() {
     httpRequest('GET', '/api/gpio', function(data) {
         for (let i = 0; i < data.entries; i++) {
             const tr = document.createElement('tr');
-            for (const k of ['gpio', 'direction', 'value']) {
+            for (const k of ['gpio', 'name', 'direction', 'value']) {
                 const td = document.createElement('td');
                 td.textContent = data.data[i][k];
                 tr.appendChild(td);

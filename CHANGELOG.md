@@ -4,6 +4,17 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v0.9.1 (not yet released)
+
+This release fixes some bugs and adds minor features.
+
+### Changelog
+
+- Feat: Show GPIO names
+- Fix: Memory leak in list GPIOs function for REST-API
+
+***
+
 ## myGPIOd v0.9.0 (2026-01-11)
 
 This release introduces a simple REST-API to control GPIOs.

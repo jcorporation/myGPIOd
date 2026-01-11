@@ -95,6 +95,19 @@ bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_d
             rc = false;
         }
     }
+
+    struct gpiod_line_info *info = gpiod_chip_get_line_info(chip, gpio);
+    if (info == NULL) {
+        rc = false;
+    }
+    else {
+        const char *name = gpiod_line_info_get_name(info);
+        if (name != NULL) {
+            data->name = sdscat(data->name, name);
+        }
+        gpiod_line_info_free(info);
+    }
+
     gpiod_request_config_free(req_cfg);
     gpiod_line_config_free(line_cfg);
     gpiod_line_settings_free(settings);

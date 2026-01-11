@@ -169,6 +169,13 @@ enum mygpio_event_clock mygpio_gpio_in_get_event_clock(struct t_mygpio_gpio *gpi
 enum mygpio_drive mygpio_gpio_out_get_drive(struct t_mygpio_gpio *gpio);
 
 /**
+ * Returns the GPIO name
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO name
+ */
+const char *mygpio_gpio_get_name(struct t_mygpio_gpio *gpio);
+
+/**
  * Frees the struct received by mygpio_recv_gpio.
  * @param gpio Pointer to struct mygpio_recv_gpio.
  */

@@ -31,6 +31,7 @@ struct t_mygpio_gpio {
     enum mygpio_gpio_value value;          //!< GPIO value
     struct t_mygpio_in *in;                //!< GPIO settings for input
     struct t_mygpio_out *out;              //!< GPIO settings for output
+    char *name;                            //!< GPIO name
 };
 
 struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_direction direction);

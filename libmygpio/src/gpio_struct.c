@@ -8,7 +8,6 @@
 #include "libmygpio/src/gpio_struct.h"
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -110,6 +109,15 @@ enum mygpio_drive mygpio_gpio_out_get_drive(struct t_mygpio_gpio *gpio) {
 }
 
 /**
+ * Returns the GPIO name
+ * @param gpio Pointer to struct t_mygpio_gpio.
+ * @return GPIO name or NULL if unknown
+ */
+const char *mygpio_gpio_get_name(struct t_mygpio_gpio *gpio) {
+    return gpio->name;
+}
+
+/**
  * Creates a new gpio struct
  * @return struct t_mygpio_gpio* 
  */
@@ -118,6 +126,7 @@ struct t_mygpio_gpio *mygpio_gpio_new(enum mygpio_gpio_direction direction) {
     assert(gpio);
     gpio->in = NULL;
     gpio->out = NULL;
+    gpio->name = NULL;
     if (direction == MYGPIO_GPIO_DIRECTION_IN) {
         gpio->in = malloc(sizeof(struct t_mygpio_in));
         assert(gpio->in);
@@ -139,6 +148,9 @@ void mygpio_free_gpio(struct t_mygpio_gpio *gpio) {
     }
     if (gpio->out != NULL) {
         free(gpio->out);
+    }
+    if (gpio->name != NULL) {
+        free(gpio->name);
     }
     free(gpio);
 }

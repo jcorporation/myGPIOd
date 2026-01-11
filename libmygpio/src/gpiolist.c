@@ -37,6 +37,7 @@ struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connecti
     unsigned gpio_nr;
     enum mygpio_gpio_direction direction;
     enum mygpio_gpio_value value;
+    char *name;
 
     struct t_mygpio_pair *pair;
     if ((pair = mygpio_recv_pair_name(connection, "gpio")) == NULL) {
@@ -66,9 +67,16 @@ struct t_mygpio_gpio *mygpio_recv_gpio_list(struct t_mygpio_connection *connecti
     }
     mygpio_free_pair(pair);
 
+    if ((pair = mygpio_recv_pair_name(connection, "name")) == NULL) {
+        return NULL;
+    }
+    name = strdup(pair->value);
+    mygpio_free_pair(pair);
+
     struct t_mygpio_gpio *gpio = mygpio_gpio_new(MYGPIO_GPIO_DIRECTION_UNKNOWN);
     gpio->gpio = gpio_nr;
     gpio->direction = direction;
     gpio->value = value;
+    gpio->name = name;
     return gpio;
 }

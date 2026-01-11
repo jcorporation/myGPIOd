@@ -11,7 +11,7 @@
 #include "mygpiod/lib/log.h"
 
 /**
- * Gets the current line value of an input gpio
+ * Gets the current line value of a gpio
  * @param config pointer to config
  * @param gpio gpio to get the value
  * @return the active state

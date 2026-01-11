@@ -44,6 +44,7 @@ struct t_gpio_in_data {
     int timer_fd;                                  //!< timer file descriptor for long press handler
     struct gpiod_edge_event_buffer *event_buffer;  //!< buffer for gpio events
     struct gpiod_line_request *request;            //!< gpio line request struct
+    sds name;                                      //!< gpio name
 };
 
 /**
@@ -54,6 +55,7 @@ struct t_gpio_out_data {
     enum gpiod_line_value value;         //!< value to set
     int timer_fd;                        //!< timer file descriptor for blink handler
     struct gpiod_line_request *request;  //!< gpio line request struct
+    sds name;                            //!< gpio name
 };
 
 /**

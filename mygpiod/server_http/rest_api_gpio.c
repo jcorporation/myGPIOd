@@ -31,11 +31,15 @@ sds rest_api_gpio_get(struct t_config *config,
     unsigned i = 0;
     struct t_list_node *current = config->gpios_in.head;
     while (current != NULL) {
+        struct t_gpio_in_data *data = (struct t_gpio_in_data *)current->data;
         if (i++) {
             buffer = sdscatlen(buffer, ",", 1);
         }
         buffer = sdscatlen(buffer, "{", 1);
         buffer = sdscatfmt(buffer, "\"gpio\":%u,", current->id);
+        buffer = sdscat(buffer, "\"name\":");
+        buffer = sds_catjson(buffer, data->name);
+        buffer = sdscatlen(buffer, ",", 1);
         buffer = sdscat(buffer, "\"direction\":\"in\",");
         buffer = sdscat(buffer, "\"value\":");
         buffer = sds_catjson(buffer, lookup_gpio_value(gpio_get_value(config, current->id)));
@@ -44,11 +48,15 @@ sds rest_api_gpio_get(struct t_config *config,
     }
     current = config->gpios_out.head;
     while (current != NULL) {
+        struct t_gpio_out_data *data = (struct t_gpio_out_data *)current->data;
         if (i++) {
             buffer = sdscatlen(buffer, ",", 1);
         }
         buffer = sdscatlen(buffer, "{", 1);
         buffer = sdscatfmt(buffer, "\"gpio\":%u,", current->id);
+        buffer = sdscat(buffer, "\"name\":");
+        buffer = sds_catjson(buffer, data->name);
+        buffer = sdscatlen(buffer, ",", 1);
         buffer = sdscat(buffer, "\"direction\":\"out\",");
         buffer = sdscat(buffer, "\"value\":");
         buffer = sds_catjson(buffer, lookup_gpio_value(gpio_get_value(config, current->id)));
@@ -125,6 +133,10 @@ sds rest_api_gpio_gpio_options(struct t_config *config,
     buffer = sds_catjson(buffer, lookup_gpio_value(gpio_get_value(config, gpio_nr)));
     buffer = sdscatlen(buffer, ",", 1);
     if (gpio_direction == GPIOD_LINE_DIRECTION_INPUT) {
+        struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
+        buffer = sdscat(buffer, "\"name\":");
+        buffer = sds_catjson(buffer, data->name);
+        buffer = sdscatlen(buffer, ",", 1);
         buffer = sdscat(buffer, "\"direction\":\"in\",");
         buffer = sdscatfmt(buffer, "\"active_low\":%s", bool_to_str(gpiod_line_info_is_active_low(info)));
         buffer = sdscatlen(buffer, ",", 1);
@@ -142,6 +154,10 @@ sds rest_api_gpio_gpio_options(struct t_config *config,
         buffer = sds_catjson(buffer, lookup_event_clock(gpiod_line_info_get_event_clock(info)));
     }
     else if (gpio_direction == GPIOD_LINE_DIRECTION_OUTPUT) {
+        struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
+        buffer = sdscat(buffer, "\"name\":");
+        buffer = sds_catjson(buffer, data->name);
+        buffer = sdscatlen(buffer, ",", 1);
         buffer = sdscat(buffer, "\"direction\":\"out\",");
         buffer = sdscat(buffer, "\"drive\":");
         buffer = sds_catjson(buffer, lookup_drive(gpiod_line_info_get_drive(info)));

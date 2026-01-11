@@ -7,8 +7,8 @@
 #include "compile_time.h"
 #include "mygpiod/server_http/rest_api_raspberry.h"
 
-#include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/lib/json_print.h"
+#include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/raspberry/vcgencmd.h"
 
 #include <stdlib.h>

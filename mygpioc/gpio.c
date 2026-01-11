@@ -32,8 +32,9 @@ int handle_gpiolist(int argc, char **argv, int option_index, struct t_mygpio_con
         struct t_mygpio_gpio *gpio;
         verbose_printf("Retrieving configured gpios");
         while ((gpio = mygpio_recv_gpio_list(conn)) != NULL) {
-            printf("GPIO %u, direction %s, value %s\n",
+            printf("GPIO %u, name \"%s\", direction %s, value %s\n",
                 mygpio_gpio_get_gpio(gpio),
+                mygpio_gpio_get_name(gpio),
                 mygpio_gpio_lookup_direction(mygpio_gpio_get_direction(gpio)),
                 mygpio_gpio_lookup_value(mygpio_gpio_get_value(gpio))
             );
@@ -71,6 +72,7 @@ int handle_gpioinfo(int argc, char **argv, int option_index, struct t_mygpio_con
         }
         enum mygpio_gpio_direction direction = mygpio_gpio_get_direction(gpio);
         printf("GPIO: %u\n", mygpio_gpio_get_gpio(gpio));
+        printf("Name: %s\n", mygpio_gpio_get_name(gpio));
         printf("Direction: %s\n", mygpio_gpio_lookup_direction(direction));
         printf("Value: %s\n", mygpio_gpio_lookup_value(mygpio_gpio_get_value(gpio)));
         if (direction == MYGPIO_GPIO_DIRECTION_IN) {

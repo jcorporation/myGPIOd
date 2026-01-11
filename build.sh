@@ -456,7 +456,32 @@ serve_doc() {
   /tmp/python-venv/bin/sphinx-autobuild -M html docs "$DOC_DEST"
 }
 
-#get action
+# Based on: https://github.com/warthog618/gpiosim-rs/blob/master/examples/basic_sim.sh
+# https://www.kernel.org/doc/html/latest/admin-guide/gpio/gpio-sim.html
+create_gpio() {
+  if ! modprobe configfs
+  then
+    echo "Failure loading configfs kernel module"
+    exit 1
+  fi
+  mountpoint /sys/kernel/config > /dev/null || mount -t configfs configfs /sys/kernel/config
+  if ! modprobe gpio-sim
+  then
+    echo "Failure loading gpio-sim kernel module"
+    exit 1
+  fi
+  mkdir /sys/kernel/config/gpio-sim/basic
+  mkdir /sys/kernel/config/gpio-sim/basic/bank0
+  echo 8 > /sys/kernel/config/gpio-sim/basic/bank0/num_lines
+  for F in {0..7}
+  do
+    mkdir "/sys/kernel/config/gpio-sim/basic/bank0/line${F}"
+    echo "gpio$F" > "/sys/kernel/config/gpio-sim/basic/bank0/line${F}/name"
+  done
+  echo 1 > /sys/kernel/config/gpio-sim/basic/live
+}
+
+# Get action
 if [ -z "${1+x}" ]
 then
   ACTION=""
@@ -548,6 +573,9 @@ case "$ACTION" in
     create_doc "$2"
     serve_doc "$2"
     ;;
+  gpiosim)
+    create_gpio
+    ;;
   *)
     echo "Usage: $0 <option>"
     echo "Version: ${VERSION}"
@@ -597,6 +625,7 @@ case "$ACTION" in
     echo "Misc options:"
     echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
     echo "  addmygpioduser:   adds mygpiod group and user"
+    echo "  gpiosim:          creates a simulated gpio device with help of gpiosim"
     echo ""
     exit 1
   ;;

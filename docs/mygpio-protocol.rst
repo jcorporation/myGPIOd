@@ -114,6 +114,11 @@ Lists all configured gpios.
    gpio:{gpio number}
    direction:{in|out}
    value:{active|inactive}
+   name:{name}
+   gpio:{gpio number}
+   direction:{in|out}
+   value:{active|inactive}
+   name:{name}
    END
 
 gpioinfo {gpio number}
@@ -134,6 +139,7 @@ Gets the current settings of a configured input or output gpio.
    is_debounced:{true|false}
    debounce_period_us:{microseconds}
    event_clock:{monotonic|realtime|hte}
+   name:{name}
    END
 
 **Response for an output gpio**
@@ -144,6 +150,7 @@ Gets the current settings of a configured input or output gpio.
    direction:out
    value:{active|inactive}
    drive:{push-pull|open-drain|open-source}
+   name:{name}
    END
 
 gpioget {gpio number}

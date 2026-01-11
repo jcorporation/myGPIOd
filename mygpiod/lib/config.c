@@ -503,6 +503,7 @@ static struct t_gpio_in_data *gpio_in_data_new(void) {
     data->event_clock = GPIOD_LINE_CLOCK_REALTIME;
     data->request = NULL;
     data->event_buffer = NULL;
+    data->name = sdsempty();
     return data;
 }
 
@@ -523,6 +524,7 @@ static void gpio_in_data_clear(struct t_gpio_in_data *data) {
     list_clear(&data->action_rising, node_data_action_clear);
     list_clear(&data->long_press_action, node_data_action_clear);
     list_clear(&data->long_press_release_action, node_data_action_clear);
+    sdsfree(data->name);
 }
 
 /**
@@ -544,6 +546,7 @@ static struct t_gpio_out_data *gpio_out_data_new(void) {
     data->value = GPIOD_LINE_VALUE_INACTIVE;
     data->timer_fd = -1;
     data->request = NULL;
+    data->name = sdsempty();
     return data;
 }
 
@@ -556,6 +559,7 @@ static void gpio_out_data_clear(struct t_gpio_out_data *data) {
     if (data->request != NULL) {
         gpiod_line_request_release(data->request);
     }
+    sdsfree(data->name);
 }
 
 /**
