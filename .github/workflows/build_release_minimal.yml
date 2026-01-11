@@ -13,7 +13,7 @@ jobs:
         curl https://ftp-master.debian.org/keys/archive-key-13.asc | sudo gpg --no-default-keyring --keyring /usr/share/keyrings/trixie.gpg --import
         sudo tee /etc/apt/sources.list.d/trixie.list <<< "deb [signed-by=/usr/share/keyrings/trixie.gpg] http://ftp.de.debian.org/debian trixie main"
         sudo apt-get update
-        sudo apt-get -y install cmake build-essential git libgpiod-dev pkgconf
+        sudo apt-get -y install cmake build-essential git libgpiod-dev libmicrohttpd-dev pkgconf
     - name: build
       run: |
         cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release -DMYGPIOD_ENABLE_ACTION_MPC=OFF -DMYGPIOD_ENABLE_ACTION_HTTP=OFF -DMYGPIOD_ENABLE_ACTION_LUA=OFF .
