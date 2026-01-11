@@ -8,8 +8,7 @@
 #include "mygpiod/server_http/util.h"
 
 #include "dist/sds/sds.h"
-#include "lib/events.h"
-#include "lib/log.h"
+#include "mygpiod/lib/events.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -172,8 +172,8 @@ sds rest_api_gpio_gpio_blink(struct t_config *config,
     int interval_i;
     if (timeout == NULL ||
         interval == NULL ||
-        mygpio_parse_int(timeout, &timeout_i, NULL, 0, INT_MAX) == false ||
-        mygpio_parse_int(interval, &interval_i, NULL, 0, INT_MAX) == false)
+        mygpio_parse_int(timeout, &timeout_i, NULL, 0, TIMEOUT_MS_MAX) == false ||
+        mygpio_parse_int(interval, &interval_i, NULL, 0, TIMEOUT_MS_MAX) == false)
     {
         *rc = false;
         return sdscat(buffer,"{\"error\":\"Parameter \"timeout\" or \"interval\" not found or invalid\"}");

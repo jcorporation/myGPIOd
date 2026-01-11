@@ -17,8 +17,8 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
+#include "mygpiod/server_http/util.h"
 #include "mygpiod/server_socket/socket.h"
-#include "server_http/util.h"
 
 #include <dirent.h>
 #include <errno.h>

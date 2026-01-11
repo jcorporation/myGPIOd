@@ -7,9 +7,9 @@
 #include "compile_time.h"
 #include "mygpiod/server_http/httpd.h"
 
-#include "lib/mem.h"
-#include "lib/sds_extras.h"
 #include "mygpiod/lib/log.h"
+#include "mygpiod/lib/mem.h"
+#include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_http/rest_api.h"
 #include "mygpiod/server_http/util.h"
 #include "mygpiod/server_http/webui.h"

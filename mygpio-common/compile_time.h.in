@@ -7,6 +7,8 @@
 #ifndef COMPILE_TIME_H
 #define COMPILE_TIME_H
 
+#include <limits.h>
+
 // Version and name from cmake
 #define MYGPIO_VERSION "${PROJECT_VERSION}"
 #define MYGPIOD_NAME "myGPIOd"

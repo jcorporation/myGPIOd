@@ -8,7 +8,7 @@
 #include "mygpiod/server_http/webui.h"
 
 #include "embedded_files.c"
-#include "server_http/util.h"
+#include "mygpiod/server_http/util.h"
 
 #include <microhttpd.h>
 #include <string.h>
