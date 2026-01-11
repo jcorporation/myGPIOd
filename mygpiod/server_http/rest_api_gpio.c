@@ -147,6 +147,7 @@ sds rest_api_gpio_gpio_options(struct t_config *config,
         buffer = sds_catjson(buffer, lookup_drive(gpiod_line_info_get_drive(info)));
     }
     buffer = sdscatlen(buffer, "}}", 2);
+    gpiod_line_info_free(info);
     *rc = true;
     return buffer;
 }
