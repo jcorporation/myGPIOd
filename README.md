@@ -25,8 +25,8 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
     - System commands
   - Set various GPIO attributes (bias, debounce, ...)
   - Set the output value of GPIOs
-  - Get info from Raspberry PI Video Core (/dev/vcio)
-  - Provides a unix socket with a simple line-based text protocol
+  - Get info from Raspberry PI Video Core (`/dev/vcio`)
+  - Provides a Unix socket with a simple line-based text protocol
     - List GPIO configuration
     - Set and get GPIO values
     - Get notifications of GPIO events
@@ -37,7 +37,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
 - **libmygpio - the client library**
   - Simple C client library
   - High level API
-  - Integration in fd based event loops
+  - Integration in poll based event loops
 - **mygpioc - the command line client**
   - Connects to the mygpiod socket to control the various functions.
 
@@ -74,7 +74,7 @@ This builds and installs the `mygpiod` daemon, `mygpioc` command line tool, the 
 
 ## Run
 
-myGPIOd needs rw access to the gpio chip device (e. g. `/dev/gpiochip0`).
+myGPIOd needs read-write access to the gpio chip device (e. g. `/dev/gpiochip0`).
 
 ```sh
 /usr/bin/mygpiod [/etc/mygpiod.conf]
@@ -124,7 +124,7 @@ services:
       - /etc/mygpiod.d/:/etc/mygpiod.d/
 ```
 
-To run `mygpioc` in the already running mygpiod container:
+To run `mygpioc` in the already running myGPIOd container:
 
 ```sh
 docker exec -it mygpiod mygpioc gpiolist
@@ -144,10 +144,10 @@ Events are triggered through changes of input GPIO values.
 
 | EVENT | DESCRIPTION |
 | ----- | ----------- |
-| falling | State of GPIO has changed from active to inactive. |
-| rising | State of GPIO has changed from inactive to active. |
-| long_press | GPIO was pressed long. Event is triggered after configurable delay. |
-| long_press_release | GPIO changing it's state after a long press event. |
+| `falling` | State of GPIO has changed from active to inactive. |
+| `rising` | State of GPIO has changed from inactive to active. |
+| `long_press` | GPIO was pressed long. Event is triggered after configurable delay. |
+| `long_press_release` | GPIO changing it's state after a long press event. |
 
 ## Actions
 
@@ -155,14 +155,14 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 
 | ACTION | ARGUMENTS | DESCRIPTION |
 | ------ | --------- | ----------- |
-| gpioblink | `<gpio>` `<timeout_ms>` `<interval_ms>` | Toggle the value of the GPIO in given timeout and interval. Set interval to 0 to blink only once. |
-| gpioset | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
-| gpiotoggle | `<gpio>` | Toggles the value of a GPIO. |
-| http | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
-| lua | `{lua function}` [`{option1}` `{option2}` ...] | Calls a user defined lua function. |
-| mpc | `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connection settings from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
-| mympd | `{uri}` `{partition}` `{script}` | Calls the myMPD api in a new child process to execute a myMPD script. Requires libcurl. |
-| system | `{command}` | Executes an executable or script in a new child process. No arguments are allowed. |
+| `gpioblink` | `<gpio>` `<timeout_ms>` `<interval_ms>` | Toggle the value of the GPIO in given timeout and interval. Set interval to 0 to blink only once. |
+| `gpioset` | `<gpio>` `<active\|inactive>` | Sets the value of a GPIO. |
+| `gpiotoggle` | `<gpio>` | Toggles the value of a GPIO. |
+| `http` | `{GET\|POST}` `{uri}` [`{content-type}` `{postdata}`] | Submits a HTTP request in a new child process. If `postdata` starts with `<</`, the string after the `<<` is interpreted as an absolute filepath from which the postdata is read. Requires libcurl. |
+| `lua` | `{lua function}` [`{option1}` `{option2}` ...] | Calls a user defined lua function. |
+| `mpc `| `{mpd command}` [`{option1}` `{option2}` ...] | Connects to MPD and issues the command with options. It uses the default connection settings from libmpdclient. A maximum of 10 options are supported. Requires libmpdclient.|
+| `mympd` | `{uri}` `{partition}` `{script}` | Calls the myMPD api in a new child process to execute a myMPD script. Requires libcurl. |
+| `system` | `{command}` | Executes an executable or script in a new child process. No arguments are allowed. |
 
 myGPIOd can take actions on rising, falling and long_press events. Long press is triggered by a falling or rising event and does not disable the triggering event, but the release event. To use a button for normal press and long_press request both events and use one event for long and the other for short press. The example below illustrates this.
 
@@ -373,7 +373,7 @@ The default REST-API port is `8081`.
 
 ## Long poll endpoint
 
-This endpoint can be used to poll for GPIO events. It responds as sooon an event occurs.
+This endpoint can be used to poll for GPIO events. It responds as soon an event occurs.
 
 URI: `/poll`
 
