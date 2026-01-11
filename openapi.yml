@@ -1,0 +1,439 @@
+openapi: 3.0.3
+info:
+  title: myGPIOweb - OpenAPI 3.0
+  contact:
+    url: https://github.com/jcorporation/myGPIOd
+  description: REST API of myGPIOd
+  version: 0.2.0
+servers:
+  - url: http://localhost:8000/api
+tags:
+  - name: gpio
+    description: GPIO
+  - name: vcio
+    description: Raspberry Video Core
+paths:
+  /gpio:
+    get:
+      tags:
+        - gpio
+      description: List all configured GPIOs
+      operationId: gpio_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_gpiolist'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /gpio/{gpio}:
+    parameters:
+      - name: gpio
+        in: path
+        required: true
+        schema:
+          type: number
+          minimum: 0
+          maximum: 99
+    get:
+      tags:
+        - gpio
+      description: Get the GPIOs current value
+      operationId: gpio_gpio_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_gpioget'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+    options:
+      tags:
+        - gpio
+      description: Get the GPIO settings
+      operationId: gpio_gpio_options
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_gpioinfo'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /gpio/{gpio}/blink:
+    parameters:
+      - name: gpio
+        in: path
+        required: true
+        schema:
+          type: number
+          minimum: 0
+          maximum: 99
+    patch:
+      tags:
+        - gpio
+      description: Blink the value of an output GPIO
+      operationId: gpio_gpio_blink_patch
+      parameters:
+        - name: timeout
+          in: query
+          required: true
+          description: GPIO blink timeout in ms
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100000
+        - name: interval
+          in: query
+          required: true
+          description: GPIO blink interval in ms
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100000
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_ok'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /gpio/{gpio}/set:
+    parameters:
+      - name: gpio
+        in: path
+        required: true
+        schema:
+          type: number
+          minimum: 0
+          maximum: 99
+    patch:
+      tags:
+        - gpio
+      description: Set the value of an output GPIO
+      operationId: gpio_gpio_set_patch
+      parameters:
+        - in: query
+          name: value
+          schema:
+            type: string
+            oneOf:
+              - $ref: '#/components/schemas/gpio_value'
+          required: true
+          description: GPIO active state
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_ok'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /gpio/{gpio}/toggle:
+    parameters:
+      - name: gpio
+        in: path
+        required: true
+        schema:
+          type: number
+          minimum: 0
+          maximum: 99
+    patch:
+      tags:
+        - gpio
+      description: Toggle the value of an output GPIO
+      operationId: gpio_gpio_toggle_patch
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_ok'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio:
+    get:
+      tags:
+        - vcio
+      description: Returns Raspberry /dev/vcio values
+      operationId: vcio_all
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_vcio'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio/temp:
+    get:
+      tags:
+        - vcio
+      description: Returns Raspberry temperature
+      operationId: vcio_temp_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_value'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio/volts:
+    get:
+      tags:
+        - vcio
+      description: Returns Raspberry core voltage
+      operationId: vcio_volts_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_value'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio/clock:
+    get:
+      tags:
+        - vcio
+      description: Returns Raspberry core clock
+      operationId: vcio_clock_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_value'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+  /vcio/throttled:
+    get:
+      tags:
+        - vcio
+      description: Returns Raspberry throttling mask
+      operationId: vcio_throttled_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_value'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
+components:
+  schemas:
+    gpio_value:
+      type: string
+      enum: [active, inactive]
+
+    gpio_direction:
+      type: string
+      enum: [in, out]
+
+    gpio_drive:
+      type: string
+      enum: [push-pull, open-drain, open-source]
+
+    gpio_bias:
+      type: string
+      enum: [disable, pull-down, pull-up]
+
+    gpio_event_request:
+      type: string
+      enum: [falling, rising, both]
+    
+    gpio_event_clock:
+      type: string
+      enum: [monotonic, realtime, hte]
+
+    resp_error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+
+    resp_ok:
+      type: object
+      properties:
+        message:
+          type: string
+          description: OK message
+
+    resp_value:
+      type: object
+      properties:
+        value:
+          type: string
+          description: Value
+
+    resp_vcio:
+      type: object
+      properties:
+        values:
+          type: object
+          properties:
+            temp:
+              type: string
+              description: Temperature
+            volts:
+              type: string
+              description: Core voltage
+            clock:
+              type: string
+              description: Core clock
+            throttled:
+              type: string
+              description: Throttled mask
+
+    resp_gpiolist:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              gpio:
+                type: number
+              direction:
+                type: string
+                description: GPIO direction
+                oneOf:
+                  - $ref: '#/components/schemas/gpio_direction'
+              value:
+                type: string
+                description: GPIO active state
+                oneOf:
+                  - $ref: '#/components/schemas/gpio_value'
+        entries:
+          type: number
+          description: GPIO count
+
+    resp_gpioget:
+      type: object
+      properties:
+        gpio:
+          type: number
+          description: GPIO number
+        value:
+          type: string
+          description: GPIO active state
+          oneOf:
+            - $ref: '#/components/schemas/gpio_value'
+
+    resp_gpioinfo:
+      type: object
+      properties:
+        gpio:
+          type: number
+          description: GPIO number
+        direction:
+          type: string
+          description: GPIO direction
+          oneOf:
+            - $ref: '#/components/schemas/gpio_direction'
+        value:
+          type: string
+          description: GPIO active state
+          oneOf:
+            - $ref: '#/components/schemas/gpio_value'
+        active_low:
+          type: boolean
+          description: Is active state low?
+        bias:
+          type: string
+          description: Bias value
+          oneOf:
+            - $ref: '#/components/schemas/gpio_bias'
+        event_request:
+          type: string
+          description: Requested events
+          oneOf:
+            - $ref: '#/components/schemas/gpio_event_request'
+        is_debounced:
+          type: boolean
+          description: Debouncing enabled?
+        debounce_period_us:
+          type: number
+          description: Debounce period in microseconds
+        event_clock:
+          type: string
+          description: Event clock
+          oneOf:
+            - $ref: '#/components/schemas/gpio_event_clock'
+        drive:
+          type: string
+          description: The drive value. Only for output GPIOs.
+          oneOf:
+            - $ref: '#/components/schemas/gpio_drive'

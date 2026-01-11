@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 # Maintainer: Juergen Mang <mail@jcgames.de>
 
 Name:           mygpiod
-Version:        0.8.2
+Version:        0.9.0
 Release:        0 
 License:        GPL-3.0-or-later
 Group:          Hardware/Other
@@ -15,18 +15,11 @@ Source:         mygpiod-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  unzip
+BuildRequires:  libmicrohttpd-devel
 BuildRequires:  libmpdclient-devel
 BuildRequires:  libcurl-devel
-BuildRequires:  autoconf-archive
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
-BuildRequires:  lua-devel
-%if 0%{?fedora} >= 39
 BuildRequires:  libgpiod-devel
-%else
-BuildRequires:  git
-%endif
+BuildRequires:  lua-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description 
@@ -67,7 +60,6 @@ true
 %doc LICENSE.md
 %doc README.md
 %doc CHANGELOG.md
-%doc PROTOCOL.md
 %{_bindir}/mygpiod
 %{_bindir}/mygpioc
 %{_libdir}/libmygpio.so*
@@ -85,5 +77,5 @@ true
 %{_mandir}/man3/libmygpio_*
 
 %changelog
-* Fri Nov 07 2025 Juergen Mang <mail@jcgames.de> 0.8.2-0
+* Sat Jan 10 2026 Juergen Mang <mail@jcgames.de> 0.9.0-0
 - Version from master

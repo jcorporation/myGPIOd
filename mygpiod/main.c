@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-or-later
- * myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ * myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  * https://github.com/jcorporation/myGPIOd
  *
  * myGPIOd is based on the gpiomon tool from
@@ -17,8 +17,9 @@
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
-#include "mygpiod/lib/util.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/lib/sds_extras.h"
+#include "mygpiod/server_http/httpd.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include <poll.h>
 #include <stdio.h>
@@ -45,30 +46,29 @@ const char *__asan_default_options(void) {
 #endif
 
 int main(int argc, char **argv) {
+    // Set initial states
     int rc = EXIT_SUCCESS;
+    logline = sdsempty();
+    log_init();
+    umask(0077);  // Only owner should have rw access
 
-    //only owner and group should have rw access
-    umask(0007);
+    // Handle command line parameter
+    if (argc == 2 && strcmp(argv[1], "-h") == 0) {
+        printf("myGPIOD %s\n", MYGPIO_VERSION);
+        printf("Usage: mygpiod [configuration file]\n");
+        printf("Default configuration file: /etc/mygpiod.conf\n");
+        return 1;
+    }
 
-    log_on_tty = isatty(fileno(stdout))
-        ? true
-        : false;
-    log_to_syslog = false;
+    // First argument is the configuration file
+    sds config_file = argc == 2
+        ? sdsnew(argv[1])
+        : sdsnew("/etc/mygpiod.conf");
 
-    #ifdef MYGPIOD_DEBUG
-        set_loglevel(LOG_DEBUG);
-    #else
-        set_loglevel(CFG_LOGLEVEL);
-    #endif
-
+    // Startup notice
     MYGPIOD_LOG_NOTICE("Starting myGPIOd %s", MYGPIO_VERSION);
     MYGPIOD_LOG_NOTICE("https://github.com/jcorporation/myGPIOd");
     MYGPIOD_LOG_NOTICE("libgpiod %s", gpiod_api_version());
-
-    // Handle command line parameter
-    sds config_file = argc == 2 && strncmp(argv[1], "/", 1) == 0
-        ? sdsnew(argv[1])
-        : sdsnew("/etc/mygpiod.conf");
 
     // Read config
     struct t_config *config = get_config(config_file);
@@ -84,9 +84,11 @@ int main(int argc, char **argv) {
     #endif
 
     // open syslog connection
-    if (config->syslog == true) {
+    if (config->syslog == true &&
+        log_type != LOG_TO_SYSTEMD)
+    {
         openlog(MYGPIOD_NAME, LOG_CONS, LOG_DAEMON);
-        log_to_syslog = true;
+        log_type = LOG_TO_SYSLOG;
     }
 
     // Set output buffers
@@ -133,6 +135,23 @@ int main(int argc, char **argv) {
     }
     event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI);
 
+    // create http server
+    if (config->http_port > 0) {
+        config->httpd = httpd_start(config);
+        if (config->httpd == NULL) {
+            MYGPIOD_LOG_EMERG("Failure starting http server.");
+            goto out;
+        }
+        const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
+        if (httpd_fd == NULL ||
+            httpd_fd->epoll_fd == -1)
+        {
+            MYGPIOD_LOG_EMERG("Failure getting MHD epoll fd.");
+            goto out;
+        }
+        event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
+    }
+
     // main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
     MYGPIOD_LOG_INFO("Monitoring %u gpios", config->gpios_in.length);
@@ -149,20 +168,36 @@ int main(int argc, char **argv) {
             update_pollfds = false;
         }
 
-        // poll
+        // Poll
         MYGPIOD_LOG_DEBUG("Polling %u fds", poll_fds.len);
-        int cnt = poll(poll_fds.fd, poll_fds.len, -1);
+        // Use timeout from MHD
+        // This is required for MHD connection suspend and resume
+        int timeout;
+        MHD_UNSIGNED_LONG_LONG to;
+        if (MHD_get_timeout (config->httpd, &to) != MHD_YES) {
+            timeout = -1;
+        }
+        else {
+            timeout = (to < INT_MAX - 1) ? (int) to : (INT_MAX - 1);
+        }
+        int cnt = poll(poll_fds.fd, poll_fds.len, timeout);
         if (cnt < 0) {
             MYGPIOD_LOG_ERROR("Failure polling fds");
             rc = EXIT_FAILURE;
             goto out;
         }
+        // MHD must be always called, even on poll timeout
+        if (MHD_run(config->httpd) != MHD_YES) {
+            MYGPIOD_LOG_ERROR("Failure running MHD");
+            rc = EXIT_FAILURE;
+            goto out;
+        }
+        // No waiting events
         if (cnt == 0) {
             MYGPIOD_LOG_DEBUG("Poll timeout");
             continue;
         }
-
-        // read and delegate events
+        // Read and delegate events
         if (event_read_delegate(config, &poll_fds) == false) {
             break;
         }
@@ -176,5 +211,6 @@ out:
     if (rc == EXIT_SUCCESS) {
         MYGPIOD_LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
     }
+    FREE_SDS(logline);
     return rc;
 }

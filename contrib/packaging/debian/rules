@@ -1,25 +1,5 @@
 #!/usr/bin/make -f
 export DH_VERBOSE = 1
 
-BUILDDIR = release
-
-binary: 
-	cmake -B $(BUILDDIR) -DCMAKE_INSTALL_PREFIX:PATH=/usr -DMYGPIOD_STATIC_LIBGPIOD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo .
-	cmake --build $(BUILDDIR)
-	DESTDIR=../debian/mygpiod cmake --install $(BUILDDIR)
-	mkdir -p debian/mygpiod/DEBIAN
-	cp debian/postinst debian/mygpiod/DEBIAN
-	cp debian/conffiles debian/mygpiod/DEBIAN
-	dh_installdocs
-	dh_installchangelogs
-	dh_compress
-	dh_makeshlibs
-	dh_shlibdeps
-	dh_strip
-	dh_gencontrol
-	dh_builddeb
-
-clean:
-	rm -rf $(BUILDDIR)
-
-.PHONY: binary binary-arch binary-indep clean
+%:
+	dh $@

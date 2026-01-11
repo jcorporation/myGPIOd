@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 
@@ -61,12 +61,7 @@ setversion() {
     sed -e "s/__VERSION__/${VERSION}/g" -e "s/__DATE_F1__/$DATE_F1/g" -e "s/__DATE_F2__/$DATE_F2/g" \
         -e "s/__DATE_F3__/$DATE_F3/g" "$F.in" > "$F"
   done
-  echo "Generating man pages"
-  rm -f contrib/man/man3/*.3
-  doxygen
-  mv contrib/man/man3/t_mygpio_connection.3 contrib/man/man3/libmygpio_t_mygpio_connection.3 
-  mv contrib/man/man3/t_mygpio_gpio.3 contrib/man/man3/libmygpio_t_mygpio_gpio.3 
-  mv contrib/man/man3/t_mygpio_idle_event.3 contrib/man/man3/libmygpio_t_mygpio_idle_event.3 
+  printf "%s" "This documentation is for myGPIOd version ${VERSION}." > docs/_includes/version
 }
 
 buildrelease() {
@@ -273,8 +268,7 @@ pkgrpm() {
 
 pkgarch() {
   check_cmd makepkg
-  prepare
-  tar -czf "mygpiod_${VERSION}.orig.tar.gz" -- *
+  pkgrpm "taronly"
   cp contrib/packaging/arch/* .
   makepkg
   if [ -n "${SIGN+x}" ] && [ "$SIGN" = "TRUE" ]
@@ -294,11 +288,13 @@ pkgarch() {
 }
 
 pkgosc() {
-  [ -z "${OSC_BIN+x}" ] && OSC_BIN="$HOME/python-venv/bin/osc"
-  if [ ! -x "$OSC_BIN" ]
+  if [ -z "${OSC_BIN+x}" ]
   then
-    echo_error "Command osc not found: $HOME/python-venv/bin/osc"
-    exit 1
+    if ! OSC_BIN=$(command -v osc)
+    then
+      echo_error "Command osc not found"
+      exit 1
+    fi
   fi
   cleanup
   cleanuposc
@@ -319,26 +315,41 @@ pkgosc() {
   
   cd "$STARTPATH" || exit 1
   pkgrpm taronly
-
-  cd "$STARTPATH" || exit 1
-  cp "package/build/mygpiod-${VERSION}.tar.gz" "osc/$OSC_REPO/"
-  
-  if [ -f /etc/debian_version ]
-  then
-    pkgdebian
-  fi
-
   cd "$STARTPATH/osc" || exit 1
-  if [ -f /etc/debian_version ]
-  then
-    cp "../package/mygpiod_${VERSION}.orig.tar.gz" "$OSC_REPO/"
-    cp "../package/mygpiod_${VERSION}-1.dsc" "$OSC_REPO/"
-    cp "../package/mygpiod_${VERSION}-1.debian.tar.xz"  "$OSC_REPO/"
-  fi
+  cp "../package/build/mygpiod-${VERSION}.tar.gz" "$OSC_REPO/"
   cp ../contrib/packaging/rpm/mygpiod.spec "$OSC_REPO/"
   cp ../contrib/packaging/arch/PKGBUILD "$OSC_REPO/"
   cp ../contrib/packaging/arch/archlinux.install "$OSC_REPO/"
-  cp ../libgpiod-2.2.tar.gz "$OSC_REPO/"
+
+  cp ../contrib/packaging/debian/changelog "$OSC_REPO/debian.changelog"
+  cp ../contrib/packaging/debian/control "$OSC_REPO/debian.control"
+  cp ../contrib/packaging/debian/rules "$OSC_REPO/debian.rules"
+
+  cat > "$OSC_REPO/mympd.dsc" << EOL
+Format: 3.0 (quilt)
+Source: mygpiod
+Binary: mygpiod
+Architecture: any
+Version: ${VERSION}-1
+Maintainer: Juergen Mang <mail@jcgames.de>
+Homepage: https://jcorporation.github.io/myGPIOd/
+Standards-Version: 4.1.2
+Build-Depends: debhelper (>= 10),
+               cmake,
+               debhelper-compat (= 13),
+               git,
+               pkgconf,
+               libmpdclient-dev,
+               libmicrohttpd-dev,
+               libcurl4-gnutls-dev,
+               liblua5.4-dev | liblua5.3-dev,
+               libgpiod-dev
+Package-List:
+ mygpiod deb misc optional arch=any
+Files:
+ 817492d742be04350ba4b6944716ceb8 9195448 mygpiod-${VERSION}.tar.gz
+ decb76e62538ad2cb8e4c34bfc1908f1 1904 mygpiod-${VERSION}-1.diff.tar.gz
+EOL
 
   cd "$OSC_REPO" || exit 1
   $OSC_BIN addremove
@@ -406,6 +417,45 @@ purge() {
   return 0
 }
 
+run_doxygen() {
+  DOC_DEST=$1
+  if ! check_cmd doxygen
+  then
+    return 1
+  fi
+  echo "Running doxygen"
+  install -d "$DOC_DEST/html/doxygen"
+  (
+    cat Doxyfile
+    echo "OUTPUT_DIRECTORY = $DOC_DEST/html/doxygen"
+    echo "MAN_OUTPUT = $STARTPATH/contrib/man"
+  ) | doxygen -
+  mv contrib/man/man3/t_mygpio_connection.3 contrib/man/man3/libmygpio_t_mygpio_connection.3 
+  mv contrib/man/man3/t_mygpio_gpio.3 contrib/man/man3/libmygpio_t_mygpio_gpio.3 
+  mv contrib/man/man3/t_mygpio_idle_event.3 contrib/man/man3/libmygpio_t_mygpio_idle_event.3 
+}
+
+create_doc() {
+  DOC_DEST=$1
+  install -d "$DOC_DEST" || return 1
+  if ! check_cmd python3
+  then
+    echo "Python3 not installed, can not create documentation"
+    return 1
+  fi
+  ./build.sh api_doc "$DOC_DEST"
+  python3 -m venv /tmp/python-venv/
+  /tmp/python-venv/bin/python3 -m pip install --upgrade pip
+  /tmp/python-venv/bin/pip install sphinx sphinx-book-theme sphinx-copybutton
+  /tmp/python-venv/bin/sphinx-build -M html docs "$DOC_DEST"
+}
+
+serve_doc() {
+  DOC_DEST=$1
+  /tmp/python-venv/bin/pip install sphinx-autobuild
+  /tmp/python-venv/bin/sphinx-autobuild -M html docs "$DOC_DEST"
+}
+
 #get action
 if [ -z "${1+x}" ]
 then
@@ -469,6 +519,35 @@ case "$ACTION" in
     uninstall
     purge
   ;;
+  api_doc|man)
+    if [ -z "${2+x}" ]
+    then
+      echo "Usage: $0 $1 <destination folder>"
+      exit 1
+    fi
+    if ! run_doxygen "$2"
+    then
+      echo "Could not create libmygpio API documentation"
+      exit 1
+    fi
+    ;;
+  doc)
+    if [ -z "${2+x}" ]
+    then
+      echo "Usage: $0 $1 <destination folder>"
+      exit 1
+    fi
+    create_doc "$2"
+    ;;
+  serve_doc)
+    if [ -z "${2+x}" ]
+    then
+      echo "Usage: $0 $1 <destination folder>"
+      exit 1
+    fi
+    create_doc "$2"
+    serve_doc "$2"
+    ;;
   *)
     echo "Usage: $0 <option>"
     echo "Version: ${VERSION}"
@@ -509,6 +588,11 @@ case "$ACTION" in
     echo "                    following environment variables are respected"
     echo "                      - OSC_REPO=\"home:jcorporation/myGPIOd\""
     echo "  pkgdocker:        creates the docker image"
+    echo ""
+    echo "Documentation options"
+    echo "  api_doc|man:      generates the api documentation and manpages for libmygpio"
+    echo "  doc:              generates the html documentation"
+    echo "  serve_doc:        generates the html documentation and runs a development server"
     echo ""
     echo "Misc options:"
     echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"

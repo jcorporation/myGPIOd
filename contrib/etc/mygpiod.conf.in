@@ -20,6 +20,10 @@ socket = /run/mygpiod/socket
 # Timeout for client connections in seconds
 timeout = 60
 
+# HTTP REST API
+http_ip = 127.0.0.1
+http_port = 8081
+
 # GPIO chip device
 chip = /dev/gpiochip0
 

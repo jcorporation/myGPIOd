@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/mygpiod
 
 # Install startup script
@@ -104,7 +104,7 @@ if("@MYGPIOD_DOC@" STREQUAL "ON")
   file(INSTALL "@CMAKE_SOURCE_DIR@/CHANGELOG.md"
                "@CMAKE_SOURCE_DIR@/LICENSE.md"
                "@CMAKE_SOURCE_DIR@/README.md"
-               "@CMAKE_SOURCE_DIR@/PROTOCOL.md"
+               "@CMAKE_SOURCE_DIR@/openapi.yml"
        DESTINATION "@CMAKE_INSTALL_FULL_DOCDIR@"
        FILE_PERMISSIONS PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 endif()

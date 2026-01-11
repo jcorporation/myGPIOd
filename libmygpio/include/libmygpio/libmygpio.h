@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- libmygpio (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ libmygpio (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -29,5 +29,6 @@
 #include "libmygpio_idle.h"
 #include "libmygpio_parser.h"
 #include "libmygpio_protocol.h"
+#include "libmygpio_raspberry_vcio.h"
 
 #endif

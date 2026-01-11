@@ -9,10 +9,14 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: installdeps
-      run: sudo apt-get -y install cmake build-essential git pkgconf libmpdclient-dev libcurl4-gnutls-dev liblua5.4-dev libgpiod-dev
+      run: |
+        curl https://ftp-master.debian.org/keys/archive-key-13.asc | sudo gpg --no-default-keyring --keyring /usr/share/keyrings/trixie.gpg --import
+        sudo tee /etc/apt/sources.list.d/trixie.list <<< "deb [signed-by=/usr/share/keyrings/trixie.gpg] http://ftp.de.debian.org/debian trixie main"
+        sudo apt-get update
+        sudo apt-get -y install cmake build-essential git libmicrohttpd-dev libmpdclient-dev libcurl4-gnutls-dev libgpiod-dev pkgconf
     - name: build
       run: |
         cmake -B release -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release .
-        make -C release
+        cmake --build release
     - name: install
-      run: sudo make -C release install
+      run: sudo cmake --install release

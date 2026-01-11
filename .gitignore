@@ -14,5 +14,4 @@ libmygpio/.cache
 mygpioc/.cache
 mygpiod/.cache
 mygpio-common/.cache
-docs
-*.tar.gz
+/_site

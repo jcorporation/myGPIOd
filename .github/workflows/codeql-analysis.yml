@@ -23,16 +23,20 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v6
 
-    # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
 
-    - name: Compile
+    - name: installdeps
       run: |
-        sudo apt-get -y install cmake build-essential git pkgconf libmpdclient-dev libcurl4-gnutls-dev libgpiod-dev
-        ./build.sh debug
+        curl https://ftp-master.debian.org/keys/archive-key-13.asc | sudo gpg --no-default-keyring --keyring /usr/share/keyrings/trixie.gpg --import
+        sudo tee /etc/apt/sources.list.d/trixie.list <<< "deb [signed-by=/usr/share/keyrings/trixie.gpg] http://ftp.de.debian.org/debian trixie main"
+        sudo apt-get update
+        sudo apt-get -y install cmake build-essential git libmicrohttpd-dev libmpdclient-dev libcurl4-gnutls-dev libgpiod-dev pkgconf
+
+    - name: Compile
+      run: ./build.sh debug
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4

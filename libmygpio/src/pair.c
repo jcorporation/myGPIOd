@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- libmygpio (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ libmygpio (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -61,6 +61,9 @@ struct t_mygpio_pair *mygpio_recv_pair_name(struct t_mygpio_connection *connecti
  * @param pair pair to free
  */
 void mygpio_free_pair(struct t_mygpio_pair *pair) {
+    if (pair == NULL) {
+        return;
+    }
     pair->name = NULL;
     pair->value = NULL;
     free(pair);

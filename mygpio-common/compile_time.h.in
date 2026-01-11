@@ -1,11 +1,13 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
 #ifndef COMPILE_TIME_H
 #define COMPILE_TIME_H
+
+#include <limits.h>
 
 // Version and name from cmake
 #define MYGPIO_VERSION "${PROJECT_VERSION}"
@@ -22,6 +24,8 @@
 #cmakedefine MYGPIOD_ENABLE_ACTION_HTTP
 #cmakedefine MYGPIOD_ENABLE_ACTION_LUA
 
+#cmakedefine HAVE_IOCTL_WITH_INT_REQUEST
+
 // Default configuration
 #define CFG_CHIP "/dev/gpiochip0"
 #define CFG_LOGLEVEL LOG_NOTICE
@@ -29,6 +33,8 @@
 #define CFG_GPIO_DIR "/etc/mygpiod.d"
 #define CFG_SOCKET_PATH "/run/mygpiod/socket"
 #define CFG_SOCKET_TIMEOUT 60 //seconds
+#define CFG_HTTP_IP "127.0.0.1"
+#define CFG_HTTP_PORT 8081
 
 // Other defaults
 #define CLIENT_CONNECTIONS_MAX 10

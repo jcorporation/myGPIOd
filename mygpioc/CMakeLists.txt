@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2018-2023 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/mympd
 
 add_executable(mygpioc "")
@@ -16,8 +16,16 @@ target_sources(mygpioc
     gpio.c
     idle.c
     options.c
+    raspberry_vcio.c
     util.c
 )
+
+if(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
+  target_link_options(mygpioc
+    PUBLIC
+      "-pie"
+  )
+endif()
 
 target_link_directories(mygpioc
   PRIVATE

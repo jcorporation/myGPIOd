@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2018-2023 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/mympd
 
 add_library(mygpio SHARED)
@@ -22,6 +22,7 @@ target_sources(mygpio
     src/parser.c
     src/pair.c
     src/protocol.c
+    src/raspberry_vcio.c
     src/socket.c
     src/util.c
 )

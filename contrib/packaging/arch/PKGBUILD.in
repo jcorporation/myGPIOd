@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 # Maintainer: Juergen Mang <mail@jcgames.de>
@@ -12,22 +12,22 @@ pkgdesc="lightweight gpio controlling daemon"
 arch=('x86_64' 'armv7h' 'aarch64')
 url="https://jcorporation.github.io/myGPIOd/"
 license=('GPL')
-depends=('libmpdclient' 'curl' 'lua')
-makedepends=('cmake' 'autoconf-archive')
+depends=('libmicrohttpd' 'libmpdclient' 'curl' 'lua' 'libgpiod')
+makedepends=('cmake' 'gzip')
 optdepends=()
 provides=()
 conflicts=()
 replaces=()
 backup=('etc/mygpiod.conf')
 install=archlinux.install
-source=("mygpiod_${pkgver}.orig.tar.gz")
+source=("mygpiod-${pkgver}.tar.gz")
 sha256sums=('SKIP')
 options=(debug strip)
 
 build() {
   local cmake_options=(
     -B build
-    -S "${srcdir}"
+    -S "${srcdir}/${pkgname}-${pkgver}"
     -DCMAKE_BUILD_TYPE=RelWithDebInfo
     -DCMAKE_INSTALL_PREFIX=/usr
     -Wno-dev
@@ -39,5 +39,4 @@ build() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  install -vDm 644 "${srcdir}"/README.md -t "$pkgdir/usr/share/doc/$pkgname/"
 }

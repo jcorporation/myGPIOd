@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -10,8 +10,8 @@
 #include "dist/sds/sds.h"
 #include "mygpio-common/util.h"
 #include "mygpiod/gpio/output.h"
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lib/util.h"
 
 #include <errno.h>
 #include <stdlib.h>

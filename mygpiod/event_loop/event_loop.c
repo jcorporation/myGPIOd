@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -12,9 +12,10 @@
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
-#include "mygpiod/server/socket.h"
+#include "mygpiod/server_socket/socket.h"
 
 #include <fcntl.h>
+#include <microhttpd.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -44,6 +45,8 @@ const char *lookup_pfd_type(enum pfd_types type) {
             return "client socket";
         case PFD_TYPE_CLIENT_TIMEOUT:
             return "timeout";
+        case PFD_TYPE_HTTPD:
+            return "httpd";
     }
     return "unknown";
 }
@@ -166,6 +169,9 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
                     return true;
                 case PFD_TYPE_CLIENT_TIMEOUT:
                     server_client_timeout(&config->clients, &poll_fds->fd[i].fd);
+                    return true;
+                case PFD_TYPE_HTTPD:
+                    // MHD is called in each poll loop iteration, no need to do it here explicitly
                     return true;
             }
         }

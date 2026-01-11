@@ -1,21 +1,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 # Maintainer: Juergen Mang <mail@jcgames.de>
 
 pkgname=mygpiod
-pkgver=0.8.2
+pkgver=0.9.0
 pkgrel=0
 pkgdesc="Lightweight gpio controlling daemon"
 url="https://jcorporation.github.io/myGPIOd/"
 arch="all"
 license="GPL-3.0-or-later"
 depends=""
-makedepends="
-	cmake
+makedepends="cmake
 	curl-dev
 	libgpiod-dev
+	libmicrohttpd-dev
 	libmpdclient-dev
 	lua5.4-dev
 	samurai

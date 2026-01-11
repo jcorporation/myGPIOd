@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/myGPIOd
 */
 
@@ -8,15 +8,14 @@
 #include "mygpiod/gpio/output.h"
 
 #include "mygpiod/event_loop/event_loop.h"
+#include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
-#include "mygpiod/lib/util.h"
 
 #include <assert.h>
-#include <errno.h>
 #include <gpiod.h>
 #include <string.h>
 

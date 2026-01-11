@@ -1,6 +1,6 @@
 /*
  SPDX-License-Identifier: GPL-3.0-or-later
- myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+ myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  https://github.com/jcorporation/mympd
 */
 
@@ -30,7 +30,7 @@ static struct option long_options[] = {
 void print_usage(void) {
     fprintf(stderr, "\nUsage: mygpioc [options] <command> [<arguments>]\n\n"
                     "myGPIOc %s\n"
-                    "(c) 2020-2025 Juergen Mang <mail@jcgames.de>\n"
+                    "(c) 2020-2026 Juergen Mang <mail@jcgames.de>\n"
                     "https://github.com/jcorporation/myGPIOd\n\n"
                     "Options:\n"
                     "  -h, --help                               Displays this help\n"
@@ -46,6 +46,10 @@ void print_usage(void) {
                     "  gpioset <number> <active|inactive>       Sets the value of an output gpio\n"
                     "  gpiotoggle <number>                      Toggles the value of an output gpio\n"
                     "  idle [<timeout>]                         Waits for idle events, timeout is in milliseconds\n"
+                    "  vciotemp                                 Gets the temperature from /dev/vcio\n"
+                    "  vciovolts                                Gets the core voltage from /dev/vcio\n"
+                    "  vcioclock                                Gets the core clock from /dev/vcio\n"
+                    "  vciothrottled                            Gets the throttled mask from /dev/vcio\n"
                     "\n",
         MYGPIO_VERSION
     );
@@ -67,7 +71,8 @@ int handle_options(int argc, char **argv, struct t_options *options) {
                 exit(EXIT_SUCCESS);
                 break;
             case 's':
-                options->socket = optarg;
+                free(options->socket);
+                options->socket = strdup(optarg);
                 break;
             case 't':
                 if (mygpio_parse_int(optarg, &options->timeout_ms, NULL, 1, 1000000) == false) {

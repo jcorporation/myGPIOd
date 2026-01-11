@@ -1,6 +1,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# myGPIOd (c) 2020-2025 Juergen Mang <mail@jcgames.de>
+# myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
 # https://github.com/jcorporation/myGPIOd
 #
 
@@ -14,7 +14,7 @@ endif()
 # myGPIO is written in C
 # supported compilers: gcc, clang
 project (mygpiod
-  VERSION 0.8.2
+  VERSION 0.9.0
   LANGUAGES C
 )
 
@@ -46,7 +46,6 @@ option(MYGPIOD_CLIENT "Builds the myGPIOd client, default ON" "ON")
 option(MYGPIOD_DAEMON "Builds the myGPIOd daemon, default ON" "ON")
 option(MYGPIOD_HEADER "Installs the myGPIOd headers, default ON" "ON")
 option(MYGPIOD_LIBRARY "Builds the myGPIOd library, default ON" "ON")
-option(MYGPIOD_STATIC_LIBGPIOD "Builds the libgpiod v2 as static library, default OFF" "OFF")
 # sanitizer options
 option(MYGPIOD_ENABLE_ASAN "Enables build with address sanitizer, default OFF" "OFF")
 option(MYGPIOD_ENABLE_TSAN "Enables build with thread sanitizer, default OFF" "OFF")
@@ -55,6 +54,7 @@ option(MYGPIOD_ENABLE_UBSAN "Enables build with undefined behavior sanitizer, de
 # cmake modules
 include(CheckCCompilerFlag)
 include(CheckCSourceCompiles)
+include(CheckPrototypeDefinition)
 include(CheckIPOSupported)
 include(GNUInstallDirs)
 
@@ -63,18 +63,24 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 
 # find required dependencies
 if(MYGPIOD_DAEMON)
-  if(NOT MYGPIOD_STATIC_LIBGPIOD)
-    find_package(LIBGPIOD)
-    if (LIBGPIOD_FOUND)
-      message("Found libgpiod version is: ${LIBGPIOD_VERSION}")
-      if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
-        message("Required libgpiod version >= 2.0.0")
-        set(LIBGPIOD_FOUND "OFF")
-      endif()
+  find_package(LIBGPIOD REQUIRED)
+  if (LIBGPIOD_FOUND)
+    message("Found libgpiod version is: ${LIBGPIOD_VERSION}")
+    if(NOT LIBGPIOD_VERSION VERSION_GREATER_EQUAL "2.0.0")
+      message(FATAL_ERROR "Required libgpiod version >= 2.0.0")
     endif()
+  else()
+    message(FATAL_ERROR "Required dependency libgpiod not found.")
   endif()
-  if (NOT LIBGPIOD_FOUND)
-    include("cmake/InstallLIBGPIOD.cmake")
+
+  find_package(LIBMHD REQUIRED)
+  if (LIBMHD_FOUND)
+    message("Found libmicrohttpd version is: ${LIBMHD_VERSION}")
+    if(NOT LIBMHD_VERSION VERSION_GREATER_EQUAL "1.0.0")
+      message(FATAL_ERROR "Required libmicrohttpd version >= 1.0.0")
+    endif()
+  else()
+    message(FATAL_ERROR "Required dependency libmicrohttpd not found.")
   endif()
 endif()
 
@@ -116,8 +122,21 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
   endif()
 endif()
 
-# configure some files - version and path information
+# Workaround for musl libc
+check_prototype_definition(
+    ioctl
+    "int ioctl(int fd, int request, ...)"
+    0
+    "sys/ioctl.h"
+    HAVE_IOCTL_WITH_INT_REQUEST
+)
+
+# Remove files that should not be cached between builds
+file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/mygpiod/CMakeFiles/mygpiod.dir/server_http/webui.c.o")
+
+# Configure some files - version and path information
 configure_file(mygpio-common/compile_time.h.in ${PROJECT_BINARY_DIR}/compile_time.h)
+configure_file(mygpiod/server_http/embedded_files.c.in ${PROJECT_BINARY_DIR}/embedded_files.c)
 configure_file(cmake/Install.cmake.in cmake/Install.cmake @ONLY)
 configure_file(contrib/initscripts/mygpiod.service.in contrib/initscripts/mygpiod.service @ONLY)
 configure_file(contrib/initscripts/mygpiod.sysVinit.in contrib/initscripts/mygpiod.sysVinit @ONLY)
@@ -137,6 +156,7 @@ if(CMAKE_BUILD_TYPE MATCHES "(Debug|Release|RelWithDebInfo|MinSizeRel)")
   add_compile_options(
     "-fdata-sections"
     "-ffunction-sections"
+    "-fPIC"
     "-fstack-protector-strong"
     "-pedantic"
     "-Wall"
@@ -187,17 +207,14 @@ endif()
 set(ASAN_FLAGS
   "-fsanitize=address"
   "-fsanitize=leak"
-  "-latomic"
 )
 
 set(UBSAN_FLAGS
   "-fsanitize=undefined"
-  "-latomic"
 )
 
 set(TSAN_FLAGS
   "-fsanitize=thread"
-  "-latomic"
 )
 
 if(MYGPIOD_ENABLE_ASAN)
@@ -254,7 +271,6 @@ endif()
 
 if(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
   add_link_options(
-    "-pie"
     "-Wl,-z,nodlopen"
     "-Wl,-z,noexecstack"
     "-Wl,-z,relro"
