@@ -6,13 +6,13 @@ https://github.com/jcorporation/myGPIOd
 
 ## myGPIOd v0.9.1 (not yet released)
 
-This release fixes some bugs and adds minor features.
+This release fixes some bugs and adds minor features. The REST-API endpoint is now versioned and starts with `/api/v1/`.
 
 ### Changelog
 
 - Feat: Show GPIO names
-- Feat: Support more HTTP method for HTTP action
-- Upd: Add Version to REST-API
+- Feat: Support more HTTP methods for HTTP action
+- Feat: Add Version to REST-API
 - Fix: Memory leak in list GPIOs function for REST-API
 
 ***
