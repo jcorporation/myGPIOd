@@ -35,51 +35,38 @@ Actions
 
 Each event can have multiple actions. Actions and its arguments are delimited by a colon, arguments are delimited by space.
 
-+---------------+-----------------------+-----------------------------+
-| Action        | Arguments             | Description                 |
-+===============+=======================+=============================+
-| ``gpioblink`` | ``<gpio>``            | Toggle the value of the     |
-|               | ``<timeout_ms>``      | GPIO in given timeout and   |
-|               | ``<interval_ms>``     | interval. Set interval to 0 |
-|               |                       | to blink only once.         |
-+---------------+-----------------------+-----------------------------+
-| ``gpioset``   | ``<gpio>``            | Sets the value of a GPIO.   |
-|               | ``<active\|inactive>``                     |                             |
-+---------------+-----------------------+-----------------------------+
-| `             | ``<gpio>``            | Toggles the value of a      |
-| `gpiotoggle`` |                       | GPIO.                       |
-+---------------+-----------------------+-----------------------------+
-| ``http``      | ``{GET\|POST}``       | Submits a HTTP request in a |
-|               | ``{uri}``             | new child process. If       |
-|               | [``{content-type}``   | ``postdata`` starts with    |
-|               | ``{postdata}``]       | ``<</``, the string after   |
-|               |                       | the ``<<`` is interpreted   |
-|               |                       | as an absolute filepath     |
-|               |                       | from which the postdata is  |
-|               |                       | read. Requires libcurl.     |
-+---------------+-----------------------+-----------------------------+
-| ``lua``       | ``{lua function}``    | Calls a user defined lua    |
-|               | [``{option1}``        | function.                   |
-|               | ``{option2}`` …]      |                             |
-+---------------+-----------------------+-----------------------------+
-| ``mpc``       | ``{mpd command}``     | Connects to MPD and issues  |
-|               | [``{option1}``        | the command with options.   |
-|               | ``{option2}`` …]      | It uses the default         |
-|               |                       | connection settings from    |
-|               |                       | libmpdclient. A maximum of  |
-|               |                       | 10 options are supported.   |
-|               |                       | Requires libmpdclient.      |
-+---------------+-----------------------+-----------------------------+
-| ``mympd``     | ``{uri}``             | Calls the myMPD api in a    |
-|               | ``{partition}``       | new child process to        |
-|               | ``{script}``          | execute a myMPD script.     |
-|               |                       | Requires libcurl.           |
-+---------------+-----------------------+-----------------------------+
-| ``system``    | ``{command}``         | Executes an executable or   |
-|               |                       | script in a new child       |
-|               |                       | process. No arguments are   |
-|               |                       | allowed.                    |
-+---------------+-----------------------+-----------------------------+
++----------------+-----------------------+------------------------------------------------------+
+| Action         | Arguments             | Description                                          |
++================+=======================+======================================================+
+| ``gpioblink``  | ``<gpio>``            | Toggle the value of the GPIO in given timeout and    |
+|                | ``<timeout_ms>``      | interval. Set interval to 0 to blink only once.      |
+|                | ``<interval_ms>``     |                                                      |
++----------------+-----------------------+------------------------------------------------------+
+| ``gpioset``    | ``<gpio>``            | Sets the value of a GPIO.                            |
+|                | ``<active|inactive>`` |                                                      |
++----------------+-----------------------+------------------------------------------------------+
+| ``gpiotoggle`` | ``<gpio>``            | Toggles the value of a GPIO.                         |
++----------------+-----------------------+------------------------------------------------------+
+| ``http``       | ``{GET|POST}``        | Submits a HTTP request in a new child process. If    |
+|                | ``{uri}``             | ``postdata`` starts with ``<</``, the string after   |
+|                | [``{content-type}``]  | the ``<<`` is interpreted as an absolute filepath    |
+|                | [``{postdata}``]      | from which the postdata is read. Requires libcurl.   |
++----------------+-----------------------+------------------------------------------------------+
+| ``lua``        | ``{lua function}``    | Calls a user defined lua function.                   |
+|                | [``{option}`` ...]    |                                                      |
++----------------+-----------------------+------------------------------------------------------+
+| ``mpc``        | ``{mpd command}``     | Connects to MPD and issues the command with options. |
+|                | [``{option}`` ...]    | It uses the default connection settings from         |
+|                |                       | libmpdclient. A maximum of 10 options are supported. |
+|                |                       | Requires libmpdclient.                               |
++----------------+-----------------------+------------------------------------------------------+
+| ``mympd``      | ``{uri}``             | Calls the myMPD api in a new child process to        |
+|                | ``{partition}``       | execute a myMPD script. Requires libcurl.            |
+|                | ``{script}``          |                                                      |
++----------------+-----------------------+------------------------------------------------------+
+| ``system``     | ``{command}``         | Executes an executable or script in a new child      |
+|                |                       | process. No arguments are allowed.                   |
++----------------+-----------------------+------------------------------------------------------+
 
 myGPIOd can take actions on rising, falling and long_press events. Long
 press is triggered by a falling or rising event and does not disable the
@@ -129,7 +116,7 @@ The functions return 0 on success, else 1.
 
 **Example gpio config**
 
-::
+.. code:: ini
 
    # Call the lua function `testFunc` with the argument `testArg` on rising event.
    action_rising = lua:testFunc testArg
@@ -160,8 +147,7 @@ This example configuration does the following:
 
   - Enables the pull-up resistor on start
   - Sets GPIO 6 to active on falling event
-  - Calls ``/usr/local/bin/reboot.sh`` after a button press (falling) of
-    2 seconds length
+  - Calls ``/usr/local/bin/reboot.sh`` after a button press (falling) of 2 seconds length
   - Toggles the value of GPIO 6 on release event of the long press event
   - Calls ``/usr/local/bin/poweroff.sh`` on a short press (rising)
 
@@ -182,8 +168,7 @@ This example configuration does the following:
 
   - Enables the pull-up resistor on start
   - Enabled the long press action for falling event
-  - Increases the mpd volume by 5 % after 100 ms and each 500 ms as long
-    the button is pressed
+  - Increases the mpd volume by 5 % after 100 ms and each 500 ms as long the button is pressed
 
 - Configures GPIO 8 as input:
 
@@ -195,7 +180,7 @@ This example configuration does the following:
 
 **/etc/mygpiod.conf**
 
-::
+.. code:: ini
 
    # GPIO chip to use
    chip = /dev/gpiochip0
