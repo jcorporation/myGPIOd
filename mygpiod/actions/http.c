@@ -18,6 +18,22 @@
 #include <unistd.h>
 
 // private definitions
+
+/**
+ * List of valid HTTP methods
+ */
+const char *http_methods[] = {
+    "DELETE",
+    "GET",
+    "HEAD",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+    NULL
+};
+
+static bool validate_http_method(const char *method);
 static bool fork_call_curl(const char *method, const char *uri, const char *content_type, const char *postdata);
 static bool call_curl(const char *method, const char *uri, const char *content_type, const char *postdata);
 static size_t catch_output(void *ptr, size_t size, size_t nmemb, sds *output);
@@ -39,16 +55,16 @@ bool action_http(const char *cmd) {
         return false;
     }
     bool rc = false;
-    if (strcasecmp(args[0], "post") == 0) {
-        if (count != 4) {
-            MYGPIOD_LOG_ERROR("Invalid number of arguments");
-            sdsfreesplitres(args, count);
-            return false;
-        }
-        rc = fork_call_curl(args[0], args[1], args[2], args[3]);
+    if (count == 4) {
+        // Request with body
+        rc = action_http2(args[0], args[1], args[2], args[3]);
+    }
+    else if (count == 2) {
+        // Request without body
+        rc = action_http2(args[0], args[1], NULL, NULL);
     }
     else {
-        rc = fork_call_curl(args[0], args[1], NULL, NULL);
+        MYGPIOD_LOG_ERROR("Invalid number of arguments");
     }
     sdsfreesplitres(args, count);
     return rc;
@@ -56,34 +72,36 @@ bool action_http(const char *cmd) {
 
 /**
  * Makes a http call in a new process
- * @param method HTTP method: POST or GET
+ * @param method HTTP method
  * @param uri HTTP Uri
  * @param content_type Content-Type or NULL
  * @param postdata data to post or NULL
  * @returns true on success, else false
  */
 bool action_http2(const char *method, const char *uri, const char *content_type, const char *postdata) {
-    bool rc = false;
-    if (strcasecmp(method, "post") == 0) {
-        if (content_type == NULL ||
-            postdata == NULL)
-        {
-            MYGPIOD_LOG_ERROR("Invalid number of arguments");
-            return false;
-        }
-        rc = fork_call_curl(method, uri, content_type, postdata);
+    if (validate_http_method(method) == false) {
+        MYGPIOD_LOG_ERROR("Invalid HTTP method: \"%s\"", method);
+        return false;
     }
-    else {
-        rc = fork_call_curl(method, uri, NULL, NULL);
-    }
-    return rc;
+    return fork_call_curl(method, uri, content_type, postdata);
 }
 
 // private functions
 
+static bool validate_http_method(const char *method) {
+    const char **p = http_methods;
+    while(*p != NULL) {
+        if (strcmp(method, *p) == 0) {
+            return true;
+        }
+        p++;
+    }
+    return false;
+}
+
 /**
  * Forks and makes the http call
- * @param method HTTP method: POST or GET
+ * @param method HTTP method
  * @param uri HTTP Uri
  * @param content_type Content-Type or NULL
  * @param postdata data to post or NULL
@@ -112,7 +130,7 @@ static bool fork_call_curl(const char *method, const char *uri, const char *cont
 
 /**
  * Makes an HTTP call
- * @param method HTTP method: POST or GET
+ * @param method HTTP method
  * @param uri HTTP Uri
  * @param content_type Content-Type or NULL
  * @param postdata data to post or NULL
@@ -158,6 +176,7 @@ static bool call_curl(const char *method, const char *uri, const char *content_t
     }
     char err_buf[CURL_ERROR_SIZE];
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, err_buf);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method);
     CURLcode res = curl_easy_perform(curl);
     curl_slist_free_all(slist);
     sdstrim(resp_header, "\r\n");

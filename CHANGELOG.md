@@ -11,6 +11,7 @@ This release fixes some bugs and adds minor features.
 ### Changelog
 
 - Feat: Show GPIO names
+- Feat: Support more HTTP method for HTTP action
 - Fix: Memory leak in list GPIOs function for REST-API
 
 ***
