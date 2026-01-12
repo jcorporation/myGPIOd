@@ -65,6 +65,9 @@ libmygpio_gpio_settings \- GPIO
 .RI "enum \fBmygpio_drive\fP \fBmygpio_gpio_out_get_drive\fP (struct \fBt_mygpio_gpio\fP *gpio)"
 .br
 .ti -1c
+.RI "const char * \fBmygpio_gpio_get_name\fP (struct \fBt_mygpio_gpio\fP *gpio)"
+.br
+.ti -1c
 .RI "void \fBmygpio_free_gpio\fP (struct \fBt_mygpio_gpio\fP *gpio)"
 .br
 .in -1c
@@ -210,6 +213,20 @@ Returns the GPIO number from struct \fBt_mygpio_gpio\fP\&.
 \fBReturns\fP
 .RS 4
 GPIO number\&. 
+.RE
+.PP
+
+.SS "const char * mygpio_gpio_get_name (struct \fBt_mygpio_gpio\fP * gpio)"
+Returns the GPIO name 
+.PP
+\fBParameters\fP
+.RS 4
+\fIgpio\fP Pointer to struct \fBt_mygpio_gpio\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+GPIO name 
 .RE
 .PP
 
