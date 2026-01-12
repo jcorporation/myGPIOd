@@ -47,10 +47,12 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 +----------------+-----------------------+------------------------------------------------------+
 | ``gpiotoggle`` | ``<gpio>``            | Toggles the value of a GPIO.                         |
 +----------------+-----------------------+------------------------------------------------------+
-| ``http``       | ``{GET|POST}``        | Submits a HTTP request in a new child process. If    |
+| ``http``       | ``{method}``          | Submits a HTTP request in a new child process. If    |
 |                | ``{uri}``             | ``postdata`` starts with ``<</``, the string after   |
-|                | [``{content-type}``]  | the ``<<`` is interpreted as an absolute filepath    |
-|                | [``{postdata}``]      | from which the postdata is read. Requires libcurl.   |
+|                | [``{content-type}``   | the ``<<`` is interpreted as an absolute filepath    |
+|                | ``{postdata}``]       | from which the postdata is read. Requires libcurl.   |
+|                |                       | Valid HTTP methods are: DELETE, GET, HEAD, OPTIONS,  |
+|                |                       | PATCH, POST, PUT                                     |
 +----------------+-----------------------+------------------------------------------------------+
 | ``lua``        | ``{lua function}``    | Calls a user defined lua function.                   |
 |                | [``{option}`` ...]    |                                                      |
@@ -74,6 +76,34 @@ triggering event, but the release event. To use a button for normal
 press and long_press request both events and use one event for long and
 the other for short press. The example below illustrates this.
 
+Examples
+~~~~~~~~
+
+.. code:: ini
+
+   # GPIO actions
+   gpioblink:5 1000 2000
+   gpioset:5 active
+   gpiotoggle:5
+
+   # Execute HTTP actions
+   http:GET http://server.lan/webhook1
+   http:PATCH http://server.lan/webhook1 application/json {"value": 1}
+   http:POST http://server.lan/webhook2 text/plain <</tmp/postdata
+
+   # Execute a custom lua function
+   lua:my_lua_func arg1 arg2
+
+   # Execute mpd commands
+   mpc:next
+   mpc:volume 5
+
+   # Start a script in myMPD
+   mympd:http://localhost:8443 default script1.lua
+
+   # Execute a system command
+   system:/bin/true
+
 Lua
 ~~~
 
@@ -86,33 +116,36 @@ lua action.
 - The lua functions should not return any value.
 
 myGPIOd registers custom lua functions to provide access to the actions.
-The functions return 0 on success, else 1.
+The functions return ``0`` on success, else ``1``.
 
-+---------------------------------------------------------+------------------------------------------------+
-| Lua function                                            | Description                                    |
-+=========================================================+================================================+
-| ``gpioBlink({GPIO}, {timeout_ms}, {interval_ms})``      | Toggle the value of the GPIO in given timeout  |
-|                                                         | and interval.                                  |
-+---------------------------------------------------------+------------------------------------------------+
-| ``gpioGet({GPIO})``                                     | Returns the GPIO state:                        |
-|                                                         | 1 = active, 0 = inactive                       |
-+---------------------------------------------------------+------------------------------------------------+
-| ``gpioSet({GPIO}, {1\|0})``                             || Sets the state of an output GPIO:             |
-|                                                         || 1 = active, 0 = inactive                      |
-+---------------------------------------------------------+------------------------------------------------+
-| ``gpioToggle({GPIO})``                                  | Toggles the state of an output GPIO.           |
-+---------------------------------------------------------+------------------------------------------------+
-| ``http({GET|POST}, {uri}, {content-type}, {postdata})`` | Submits a HTTP request in a new child process. |
-|                                                         | This is an async function.                     |
-+---------------------------------------------------------+------------------------------------------------+
-| ``mpc({mpd protocol command})``                         | Runs a mpd protocol command.                   |
-+---------------------------------------------------------+------------------------------------------------+
-| ``mympd({uri}, {partition}, {script})``                 | Calls the myGPIOd api to execute a script in a |
-|                                                         | new child process. This is an async function.  |
-+---------------------------------------------------------+------------------------------------------------+
-| ``system({command})``                                   | Executes an executable or script in a new      |
-|                                                         |  child process. This is an async function.     |
-+---------------------------------------------------------+------------------------------------------------+
++---------------------------------------------------------+-------------------------------------------------+
+| Lua function                                            | Description                                     |
++=========================================================+=================================================+
+| ``gpioBlink({GPIO}, {timeout_ms}, {interval_ms})``      | Toggle the value of the GPIO in given timeout   |
+|                                                         | and interval.                                   |
++---------------------------------------------------------+-------------------------------------------------+
+| ``gpioGet({GPIO})``                                     | Returns the GPIO state:                         |
+|                                                         | 1 = active, 0 = inactive                        |
++---------------------------------------------------------+-------------------------------------------------+
+| ``gpioSet({GPIO}, {1\|0})``                             || Sets the state of an output GPIO:              |
+|                                                         || 1 = active, 0 = inactive                       |
++---------------------------------------------------------+-------------------------------------------------+
+| ``gpioToggle({GPIO})``                                  | Toggles the state of an output GPIO.            |
++---------------------------------------------------------+-------------------------------------------------+
+| ``http({method}, {uri}, {content-type}, {postdata})``   | Submits a HTTP request in a new child process.  |
+|                                                         | ``content-type`` and ``postdata`` are optional. |
+|                                                         | This is an async function.                      |
+|                                                         | Valid HTTP methods are: DELETE, GET, HEAD,      |
+|                                                         | OPTIONS, PATCH, POST, PUT                       |
++---------------------------------------------------------+-------------------------------------------------+
+| ``mpc({mpd protocol command})``                         | Runs a mpd protocol command.                    |
++---------------------------------------------------------+-------------------------------------------------+
+| ``mympd({uri}, {partition}, {script})``                 | Calls the myGPIOd api to execute a script in a  |
+|                                                         | new child process. This is an async function.   |
++---------------------------------------------------------+-------------------------------------------------+
+| ``system({command})``                                   | Executes an executable or script in a new       |
+|                                                         |  child process. This is an async function.      |
++---------------------------------------------------------+-------------------------------------------------+
 
 **Example gpio config**
 
@@ -128,8 +161,8 @@ The functions return 0 on success, else 1.
    function changeMPDvolume()
      -- This example function can be used to change the MPD volume with a rotary encoder
      -- Get value of the GPIOs
-     clk = gpioGet(4)
-     dt = gpioGet(5)
+     local clk = gpioGet(4)
+     local dt = gpioGet(5)
      -- Check rotation direction
      if clk == dt then
        mpc("volume 5")
