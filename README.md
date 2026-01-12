@@ -43,7 +43,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
 
 ## Documentation
 
-For information on installation and configuration, see the [myGPIOd documentation](https://jcorporation.github.io/myGPIOd/)
+For information on installation and configuration, see the [myGPIOd documentation](https://jcorporation.github.io/myGPIOd/).
 
 ## Support
 
