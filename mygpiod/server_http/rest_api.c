@@ -78,37 +78,37 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     sds buffer = sdsempty();
     bool rc = false;
     unsigned gpio_nr = UINT_MAX;
-    if (method == HTTP_GET && strcmp(url, "/api/gpio") == 0) {
+    if (method == HTTP_GET && strcmp(url, "/api/v1/gpio") == 0) {
         buffer = rest_api_gpio_get(config, buffer, &rc);
     }
-    else if (method == HTTP_GET && match_url_gpio(url, "/api/gpio/*", &gpio_nr)) {
+    else if (method == HTTP_GET && match_url_gpio(url, "/api/v1/gpio/*", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_get(config, buffer, gpio_nr, &rc);
     }
-    else if (method == HTTP_OPTIONS && match_url_gpio(url, "/api/gpio/*", &gpio_nr)) {
+    else if (method == HTTP_OPTIONS && match_url_gpio(url, "/api/v1/gpio/*", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_options(config, buffer, gpio_nr, &rc);
     }
-    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/blink", &gpio_nr)) {
+    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/v1/gpio/*/blink", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_blink(config, buffer, gpio_nr, connection, &rc);
     }
-    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/set", &gpio_nr)) {
+    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/v1/gpio/*/set", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_set(config, buffer, gpio_nr, connection, &rc);
     }
-    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/gpio/*/toggle", &gpio_nr)) {
+    else if (method == HTTP_PATCH && match_url_gpio(url, "/api/v1/gpio/*/toggle", &gpio_nr)) {
         buffer = rest_api_gpio_gpio_toggle(config, buffer, gpio_nr, &rc);
     }
-    else if (method == HTTP_GET && strcmp(url, "/api/vcio") == 0) {
+    else if (method == HTTP_GET && strcmp(url, "/api/v1/vcio") == 0) {
         buffer = rest_api_raspberry_vcio_all(buffer, &rc);
     }
-    else if (method == HTTP_GET && strcmp(url, "/api/vcio/temp") == 0) {
+    else if (method == HTTP_GET && strcmp(url, "/api/v1/vcio/temp") == 0) {
         buffer = rest_api_raspberry_vcio(buffer, "measure_temp", &rc);
     }
-    else if (method == HTTP_GET && strcmp(url, "/api/vcio/volts") == 0) {
+    else if (method == HTTP_GET && strcmp(url, "/api/v1/vcio/volts") == 0) {
         buffer = rest_api_raspberry_vcio(buffer, "measure_volts core", &rc);
     }
-    else if (method == HTTP_GET && strcmp(url, "/api/vcio/clock") == 0) {
+    else if (method == HTTP_GET && strcmp(url, "/api/v1/vcio/clock") == 0) {
         buffer = rest_api_raspberry_vcio(buffer, "measure_clock arm", &rc);
     }
-    else if (method == HTTP_GET && strcmp(url, "/api/vcio/throttled") == 0) {
+    else if (method == HTTP_GET && strcmp(url, "/api/v1/vcio/throttled") == 0) {
         buffer = rest_api_raspberry_vcio(buffer, "get_throttled", &rc);
     }
     else {

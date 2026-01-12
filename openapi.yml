@@ -4,9 +4,9 @@ info:
   contact:
     url: https://github.com/jcorporation/myGPIOd
   description: REST API of myGPIOd
-  version: 0.2.0
+  version: 0.9.1
 servers:
-  - url: http://localhost:8000/api
+  - url: http://localhost:8000/api/v1
 tags:
   - name: gpio
     description: GPIO

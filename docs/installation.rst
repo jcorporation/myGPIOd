@@ -67,7 +67,7 @@ Docker
 
 Example docker compose file to start myGPIOd.
 
-.. code:: yml
+.. code:: yaml
 
    services:
      mygpiod:

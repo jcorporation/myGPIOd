@@ -14,7 +14,7 @@
 #include <stdlib.h>
 
 /**
- * Handles the REST API request for GET /api/vcio/{temp,volts,clock,throttled}
+ * Handles the REST API request for GET /api/v1/vcio/{temp,volts,clock,throttled}
  * @param buffer Already allocated buffer to populate with the response
  * @param command Command to submit
  * @param rc Pointer to bool to set the result code
@@ -39,7 +39,7 @@ sds rest_api_raspberry_vcio(sds buffer,
 }
 
 /**
- * Handles the REST API request for GET /api/vcio
+ * Handles the REST API request for GET /api/v1/vcio
  * @param buffer Already allocated buffer to populate with the response
  * @param rc Pointer to bool to set the result code
  * @return Pointer to buffer

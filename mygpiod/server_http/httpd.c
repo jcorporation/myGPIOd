@@ -92,7 +92,7 @@ static enum MHD_Result request_handler(void *cls,
 
     MYGPIOD_LOG_DEBUG("HTTP connection %u: %s %s", request_data->conn_id, method_str, url);
     // REST-API
-    if (strncmp(url, "/api/", 5) == 0) {
+    if (strncmp(url, "/api/v1/", 8) == 0) {
         MYGPIOD_LOG_DEBUG("HTTP connection %u: Calling REST-API handler for %s %s", request_data->conn_id, method_str, url);
         return rest_api_handler(connection, request_data->conn_id, url, method, config);
     }

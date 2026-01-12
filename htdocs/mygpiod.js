@@ -32,7 +32,7 @@ function updateGPIOstate(event) {
     target.innerHTML = icons.updating;
     const tr = event.target.closest('tr');
     const gpio = tr.data.gpio;
-    httpRequest('GET', '/api/gpio/' + gpio, function(data) {
+    httpRequest('GET', '/api/v1/gpio/' + gpio, function(data) {
         tr.childNodes[2].textContent = data.value;
         setTimeout(function() {
             target.innerHTML = icons.update;
@@ -43,7 +43,7 @@ function updateGPIOstate(event) {
 // Executes the toggle GPIO action.
 function toggleGPIO(event) {
     const gpio = event.target.closest('tr').data.gpio;
-    httpRequest('PATCH', '/api/gpio/' + gpio + '/toggle', getGPIOs);
+    httpRequest('PATCH', '/api/v1/gpio/' + gpio + '/toggle', getGPIOs);
 }
 
 // Shows the modal for the set GPIO action.
@@ -58,7 +58,7 @@ function setGPIO() {
     const gpio = document.getElementById('modalGPIOsetGPIO').value;
     const valueEl = document.getElementById('modalGPIOsetValue');
     const value = valueEl.options[valueEl.selectedIndex].value;
-    httpRequest('PATCH', '/api/gpio/' + gpio + '/set?value=' + value, getGPIOs);
+    httpRequest('PATCH', '/api/v1/gpio/' + gpio + '/set?value=' + value, getGPIOs);
 }
 
 // Shows the modal for the blink GPIO action.
@@ -73,7 +73,7 @@ function blinkGPIO() {
     const gpio = document.getElementById('modalGPIOblinkGPIO').value;
     const timeout = document.getElementById('modalGPIOblinkTimeout').value;
     const interval = document.getElementById('modalGPIOblinkInterval').value;
-    httpRequest('PATCH', '/api/gpio/' + gpio + '/blink?timeout=' + timeout + '&interval=' + interval, getGPIOs);
+    httpRequest('PATCH', '/api/v1/gpio/' + gpio + '/blink?timeout=' + timeout + '&interval=' + interval, getGPIOs);
 }
 
 // Gets the details of a GPIO and displays it in a modal.
@@ -81,7 +81,7 @@ function infoGPIO(event) {
     const gpioInfoEl = document.getElementById('modalGPIOinfoList');
     gpioInfoEl.textContent = '';
     const gpio = event.target.closest('tr').data.gpio;
-    httpRequest('OPTIONS', '/api/gpio/' + gpio, function(data) {
+    httpRequest('OPTIONS', '/api/v1/gpio/' + gpio, function(data) {
         const keys = Object.keys(data.data);
         for (const key of keys) {
             const tr = document.createElement('tr');
@@ -129,7 +129,7 @@ function getGPIOs() {
     document.getElementById('gpioUpdateAll').innerHTML = icons.updating;
     const gpiosEl = document.getElementById('gpios');
     const rows = gpiosEl.querySelectorAll('tr');
-    httpRequest('GET', '/api/gpio', function(data) {
+    httpRequest('GET', '/api/v1/gpio', function(data) {
         for (let i = 0; i < data.entries; i++) {
             const tr = document.createElement('tr');
             for (const k of ['gpio', 'name', 'direction', 'value']) {
@@ -273,8 +273,8 @@ document.getElementById('clearEvents').addEventListener('click', function(event)
 }, false);
 
 
-const serverUri = getUri()
+const serverUri = getUri();
 // Fetch GPIO table
-getGPIOs()
+getGPIOs();
 // Long poll
 pollEvents();

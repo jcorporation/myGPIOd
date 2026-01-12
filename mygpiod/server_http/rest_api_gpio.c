@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 /**
- * Handles the REST API request for GET /api/gpio
+ * Handles the REST API request for GET /api/v1/gpio
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param rc pointer to bool to set the result code
@@ -69,7 +69,7 @@ sds rest_api_gpio_get(struct t_config *config,
 }
 
 /**
- * Handles the REST API request for GET /api/gpio/{gpio_nr}
+ * Handles the REST API request for GET /api/v1/gpio/{gpio_nr}
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
@@ -96,7 +96,7 @@ sds rest_api_gpio_gpio_get(struct t_config *config,
 }
 
 /**
- * Handles the REST API request for OPTIONS /api/gpio/{gpio_nr}
+ * Handles the REST API request for OPTIONS /api/v1/gpio/{gpio_nr}
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
@@ -169,7 +169,7 @@ sds rest_api_gpio_gpio_options(struct t_config *config,
 }
 
 /**
- * Handles the REST API request for PATCH /api/gpio/{gpio_nr}/blink
+ * Handles the REST API request for PATCH /api/v1/gpio/{gpio_nr}/blink
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
@@ -207,7 +207,7 @@ sds rest_api_gpio_gpio_blink(struct t_config *config,
 }
 
 /**
- * Handles the REST API request for PATCH /api/gpio/{gpio_nr}/set
+ * Handles the REST API request for PATCH /api/v1/gpio/{gpio_nr}/set
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
@@ -245,7 +245,7 @@ sds rest_api_gpio_gpio_set(struct t_config *config,
 }
 
 /**
- * Handles the REST API request for PATCH /api/gpio/{gpio_nr}/toggle
+ * Handles the REST API request for PATCH /api/v1/gpio/{gpio_nr}/toggle
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
