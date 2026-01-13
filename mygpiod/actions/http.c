@@ -204,6 +204,7 @@ static bool call_curl(const char *method, const char *uri, const char *content_t
             MYGPIOD_LOG_DEBUG("%s", resp_body);
         }
     }
+    curl_easy_cleanup(curl);
     curl_global_cleanup();
     sdsfree(resp_header);
     sdsfree(resp_body);
