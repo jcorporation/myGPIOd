@@ -7,15 +7,11 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/util.h"
 
-#include "dist/sds/sds.h"
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lib/mem.h"
 
 #include <errno.h>
 #include <gpiod.h>
 #include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
