@@ -186,7 +186,7 @@ void mygpiod_log(int level, const char *file, int line, const char *fmt, ...) {
         logline = sdscatfmt(logline, "<%i>", level);
     }
     logline = sdscatprintf(logline, "%-8s", loglevel_names[level]);
-    #ifdef MYMPD_DEBUG
+    #ifdef MYGPIOD_DEBUG
         logline = sdscatfmt(logline, "%s:%i: ", file, line);
     #else
         (void)file;
