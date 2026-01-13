@@ -172,6 +172,7 @@ static bool call_curl(const char *method, const char *uri, const char *content_t
     char err_buf[CURL_ERROR_SIZE];
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, err_buf);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "myGPIOd");
     CURLcode res = curl_easy_perform(curl);
     curl_slist_free_all(slist);
     sdstrim(resp_header, "\r\n");
