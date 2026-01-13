@@ -49,11 +49,6 @@ static size_t catch_output(void *ptr, size_t size, size_t nmemb, sds *output);
 bool action_http(const char *cmd) {
     int count = 0;
     sds *args = sdssplitargs(cmd, &count);
-    if (count < 2) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments");
-        sdsfreesplitres(args, count);
-        return false;
-    }
     bool rc = false;
     if (count == 4) {
         // Request with body
@@ -64,7 +59,7 @@ bool action_http(const char *cmd) {
         rc = action_http2(args[0], args[1], NULL, NULL);
     }
     else {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments");
+        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
     }
     sdsfreesplitres(args, count);
     return rc;

@@ -32,7 +32,7 @@ bool action_mpc(struct t_config *config, const char *cmd) {
     int count = 0;
     sds *args = sdssplitargs(cmd, &count);
     if (count < 1 || count > MAX_MPC_ARGS) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments");
+        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         sdsfreesplitres(args, count);
         return false;
     }

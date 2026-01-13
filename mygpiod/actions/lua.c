@@ -133,7 +133,7 @@ bool action_lua(struct t_config *config, const char *cmd) {
 bool check_lua_arg_count(lua_State *lua_vm, const char *cmd, int required) {
     int count = lua_gettop(lua_vm);
     if (count != required) {
-        MYGPIOD_LOG_DEBUG("Invalid number of arguments for %s", cmd);
+        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         for (int i = 1; i <= count; i++) {
             lua_pop(lua_vm, i);
         }
@@ -283,7 +283,7 @@ int lua_http(lua_State *lua_vm) {
         lua_pop(lua_vm, 2);
     }
     else {
-        MYGPIOD_LOG_DEBUG("Invalid number of arguments for http");
+        MYGPIOD_LOG_DEBUG("Invalid number of arguments for http (%d)", arg_count);
         for (int i = 1; i <= arg_count; i++) {
             lua_pop(lua_vm, i);
         }

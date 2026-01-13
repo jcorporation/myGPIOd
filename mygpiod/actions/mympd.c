@@ -25,7 +25,7 @@ bool action_mympd(const char *cmd) {
     int count = 0;
     sds *args = sdssplitargs(cmd, &count);
     if (count < 3) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments");
+        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         sdsfreesplitres(args, count);
         exit(EXIT_FAILURE);
     }

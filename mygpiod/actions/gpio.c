@@ -27,7 +27,7 @@ bool action_gpioset(struct t_config *config, const char *cmd) {
     sds *args = sdssplitargs(cmd, &count);
 
     if (count != 2) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments");
+        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         sdsfreesplitres(args, count);
         return false;
     }
@@ -59,7 +59,7 @@ bool action_gpiotoggle(struct t_config *config, const char *cmd) {
     sds *args = sdssplitargs(cmd, &count);
 
     if (count != 1) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments");
+        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         sdsfreesplitres(args, count);
         return false;
     }
@@ -84,7 +84,7 @@ bool action_gpioblink(struct t_config *config, const char *cmd) {
     sds *args = sdssplitargs(cmd, &count);
 
     if (count != 3) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments");
+        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         sdsfreesplitres(args, count);
         return false;
     }
