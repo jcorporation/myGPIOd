@@ -88,7 +88,7 @@ Examples
 
    # Execute HTTP actions
    http:GET http://server.lan/webhook1
-   http:PATCH http://server.lan/webhook1 application/json {"value": 1}
+   http:PATCH http://server.lan/webhook1 application/json '{"value": 1}'
    http:POST http://server.lan/webhook2 text/plain <</tmp/postdata
 
    # Execute a custom lua function
@@ -99,7 +99,7 @@ Examples
    mpc:volume 5
 
    # Start a script in myMPD
-   mympd:http://localhost:8443 default script1.lua
+   mympd:http://localhost:8443 default script1
 
    # Execute a system command
    system:/bin/true
