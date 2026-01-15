@@ -20,6 +20,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
    installation.rst
    mygpio-configuration.rst
    mygpiod-http-api.rst
-   mygpio-protocol.rst
+   mygpiod-protocol.rst
    mygpio-client.rst
    mygpio-library.rst
+   test.rst

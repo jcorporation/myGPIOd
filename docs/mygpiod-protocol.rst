@@ -1,9 +1,9 @@
-myGPIO Protocol
-===============
+myGPIOd Protocol
+================
 
-myGPIOd can be controlled and queried through a simple line-based text protocol.
+myGPIOd can be controlled and queried through a simple line-based text protocol over a local Unix socket.
 
-The myGPIOd protocol exchanges line-based text messages between client and server over a local Unix socket.
+Default socket: ``/run/mygpiod/socket``
 
 You can test the protocol with:
 
@@ -18,8 +18,6 @@ When the client connects, the server responds with:
    OK
    version:{major}.{minor}.{patch}
    END
-
-Default socket: ``/run/mygpiod/socket``
 
 Requests
 --------
