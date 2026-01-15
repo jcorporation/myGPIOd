@@ -43,10 +43,10 @@ bool action_mpc(struct t_config *config, const char *cmd) {
             : NULL;
     }
 
-    // Check connection
-    if (mpc_check_conn(config) == false &&
-        mpc_connect(config) == false)
+    if (mpc_check_conn(config) == false &&  // Check connection
+        mpc_connect(config) == false)       // Try to connect
     {
+        // Failure
         sdsfreesplitres(args, count);
         free(tokens);
         return false;
