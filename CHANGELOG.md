@@ -14,6 +14,7 @@ This release fixes some bugs and adds minor features. The REST-API endpoint is n
 - Feat: Support more HTTP methods for HTTP action
 - Feat: Add Version to REST-API
 - Fix: Memory leak in list GPIOs function for REST-API
+- Fix: myMPD action
 
 ***
 

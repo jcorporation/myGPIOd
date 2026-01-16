@@ -11,10 +11,6 @@
 #include "mygpiod/actions/http.h"
 #include "mygpiod/lib/log.h"
 
-#include <curl/curl.h>
-#include <stdlib.h>
-#include <unistd.h>
-
 /**
  * Execute a myGPIOd script through the myGPIOd api.
  * @param cmd command to parse, format:
@@ -24,12 +20,15 @@
 bool action_mympd(const char *cmd) {
     int count = 0;
     sds *args = sdssplitargs(cmd, &count);
+    bool rc = false;
     if (count < 3) {
         MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
-        sdsfreesplitres(args, count);
-        exit(EXIT_FAILURE);
     }
-    return action_mympd2(args[0], args[1], args[2]);
+    else {
+        rc = action_mympd2(args[0], args[1], args[2]);
+    }
+    sdsfreesplitres(args, count);
+    return rc;
 }
 
 /**
@@ -42,8 +41,8 @@ bool action_mympd(const char *cmd) {
 bool action_mympd2(const char *uri, const char *partition, const char *script) {
     sds full_uri = sdscatfmt(sdsempty(), "%S/api/%S", uri, partition);
     sds postdata = sdscatfmt(sdsempty(),
-        "\"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"id\\\":0,\\\"method\\\":\\\"MYMPD_API_SCRIPT_EXECUTE\\\","
-        "\\\"params\\\":{\\\"script\\\":\\\"%S\\\",\\\"arguments\\\":{}}}\"",
+        "{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"MYMPD_API_SCRIPT_EXECUTE\","
+        "\"params\":{\"event\":\"user\",\"script\":\"%S\",\"arguments\":{}}}",
         script);
     bool rc = action_http2("POST", full_uri, "application/json", postdata);
     sdsfree(full_uri);
