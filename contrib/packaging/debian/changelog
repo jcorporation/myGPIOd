@@ -1,5 +1,5 @@
-mygpiod (0.9.1-1) unstable; urgency=medium
+mygpiod (1.0.0-1) unstable; urgency=medium
 
   * Release from master
 
- -- Juergen Mang <mail@jcgames.de>  Sun, 11 Jan 2026 17:01:26 +0100
+ -- Juergen Mang <mail@jcgames.de>  Fri, 16 Jan 2026 21:01:25 +0100

@@ -4,7 +4,7 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v0.9.1 (not yet released)
+## myGPIOd v1.0.0 (not yet released)
 
 This release fixes some bugs and adds minor features. The REST-API endpoint is now versioned and starts with `/api/v1/`.
 
