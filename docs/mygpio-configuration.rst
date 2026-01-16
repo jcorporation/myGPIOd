@@ -124,8 +124,8 @@ The functions return ``0`` on success, else ``1``.
 | ``gpioBlink({GPIO}, {timeout_ms}, {interval_ms})``      | Toggle the value of the GPIO in given timeout   |
 |                                                         | and interval.                                   |
 +---------------------------------------------------------+-------------------------------------------------+
-| ``gpioGet({GPIO})``                                     | Returns the GPIO state:                         |
-|                                                         | 1 = active, 0 = inactive                        |
+| ``gpioGet({GPIO})``                                     || Returns the GPIO state:                        |
+|                                                         || 1 = active, 0 = inactive                       |
 +---------------------------------------------------------+-------------------------------------------------+
 | ``gpioSet({GPIO}, {1\|0})``                             || Sets the state of an output GPIO:              |
 |                                                         || 1 = active, 0 = inactive                       |
@@ -144,7 +144,7 @@ The functions return ``0`` on success, else ``1``.
 |                                                         | new child process. This is an async function.   |
 +---------------------------------------------------------+-------------------------------------------------+
 | ``system({command})``                                   | Executes an executable or script in a new       |
-|                                                         |  child process. This is an async function.      |
+|                                                         | child process. This is an async function.       |
 +---------------------------------------------------------+-------------------------------------------------+
 
 **Example gpio config**
