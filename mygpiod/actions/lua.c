@@ -133,7 +133,7 @@ bool action_lua(struct t_config *config, const char *cmd) {
  */
 static bool check_lua_arg_count(lua_State *lua_vm, const char *cmd, int required) {
     int count = lua_gettop(lua_vm);
-    if (count != required) {
+    if (count -1 != required) {
         MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         clean_up_lua_stack(lua_vm);
         return false;
