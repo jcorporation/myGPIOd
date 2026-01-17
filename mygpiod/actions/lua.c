@@ -133,7 +133,7 @@ bool action_lua(struct t_config *config, const char *cmd) {
  */
 static bool check_lua_arg_count(lua_State *lua_vm, const char *cmd, int required) {
     int count = lua_gettop(lua_vm);
-    if (count -1 != required) {
+    if (count != required) {
         MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
         clean_up_lua_stack(lua_vm);
         return false;
@@ -158,18 +158,16 @@ static void clean_up_lua_stack(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_gpio_blink(lua_State *lua_vm) {
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     if (check_lua_arg_count(lua_vm, "gpioBlink", 3) == false) {
         return false;
     }
+    lua_getglobal(lua_vm, "mygpiodConfig");
+    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int timeout = (int)lua_tointeger(lua_vm, 2);
     int interval = (int)lua_tointeger(lua_vm, 3);
     bool rc = gpio_blink(config, gpio, timeout, interval);
-    lua_pop(lua_vm, 1);
-    lua_pop(lua_vm, 2);
-    lua_pop(lua_vm, 3);
+    clean_up_lua_stack(lua_vm);
     return rc;
 }
 
@@ -179,14 +177,14 @@ static int lua_gpio_blink(lua_State *lua_vm) {
  * @return the gpio value
  */
 static int lua_gpio_get(lua_State *lua_vm) {
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     if (check_lua_arg_count(lua_vm, "gpioGet", 1) == false) {
         return false;
     }
+    lua_getglobal(lua_vm, "mygpiodConfig");
+    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     enum gpiod_line_value value = gpio_get_value(config, gpio);
-    lua_pop(lua_vm, 1);
+    clean_up_lua_stack(lua_vm);
     return value;
 }
 
@@ -196,16 +194,15 @@ static int lua_gpio_get(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_gpio_set(lua_State *lua_vm) {
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     if (check_lua_arg_count(lua_vm, "gpioSet", 2) == false) {
         return false;
     }
+    lua_getglobal(lua_vm, "mygpiodConfig");
+    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int value = (int)lua_tointeger(lua_vm, 2);
     bool rc = gpio_set_value(config, gpio, value);
-    lua_pop(lua_vm, 1);
-    lua_pop(lua_vm, 2);
+    clean_up_lua_stack(lua_vm);
     return rc;
 }
 
@@ -215,14 +212,14 @@ static int lua_gpio_set(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_gpio_toggle(lua_State *lua_vm) {
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     if (check_lua_arg_count(lua_vm, "gpioToggle", 1) == false) {
         return false;
     }
+    lua_getglobal(lua_vm, "mygpiodConfig");
+    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     bool rc = gpio_toggle_value(config, gpio);
-    lua_pop(lua_vm, 1);
+    clean_up_lua_stack(lua_vm);
     return rc;
 }
 
@@ -233,14 +230,14 @@ static int lua_gpio_toggle(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_mpc(lua_State *lua_vm) {
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     if (check_lua_arg_count(lua_vm, "mpc", 1) == false) {
         return false;
     }
+    lua_getglobal(lua_vm, "mygpiodConfig");
+    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     const char *cmd = lua_tostring(lua_vm, 1);
     bool rc = action_mpc(config, cmd);
-    lua_pop(lua_vm, 1);
+    clean_up_lua_stack(lua_vm);
     return rc;
 }
 #endif
@@ -259,9 +256,7 @@ static int lua_mympd(lua_State *lua_vm) {
     const char *partition = lua_tostring(lua_vm, 2);
     const char *script = lua_tostring(lua_vm, 3);
     bool rc = action_mympd2(uri, partition, script);
-    lua_pop(lua_vm, 1);
-    lua_pop(lua_vm, 2);
-    lua_pop(lua_vm, 3);
+    clean_up_lua_stack(lua_vm);
     return rc;
 }
 
