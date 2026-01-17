@@ -11,7 +11,6 @@
 
 #include <errno.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 /**
@@ -23,19 +22,21 @@ bool action_system(const char *cmd) {
     errno = 0;
     int pid = fork();
     if (pid == 0) {
-        // this is the child process
+        // This is the child process
         errno = 0;
         execl(cmd, cmd, (char *)NULL);
         // successful execl call does not return
-        MYGPIOD_LOG_ERROR("Error executing action \"%s\": %s", cmd, strerror(errno));
+        MYGPIOD_LOG_ERROR("Error executing action \"%s\"", cmd);
+        MYGPIOD_LOG_ERRNO(errno);
         exit(EXIT_FAILURE);
     }
-    else {
-        if (pid == -1) {
-            MYGPIOD_LOG_ERROR("Could not fork: %s", strerror(errno));
-            return false;
-        }
-        MYGPIOD_LOG_DEBUG("Forked process with pid %d", pid);
-        return true;
+
+    // Main process
+    if (pid == -1) {
+        MYGPIOD_LOG_ERROR("Could not fork");
+        MYGPIOD_LOG_ERRNO(errno);
+        return false;
     }
+    MYGPIOD_LOG_DEBUG("Forked process with pid %d", pid);
+    return true;
 }
