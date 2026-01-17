@@ -13,34 +13,35 @@ Custom lua functions
 
 myGPIOd registers custom lua functions to provide access to the actions. The functions return ``0`` on success, else ``1``.
 
-+---------------------------------------------------------+-------------------------------------------------+
-| Lua function                                            | Description                                     |
-+=========================================================+=================================================+
-| ``gpioBlink({GPIO}, {timeout_ms}, {interval_ms})``      | Toggle the value of the GPIO in given timeout   |
-|                                                         | and interval.                                   |
-+---------------------------------------------------------+-------------------------------------------------+
-| ``gpioGet({GPIO})``                                     || Returns the GPIO state:                        |
-|                                                         || 1 = active, 0 = inactive                       |
-+---------------------------------------------------------+-------------------------------------------------+
-| ``gpioSet({GPIO}, {1\|0})``                             || Sets the state of an output GPIO:              |
-|                                                         || 1 = active, 0 = inactive                       |
-+---------------------------------------------------------+-------------------------------------------------+
-| ``gpioToggle({GPIO})``                                  | Toggles the state of an output GPIO.            |
-+---------------------------------------------------------+-------------------------------------------------+
-| ``http({method}, {uri}, {content-type}, {postdata})``   | Submits a HTTP request in a new child process.  |
-|                                                         | ``content-type`` and ``postdata`` are optional. |
-|                                                         | This is an async function.                      |
-|                                                         | Valid HTTP methods are: DELETE, GET, HEAD,      |
-|                                                         | OPTIONS, PATCH, POST, PUT                       |
-+---------------------------------------------------------+-------------------------------------------------+
-| ``mpc({mpd protocol command})``                         | Runs a mpd protocol command.                    |
-+---------------------------------------------------------+-------------------------------------------------+
-| ``mympd({uri}, {partition}, {script})``                 | Calls the myGPIOd api to execute a script in a  |
-|                                                         | new child process. This is an async function.   |
-+---------------------------------------------------------+-------------------------------------------------+
-| ``system({command})``                                   | Executes an executable or script in a new       |
-|                                                         | child process. This is an async function.       |
-+---------------------------------------------------------+-------------------------------------------------+
++---------------------------------------------------------+-----------------------------------------------------+
+| Lua function                                            | Description                                         |
++=========================================================+=====================================================+
+| ``gpioBlink({GPIO}, {timeout_ms}, {interval_ms})``      | Toggle the value of the GPIO in given timeout       |
+|                                                         | and interval.                                       |
++---------------------------------------------------------+-----------------------------------------------------+
+| ``gpioGet({GPIO})``                                     || Returns the GPIO state:                            |
+|                                                         || 1 = active, 0 = inactive                           |
++---------------------------------------------------------+-----------------------------------------------------+
+| ``gpioSet({GPIO}, {1\|0})``                             || Sets the state of an output GPIO:                  |
+|                                                         || 1 = active, 0 = inactive                           |
++---------------------------------------------------------+-----------------------------------------------------+
+| ``gpioToggle({GPIO})``                                  | Toggles the state of an output GPIO.                |
++---------------------------------------------------------+-----------------------------------------------------+
+| ``http({method}, {uri}, {content-type}, {postdata})``   | Submits a HTTP request in a new child process.      |
+|                                                         | Set ``content-type`` and ``postdata`` to ``nil`` if |
+|                                                         | no body should be sent.                             |
+|                                                         | This is an async function.                          |
+|                                                         | Valid HTTP methods are: DELETE, GET, HEAD,          |
+|                                                         | OPTIONS, PATCH, POST, PUT                           |
++---------------------------------------------------------+-----------------------------------------------------+
+| ``mpc({mpd protocol command})``                         | Runs a mpd protocol command.                        |
++---------------------------------------------------------+-----------------------------------------------------+
+| ``mympd({uri}, {partition}, {script})``                 | Calls the myGPIOd api to execute a script in a      |
+|                                                         | new child process. This is an async function.       |
++---------------------------------------------------------+-----------------------------------------------------+
+| ``system({command})``                                   | Executes an executable or script in a new           |
+|                                                         | child process. This is an async function.           |
++---------------------------------------------------------+-----------------------------------------------------+
 
 Example lua file
 ----------------
