@@ -39,11 +39,12 @@ bool action_mympd(const char *cmd) {
  * @returns true on success, else false
  */
 bool action_mympd2(const char *uri, const char *partition, const char *script) {
-    sds full_uri = sdscatfmt(sdsempty(), "%S/api/%S", uri, partition);
+    sds full_uri = sdscatfmt(sdsempty(), "%s/api/%s", uri, partition);
     sds postdata = sdscatfmt(sdsempty(),
         "{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"MYMPD_API_SCRIPT_EXECUTE\","
-        "\"params\":{\"event\":\"user\",\"script\":\"%S\",\"arguments\":{}}}",
+        "\"params\":{\"event\":\"user\",\"script\":\"%s\",\"arguments\":{}}}",
         script);
+    MYGPIOD_LOG_DEBUG("Calling myMPD API \"%s\"", full_uri);
     bool rc = action_http2("POST", full_uri, "application/json", postdata);
     sdsfree(full_uri);
     sdsfree(postdata);
