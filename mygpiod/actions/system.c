@@ -23,17 +23,18 @@ bool action_system(const char *cmd) {
     int pid = fork();
     if (pid == 0) {
         // This is the child process
+        MYGPIOD_LOG_INFO("Executing system command \"%s\"", cmd);
         errno = 0;
         execl(cmd, cmd, (char *)NULL);
         // successful execl call does not return
-        MYGPIOD_LOG_ERROR("Error executing action \"%s\"", cmd);
+        MYGPIOD_LOG_ERROR("Failure executing system command \"%s\"", cmd);
         MYGPIOD_LOG_ERRNO(errno);
         exit(EXIT_FAILURE);
     }
 
     // Main process
     if (pid == -1) {
-        MYGPIOD_LOG_ERROR("Could not fork");
+        MYGPIOD_LOG_ERROR("Forking failed");
         MYGPIOD_LOG_ERRNO(errno);
         return false;
     }
