@@ -32,7 +32,7 @@ enum log_types {
     #define MYGPIOD_LOG_NOTICE(...) mygpiod_log(LOG_NOTICE, __FILE__, __LINE__, __VA_ARGS__)
     #define MYGPIOD_LOG_INFO(...) mygpiod_log(LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
     #define MYGPIOD_LOG_DEBUG(...) mygpiod_log(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
-    #define MYGPIOD_LOG_ERRNO(PART, ERRNUM) mygpiod_log_errno(__FILE__, __LINE__, PART, ERRNUM)
+    #define MYGPIOD_LOG_ERRNO(ERRNUM) mygpiod_log_errno(__FILE__, __LINE__, ERRNUM)
 #else
     /**
      * release build should have no references to build dir
@@ -45,7 +45,7 @@ enum log_types {
     #define MYGPIOD_LOG_NOTICE(...) mygpiod_log(LOG_NOTICE, "", __LINE__, __VA_ARGS__)
     #define MYGPIOD_LOG_INFO(...) mygpiod_log(LOG_INFO, "", __LINE__, __VA_ARGS__)
     #define MYGPIOD_LOG_DEBUG(...) mygpiod_log(LOG_DEBUG, "", __LINE__, __VA_ARGS__)
-    #define MYGPIOD_LOG_ERRNO(PART, ERRNUM) mygpiod_log_errno("", __LINE__, PART, ERRNUM)
+    #define MYGPIOD_LOG_ERRNO(ERRNUM) mygpiod_log_errno("", __LINE__, ERRNUM)
 #endif
 
 /**
