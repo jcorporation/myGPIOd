@@ -20,6 +20,7 @@
 #include <lualib.h>
 
 // private definitions
+static struct t_config *get_lua_global_config(lua_State *lua_vm);
 static void clean_up_lua_stack(lua_State *lua_vm);
 static bool check_lua_arg_count(lua_State *lua_vm, const char *cmd, int required);
 static int lua_gpio_blink(lua_State *lua_vm);
@@ -153,16 +154,27 @@ static void clean_up_lua_stack(lua_State *lua_vm) {
 }
 
 /**
+ * Gets the config struct from lua userdata
+ * @param lua_vm lua instance
+ * @return pointer to mympd config struct
+ */
+static struct t_config *get_lua_global_config(lua_State *lua_vm) {
+    lua_getglobal(lua_vm, "mygpiodConfig");
+    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
+    lua_pop(lua_vm, 1);
+    return config;
+}
+
+/**
  * Toggle the value of the GPIO in given timeout and interval.
  * @param lua_vm pointer to lua vm
  * @return 1 on success, else 0
  */
 static int lua_gpio_blink(lua_State *lua_vm) {
+    struct t_config *config = get_lua_global_config(lua_vm);
     if (check_lua_arg_count(lua_vm, "gpioBlink", 3) == false) {
         return false;
     }
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int timeout = (int)lua_tointeger(lua_vm, 2);
     int interval = (int)lua_tointeger(lua_vm, 3);
@@ -177,11 +189,10 @@ static int lua_gpio_blink(lua_State *lua_vm) {
  * @return the gpio value
  */
 static int lua_gpio_get(lua_State *lua_vm) {
+    struct t_config *config = get_lua_global_config(lua_vm);
     if (check_lua_arg_count(lua_vm, "gpioGet", 1) == false) {
         return false;
     }
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     enum gpiod_line_value value = gpio_get_value(config, gpio);
     clean_up_lua_stack(lua_vm);
@@ -194,11 +205,10 @@ static int lua_gpio_get(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_gpio_set(lua_State *lua_vm) {
+    struct t_config *config = get_lua_global_config(lua_vm);
     if (check_lua_arg_count(lua_vm, "gpioSet", 2) == false) {
         return false;
     }
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int value = (int)lua_tointeger(lua_vm, 2);
     int rc = gpio_set_value(config, gpio, value);
@@ -212,11 +222,10 @@ static int lua_gpio_set(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_gpio_toggle(lua_State *lua_vm) {
+    struct t_config *config = get_lua_global_config(lua_vm);
     if (check_lua_arg_count(lua_vm, "gpioToggle", 1) == false) {
         return false;
     }
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int rc = gpio_toggle_value(config, gpio);
     clean_up_lua_stack(lua_vm);
@@ -230,11 +239,10 @@ static int lua_gpio_toggle(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_mpc(lua_State *lua_vm) {
+    struct t_config *config = get_lua_global_config(lua_vm);
     if (check_lua_arg_count(lua_vm, "mpc", 1) == false) {
         return false;
     }
-    lua_getglobal(lua_vm, "mygpiodConfig");
-    struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     const char *cmd = lua_tostring(lua_vm, 1);
     int rc = action_mpc(config, cmd);
     clean_up_lua_stack(lua_vm);
