@@ -9,7 +9,6 @@
 
 #include "compile_time.h"
 #include "dist/sds/sds.h"
-#include "mygpiod/actions/lua.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/chip.h"
 #include "mygpiod/gpio/input.h"
@@ -20,6 +19,10 @@
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_http/httpd.h"
 #include "mygpiod/server_socket/socket.h"
+
+#ifdef MYGPIOD_ENABLE_ACTION_LUA
+    #include "mygpiod/lua/luavm.h"
+#endif
 
 #include <poll.h>
 #include <stdio.h>
@@ -101,7 +104,7 @@ int main(int argc, char **argv) {
     }
 
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
-        if (init_luavm(config) == false) {
+        if (luavm_init(config) == false) {
             rc = EXIT_FAILURE;
             goto out;
         }

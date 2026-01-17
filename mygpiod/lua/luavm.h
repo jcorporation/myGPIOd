@@ -4,13 +4,13 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef MYGPIOD_ACTIONS_LUA_H
-#define MYGPIOD_ACTIONS_LUA_H
+#ifndef MYGPIOD_LUA_LUAVM_H
+#define MYGPIOD_LUA_LUAVM_H
 
 #include "mygpiod/lib/config.h"
 
 #include <stdbool.h>
 
-bool action_lua(struct t_config *config, const char *cmd);
+bool luavm_init(struct t_config *config);
 
 #endif

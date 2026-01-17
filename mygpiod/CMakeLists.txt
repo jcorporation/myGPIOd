@@ -107,6 +107,9 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
   target_sources(mygpiod
     PRIVATE
       actions/lua.c
+      lua/functions.c
+      lua/luavm.c
+      lua/util.c
   )
   target_link_libraries(mygpiod
     "${LUA_LIBRARIES}"

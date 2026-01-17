@@ -12,7 +12,6 @@
 
 #include <gpiod.h>
 #include <stdbool.h>
-#include <time.h>
 
 #ifdef MYGPIOD_ENABLE_ACTION_MPC
     #include <mpd/client.h>
