@@ -166,7 +166,7 @@ static int lua_gpio_blink(lua_State *lua_vm) {
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int timeout = (int)lua_tointeger(lua_vm, 2);
     int interval = (int)lua_tointeger(lua_vm, 3);
-    bool rc = gpio_blink(config, gpio, timeout, interval);
+    int rc = gpio_blink(config, gpio, timeout, interval);
     clean_up_lua_stack(lua_vm);
     return rc;
 }
@@ -201,7 +201,7 @@ static int lua_gpio_set(lua_State *lua_vm) {
     struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int value = (int)lua_tointeger(lua_vm, 2);
-    bool rc = gpio_set_value(config, gpio, value);
+    int rc = gpio_set_value(config, gpio, value);
     clean_up_lua_stack(lua_vm);
     return rc;
 }
@@ -218,7 +218,7 @@ static int lua_gpio_toggle(lua_State *lua_vm) {
     lua_getglobal(lua_vm, "mygpiodConfig");
     struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
-    bool rc = gpio_toggle_value(config, gpio);
+    int rc = gpio_toggle_value(config, gpio);
     clean_up_lua_stack(lua_vm);
     return rc;
 }
@@ -236,7 +236,7 @@ static int lua_mpc(lua_State *lua_vm) {
     lua_getglobal(lua_vm, "mygpiodConfig");
     struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
     const char *cmd = lua_tostring(lua_vm, 1);
-    bool rc = action_mpc(config, cmd);
+    int rc = action_mpc(config, cmd);
     clean_up_lua_stack(lua_vm);
     return rc;
 }
@@ -255,7 +255,7 @@ static int lua_mympd(lua_State *lua_vm) {
     const char *uri = lua_tostring(lua_vm, 1);
     const char *partition = lua_tostring(lua_vm, 2);
     const char *script = lua_tostring(lua_vm, 3);
-    bool rc = action_mympd2(uri, partition, script);
+    int rc = action_mympd2(uri, partition, script);
     clean_up_lua_stack(lua_vm);
     return rc;
 }
@@ -266,26 +266,14 @@ static int lua_mympd(lua_State *lua_vm) {
  * @return 1 on success, else 0
  */
 static int lua_http(lua_State *lua_vm) {
-    int arg_count = lua_gettop(lua_vm);
-    if (arg_count != 4 ||
-        lua_isnil(lua_vm, 1) == 1 ||
-        lua_isnil(lua_vm, 2) == 1)
-    {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments for http (%d)", arg_count);
-        clean_up_lua_stack(lua_vm);
-        return 0;
+    if (check_lua_arg_count(lua_vm, "http", 4) == false) {
+        return false;
     }
 
     const char *method = lua_tostring(lua_vm, 1);
     const char *uri = lua_tostring(lua_vm, 2);
-    const char *content_type = NULL;
-    const char *postdata = NULL;
-    if (lua_isnil(lua_vm, 3) == 0) {
-        content_type = lua_tostring(lua_vm, 3);
-    }
-    if (lua_isnil(lua_vm, 4) == 0) {
-        postdata = lua_tostring(lua_vm, 4);
-    }
+    const char *content_type = lua_tostring(lua_vm, 3);
+    const char *postdata = lua_tostring(lua_vm, 4);
     int rc = action_http2(method, uri, content_type, postdata);
     clean_up_lua_stack(lua_vm);
     return rc;
@@ -302,7 +290,7 @@ static int lua_system(lua_State *lua_vm) {
         return false;
     }
     const char *cmd = lua_tostring(lua_vm, 1);
-    bool rc = action_system(cmd);
+    int rc = action_system(cmd);
     lua_pop(lua_vm, 1);
     return rc;
 }
