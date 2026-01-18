@@ -23,7 +23,7 @@
  */
 bool luavm_init(struct t_config *config) {
     if (sdslen(config->lua_file) == 0) {
-        MYGPIOD_LOG_DEBUG("No lua file configured");
+        MYGPIOD_LOG_INFO("No lua file configured");
         return true;
     }
     config->lua_vm = luaL_newstate();
@@ -53,7 +53,7 @@ bool luavm_init(struct t_config *config) {
     int rc = luaL_dofile(config->lua_vm, config->lua_file);
     if (rc != 0) {
         const char *err_str = lua_err_to_str(rc);
-        MYGPIOD_LOG_ERROR("Error loading lua file: %s", err_str);
+        MYGPIOD_LOG_ERROR("Failure loading lua file: \"%s\"", err_str);
         if (lua_gettop(config->lua_vm) == 1) {
             //return value on stack
             MYGPIOD_LOG_ERROR("%s", lua_tostring(config->lua_vm, 1));
@@ -62,6 +62,6 @@ bool luavm_init(struct t_config *config) {
         config->lua_vm = NULL;
         return false;
     }
-    MYGPIOD_LOG_INFO("Lua initialized");
+    MYGPIOD_LOG_INFO("Lua initialized successfully");
     return true;
 }
