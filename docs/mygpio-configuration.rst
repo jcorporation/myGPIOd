@@ -20,7 +20,7 @@ Events
 Events are triggered through changes of input GPIO values.
 
 +------------------------+-----------------------------------------------------------------------------+
-| Event                  | Description and actions                                                     |
+| Event                  | Description and options                                                     |
 +========================+=============================================================================+
 | ``falling``            || State of GPIO has changed from active to inactive.                         |
 |                        || ``action_falling``: Action to execute.                                     |
