@@ -68,7 +68,7 @@ bool action_mpc(struct t_config *config, const char *cmd) {
 /**
  * Checks if the MPD connection is ready
  * @param config pointer to config struct
- * @return true if it ready, else false 
+ * @return true if it ready, else false
  */
 static bool mpc_check_conn(struct t_config *config) {
     if (config->mpd_conn == NULL) {
@@ -99,7 +99,7 @@ static bool mpc_check_conn(struct t_config *config) {
 static bool mpc_connect(struct t_config *config) {
     config->mpd_conn = mpd_connection_new(NULL, 0, 0);
     if (config->mpd_conn == NULL) {
-        MYGPIOD_LOG_ERROR("MPD Connection: Out of memory");       
+        MYGPIOD_LOG_ERROR("MPD Connection: Out of memory");
         return false;
     }
     if (mpd_connection_get_error(config->mpd_conn) != MPD_ERROR_SUCCESS) {
