@@ -15,12 +15,13 @@ Dependencies
 
 - C build environment
 - cmake >= 3.13
+- pkgconf
 - libgpiod >= 2.0.0
 - libmicrohttpd
 - Optional:
   - libcurl
   - libmpdclient2
-  - lua >= 5.3.0
+  - lua >= 5.4.0
 
 Build myGPIOd
 ~~~~~~~~~~~~~

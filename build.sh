@@ -342,7 +342,7 @@ Build-Depends: debhelper (>= 10),
                libmpdclient-dev,
                libmicrohttpd-dev,
                libcurl4-gnutls-dev,
-               liblua5.4-dev | liblua5.3-dev,
+               liblua5.4-dev,
                libgpiod-dev
 Package-List:
  mygpiod deb misc optional arch=any

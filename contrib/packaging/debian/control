@@ -11,7 +11,7 @@ Build-Depends: debhelper (>= 10),
                libmpdclient-dev,
                libcurl4-gnutls-dev,
                libgpiod-dev,
-               liblua5.4-dev | liblua5.3-dev
+               liblua5.4-dev
 Standards-Version: 4.1.2
 Homepage: https://jcorporation.github.io/myGPIOd/
 
