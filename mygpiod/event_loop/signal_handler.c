@@ -32,7 +32,7 @@ int make_signalfd(void) {
     }
 
     errno = 0;
-    int sigfd = signalfd(-1, &sigmask, 0);
+    int sigfd = signalfd(-1, &sigmask, SFD_NONBLOCK | SFD_CLOEXEC);
     if (sigfd < 0) {
         MYGPIOD_LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
         return -1;
