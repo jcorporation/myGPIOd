@@ -47,7 +47,7 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 Example lua file
 ----------------
 
-This Lua file registers two functions: ``btnPress`` and ``changeMPDvolume``.
+This Lua file registers two functions: ``btnPress`` and ``rotaryEncoder``.
 
 .. code:: lua
 
@@ -83,16 +83,14 @@ This Lua file registers two functions: ``btnPress`` and ``changeMPDvolume``.
       print("Value of GPIO1: " .. val)
   end
 
-  function changeMPDvolume()
-      -- This example function can be used to change the MPD volume with a rotary encoder
-      -- Get value of the GPIOs
-      local _, clk, dt
-      _, clk = gpioGet(4)
-      _, dt = gpioGet(5)
-      -- Check rotation direction
-      if clk == dt then
-      mpc("volume 5")
-      else
-      mpc("volume -5")
-      end
+  -- Add this action to the CLX pin for the rising event
+  function rotaryEncoder()
+    -- Get value of the DT pin
+    local _, dt  = gpioGet(6)
+    -- Determine rotation direction
+    if dt == "active" then
+        print("counter-clockwise")
+    else
+        print("clockwise")
+    end
   end

@@ -140,7 +140,7 @@ Example configuration
   gpio_dir = /etc/mygpiod.d
 
   # File with user defined lua functions
-  #lua_file = 
+  #lua_file = /etc/mygpiod.lua
 
 
 GPIO configuration
@@ -287,3 +287,42 @@ GPIO configuration
     # Execute the Jukebox script through the myGPIOd API
     action_falling = gpioblink:6 1000 0
     action_falling = mympd:https://127.0.0.1 default Jukebox
+
+- Rotary Encoder configuration:
+
+  - Configure GPIO 5 as input and connect it to the CLX pin
+  - Configure GPIO 6 as input and connect it to the DT pin
+  - Disable internal resistors
+  - On rising event of GPIO 5 execute a Lua script that reads the value of GPIO 6
+
+  **/etc/mygpiod.d/5.in**
+
+  .. code:: ini
+
+    event_request = rising
+    bias = disable
+    debounce = 5000
+    action_rising = lua:rotaryEncoder
+
+  **/etc/mygpiod.d/5.in**
+
+  .. code:: ini
+
+    event_request = rising
+    bias = disable
+    debounce = 5000
+
+  **/etc/mygpiod.lua**
+
+  .. code:: lua
+
+    function rotaryEncoder()
+      -- Get value of the DT pin
+      local _, dt  = gpioGet(6)
+      -- Determine rotation direction
+      if dt == "active" then
+          print("counter-clockwise")
+      else
+          print("clockwise")
+      end
+    end
