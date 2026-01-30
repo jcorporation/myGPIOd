@@ -86,8 +86,9 @@ This Lua file registers two functions: ``btnPress`` and ``changeMPDvolume``.
   function changeMPDvolume()
       -- This example function can be used to change the MPD volume with a rotary encoder
       -- Get value of the GPIOs
-      local clk = gpioGet(4)
-      local dt = gpioGet(5)
+      local _, clk, dt
+      _, clk = gpioGet(4)
+      _, dt = gpioGet(5)
       -- Check rotation direction
       if clk == dt then
       mpc("volume 5")

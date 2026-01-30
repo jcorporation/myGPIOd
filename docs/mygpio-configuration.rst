@@ -169,10 +169,10 @@ GPIO configuration
     bias = pull-up
 
     # Short press does a poweroff
-    # The rising event is not triggered if GPIO 6 is pressed longer than 2000 ms.
+    # The rising event is not triggered if GPIO 3 is pressed longer than 2000 ms.
     action_rising = system:/usr/local/bin/poweroff.sh
 
-    # Reboot on long press and activate a LED for maximal 2s while GPIO 6 is pressed.
+    # Reboot on long press and activate a LED for maximal 2s while GPIO 3 is pressed.
 
     # Set GPIO 6 active on falling
     action_falling = gpioset:6 active
