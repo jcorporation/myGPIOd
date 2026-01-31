@@ -308,7 +308,7 @@ GPIO configuration
 
   .. code:: ini
 
-    event_request = rising
+    event_request = none
     bias = disable
     debounce = 5000
 

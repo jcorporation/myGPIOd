@@ -2,6 +2,7 @@
 # Copy it to <gpio number>.in
 
 # The events to request
+#event_request = none
 #event_request = both
 #event_request = falling
 #event_request = rising
