@@ -27,7 +27,6 @@
 #cmakedefine HAVE_IOCTL_WITH_INT_REQUEST
 
 // Default configuration
-#define CFG_CHIP "/dev/gpiochip0"
 #define CFG_LOGLEVEL LOG_NOTICE
 #define CFG_SYSLOG false
 #define CFG_GPIO_DIR "/etc/mygpiod.d"

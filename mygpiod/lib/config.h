@@ -98,6 +98,7 @@ struct t_config {
     #endif
 };
 
+void config_gpios_clear(struct t_config *config);
 void config_clear(struct t_config *config);
 struct t_config *get_config(sds config_file);
 

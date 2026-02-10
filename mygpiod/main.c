@@ -9,6 +9,7 @@
 
 #include "compile_time.h"
 #include "dist/sds/sds.h"
+#include "lib/list.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/chip.h"
 #include "mygpiod/gpio/input.h"
@@ -116,18 +117,18 @@ int main(int argc, char **argv) {
     update_pollfds = true;
 
     // open the chip, set output gpios and request input gpios
-    if (sdslen(config->chip_path) == 0) {
-        MYGPIOD_LOG_EMERG("No GPIO chip configured");
-        rc = EXIT_FAILURE;
-        goto out;
+    if (sdslen(config->chip_path) > 0) {
+        if (gpio_open_chip(config) == false ||
+            gpio_set_outputs(config) == false ||
+            gpio_request_inputs(config, &poll_fds) == false)
+        {
+            rc = EXIT_FAILURE;
+            goto out;
+        }
     }
-
-    if (gpio_open_chip(config) == false ||
-        gpio_set_outputs(config) == false ||
-        gpio_request_inputs(config, &poll_fds) == false)
-    {
-        rc = EXIT_FAILURE;
-        goto out;
+    else {
+        MYGPIOD_LOG_INFO("No GPIO chip configured");
+        config_gpios_clear(config);
     }
 
     // add signal fd
