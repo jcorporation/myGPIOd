@@ -481,6 +481,11 @@ create_gpio() {
   echo 1 > /sys/kernel/config/gpio-sim/basic/live
 }
 
+create_includes() {
+  awk '/^#define KEY/ && $2 !~ /_(MIN_INTERESTING|MAX|CNT|VERSION)/ && $3 ~ /[0-9]/ {print "{ "$3", \""$2"\"},"}' \
+    /usr/include/linux/input-event-codes.h > "$MYGPIOD_BUILDDIR/event_key_code_table.inc"
+}
+
 # Get action
 if [ -z "${1+x}" ]
 then
@@ -576,6 +581,9 @@ case "$ACTION" in
   gpiosim)
     create_gpio
     ;;
+  create_includes)
+    create_includes
+    ;;
   *)
     echo "Usage: $0 <option>"
     echo "Version: ${VERSION}"
@@ -626,6 +634,7 @@ case "$ACTION" in
     echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
     echo "  addmygpioduser:   adds mygpiod group and user"
     echo "  gpiosim:          creates a simulated gpio device with help of gpiosim"
+    echo "  create_includes:  create required dynamic includes"
     echo ""
     exit 1
   ;;

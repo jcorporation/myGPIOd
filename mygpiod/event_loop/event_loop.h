@@ -26,7 +26,8 @@ enum pfd_types {
     PFD_TYPE_CONNECT,
     PFD_TYPE_CLIENT,
     PFD_TYPE_CLIENT_TIMEOUT,
-    PFD_TYPE_HTTPD
+    PFD_TYPE_HTTPD,
+    PFD_TYPE_INPUT,
 };
 
 /**

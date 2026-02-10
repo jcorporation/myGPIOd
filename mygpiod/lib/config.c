@@ -43,6 +43,8 @@ static void gpio_in_data_clear(struct t_gpio_in_data *data);
 static void gpio_node_in_clear(struct t_list_node *node);
 static void gpio_out_data_clear(struct t_gpio_out_data *data);
 static void gpio_node_out_clear(struct t_list_node *node);
+static void input_data_clear(struct t_input_data *data);
+static void input_node_data_clear(struct t_list_node *node);
 
 //public functions
 
@@ -111,6 +113,7 @@ void config_clear(struct t_config *config) {
         MHD_stop_daemon(config->httpd);
         list_clear(&config->http_suspended, NULL);
     }
+    list_clear(&config->inputs, input_node_data_clear);
 }
 
 //private functions
@@ -144,6 +147,8 @@ static struct t_config *config_new(void) {
         config->lua_vm = NULL;
         config->lua_file = sdsempty();
     #endif
+
+    list_init(&config->inputs);
 
     config->http_ip = sdsnew(CFG_HTTP_IP);
     config->http_port = CFG_HTTP_PORT;
@@ -311,6 +316,14 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
             return true;
         }
         return false;
+    }
+    if (strcmp(key, "input") == 0) {
+        struct t_input_data *data = malloc_assert(sizeof(struct t_input_data));
+        data->fd = -1;
+        data->name = sdsdup(value);
+        list_push(&config->inputs, 0, data);
+        MYGPIOD_LOG_DEBUG("Adding input %s", value);
+        return true;
     }
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         if (strcmp(key, "lua_file") == 0) {
@@ -577,4 +590,22 @@ static void gpio_out_data_clear(struct t_gpio_out_data *data) {
 static void gpio_node_out_clear(struct t_list_node *node) {
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
     gpio_out_data_clear(data);
+}
+
+/**
+ * Frees pointers and closes file descriptors from this node.
+ * @param data input data to clear
+ */
+static void input_data_clear(struct t_input_data *data) {
+    close_fd(&data->fd);
+    sdsfree(data->name);
+}
+
+/**
+ * Frees pointers and closes file descriptors from this node.
+ * @param node input config node to clear
+ */
+static void input_node_data_clear(struct t_list_node *node) {
+    struct t_input_data *data = (struct t_input_data *)node->data;
+    input_data_clear(data);
 }

@@ -27,6 +27,9 @@ target_sources(mygpiod
     gpio/output.c
     gpio/timer.c
     gpio/util.c
+    input/input_event_code.c
+    input/input_event_type.c
+    input/input.c
     lib/action.c
     lib/config.c
     lib/events.c
@@ -49,6 +52,13 @@ target_sources(mygpiod
     server_socket/response.c
     server_socket/socket.c
 )
+
+set(ENV{MYGPIOD_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")
+
+execute_process(COMMAND "${PROJECT_SOURCE_DIR}/build.sh" create_includes RESULT_VARIABLE RC_CREATE_INCLUDES)
+if(RC_CREATE_INCLUDES GREATER 0)
+  message(FATAL_ERROR "Creating includes failed")
+endif()
 
 if (MYGPIOD_DEBUG)
   target_sources(mygpiod

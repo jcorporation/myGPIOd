@@ -9,6 +9,7 @@
 
 #include "mygpiod/gpio/event.h"
 #include "mygpiod/gpio/timer.h"
+#include "mygpiod/input/input.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
@@ -47,6 +48,8 @@ const char *lookup_pfd_type(enum pfd_types type) {
             return "timeout";
         case PFD_TYPE_HTTPD:
             return "httpd";
+        case PFD_TYPE_INPUT:
+            return "input";
     }
     return "unknown";
 }
@@ -172,6 +175,9 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
                     return true;
                 case PFD_TYPE_HTTPD:
                     // MHD is called in each poll loop iteration, no need to do it here explicitly
+                    return true;
+                case PFD_TYPE_INPUT:
+                    input_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
             }
         }

@@ -9,6 +9,7 @@
 
 #include "compile_time.h"
 #include "dist/sds/sds.h"
+#include "input/input.h"
 #include "lib/list.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/chip.h"
@@ -130,6 +131,9 @@ int main(int argc, char **argv) {
         MYGPIOD_LOG_INFO("No GPIO chip configured");
         config_gpios_clear(config);
     }
+
+    // add input fds
+    inputs_open(config, &poll_fds);
 
     // add signal fd
     event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL, POLLIN | POLLPRI);

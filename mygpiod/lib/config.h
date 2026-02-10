@@ -58,17 +58,21 @@ struct t_gpio_out_data {
 };
 
 /**
+ * Config data for inputs
+ */
+struct t_input_data {
+    sds name;  //!< Device name /dev/input/...
+    int fd;    //!< File descriptor
+};
+
+/**
  * Central myGPIOd config and state
  */
 struct t_config {
     // Configuration
-    struct t_list gpios_in;               //!< holds the list of GPIOs to monitor
-    struct t_list gpios_out;              //!< holds the list of GPIOs to set
-    sds chip_path;                        //!< path of the gpio chip device
     int loglevel;                         //!< the loglevel
     bool syslog;                          //!< enable syslog?
     int signal_fd;                        //!< file descriptor for the signal handler
-    sds dir_gpio;                         //!< directory for the gpio config files
 
     // Socket Server
     sds socket_path;                      //!< server socket filepath
@@ -81,10 +85,17 @@ struct t_config {
     sds http_ip;                          //!< HTTPD listening ip
     unsigned http_port;                   //!< HTTPD listening port
     struct t_list http_suspended;         //!< List of suspended HTTP connections
-    unsigned http_conn_id;           //!< Uniq HTTP connection id
+    unsigned http_conn_id;                //!< Uniq HTTP connection id
 
-    // GPIOd
+    // GPIO
+    sds dir_gpio;                         //!< directory for the gpio config files
+    struct t_list gpios_in;               //!< holds the list of GPIOs to monitor
+    struct t_list gpios_out;              //!< holds the list of GPIOs to set
+    sds chip_path;                        //!< path of the gpio chip device
     struct gpiod_chip *chip;              //!< gpiod chip object
+
+    // input events
+    struct t_list inputs;                 //!< list of /dev/input/* devices
 
     // MPD
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
