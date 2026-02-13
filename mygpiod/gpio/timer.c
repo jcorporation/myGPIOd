@@ -42,7 +42,7 @@ bool gpio_in_timer_handle_event(struct t_config *config, int *fd) {
     }
     MYGPIOD_LOG_INFO("Long press event for gpio \"%u\"", node->id);
     struct t_gpio_in_data *data = (struct t_gpio_in_data *)node->data;
-    action_execute_delayed(node->id, data, config);
+    gpio_action_execute_delayed(node->id, data, config);
     return true;
 }
 

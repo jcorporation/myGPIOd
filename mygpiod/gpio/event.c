@@ -49,8 +49,8 @@ bool gpio_handle_event(struct t_config *config, int *fd) {
             MYGPIOD_LOG_ERROR("Unable to retrieve event from buffer");
             continue;
         }
-        action_delay_abort(data);
-        action_handle(config, node->id, gpiod_edge_event_get_timestamp_ns(event),
+        gpio_action_delay_abort(data);
+        gpio_action_handle(config, node->id, gpiod_edge_event_get_timestamp_ns(event),
             gpiod_edge_event_get_event_type(event), data);
     }
     return true;

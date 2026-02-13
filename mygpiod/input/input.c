@@ -7,8 +7,9 @@
 #include "compile_time.h"
 #include "mygpiod/input/input.h"
 
-#include "mygpiod/input/input_event_code.h"
+#include "mygpiod/input/action.c"
 #include "mygpiod/input/input_event_type.h"
+#include "mygpiod/input/util.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
@@ -80,16 +81,7 @@ bool input_handle_event(struct t_config *config, int *fd) {
         case EV_REL:
         case EV_ABS:
         case EV_SW:
-            MYGPIOD_LOG_INFO("%s: time=%ld.%06lu type=%s (%hu) code=%s (%hu) value=%u",
-                data->name,
-                input_data.time.tv_sec,
-                input_data.time.tv_usec,
-                input_event_type_name(input_data.type),
-                input_data.type,
-                input_event_code_name(input_data.type, input_data.code),
-                input_data.code,
-                input_data.value
-            );
+            input_action_handle(config, data->name, &input_data);
             break;
         default:
             MYGPIOD_LOG_DEBUG("%s: Ignoring event type %s (%hu) with code=%hu value=%u",

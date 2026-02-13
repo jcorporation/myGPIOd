@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 // private definitions
-static void action_delay(struct t_gpio_in_data *data);
+static void gpio_action_delay(struct t_gpio_in_data *data);
 
 // public functions
 
@@ -35,7 +35,7 @@ static void action_delay(struct t_gpio_in_data *data);
  * @param event_type the event type
  * @param data gpio config data
  */
-void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns,
+void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns,
         enum gpiod_edge_event_type event_type, struct t_gpio_in_data *data)
 {
     if (data->ignore_event == true) {
@@ -64,7 +64,7 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns
             data->long_press_timeout_ms > 0)
         {
             data->long_press_value = gpio_get_value(config, gpio);
-            action_delay(data);
+            gpio_action_delay(data);
         }
     }
     else {
@@ -80,7 +80,7 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns
             data->long_press_timeout_ms > 0)
         {
             data->long_press_value = gpio_get_value(config, gpio);
-            action_delay(data);
+            gpio_action_delay(data);
         }
     }
 }
@@ -92,7 +92,7 @@ void action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns
  * @param data gpio config data
  * @param config config
  */
-void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t_config *config) {
+void gpio_action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t_config *config) {
     // check if gpio value has not changed
     if (gpio_get_value(config, gpio) == data->long_press_value) {
         uint64_t timestamp_ns = get_timestamp_ns(data->event_clock);
@@ -110,14 +110,14 @@ void action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, struct t
         }
     }
     // remove timerfd
-    action_delay_abort(data);
+    gpio_action_delay_abort(data);
 }
 
 /**
  * Closes a timerfd for a delayed action
  * @param node pointer to node
  */
-void action_delay_abort(struct t_gpio_in_data *data) {
+void gpio_action_delay_abort(struct t_gpio_in_data *data) {
     MYGPIOD_LOG_DEBUG("Removing action delay timer");
     close_fd(&data->timer_fd);
 }
@@ -129,9 +129,9 @@ void action_delay_abort(struct t_gpio_in_data *data) {
  * @param node gpio config data
  * @param event_type the event type
  */
-static void action_delay(struct t_gpio_in_data *data) {
+static void gpio_action_delay(struct t_gpio_in_data *data) {
     if (data->timer_fd > -1) {
-        action_delay_abort(data);
+        gpio_action_delay_abort(data);
     }
     data->timer_fd = timer_new(data->long_press_timeout_ms, data->long_press_interval_ms);
 }
