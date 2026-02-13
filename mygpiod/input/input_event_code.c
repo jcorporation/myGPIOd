@@ -20,10 +20,34 @@ struct t_input_event_code_name {
 };
 
 /**
- * Maps input event key codes to names
+ * Maps input event key/btn codes to names
  */
 static const struct t_input_event_code_name input_event_key_code_names[] = {
     #include "mygpiod/event_key_code_table.inc"
+    { KEY_MAX, NULL }
+};
+
+/**
+ * Maps input event rel codes to names
+ */
+static const struct t_input_event_code_name input_event_rel_code_names[] = {
+    #include "mygpiod/event_rel_code_table.inc"
+    { KEY_MAX, NULL }
+};
+
+/**
+ * Maps input event abs codes to names
+ */
+static const struct t_input_event_code_name input_event_abs_code_names[] = {
+    #include "mygpiod/event_abs_code_table.inc"
+    { KEY_MAX, NULL }
+};
+
+/**
+ * Maps input event sw codes to names
+ */
+static const struct t_input_event_code_name input_event_sw_code_names[] = {
+    #include "mygpiod/event_sw_code_table.inc"
     { KEY_MAX, NULL }
 };
 
@@ -32,14 +56,39 @@ static const struct t_input_event_code_name input_event_key_code_names[] = {
  * @param event_type Input event code
  * @return const char* Name of input event code
  */
-const char *input_event_key_code_name(unsigned short event_code) {
+const char *input_event_code_name(unsigned short event_type, unsigned short event_code) {
     const struct t_input_event_code_name *p = NULL;
-    for (p = input_event_key_code_names; p->name != NULL; p++) {
-        if (p->event_code == event_code) {
+    switch (event_type) {
+        case EV_KEY:
+            for (p = input_event_key_code_names; p->name != NULL; p++) {
+                if (p->event_code == event_code) {
+                    return p->name;
+                }
+            }
             break;
-        }
+        case EV_REL:
+            for (p = input_event_rel_code_names; p->name != NULL; p++) {
+                if (p->event_code == event_code) {
+                    return p->name;
+                }
+            }
+            break;
+        case EV_ABS:
+            for (p = input_event_abs_code_names; p->name != NULL; p++) {
+                if (p->event_code == event_code) {
+                    return p->name;
+                }
+            }
+            break;
+        case EV_SW:
+            for (p = input_event_sw_code_names; p->name != NULL; p++) {
+                if (p->event_code == event_code) {
+                    return p->name;
+                }
+            }
+            break;
     }
-    return p->name;
+    return NULL;
 }
 
 /**
@@ -47,9 +96,24 @@ const char *input_event_key_code_name(unsigned short event_code) {
  * @param name String to parse
  * @return unsigned short or KEY_MAX if it can not be parsed
  */
-unsigned short input_event_key_code_parse(const char *name) {
+unsigned short input_event_code_parse(const char *name) {
     const struct t_input_event_code_name *p = NULL;
     for (p = input_event_key_code_names; p->name != NULL; p++) {
+        if (strcasecmp(name, p->name) == 0) {
+            break;
+        }
+    }
+    for (p = input_event_rel_code_names; p->name != NULL; p++) {
+        if (strcasecmp(name, p->name) == 0) {
+            break;
+        }
+    }
+    for (p = input_event_abs_code_names; p->name != NULL; p++) {
+        if (strcasecmp(name, p->name) == 0) {
+            break;
+        }
+    }
+    for (p = input_event_sw_code_names; p->name != NULL; p++) {
         if (strcasecmp(name, p->name) == 0) {
             break;
         }

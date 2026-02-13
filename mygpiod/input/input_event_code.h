@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_INPUT_EVENT_CODE_H
 #define MYGPIOD_INPUT_EVENT_CODE_H
 
-const char *input_event_key_code_name(unsigned short event_code);
+const char *input_event_code_name(unsigned short event_type, unsigned short event_code);
 unsigned short input_event_code_parse(const char *name);
 
 #endif

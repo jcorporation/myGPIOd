@@ -75,26 +75,30 @@ bool input_handle_event(struct t_config *config, int *fd) {
         MYGPIOD_LOG_ERRNO(errno);
         return false;
     }
-    if (input_data.type == EV_KEY) {
-        MYGPIOD_LOG_INFO("%s: time=%ld.%06lu type=%s (%hu) code=%s (%hu) value=%u",
-            data->name,
-            input_data.time.tv_sec,
-            input_data.time.tv_usec,
-            input_event_type_name(input_data.type),
-            input_data.type,
-            input_event_key_code_name(input_data.code),
-            input_data.code,
-            input_data.value
-        );
-    }
-    else {
-        MYGPIOD_LOG_DEBUG("%s: Ignoring event type %s (%hu) with code=%hu value=%u",
-            data->name,
-            input_event_type_name(input_data.type),
-            input_data.type,
-            input_data.code,
-            input_data.value
-        );
+    switch (input_data.type) {
+        case EV_KEY:
+        case EV_REL:
+        case EV_ABS:
+        case EV_SW:
+            MYGPIOD_LOG_INFO("%s: time=%ld.%06lu type=%s (%hu) code=%s (%hu) value=%u",
+                data->name,
+                input_data.time.tv_sec,
+                input_data.time.tv_usec,
+                input_event_type_name(input_data.type),
+                input_data.type,
+                input_event_code_name(input_data.type, input_data.code),
+                input_data.code,
+                input_data.value
+            );
+            break;
+        default:
+            MYGPIOD_LOG_DEBUG("%s: Ignoring event type %s (%hu) with code=%hu value=%u",
+                data->name,
+                input_event_type_name(input_data.type),
+                input_data.type,
+                input_data.code,
+                input_data.value
+            );
     }
     return true;
 }

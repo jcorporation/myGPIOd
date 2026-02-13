@@ -482,8 +482,17 @@ create_gpio() {
 }
 
 create_includes() {
-  awk '/^#define KEY/ && $2 !~ /_(MIN_INTERESTING|MAX|CNT|VERSION)/ && $3 ~ /[0-9]/ {print "{ "$3", \""$2"\"},"}' \
+  awk '/^#define (KEY_|BTN_)/ && $2 !~ /_(MIN_INTERESTING|MAX|CNT|VERSION)/ && $3 ~ /[0-9]/ {print "{ "$3", \""$2"\"},"}' \
     /usr/include/linux/input-event-codes.h > "$MYGPIOD_BUILDDIR/event_key_code_table.inc"
+
+  awk '/^#define REL_/ && $2 !~ /_(MIN_INTERESTING|MAX|CNT|VERSION)/ && $3 ~ /[0-9]/ {print "{ "$3", \""$2"\"},"}' \
+    /usr/include/linux/input-event-codes.h > "$MYGPIOD_BUILDDIR/event_rel_code_table.inc"
+  
+  awk '/^#define ABS_/ && $2 !~ /_(MIN_INTERESTING|MAX|CNT|VERSION)/ && $3 ~ /[0-9]/ {print "{ "$3", \""$2"\"},"}' \
+    /usr/include/linux/input-event-codes.h > "$MYGPIOD_BUILDDIR/event_abs_code_table.inc"
+  
+  awk '/^#define SW_/ && $2 !~ /_(MIN_INTERESTING|MAX|CNT|VERSION)/ && $3 ~ /[0-9]/ {print "{ "$3", \""$2"\"},"}' \
+    /usr/include/linux/input-event-codes.h > "$MYGPIOD_BUILDDIR/event_sw_code_table.inc"
 }
 
 # Get action
