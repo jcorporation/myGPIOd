@@ -9,6 +9,7 @@
 
 #include "libmygpio/include/libmygpio/libmygpio.h"
 
+#include "libmygpio/include/libmygpio/libmygpio_idle.h"
 #include "mygpio-common/util.h"
 #include "mygpioc/util.h"
 
@@ -41,11 +42,21 @@ int handle_idle(int argc, char **argv, int option_index, struct t_mygpio_connect
         verbose_printf("Events waiting");
         struct t_mygpio_idle_event *event;
         while ((event = mygpio_recv_idle_event(conn)) != NULL) {
-            printf("GPIO %u, event %s, timestamp %llu ms\n",
-                mygpio_idle_event_get_gpio(event),
-                mygpio_idle_event_get_event_name(event),
-                (unsigned long long)mygpio_idle_event_get_timestamp_ms(event)
-            );
+            if (mygpio_idle_event_get_event(event) == MYGPIO_EVENT_INPUT) {
+                printf("Device %s, type %s, code %s, timestamp %llu ms\n",
+                    mygpio_idle_event_get_input_device(event),
+                    mygpio_idle_event_get_input_type(event),
+                    mygpio_idle_event_get_input_code(event),
+                    (unsigned long long)mygpio_idle_event_get_timestamp_ms(event)
+                );
+            }
+            else {
+                printf("GPIO %u, event %s, timestamp %llu ms\n",
+                    mygpio_idle_event_get_gpio(event),
+                    mygpio_idle_event_get_event_name(event),
+                    (unsigned long long)mygpio_idle_event_get_timestamp_ms(event)
+                );
+            }
             mygpio_free_idle_event(event);
         }
         mygpio_response_end(conn);

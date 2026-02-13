@@ -13,7 +13,7 @@ libmygpio_idle_event \- Idle events
 
 .in +1c
 .ti -1c
-.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_FALLING\fP, \fBMYGPIO_EVENT_RISING\fP, \fBMYGPIO_EVENT_LONG_PRESS\fP, \fBMYGPIO_EVENT_LONG_PRESS_RELEASE\fP }"
+.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_GPIO_FALLING\fP, \fBMYGPIO_EVENT_GPIO_RISING\fP, \fBMYGPIO_EVENT_GPIO_LONG_PRESS\fP, \fBMYGPIO_EVENT_GPIO_LONG_PRESS_RELEASE\fP, \fBMYGPIO_EVENT_INPUT\fP }"
 .br
 .in -1c
 .SS "Functions"
@@ -50,6 +50,18 @@ libmygpio_idle_event \- Idle events
 .RI "uint64_t \fBmygpio_idle_event_get_timestamp_ms\fP (struct \fBt_mygpio_idle_event\fP *event)"
 .br
 .ti -1c
+.RI "const char * \fBmygpio_idle_event_get_input_device\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_idle_event_get_input_type\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_idle_event_get_input_code\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "unsigned \fBmygpio_idle_event_get_input_value\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
 .RI "void \fBmygpio_free_idle_event\fP (struct \fBt_mygpio_idle_event\fP *event)"
 .br
 .in -1c
@@ -69,17 +81,20 @@ Possible event types
 \f(BIMYGPIO_EVENT_UNKNOWN \fP
 unknown 
 .TP
-\f(BIMYGPIO_EVENT_FALLING \fP
-falling 
+\f(BIMYGPIO_EVENT_GPIO_FALLING \fP
+GPIO falling\&. 
 .TP
-\f(BIMYGPIO_EVENT_RISING \fP
-rising 
+\f(BIMYGPIO_EVENT_GPIO_RISING \fP
+GPIO rising\&. 
 .TP
-\f(BIMYGPIO_EVENT_LONG_PRESS \fP
-long_press 
+\f(BIMYGPIO_EVENT_GPIO_LONG_PRESS \fP
+GPIO long_press\&. 
 .TP
-\f(BIMYGPIO_EVENT_LONG_PRESS_RELEASE \fP
-long_press release 
+\f(BIMYGPIO_EVENT_GPIO_LONG_PRESS_RELEASE \fP
+GPIO long_press release\&. 
+.TP
+\f(BIMYGPIO_EVENT_INPUT \fP
+Input event\&. 
 .SH "Function Documentation"
 .PP 
 .SS "void mygpio_free_idle_event (struct \fBt_mygpio_idle_event\fP * event)"
@@ -130,6 +145,62 @@ Returns the GPIO number from an idle event\&.
 \fBReturns\fP
 .RS 4
 GPIO number\&. 
+.RE
+.PP
+
+.SS "const char * mygpio_idle_event_get_input_code (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the input event code 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+char * or NULL if not an input event 
+.RE
+.PP
+
+.SS "const char * mygpio_idle_event_get_input_device (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the input event device 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+char * or NULL if not an input event 
+.RE
+.PP
+
+.SS "const char * mygpio_idle_event_get_input_type (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the input event type 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+char * or NULL if not an input event 
+.RE
+.PP
+
+.SS "unsigned mygpio_idle_event_get_input_value (struct \fBt_mygpio_idle_event\fP * event)"
+Returns the input event value 
+.PP
+\fBParameters\fP
+.RS 4
+\fIevent\fP Pointer to struct \fBt_mygpio_idle_event\fP\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+char * or NULL if not an input event 
 .RE
 .PP
 

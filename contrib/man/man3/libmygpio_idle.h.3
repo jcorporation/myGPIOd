@@ -16,7 +16,7 @@ libmygpio/include/libmygpio/libmygpio_idle.h \- myGPIOd client library
 
 .in +1c
 .ti -1c
-.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_FALLING\fP, \fBMYGPIO_EVENT_RISING\fP, \fBMYGPIO_EVENT_LONG_PRESS\fP, \fBMYGPIO_EVENT_LONG_PRESS_RELEASE\fP }"
+.RI "enum \fBmygpio_event\fP { \fBMYGPIO_EVENT_UNKNOWN\fP = -1, \fBMYGPIO_EVENT_GPIO_FALLING\fP, \fBMYGPIO_EVENT_GPIO_RISING\fP, \fBMYGPIO_EVENT_GPIO_LONG_PRESS\fP, \fBMYGPIO_EVENT_GPIO_LONG_PRESS_RELEASE\fP, \fBMYGPIO_EVENT_INPUT\fP }"
 .br
 .in -1c
 .SS "Functions"
@@ -51,6 +51,18 @@ libmygpio/include/libmygpio/libmygpio_idle.h \- myGPIOd client library
 .br
 .ti -1c
 .RI "uint64_t \fBmygpio_idle_event_get_timestamp_ms\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_idle_event_get_input_device\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_idle_event_get_input_type\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "const char * \fBmygpio_idle_event_get_input_code\fP (struct \fBt_mygpio_idle_event\fP *event)"
+.br
+.ti -1c
+.RI "unsigned \fBmygpio_idle_event_get_input_value\fP (struct \fBt_mygpio_idle_event\fP *event)"
 .br
 .ti -1c
 .RI "void \fBmygpio_free_idle_event\fP (struct \fBt_mygpio_idle_event\fP *event)"

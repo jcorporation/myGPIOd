@@ -115,15 +115,15 @@ void event_data_clear(struct t_list_node *node) {
 const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
     switch(event_type) {
         case MYGPIOD_EVENT_GPIO_FALLING:
-            return "falling";
+            return "gpio_falling";
         case MYGPIOD_EVENT_GPIO_RISING:
-            return "rising";
+            return "gpio_rising";
         case MYGPIOD_EVENT_GPIO_LONG_PRESS:
-            return "long_press";
+            return "gpio_long_press";
         case MYGPIOD_EVENT_GPIO_LONG_PRESS_RELEASE:
-            return "long_press_release";
+            return "gpio_long_press_release";
         case MYGPIOD_EVENT_INPUT:
-            return "input";
+            return "gpio_input";
     }
     return "";
 }

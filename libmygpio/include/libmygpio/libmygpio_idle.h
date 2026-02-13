@@ -44,10 +44,11 @@ struct t_mygpio_idle_event;
  */
 enum mygpio_event {
     MYGPIO_EVENT_UNKNOWN = -1,       //!< unknown
-    MYGPIO_EVENT_FALLING,            //!< falling
-    MYGPIO_EVENT_RISING,             //!< rising
-    MYGPIO_EVENT_LONG_PRESS,         //!< long_press
-    MYGPIO_EVENT_LONG_PRESS_RELEASE  //!< long_press release
+    MYGPIO_EVENT_GPIO_FALLING,            //!< GPIO falling
+    MYGPIO_EVENT_GPIO_RISING,             //!< GPIO rising
+    MYGPIO_EVENT_GPIO_LONG_PRESS,         //!< GPIO long_press
+    MYGPIO_EVENT_GPIO_LONG_PRESS_RELEASE, //!< GPIO long_press release
+    MYGPIO_EVENT_INPUT,              //!< Input event
 };
 
 /**
@@ -126,6 +127,34 @@ const char *mygpio_idle_event_get_event_name(struct t_mygpio_idle_event *event);
  * @return The timestamp in milliseconds.
  */
 uint64_t mygpio_idle_event_get_timestamp_ms(struct t_mygpio_idle_event *event);
+
+/**
+ * Returns the input event device
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return char * or NULL if not an input event
+ */
+const char *mygpio_idle_event_get_input_device(struct t_mygpio_idle_event *event);
+
+/**
+ * Returns the input event type
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return char * or NULL if not an input event
+ */
+const char *mygpio_idle_event_get_input_type(struct t_mygpio_idle_event *event);
+
+/**
+ * Returns the input event code
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return char * or NULL if not an input event
+ */
+const char *mygpio_idle_event_get_input_code(struct t_mygpio_idle_event *event);
+
+/**
+ * Returns the input event value
+ * @param event Pointer to struct t_mygpio_idle_event.
+ * @return char * or NULL if not an input event
+ */
+unsigned mygpio_idle_event_get_input_value(struct t_mygpio_idle_event *event);
 
 /**
  * Frees the struct received by mygpio_recv_idle_event

@@ -68,6 +68,7 @@ bool send_idle_events(struct t_list_node *client_node, bool send_ok) {
     while (current != NULL) {
         struct t_event_data *event_data = (struct t_event_data *)current->data;
         server_response_append(client_data, "event:%s", mygpiod_event_name(event_data->mygpiod_event_type));
+        server_response_append(client_data, "timestamp_ms:%llu", (long long unsigned)(event_data->timestamp_ns / 1000000));
         if (event_data->mygpiod_event_type == MYGPIOD_EVENT_INPUT) {
             server_response_append(client_data, "device:%s", event_data->input_event_device);
             server_response_append(client_data, "type:%s", input_event_type_name(event_data->input_event_type));
@@ -77,7 +78,6 @@ bool send_idle_events(struct t_list_node *client_node, bool send_ok) {
         else {
             server_response_append(client_data, "gpio:%u", current->id);
         }
-        server_response_append(client_data, "timestamp_ms:%llu", (long long unsigned)(event_data->timestamp_ns / 1000000));
         current = current -> next;
     }
     list_clear(&client_data->waiting_events, event_data_clear);
