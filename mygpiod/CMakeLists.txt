@@ -15,6 +15,7 @@ target_include_directories(mygpiod
 target_sources(mygpiod
   PRIVATE
     main.c
+    actions/execute.c
     actions/gpio.c
     actions/system.c
     event_loop/event_loop.c
