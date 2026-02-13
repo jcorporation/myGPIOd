@@ -7,8 +7,9 @@
 #include "compile_time.h"
 #include "mygpiod/input/action.h"
 
-#include "mygpiod/input/input_event_code.h"
-#include "mygpiod/input/input_event_type.h"
+#include "mygpiod/input/event_code.h"
+#include "mygpiod/input/event_type.h"
+#include "mygpiod/lib/events.h"
 #include "mygpiod/lib/log.h"
 
 /**
@@ -29,8 +30,10 @@ void input_action_handle(struct t_config *config, const char *device, struct t_i
         input_data->value
     );
     (void) config;
+    // Check if we subscribed to this event
+    
+    event_enqueue_input(config, device, input_data);
     /*
-    event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS_RELEASE, timestamp_ns);
     action_execute(config, &data->long_press_release_action);
     */
 }

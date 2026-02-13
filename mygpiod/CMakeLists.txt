@@ -28,8 +28,8 @@ target_sources(mygpiod
     gpio/output.c
     gpio/timer.c
     gpio/util.c
-    input/input_event_code.c
-    input/input_event_type.c
+    input/event_code.c
+    input/event_type.c
     input/input.c
     lib/action.c
     lib/config.c

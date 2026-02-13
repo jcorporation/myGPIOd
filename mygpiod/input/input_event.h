@@ -4,14 +4,15 @@
  https://github.com/jcorporation/mympd
 */
 
-#ifndef MYGPIOD_INPUT_UTIL_H
-#define MYGPIOD_INPUT_UTIL_H
+#ifndef MYGPIOD_INPUT_EVENT_H
+#define MYGPIOD_INPUT_EVENT_H
 
-#include <time.h>
+#include <sys/time.h>
 
 /**
  * Input struct
  * https://www.kernel.org/doc/Documentation/input/input.txt
+ * https://www.kernel.org/doc/html/latest/input/event-codes.html
  */
 struct t_input_event {
     struct timeval time;  //!< timestamp, it returns the time at which the event happened.

@@ -8,6 +8,7 @@
 #define MYGPIOD_SERVER_HTTPD_UTIL_H
 
 #include "dist/sds/sds.h"
+#include "mygpiod/input/input_event.h"
 #include "mygpiod/lib/event_types.h"
 
 #include <inttypes.h>
@@ -40,11 +41,16 @@ enum MHD_Result http_respond(struct MHD_Connection *connection,
 enum http_method http_parse_method(const char *method);
 const char *http_lookup_method(enum http_method method);
 
-void http_connection_resume(struct t_request_data *request_data,
-                            unsigned gpio,
-                            enum mygpiod_event_types event_type,
-                            uint64_t timestamp);
- void http_connection_done(void *cls,
+void http_connection_resume_gpio(struct t_request_data *request_data,
+                                 unsigned gpio,
+                                 enum mygpiod_event_types event_type,
+                                 uint64_t timestamp);
+
+void http_connection_resume_input(struct t_request_data *request_data,
+                                  const char *device,
+                                  struct t_input_event *input_data);
+
+void http_connection_done(void *cls,
                            struct MHD_Connection *connection,
                            void **req_cls,
                            enum MHD_RequestTerminationCode toe);

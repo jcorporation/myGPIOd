@@ -43,7 +43,7 @@ void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timesta
         // long_press event has fired for this gpio
         MYGPIOD_LOG_INFO("Event: \"long_press_release\" gpio: \"%u\" timestamp: \"%llu ns\"",
             gpio, (long long unsigned)timestamp_ns);
-        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS_RELEASE, timestamp_ns);
+        event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_LONG_PRESS_RELEASE, timestamp_ns);
         action_execute(config, &data->long_press_release_action);
         return;
     }
@@ -52,7 +52,7 @@ void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timesta
         lookup_event_type(event_type), gpio, (long long unsigned)timestamp_ns);
 
     if (event_type == GPIOD_EDGE_EVENT_FALLING_EDGE) {
-        event_enqueue(config, gpio, MYGPIOD_EVENT_FALLING, timestamp_ns);
+        event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_FALLING, timestamp_ns);
         if (data->action_falling.length > 0) {
             action_execute(config, &data->action_falling);
         }
@@ -68,7 +68,7 @@ void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timesta
         }
     }
     else {
-        event_enqueue(config, gpio, MYGPIOD_EVENT_RISING, timestamp_ns);
+        event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_RISING, timestamp_ns);
         if (data->action_rising.length > 0) {
             action_execute(config, &data->action_rising);
         }
@@ -98,7 +98,7 @@ void gpio_action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, str
         uint64_t timestamp_ns = get_timestamp_ns(data->event_clock);
         MYGPIOD_LOG_INFO("Event: \"long_press\" gpio: \"%u\" timestamp: \"%llu ns\"",
             gpio, (long long unsigned)timestamp_ns);
-        event_enqueue(config, gpio, MYGPIOD_EVENT_LONG_PRESS, timestamp_ns);
+        event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_LONG_PRESS, timestamp_ns);
         action_execute(config, &data->long_press_action);
         if (data->event_request == GPIOD_LINE_EDGE_BOTH) {
             // ignore the release event

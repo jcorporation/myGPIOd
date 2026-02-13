@@ -5,7 +5,7 @@
 */
 
 #include "compile_time.h"
-#include "mygpiod/input/input_event_type.h"
+#include "mygpiod/input/event_type.h"
 
 #include <linux/input-event-codes.h>
 #include <stddef.h>

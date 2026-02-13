@@ -8,8 +8,7 @@
 #include "mygpiod/input/input.h"
 
 #include "mygpiod/input/action.c"
-#include "mygpiod/input/input_event_type.h"
-#include "mygpiod/input/util.h"
+#include "mygpiod/input/event_type.h"
 #include "mygpiod/lib/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"

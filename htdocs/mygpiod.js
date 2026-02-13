@@ -26,6 +26,13 @@ function setError(msg) {
     document.getElementById('lastError').textContent = msg;
 }
 
+// Create a table cell with content
+function createTd(content) {
+    const td= document.createElement('td');
+    td.textContent = content;
+    return td;
+}
+
 // Executes the update GPIO action.
 function updateGPIOstate(event) {
     const target = event.target;
@@ -85,12 +92,8 @@ function infoGPIO(event) {
         const keys = Object.keys(data.data);
         for (const key of keys) {
             const tr = document.createElement('tr');
-            const td1 = document.createElement('td');
-            td1.textContent = key;
-            tr.appendChild(td1);
-            const td2 = document.createElement('td');
-            td2.textContent = data.data[key];
-            tr.appendChild(td2);
+            tr.appendChild(createTd(key));
+            tr.appendChild(createTd(data.data[key]));
             gpioInfoEl.appendChild(tr);
         }
         modalGPIOinfoInit.show();
@@ -220,15 +223,18 @@ async function pollEvents() {
     }
 
     const tr = document.createElement('tr');
-    const tdGPIO = document.createElement('td');
-    tdGPIO.textContent = data.gpio;
-    const tdEvent = document.createElement('td');
-    tdEvent.textContent = data.event;
-    const tdTimestamp = document.createElement('td');
-    tdTimestamp.textContent = data.timestamp_ms;
-    tr.appendChild(tdGPIO);
-    tr.appendChild(tdEvent);
-    tr.appendChild(tdTimestamp);
+    if (data.event === 'input') {
+        tr.appendChild(createTd(data.device));
+        tr.appendChild(createTd(data.timestamp_ms));
+        tr.appendChild(createTd(
+            'Type: ' + data.type + ', Code: ' + data.code + ', Value: ' + data.value
+        ));
+    }
+    else {
+        tr.appendChild(createTd('GPIO' + data.gpio));
+        tr.appendChild(createTd(data.timestamp_ms));
+        tr.appendChild(createTd(data.event));
+    }
     const eventsEl = document.getElementById('events');
     eventsEl.prepend(tr);
     // enforce event list size

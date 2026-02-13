@@ -7,6 +7,9 @@
 #include "compile_time.h"
 #include "mygpiod/server_socket/idle.h"
 
+#include "input/event_code.h"
+#include "input/event_type.h"
+#include "lib/event_types.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/server_socket/response.h"
@@ -64,9 +67,17 @@ bool send_idle_events(struct t_list_node *client_node, bool send_ok) {
     struct t_list_node *current = client_data->waiting_events.head;
     while (current != NULL) {
         struct t_event_data *event_data = (struct t_event_data *)current->data;
-        server_response_append(client_data, "gpio:%u", current->id);
         server_response_append(client_data, "event:%s", mygpiod_event_name(event_data->mygpiod_event_type));
-        server_response_append(client_data, "timestamp_ms:%llu", (long long unsigned)(event_data->timestamp / 1000000));
+        if (event_data->mygpiod_event_type == MYGPIOD_EVENT_INPUT) {
+            server_response_append(client_data, "device:%s", event_data->input_event_device);
+            server_response_append(client_data, "type:%s", input_event_type_name(event_data->input_event_type));
+            server_response_append(client_data, "code:%s", input_event_code_name(event_data->input_event_type, event_data->input_event_code));
+            server_response_append(client_data, "value:%u", event_data->input_event_value);
+        }
+        else {
+            server_response_append(client_data, "gpio:%u", current->id);
+        }
+        server_response_append(client_data, "timestamp_ms:%llu", (long long unsigned)(event_data->timestamp_ns / 1000000));
         current = current -> next;
     }
     list_clear(&client_data->waiting_events, event_data_clear);

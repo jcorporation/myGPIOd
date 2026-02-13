@@ -146,10 +146,10 @@ bool gpio_set_value_by_line_request(struct t_config *config, struct gpiod_line_r
     int rc = gpiod_line_request_set_value(line_request, gpio, value);
     if (rc == 0) {
         enum mygpiod_event_types event = value == GPIOD_LINE_VALUE_ACTIVE
-            ? MYGPIOD_EVENT_RISING
-            : MYGPIOD_EVENT_FALLING;
+            ? MYGPIOD_EVENT_GPIO_RISING
+            : MYGPIOD_EVENT_GPIO_FALLING;
         uint64_t timestamp_ns = get_timestamp_ns(GPIOD_LINE_CLOCK_REALTIME);
-        event_enqueue(config, gpio, event, timestamp_ns);
+        event_enqueue_gpio(config, gpio, event, timestamp_ns);
         return true;
     }
     return false;

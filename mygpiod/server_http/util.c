@@ -8,6 +8,8 @@
 #include "mygpiod/server_http/util.h"
 
 #include "dist/sds/sds.h"
+#include "input/event_code.h"
+#include "input/event_type.h"
 #include "mygpiod/lib/events.h"
 
 #include <stdlib.h>
@@ -75,21 +77,58 @@ const char *http_lookup_method(enum http_method method) {
 }
 
 /**
- * Crates the response message and resumes a suspended connection for the long poll endpoint
+ * Creates the response message and resumes a suspended connection
+ * for the long poll endpoint and an GPIO event
  * @param connection User data from a MHD connection
  * @param gpio GPIO number
  * @param event_type GPIO event
  * @param timestamp Event timestamp
  */
-void http_connection_resume(struct t_request_data *request_data,
-                            unsigned gpio,
-                            enum mygpiod_event_types event_type,
-                            uint64_t timestamp)
+void http_connection_resume_gpio(struct t_request_data *request_data,
+                                 unsigned gpio,
+                                 enum mygpiod_event_types event_type,
+                                 uint64_t timestamp)
 {
-    request_data->resume_buffer = sdscatprintf(sdsempty(), "{\"gpio\":%u,\"event\":\"%s\",\"timestamp_ms\":%llu}",
-        gpio,
+    request_data->resume_buffer = sdscatprintf(sdsempty(),
+        "{"
+          "\"event\":\"%s\","
+          "\"gpio\":%u,"
+          "\"timestamp_ms\":%llu"
+        "}",
         mygpiod_event_name(event_type),
+        gpio,
         (long long unsigned)(timestamp / 1000000)
+    );
+    MHD_resume_connection(request_data->connection);
+}
+
+/**
+ * Creates the response message and resumes a suspended connection
+ * for the long poll endpoint and an input event
+ * @param connection User data from a MHD connection
+ * @param input_data Input data
+ */
+void http_connection_resume_input(struct t_request_data *request_data,
+                                  const char *device,
+                                  struct t_input_event *input_data)
+{
+    uint64_t timestamp_ms = (uint64_t)(input_data->time.tv_sec * 1000) + (uint64_t)(input_data->time.tv_usec);
+
+    request_data->resume_buffer = sdscatprintf(sdsempty(),
+        "{"
+          "\"event\":\"%s\","
+          "\"device\":\"%s\","
+          "\"timestamp_ms\":%llu,"
+          "\"type\":\"%s\","
+          "\"code\":\"%s\","
+          "\"value\":%u"
+        "}",
+        mygpiod_event_name(MYGPIOD_EVENT_INPUT),
+        device,
+        (long long unsigned)(timestamp_ms),
+        input_event_type_name(input_data->type),
+        input_event_code_name(input_data->type, input_data->code),
+        input_data->value
     );
     MHD_resume_connection(request_data->connection);
 }
