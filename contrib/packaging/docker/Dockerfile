@@ -16,7 +16,6 @@ FROM alpine:latest
 RUN apk add --no-cache libmpdclient curl lua5.4 libgpiod libmicrohttpd
 COPY --from=build /myGPIOd/release/bin/mygpiod /usr/bin/
 COPY --from=build /myGPIOd/release/bin/mygpioc /usr/bin/
-COPY --from=build /myGPIOd/release/libmygpio/libmygpio.so /usr/lib/
-COPY --from=build /myGPIOd/release/libmygpio/libmygpio.so.1 /usr/lib/
+COPY --from=build /myGPIOd/release/libmygpio/libmygpio.so* /usr/lib/
 
 ENTRYPOINT ["/usr/bin/mygpiod"]

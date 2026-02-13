@@ -4,6 +4,16 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v2.0.0 (not yet released)
+
+This release adds support for input events. myGPIOd can now read events from /dev/input/* devices.
+
+### Changelog
+
+- Feat: Support for input events
+
+***
+
 ## myGPIOd v1.0.0 (2026-01-30)
 
 This release fixes some bugs and adds minor features. The REST-API endpoint is now versioned and starts with `/api/v1/`.
