@@ -8,8 +8,8 @@
 #include "mygpiod/server_http/util.h"
 
 #include "dist/sds/sds.h"
-#include "input/event_code.h"
-#include "input/event_type.h"
+#include "mygpiod/input/event_code.h"
+#include "mygpiod/input/event_type.h"
 #include "mygpiod/lib/events.h"
 
 #include <stdlib.h>

@@ -80,7 +80,7 @@ bool input_handle_event(struct t_config *config, int *fd) {
         case EV_REL:
         case EV_ABS:
         case EV_SW:
-            input_action_handle(config, data->name, &input_data);
+            input_action_handle(config, data, &input_data);
             break;
         default:
             MYGPIOD_LOG_DEBUG("%s: Ignoring event type %s (%hu) with code=%hu value=%u",

@@ -7,10 +7,17 @@
 #include "compile_time.h"
 #include "mygpiod/input/action.h"
 
+#include "mygpiod/actions/execute.h"
 #include "mygpiod/input/event_code.h"
 #include "mygpiod/input/event_type.h"
 #include "mygpiod/lib/events.h"
+#include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
+
+// Private definitions
+static bool check_event(struct t_input_event_actions *event, struct t_input_event *input_data);
+
+// Public functions
 
 /**
  * Handles the configured actions for an input event
@@ -18,9 +25,9 @@
  * @param config pointer to config
  * @param input_data Input event data
  */
-void input_action_handle(struct t_config *config, const char *device, struct t_input_event *input_data) {
+void input_action_handle(struct t_config *config, struct t_input_data *data, struct t_input_event *input_data) {
     MYGPIOD_LOG_INFO("%s: time=%ld.%06lu type=%s (%hu) code=%s (%hu) value=%u",
-        device,
+        data->name,
         input_data->time.tv_sec,
         input_data->time.tv_usec,
         input_event_type_name(input_data->type),
@@ -29,11 +36,41 @@ void input_action_handle(struct t_config *config, const char *device, struct t_i
         input_data->code,
         input_data->value
     );
-    (void) config;
-    // Check if we subscribed to this event
-    
-    event_enqueue_input(config, device, input_data);
-    /*
-    action_execute(config, &data->long_press_release_action);
-    */
+
+    // Check if read input data matches configured event
+    // Execute actions and notify clients
+    struct t_list_node *current = data->event_actions.head;
+    bool subscribed = false;
+    while (current != NULL) {
+        struct t_input_event_actions *event = (struct t_input_event_actions *)current->data;
+        if (check_event(event, input_data) == true) {
+            action_execute(config, &event->action);
+            subscribed = true;
+        }
+        current = current->next;
+    }
+    if (subscribed == true) {
+        event_enqueue_input(config, data->name, input_data);
+    }
+}
+
+// Private functions
+
+/**
+ * Checks if configured event is the same as the read input data
+ * @param event Event configuration
+ * @param input_data Read input data
+ * @return true if it matches, else false
+ */
+static bool check_event(struct t_input_event_actions *event, struct t_input_event *input_data) {
+    if (event->event_type != input_data->type) {
+        return false;
+    }
+    if (event->event_code != input_data->code) {
+        return false;
+    }
+    if (event->event_value != input_data->value) {
+        return false;
+    }
+    return true;
 }

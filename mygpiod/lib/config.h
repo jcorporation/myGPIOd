@@ -8,6 +8,7 @@
 #define MYGPIOD_CONFIG_H
 
 #include "dist/sds/sds.h"
+#include "lib/action.h"
 #include "mygpiod/lib/list.h"
 
 #include <gpiod.h>
@@ -58,11 +59,22 @@ struct t_gpio_out_data {
 };
 
 /**
+ * Config data for input event actions
+ */
+struct t_input_event_actions {
+    unsigned short event_type;  //!< Input event type
+    unsigned short event_code;  //!< Input event code
+    unsigned int event_value;   //!< Input event value
+    struct t_action action;     //!< Action
+};
+
+/**
  * Config data for inputs
  */
 struct t_input_data {
-    sds name;  //!< Device name /dev/input/...
-    int fd;    //!< File descriptor
+    sds name;                      //!< Device name /dev/input/...
+    int fd;                        //!< File descriptor
+    struct t_list event_actions;   //!< List of events
 };
 
 /**

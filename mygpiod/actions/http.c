@@ -8,8 +8,8 @@
 #include "mygpiod/actions/http.h"
 
 #include "dist/sds/sds.h"
-#include "lib/mem.h"
 #include "mygpiod/lib/log.h"
+#include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
 
 #include <curl/curl.h>

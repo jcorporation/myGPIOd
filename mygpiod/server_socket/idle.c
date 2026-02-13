@@ -7,9 +7,9 @@
 #include "compile_time.h"
 #include "mygpiod/server_socket/idle.h"
 
-#include "input/event_code.h"
-#include "input/event_type.h"
-#include "lib/event_types.h"
+#include "mygpiod/input/event_code.h"
+#include "mygpiod/input/event_type.h"
+#include "mygpiod/lib/event_types.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/server_socket/response.h"

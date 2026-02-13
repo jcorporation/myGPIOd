@@ -321,6 +321,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         struct t_input_data *data = malloc_assert(sizeof(struct t_input_data));
         data->fd = -1;
         data->name = sdsdup(value);
+        list_init(&data->event_actions);
         list_push(&config->inputs, 0, data);
         MYGPIOD_LOG_DEBUG("Adding input %s", value);
         return true;
@@ -593,12 +594,22 @@ static void gpio_node_out_clear(struct t_list_node *node) {
 }
 
 /**
+ * Clears the input event actions node data
+ * @param node pointer to client
+ */
+void node_data_input_event_actions_clear(struct t_list_node *node) {
+    struct t_input_event_actions *data = (struct t_input_event_actions *)node->data;
+    FREE_SDS(data->action.option);
+}
+
+/**
  * Frees pointers and closes file descriptors from this node.
  * @param data input data to clear
  */
 static void input_data_clear(struct t_input_data *data) {
     close_fd(&data->fd);
     sdsfree(data->name);
+    list_clear(&data->event_actions, node_data_input_event_actions_clear);
 }
 
 /**

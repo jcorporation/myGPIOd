@@ -44,7 +44,7 @@ void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timesta
         MYGPIOD_LOG_INFO("Event: \"long_press_release\" gpio: \"%u\" timestamp: \"%llu ns\"",
             gpio, (long long unsigned)timestamp_ns);
         event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_LONG_PRESS_RELEASE, timestamp_ns);
-        action_execute(config, &data->long_press_release_action);
+        actions_execute(config, &data->long_press_release_action);
         return;
     }
 
@@ -54,7 +54,7 @@ void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timesta
     if (event_type == GPIOD_EDGE_EVENT_FALLING_EDGE) {
         event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_FALLING, timestamp_ns);
         if (data->action_falling.length > 0) {
-            action_execute(config, &data->action_falling);
+            actions_execute(config, &data->action_falling);
         }
         else {
             MYGPIOD_LOG_DEBUG("No action configured");
@@ -70,7 +70,7 @@ void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timesta
     else {
         event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_RISING, timestamp_ns);
         if (data->action_rising.length > 0) {
-            action_execute(config, &data->action_rising);
+            actions_execute(config, &data->action_rising);
         }
         else {
             MYGPIOD_LOG_DEBUG("No action configured");
@@ -99,7 +99,7 @@ void gpio_action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, str
         MYGPIOD_LOG_INFO("Event: \"long_press\" gpio: \"%u\" timestamp: \"%llu ns\"",
             gpio, (long long unsigned)timestamp_ns);
         event_enqueue_gpio(config, gpio, MYGPIOD_EVENT_GPIO_LONG_PRESS, timestamp_ns);
-        action_execute(config, &data->long_press_action);
+        actions_execute(config, &data->long_press_action);
         if (data->event_request == GPIOD_LINE_EDGE_BOTH) {
             // ignore the release event
             MYGPIOD_LOG_DEBUG("Set next event for gpio %u to ignore", gpio);
