@@ -106,7 +106,7 @@ function createActionLink(icon, title, callback) {
     a.innerHTML = icon;
     a.href = '#';
     a.title = title;
-    a.classList.add('me-2','btn','btn-sm','btn-secondary');
+    a.classList.add('me-2', 'mb-1','btn','btn-sm','btn-secondary');
     a.addEventListener('click', function(event) {
         event.preventDefault();
         callback(event);
