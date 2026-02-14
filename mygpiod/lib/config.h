@@ -8,7 +8,7 @@
 #define MYGPIOD_CONFIG_H
 
 #include "dist/sds/sds.h"
-#include "lib/action.h"
+#include "mygpiod/lib/action.h"
 #include "mygpiod/lib/list.h"
 
 #include <gpiod.h>

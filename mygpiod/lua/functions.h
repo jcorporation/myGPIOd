@@ -7,6 +7,7 @@
 #ifndef MYGPIOD_LUA_FUNCTIONS_H
 #define MYGPIOD_LUA_FUNCTIONS_H
 
+#include "compile_time.h"
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>

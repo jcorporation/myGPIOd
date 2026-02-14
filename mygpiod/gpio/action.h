@@ -10,7 +10,6 @@
 #include "mygpiod/lib/config.h"
 
 #include <stdint.h>
-#include <time.h>
 
 void gpio_action_handle(struct t_config *config, unsigned gpio, uint64_t timestamp_ns,
         enum gpiod_edge_event_type event_type, struct t_gpio_in_data *data);

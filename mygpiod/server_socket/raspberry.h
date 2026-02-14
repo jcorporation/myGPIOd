@@ -7,8 +7,7 @@
 #ifndef MYGPIOD_SERVER_RASPBERRY_H
 #define MYGPIOD_SERVER_RASPBERRY_H
 
-#include "mygpiod/lib/config.h"
-#include "mygpiod/server_socket/protocol.h"
+#include "mygpiod/lib/list.h"
 
 #include <stdbool.h>
 

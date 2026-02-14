@@ -10,7 +10,6 @@
 #include "dist/sds/sds.h"
 
 #include <gpiod.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
