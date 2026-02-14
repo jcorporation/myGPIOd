@@ -11,6 +11,7 @@ This release adds support for input events. myGPIOd can now read events from /de
 ### Changelog
 
 - Feat: Support for input events
+- Upd: Set required Lua version to 5.4+
 
 ***
 
