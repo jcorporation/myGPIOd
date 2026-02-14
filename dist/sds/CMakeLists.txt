@@ -4,11 +4,6 @@
 
 add_library(sds "")
 
-target_compile_options(sds
-  PRIVATE
-    "-Wno-conversion"
-)
-
 target_sources(sds
   PRIVATE
     sds.c
@@ -21,3 +16,11 @@ target_include_directories(sds
   PRIVATE
     ${PROJECT_SOURCE_DIR}
 )
+
+if(CMAKE_BUILD_TYPE MATCHES "(Debug|Release|RelWithDebInfo|MinSizeRel)")
+  target_compile_options(sds
+    PRIVATE
+      "-Wno-conversion"
+      "-Wno-format-nonliteral"
+  )
+endif()
