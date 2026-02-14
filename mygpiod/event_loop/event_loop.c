@@ -107,7 +107,7 @@ void event_add_gpio_out_timer_fds(struct t_config *config, struct t_poll_fds *po
 }
 
 /**
- * Adds the timer fds to the poll_fds
+ * Adds the socket client fds to the poll_fds
  * @param config pointer to config
  * @param poll_fds t_poll_fds struct to populate
  */
