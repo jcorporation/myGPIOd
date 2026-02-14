@@ -7,8 +7,8 @@
 #include "compile_time.h"
 #include "mygpiod/config/gpio.h"
 
-#include "event_loop/event_loop.h"
 #include "mygpio-common/util.h"
+#include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/log.h"
@@ -258,34 +258,6 @@ void gpio_out_data_clear(struct t_gpio_out_data *data) {
 void gpio_node_out_clear(struct t_list_node *node) {
     struct t_gpio_out_data *data = (struct t_gpio_out_data *)node->data;
     gpio_out_data_clear(data);
-}
-
-/**
- * Clears the input event actions node data
- * @param node pointer to client
- */
-void node_data_input_event_actions_clear(struct t_list_node *node) {
-    struct t_input_event_actions *data = (struct t_input_event_actions *)node->data;
-    FREE_SDS(data->action.option);
-}
-
-/**
- * Frees pointers and closes file descriptors from this node.
- * @param data input data to clear
- */
-void input_data_clear(struct t_input_data *data) {
-    close_fd(&data->fd);
-    sdsfree(data->name);
-    list_clear(&data->event_actions, node_data_input_event_actions_clear);
-}
-
-/**
- * Frees pointers and closes file descriptors from this node.
- * @param node input config node to clear
- */
-void input_node_data_clear(struct t_list_node *node) {
-    struct t_input_data *data = (struct t_input_data *)node->data;
-    input_data_clear(data);
 }
 
 // Private functions

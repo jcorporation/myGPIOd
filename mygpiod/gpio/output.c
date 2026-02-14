@@ -7,9 +7,9 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/output.h"
 
+#include "mygpiod/config/config.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/util.h"
-#include "mygpiod/config/config.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"

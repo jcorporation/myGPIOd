@@ -25,9 +25,9 @@ static bool check_event(struct t_input_event_actions *event, struct t_input_even
  * @param config pointer to config
  * @param input_data Input event data
  */
-void input_action_handle(struct t_config *config, struct t_input_data *data, struct t_input_event *input_data) {
+void input_action_handle(struct t_config *config, struct t_input_device *device, struct t_input_event *input_data) {
     MYGPIOD_LOG_INFO("%s: time=%ld.%06lu type=%s (%hu) code=%s (%hu) value=%u",
-        data->name,
+        device->device,
         input_data->time.tv_sec,
         input_data->time.tv_usec,
         input_event_type_name(input_data->type),
@@ -39,18 +39,32 @@ void input_action_handle(struct t_config *config, struct t_input_data *data, str
 
     // Check if read input data matches configured event
     // Execute actions and notify clients
-    struct t_list_node *current = data->event_actions.head;
     bool subscribed = false;
-    while (current != NULL) {
-        struct t_input_event_actions *event = (struct t_input_event_actions *)current->data;
-        if (check_event(event, input_data) == true) {
-            action_execute(config, &event->action);
-            subscribed = true;
+    if (device->event_actions.length == 0) {
+        MYGPIOD_LOG_DEBUG("No actions configured for device %s", device->device);
+    }
+    else {
+        struct t_list_node *current = device->event_actions.head;
+        while (current != NULL) {
+            struct t_input_event_actions *event = (struct t_input_event_actions *)current->data;
+            if (check_event(event, input_data) == true) {
+                action_execute(config, &event->action);
+                subscribed = true;
+            }
+            current = current->next;
         }
-        current = current->next;
     }
     if (subscribed == true) {
-        event_enqueue_input(config, data->name, input_data);
+        event_enqueue_input(config, device->device, input_data);
+    }
+    else {
+        MYGPIOD_LOG_DEBUG("No action configured for type=%s (%hu) code=%s (%hu) value=%u",
+            input_event_type_name(input_data->type),
+            input_data->type,
+            input_event_code_name(input_data->type, input_data->code),
+            input_data->code,
+            input_data->value
+        );
     }
 }
 

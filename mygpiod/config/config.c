@@ -176,7 +176,7 @@ static bool config_read(struct t_config *config, sds config_file) {
         sds *kv = sds_splitfirst(line, '=', &count);
         if (count == 2) {
             if (parse_config_file_kv(kv[0], kv[1], config) == false) {
-                MYGPIOD_LOG_WARN("Invalid config line #%u", line_num);
+                MYGPIOD_LOG_EMERG("Invalid config line #%u", line_num);
                 sdsfreesplitres(kv, count);
                 rc = false;
                 break;
@@ -307,9 +307,9 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         return false;
     }
     if (strcmp(key, "input") == 0) {
-        struct t_input_data *data = malloc_assert(sizeof(struct t_input_data));
+        struct t_input_device *data = malloc_assert(sizeof(struct t_input_device));
         data->fd = -1;
-        data->name = sdsdup(value);
+        data->device = sdsdup(value);
         list_init(&data->event_actions);
         list_push(&config->inputs, 0, data);
         MYGPIOD_LOG_DEBUG("Adding input %s", value);
@@ -317,7 +317,6 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     }
     if (strcmp(key, "input_ev") == 0) {
         if (parse_input_ev(config, value) == true) {
-            MYGPIOD_LOG_DEBUG("Adding input ev %s", value);
             return true;
         }
         return false;

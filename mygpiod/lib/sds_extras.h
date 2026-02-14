@@ -22,5 +22,6 @@ sds sds_getline(sds s, FILE *fp, size_t max, int *nread);
 sds sds_getfile(sds s, const char *file_path, int *nread);
 sds *sds_splitfirst(sds s, char sep, int *count);
 sds sds_catchar(sds s, const char c);
+sds sds_getvalue(sds s, char sep);
 
 #endif

@@ -71,8 +71,8 @@ struct t_input_event_actions {
 /**
  * Config data for inputs
  */
-struct t_input_data {
-    sds name;                      //!< Device name /dev/input/...
+struct t_input_device {
+    sds device;                    //!< Device name /dev/input/...
     int fd;                        //!< File descriptor
     struct t_list event_actions;   //!< List of events
 };

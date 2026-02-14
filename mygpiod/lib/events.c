@@ -7,8 +7,8 @@
 #include "compile_time.h"
 #include "mygpiod/lib/events.h"
 
-#include "mygpiod/input/input_event.h"
 #include "mygpiod/config/config.h"
+#include "mygpiod/input/input_event.h"
 #include "mygpiod/lib/event_types.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"

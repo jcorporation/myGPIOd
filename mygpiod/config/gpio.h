@@ -20,7 +20,5 @@ void gpio_in_data_clear(struct t_gpio_in_data *data);
 void gpio_node_in_clear(struct t_list_node *node);
 void gpio_out_data_clear(struct t_gpio_out_data *data);
 void gpio_node_out_clear(struct t_list_node *node);
-void input_data_clear(struct t_input_data *data);
-void input_node_data_clear(struct t_list_node *node);
 
 #endif

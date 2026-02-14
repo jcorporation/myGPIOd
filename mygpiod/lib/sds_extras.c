@@ -130,3 +130,29 @@ sds sds_catchar(sds s, const char c) {
     s[i] = '\0';
     return s;
 }
+
+/**
+ * Returns the string until separator is found and removes it from original string.
+ * @param s String to modify
+ * @param sep Seperatir
+ * @return sds or NULL on error
+ */
+sds sds_getvalue(sds s, char sep) {
+    if (sdslen(s) == 0) {
+        return NULL;
+    }
+    size_t len = sdslen(s);
+    size_t i = 0;
+    for (; i < len; i++) {
+        if (*(s + i) == sep) {
+            break;
+        }
+    }
+    sds value = i > 0
+        ? sdsnewlen(s, i)
+        : sdsempty();
+    if (i > 0) {
+        sdsrange(s, (ssize_t)i + 1, -1);
+    }
+    return value;
+}

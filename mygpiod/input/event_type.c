@@ -7,6 +7,8 @@
 #include "compile_time.h"
 #include "mygpiod/input/event_type.h"
 
+#include "mygpiod/lib/log.h"
+
 #include <linux/input-event-codes.h>
 #include <stddef.h>
 #include <strings.h>
@@ -50,6 +52,11 @@ const char *input_event_type_name(unsigned short event_type) {
             break;
         }
     }
+    if (p == NULL ||
+        p->name == NULL)
+    {
+        MYGPIOD_LOG_WARN("Unknown event type \"%hu\"", event_type);
+    }
     return p->name;
 }
 
@@ -64,6 +71,9 @@ unsigned short input_event_type_parse(const char *name) {
         if (strcasecmp(name, p->name) == 0) {
             break;
         }
+    }
+    if (p->event_type == EV_MAX) {
+        MYGPIOD_LOG_WARN("Unknown event type \"%s\"", name);
     }
     return p->event_type;
 }
