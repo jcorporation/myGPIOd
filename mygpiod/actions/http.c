@@ -156,6 +156,7 @@ static bool validate_http_method(const char *method) {
  */
 static void *curl_thread(void *thread_arg) {
     // Initialize
+    logline = sdsempty();
     struct t_curl_arguments *arg = (struct t_curl_arguments *)thread_arg;
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl;
@@ -231,6 +232,7 @@ static void *curl_thread(void *thread_arg) {
     sdsfree(resp_header);
     sdsfree(resp_body);
     free_curl_arguments(arg);
+    sdsfree(logline);
     return NULL;
 }
 

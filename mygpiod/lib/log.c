@@ -18,7 +18,7 @@
  * Global variables
  */
 
-sds logline;  //!< Thread specific log buffer
+_Thread_local sds logline;  //!< Thread specific log buffer
 
 _Atomic int loglevel;     //!< Loglevel
 enum log_types log_type;  //!< Type of logging system

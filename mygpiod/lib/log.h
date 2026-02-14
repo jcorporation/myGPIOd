@@ -54,7 +54,7 @@ enum log_types {
 extern _Atomic int loglevel;
 extern enum log_types log_type;
 
-extern sds logline;
+_Thread_local extern sds logline;
 
 const char *get_loglevel_name(int level);
 void set_loglevel(int level);
