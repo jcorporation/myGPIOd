@@ -19,25 +19,45 @@ Events
 
 Events are triggered through changes of input GPIO values.
 
-+------------------------+-----------------------------------------------------------------------------+
-| Event                  | Description and options                                                     |
-+========================+=============================================================================+
-| ``falling``            || State of GPIO has changed from active to inactive.                         |
-|                        || ``action_falling``: Action to execute.                                     |
-+------------------------+-----------------------------------------------------------------------------+
-| ``rising``             || State of GPIO has changed from inactive to active.                         |
-|                        || ``action_rising``: Action to execute.                                      |
-+------------------------+-----------------------------------------------------------------------------+
-| ``long_press``         || GPIO was pressed long.                                                     |
-|                        || ``long_press_event``: Event for long press ``falling`` or ``rising``.      |
-|                        || ``long_press_timeout``: Timeout a button is considered as long pressed.    |
-|                        || ``long_press_action``: Action for long press.                              |
-|                        || ``long_press_interval``: Action is repeated in this interval until button  |
-|                        | is released, set to ``0`` to disable.                                       |
-+------------------------+-----------------------------------------------------------------------------+
-| ``long_press_release`` || GPIO changing it's state after a long press event.                         |
-|                        || ``long_press_release_action``: Action executed when button was released.   |
-+------------------------+-----------------------------------------------------------------------------+
++-----------------------------+-----------------------------------------------------------------------------+
+| Event                       | Description and options                                                     |
++=============================+=============================================================================+
+| ``gpio_falling``            || State of GPIO has changed from active to inactive.                         |
+|                             || ``action_falling``: Action to execute.                                     |
++-----------------------------+-----------------------------------------------------------------------------+
+| ``gpio_rising``             || State of GPIO has changed from inactive to active.                         |
+|                             || ``action_rising``: Action to execute.                                      |
++-----------------------------+-----------------------------------------------------------------------------+
+| ``gpio_long_press``         || GPIO was pressed long.                                                     |
+|                             || ``long_press_event``: Event for long press ``falling`` or ``rising``.      |
+|                             || ``long_press_timeout``: Timeout a button is considered as long pressed.    |
+|                             || ``long_press_action``: Action for long press.                              |
+|                             || ``long_press_interval``: Action is repeated in this interval until button  |
+|                             | is released, set to ``0`` to disable.                                       |
++-----------------------------+-----------------------------------------------------------------------------+
+| ``gpio_long_press_release`` || GPIO changing it's state after a long press event.                         |
+|                             || ``long_press_release_action``: Action executed when button was released.   |
++-----------------------------+-----------------------------------------------------------------------------+
+| ``input``                   || An input event has occurred.                                               |
++-----------------------------+-----------------------------------------------------------------------------+
+
+Input events
+------------
+
+myGPIOd can read events from `/dev/input/...` devices and execute actions. Which input device to use and which is the correct event type, code and value can easily determined with the `evtest` utility.
+
+.. code:: ini
+
+  # Inputs must be defined before input events
+  input = /dev/input/event0
+  #input = /dev/input/event3
+
+  #input_ev = device:type:code:value:action:options
+  # To ignore the carried event value use UINT_MAX for the value
+  #input_ev = device:type:code:UINT_MAX:action:options
+  input_ev = /dev/input/event0:EV_KEY:KEY_POWER:1:system:/home/juergen/projekte/myGPIOd/etc/command.sh
+
+Supported event types: EV_KEY, EV_REL, EV_ABS, EV_SW
 
 Actions
 -------
@@ -141,7 +161,6 @@ Example configuration
 
   # File with user defined lua functions
   #lua_file = /etc/mygpiod.lua
-
 
 GPIO configuration
 ~~~~~~~~~~~~~~~~~~

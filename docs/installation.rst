@@ -61,7 +61,7 @@ The default myGPIOd service unit uses the ``DynamicUser=`` directive, therefore 
 .. code:: sh
 
    mkdir /etc/systemd/system/mygpiod.service.d
-   echo -e '[Service]\nSupplementaryGroups=gpio' > /etc/systemd/system/mygpiod.service.d/gpio-group.conf
+   echo -e '[Service]\nSupplementaryGroups=gpio input' > /etc/systemd/system/mygpiod.service.d/gpio-group.conf
 
 Docker
 ~~~~~~
@@ -82,9 +82,11 @@ Example docker compose file to start myGPIOd.
        group_add:
          - gpio
          - video
+         - input
        devices:
          - /dev/gpiochip0:/dev/gpiochip0
          - /dev/vcio:/dev/vcio
+         - /dev/input/event0:/dev/input/event0
        volumes:
          - /etc/mygpiod.conf:/etc/mygpiod.conf
          - /etc/mygpiod.d/:/etc/mygpiod.d/

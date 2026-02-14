@@ -16,6 +16,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
     - falling
     - long press (with optional interval)
     - long press release
+  - Call actions on input events (`/dev/input/..`)
   - Integrated actions
     - GPIO settings
     - HTTP requests
@@ -33,7 +34,7 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
   - Provides a REST-API endpoint
     - List GPIO configuration
     - Set and get GPIO values
-  - Provides a long poll endpoint to receive GPIO events
+  - Provides a long poll endpoint to receive GPIO and input events
 - **libmygpio - the client library**
   - Simple C client library
   - High level API

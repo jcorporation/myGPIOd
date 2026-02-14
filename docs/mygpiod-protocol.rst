@@ -56,17 +56,28 @@ myGPIOd stores only the last 10 events while not in idle mode.
 
 Only the ``noidle`` command is allowed while the client is in idle mode.
 
-**Response**
+**Response for GPIO events**
 
 ::
 
-   gpio:{gpio number}
-   event:{falling|rising|long_press}
+   event:{gpio_falling|gpio_rising|gpio_long_press|input}
    timestamp_ms:{milliseconds}
    gpio:{gpio number}
-   event:{falling|rising|long_press}
+   event:{gpio_falling|gpio_rising|gpio_long_press|input}
    timestamp_ms:{milliseconds}
+   gpio:{gpio number}
    END
+
+**Response for input events**
+
+::
+   OK
+   event:gpio_input
+   timestamp_ms:1771101110
+   device:/dev/input/event0
+   type:EV_KEY
+   code:KEY_POWER
+   value:1
 
 noidle
 ~~~~~~
@@ -74,18 +85,29 @@ noidle
 Exits the idle mode and allows the client to send commands. It responds
 with the accumulated events.
 
-**Response**
+**Response for GPIO events**
 
 ::
 
    OK
-   gpio:{gpio number}
-   event:{falling|rising|long_press}
+   event:{gpio_falling|gpio_rising|gpio_long_press|input}
    timestamp_ms:{milliseconds}
    gpio:{gpio number}
-   event:{falling|rising|long_press}
+   event:{gpio_falling|gpio_rising|gpio_long_press|input}
    timestamp_ms:{milliseconds}
+   gpio:{gpio number}
    END
+
+**Response for input events**
+
+::
+   OK
+   event:gpio_input
+   timestamp_ms:1771101110
+   device:/dev/input/event0
+   type:EV_KEY
+   code:KEY_POWER
+   value:1
 
 Events
 ------
