@@ -53,7 +53,7 @@ static size_t catch_output(void *ptr, size_t size, size_t nmemb, sds *output);
 
 /**
  * Makes a http call in a new process. Parses the cmd.
- * @param cmd command and it's options, format:
+ * @param action Action struct, options must be:
  *            {method} {uri} [{content-type} {postdata}]
  * @returns true on success, else false
  */

@@ -15,7 +15,7 @@
 
 /**
  * Calls a lua function
- * @param cmd command to parse
+ * @param action Action struct
  * @returns true on success, else false
  */
 bool action_lua(struct t_config *config, struct t_action *action) {

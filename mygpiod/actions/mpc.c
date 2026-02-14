@@ -24,7 +24,7 @@ static bool mpc_check_conn(struct t_config *config);
 
 /**
  * Controls MPD, re-uses the existing connection or creates a new one
- * @param cmd command to parse
+ * @param action Action struct
  * @returns true on success, else false
  */
 bool action_mpc(struct t_config *config, struct t_action *action) {

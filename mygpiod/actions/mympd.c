@@ -13,7 +13,7 @@
 
 /**
  * Execute a myGPIOd script through the myGPIOd api.
- * @param cmd command to parse, format:
+ * @param action Action struct, options must be:
  *            {uri} {partition} {script}
  * @returns true on success, else false
  */
