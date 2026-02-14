@@ -9,7 +9,7 @@
 
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/util.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"

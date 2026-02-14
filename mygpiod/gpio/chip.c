@@ -7,7 +7,7 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/chip.h"
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/log.h"
 
 #include <gpiod.h>

@@ -8,7 +8,7 @@
 #include "mygpiod/gpio/input.h"
 
 #include "mygpiod/gpio/util.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 

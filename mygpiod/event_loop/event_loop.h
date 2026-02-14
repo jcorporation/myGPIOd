@@ -8,7 +8,7 @@
 #define MYGPIOD_EVENT_LOOP_H
 
 #include "compile_time.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 #include <gpiod.h>
 #include <poll.h>

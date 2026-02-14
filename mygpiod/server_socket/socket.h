@@ -8,7 +8,7 @@
 #define MYGPIOD_SERVER_SOCKET_H
 
 #include "dist/sds/sds.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 #include <poll.h>
 #include <sys/types.h>

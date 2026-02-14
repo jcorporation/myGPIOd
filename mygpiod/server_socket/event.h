@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_SERVER_EVENT_H
 #define MYGPIOD_SERVER_EVENT_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/server_socket/protocol.h"
 
 #include <stdbool.h>

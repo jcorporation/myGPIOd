@@ -15,7 +15,7 @@
 #include "mygpiod/gpio/chip.h"
 #include "mygpiod/gpio/input.h"
 #include "mygpiod/gpio/output.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"

@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_INPUT_H
 #define MYGPIOD_INPUT_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/event_loop/event_loop.h"
 
 bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds);

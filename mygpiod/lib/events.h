@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_EVENTS_H
 #define MYGPIOD_EVENTS_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/event_types.h"
 
 #include "mygpiod/input/input_event.h"

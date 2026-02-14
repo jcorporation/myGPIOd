@@ -8,7 +8,7 @@
 #define MYGPIOD_ACTIONS_EXECUTE_H
 
 #include "mygpiod/lib/action.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 void actions_execute(struct t_config *config, struct t_list *actions);
 void action_execute(struct t_config *config, struct t_action *action);

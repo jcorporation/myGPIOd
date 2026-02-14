@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_LUA_LUAVM_H
 #define MYGPIOD_LUA_LUAVM_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 #include <stdbool.h>
 

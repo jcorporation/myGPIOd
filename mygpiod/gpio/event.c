@@ -8,7 +8,7 @@
 #include "mygpiod/gpio/event.h"
 
 #include "mygpiod/gpio/action.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 

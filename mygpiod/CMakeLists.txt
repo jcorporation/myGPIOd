@@ -18,6 +18,9 @@ target_sources(mygpiod
     actions/execute.c
     actions/gpio.c
     actions/system.c
+    config/config.c
+    config/gpio.c
+    config/input.c
     event_loop/event_loop.c
     event_loop/signal_handler.c
     gpio/action.c
@@ -32,7 +35,6 @@ target_sources(mygpiod
     input/event_type.c
     input/input.c
     lib/action.c
-    lib/config.c
     lib/events.c
     lib/json_print.c
     lib/list.c

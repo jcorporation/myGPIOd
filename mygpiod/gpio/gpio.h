@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_GPIO_INPUT_H
 #define MYGPIOD_GPIO_INPUT_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 #include <gpiod.h>
 

@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_ACTIONS_MPC_H
 #define MYGPIOD_ACTIONS_MPC_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 #include <stdbool.h>
 

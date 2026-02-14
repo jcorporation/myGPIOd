@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_SERVER_IDLE_H
 #define MYGPIOD_SERVER_IDLE_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 bool handle_idle(struct t_list_node *client_node);
 bool handle_noidle(struct t_config *config, struct t_list_node *client_node);

@@ -69,6 +69,10 @@ static bool check_event(struct t_input_event_actions *event, struct t_input_even
     if (event->event_code != input_data->code) {
         return false;
     }
+    if (event->event_value == UINT_MAX) {
+        // UINT_MAX means any value
+        return true;
+    }
     if (event->event_value != input_data->value) {
         return false;
     }

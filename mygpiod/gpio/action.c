@@ -12,7 +12,7 @@
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/util.h"
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/events.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"

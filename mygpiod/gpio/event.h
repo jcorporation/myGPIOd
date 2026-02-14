@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_GPIO_EVENT_H
 #define MYGPIOD_GPIO_EVENT_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 bool gpio_handle_event(struct t_config *config, int *fd);
 

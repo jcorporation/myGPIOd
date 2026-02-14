@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_SERVER_HTTPD_REST_API_H
 #define MYGPIOD_SERVER_HTTPD_REST_API_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/server_http/util.h"
 
 #include <microhttpd.h>

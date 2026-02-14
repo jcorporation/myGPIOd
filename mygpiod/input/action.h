@@ -8,7 +8,7 @@
 #define MYGPIOD_INPUT_ACTION_H
 
 #include "mygpiod/input/input_event.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 void input_action_handle(struct t_config *config, struct t_input_data *data, struct t_input_event *input_data);
 

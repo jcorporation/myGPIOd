@@ -9,7 +9,7 @@
 
 #include "mygpiod/input/action.c"
 #include "mygpiod/input/event_type.h"
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 

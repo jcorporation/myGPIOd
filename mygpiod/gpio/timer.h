@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_GPIO_TIMER_H
 #define MYGPIOD_GPIO_TIMER_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 bool gpio_in_timer_handle_event(struct t_config *config, int *fd);
 bool gpio_out_timer_handle_event(struct t_config *config, int *fd);

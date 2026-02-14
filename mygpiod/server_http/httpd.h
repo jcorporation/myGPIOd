@@ -7,7 +7,7 @@
 #ifndef MYGPIOD_SERVER_HTTPD_H
 #define MYGPIOD_SERVER_HTTPD_H
 
-#include "mygpiod/lib/config.h"
+#include "mygpiod/config/config.h"
 
 #include <microhttpd.h>
 
