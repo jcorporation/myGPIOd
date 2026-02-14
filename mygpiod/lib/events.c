@@ -123,7 +123,7 @@ const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
         case MYGPIOD_EVENT_GPIO_LONG_PRESS_RELEASE:
             return "gpio_long_press_release";
         case MYGPIOD_EVENT_INPUT:
-            return "gpio_input";
+            return "input";
     }
     return "";
 }
