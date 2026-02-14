@@ -19,7 +19,6 @@
  * @returns true on success, else false
  */
 bool action_system(const char *cmd) {
-    MYGPIOD_LOG_INFO("Executing system command \"%s\"", cmd);
     errno = 0;
     int pid = fork();
     if (pid == 0) {
