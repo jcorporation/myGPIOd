@@ -41,10 +41,22 @@ Events are triggered through changes of input GPIO values.
 | ``input``                   || An input event has occurred.                                               |
 +-----------------------------+-----------------------------------------------------------------------------+
 
+GPIO events
+-----------
+
+myGPIOD can read edge events from GPIO lines and execute configured actions. Only one GPIO device can be configured.
+
+.. code:: ini
+
+  # GPIO chip device
+  chip = /dev/gpiochip0
+
+Which GPIO lines to use are configured with one file per line in the directory ``/etc/mygpiod.d``.
+
 Input events
 ------------
 
-myGPIOd can read events from `/dev/input/...` devices and execute actions. Which input device to use and which is the correct event type, code and value can easily determined with the `evtest` utility.
+myGPIOd read events from `/dev/input/...` devices and execute configured actions. Which input device to use and which is the correct event type, code and value can easily determined with the `evtest` utility.
 
 .. code:: ini
 
