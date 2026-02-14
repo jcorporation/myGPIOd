@@ -247,9 +247,13 @@ bool server_client_disconnect(struct t_list *clients, struct t_list_node *node) 
  * @param timeout_s timeout in seconds
  */
 int server_client_connection_set_timeout(int timeout_fd, int timeout_s) {
-    if (timeout_fd > 0) {
-        timer_set(timeout_fd, timeout_s * 1000, 0);
+    // First try to update an existing timer
+    if (timeout_fd > 0 &&
+        timer_set(timeout_fd, timeout_s * 1000, 0) == true)
+    {
+        return timeout_fd;
     }
+    // Create a new timer
     return timer_new(timeout_s * 1000, 0);
 }
 
