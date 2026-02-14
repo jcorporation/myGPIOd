@@ -7,9 +7,11 @@
 #ifndef MYGPIOD_ACTIONS_MYMPD_H
 #define MYGPIOD_ACTIONS_MYMPD_H
 
+#include "mygpiod/lib/action.h"
+
 #include <stdbool.h>
 
-bool action_mympd(const char *cmd);
+bool action_mympd(struct t_action *action);
 bool action_mympd2(const char *uri, const char *partition, const char *script);
 
 #endif

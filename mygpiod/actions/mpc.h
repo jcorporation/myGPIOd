@@ -8,9 +8,10 @@
 #define MYGPIOD_ACTIONS_MPC_H
 
 #include "mygpiod/config/config.h"
+#include "mygpiod/lib/action.h"
 
 #include <stdbool.h>
 
-bool action_mpc(struct t_config *config, const char *cmd);
+bool action_mpc(struct t_config *config, struct t_action *action);
 
 #endif

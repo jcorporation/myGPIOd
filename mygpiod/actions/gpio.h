@@ -8,11 +8,12 @@
 #define MYGPIOD_ACTIONS_GPIOSET_H
 
 #include "mygpiod/config/config.h"
+#include "mygpiod/lib/action.h"
 
 #include <stdbool.h>
 
-bool action_gpioset(struct t_config *config, const char *cmd);
-bool action_gpiotoggle(struct t_config *config, const char *cmd);
-bool action_gpioblink(struct t_config *config, const char *cmd);
+bool action_gpioset(struct t_config *config, struct t_action *action);
+bool action_gpiotoggle(struct t_config *config, struct t_action *action);
+bool action_gpioblink(struct t_config *config, struct t_action *action);
 
 #endif

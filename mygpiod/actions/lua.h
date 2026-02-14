@@ -8,9 +8,10 @@
 #define MYGPIOD_ACTIONS_LUA_H
 
 #include "mygpiod/config/config.h"
+#include "mygpiod/lib/action.h"
 
 #include <stdbool.h>
 
-bool action_lua(struct t_config *config, const char *cmd);
+bool action_lua(struct t_config *config, struct t_action *action);
 
 #endif

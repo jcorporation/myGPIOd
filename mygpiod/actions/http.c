@@ -57,22 +57,19 @@ static size_t catch_output(void *ptr, size_t size, size_t nmemb, sds *output);
  *            {method} {uri} [{content-type} {postdata}]
  * @returns true on success, else false
  */
-bool action_http(const char *cmd) {
-    int count = 0;
-    sds *args = sdssplitargs(cmd, &count);
+bool action_http(struct t_action *action) {
     bool rc = false;
-    if (count == 4) {
+    if (action->options_count == 4) {
         // Request with body
-        rc = action_http2(args[0], args[1], args[2], args[3]);
+        rc = action_http2(action->options[0], action->options[1], action->options[2], action->options[3]);
     }
-    else if (count == 2) {
+    else if (action->options_count == 2) {
         // Request without body
-        rc = action_http2(args[0], args[1], NULL, NULL);
+        rc = action_http2(action->options[0], action->options[1], NULL, NULL);
     }
     else {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
+        MYGPIOD_LOG_ERROR("Invalid number of arguments: %d", action->options_count);
     }
-    sdsfreesplitres(args, count);
     return rc;
 }
 

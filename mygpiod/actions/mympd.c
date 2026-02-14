@@ -17,18 +17,12 @@
  *            {uri} {partition} {script}
  * @returns true on success, else false
  */
-bool action_mympd(const char *cmd) {
-    int count = 0;
-    sds *args = sdssplitargs(cmd, &count);
-    bool rc = false;
-    if (count < 3) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
+bool action_mympd(struct t_action *action) {
+    if (action->options_count < 3) {
+        MYGPIOD_LOG_ERROR("Invalid number of arguments: %d", action->options_count);
+        return false;
     }
-    else {
-        rc = action_mympd2(args[0], args[1], args[2]);
-    }
-    sdsfreesplitres(args, count);
-    return rc;
+    return action_mympd2(action->options[0], action->options[1], action->options[2]);
 }
 
 /**

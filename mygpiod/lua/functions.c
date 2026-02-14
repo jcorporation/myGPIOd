@@ -7,6 +7,8 @@
 #include "compile_time.h"
 #include "mygpiod/lua/functions.h"
 
+#include "dist/sds/sds.h"
+#include "lib/action.h"
 #include "mygpiod/actions/http.h"
 #include "mygpiod/actions/mpc.h"
 #include "mygpiod/actions/mympd.h"
@@ -50,7 +52,7 @@ int lua_gpio_blink(lua_State *lua_vm) {
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
     int timeout = (int)lua_tointeger(lua_vm, 2);
     int interval = (int)lua_tointeger(lua_vm, 3);
-    int rc = gpio_blink(config, gpio, timeout, interval);
+    bool rc = gpio_blink(config, gpio, timeout, interval);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }
@@ -104,7 +106,7 @@ int lua_gpio_set(lua_State *lua_vm) {
         clean_up_lua_stack(lua_vm);
         return set_lua_rc(lua_vm, false);
     }
-    int rc = gpio_set_value(config, gpio, value);
+    bool rc = gpio_set_value(config, gpio, value);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }
@@ -125,7 +127,7 @@ int lua_gpio_toggle(lua_State *lua_vm) {
         return set_lua_rc(lua_vm, false);
     }
     unsigned gpio = (unsigned)lua_tointeger(lua_vm, 1);
-    int rc = gpio_toggle_value(config, gpio);
+    bool rc = gpio_toggle_value(config, gpio);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }
@@ -147,8 +149,12 @@ int lua_mpc(lua_State *lua_vm) {
         clean_up_lua_stack(lua_vm);
         return set_lua_rc(lua_vm, false);
     }
-    int rc = action_mpc(config, cmd);
+    struct t_action action;
+    action.action = MYGPIOD_ACTION_MPC;
+    action.options = sdssplitargs(cmd, &action.options_count);
+    bool rc = action_mpc(config, &action);
     clean_up_lua_stack(lua_vm);
+    sdsfreesplitres(action.options, action.options_count);
     return set_lua_rc(lua_vm, rc);
 }
 #endif
@@ -181,7 +187,7 @@ int lua_mympd(lua_State *lua_vm) {
         clean_up_lua_stack(lua_vm);
         return set_lua_rc(lua_vm, false);
     }
-    int rc = action_mympd2(uri, partition, script);
+    bool rc = action_mympd2(uri, partition, script);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }
@@ -209,7 +215,7 @@ int lua_http(lua_State *lua_vm) {
     }
     const char *content_type = lua_tostring(lua_vm, 3);
     const char *postdata = lua_tostring(lua_vm, 4);
-    int rc = action_http2(method, uri, content_type, postdata);
+    bool rc = action_http2(method, uri, content_type, postdata);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }
@@ -230,7 +236,7 @@ int lua_system(lua_State *lua_vm) {
         clean_up_lua_stack(lua_vm);
         return set_lua_rc(lua_vm, false);
     }
-    int rc = action_system(cmd);
+    bool rc = action_system(cmd);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }

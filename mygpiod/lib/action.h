@@ -37,7 +37,8 @@ enum mygpiod_actions {
  */
 struct t_action {
     enum mygpiod_actions action;  //!< Action type
-    sds option;                   //!< option for the action type
+    int options_count;            //!< Length of options array
+    sds *options;                 //!< option for the action type
 };
 
 struct t_action *action_node_data_new(enum mygpiod_actions action, sds option);

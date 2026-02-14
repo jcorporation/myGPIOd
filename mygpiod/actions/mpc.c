@@ -27,19 +27,18 @@ static bool mpc_check_conn(struct t_config *config);
  * @param cmd command to parse
  * @returns true on success, else false
  */
-bool action_mpc(struct t_config *config, const char *cmd) {
+bool action_mpc(struct t_config *config, struct t_action *action) {
     #define MAX_MPC_ARGS 10
-    int count = 0;
-    sds *args = sdssplitargs(cmd, &count);
-    if (count < 1 || count > MAX_MPC_ARGS) {
-        MYGPIOD_LOG_ERROR("Invalid number of arguments (%d): \"%s\"", count, cmd);
-        sdsfreesplitres(args, count);
+    if (action->options_count < 1 ||
+        action->options_count > MAX_MPC_ARGS)
+    {
+        MYGPIOD_LOG_ERROR("Invalid number of arguments: %d", action->options_count);
         return false;
     }
     sds *tokens = malloc_assert(sizeof(sds)*MAX_MPC_ARGS);
     for (int i = 0; i < MAX_MPC_ARGS; i++) {
-        tokens[i] = i < count
-            ? args[i]
+        tokens[i] = i < action->options_count
+            ? action->options[i]
             : NULL;
     }
 
@@ -47,14 +46,13 @@ bool action_mpc(struct t_config *config, const char *cmd) {
         mpc_connect(config) == false)       // Try to connect
     {
         // Failure
-        sdsfreesplitres(args, count);
         free(tokens);
         return false;
     }
     // We are connected
     mpd_send_command(config->mpd_conn, tokens[0], tokens[1], tokens[2], tokens[3], tokens[4],
         tokens[5], tokens[6], tokens[7], tokens[8], tokens[9], NULL);
-    sdsfreesplitres(args, count);
+
     free(tokens);
     if (mpd_response_finish(config->mpd_conn) == false) {
         MYGPIOD_LOG_ERROR("MPD error: %s", mpd_connection_get_error_message(config->mpd_conn));

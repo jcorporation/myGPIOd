@@ -74,7 +74,7 @@ bool parse_input_ev(struct t_config *config, sds config_value) {
     data->event_code = code;
     data->event_value = value;
     data->action.action = action;
-    data->action.option = sdsdup(config_value);
+    data->action.options = sdssplitargs(config_value, &data->action.options_count);
     return list_push(&device->event_actions, 0, data);
 }
 
@@ -124,5 +124,5 @@ struct t_input_device *get_device(struct t_config *config, const char *device) {
  */
 static void node_data_input_event_actions_clear(struct t_list_node *node) {
     struct t_input_event_actions *data = (struct t_input_event_actions *)node->data;
-    FREE_SDS(data->action.option);
+    sdsfreesplitres(data->action.options, data->action.options_count);
 }

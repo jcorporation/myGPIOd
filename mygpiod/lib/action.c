@@ -8,7 +8,6 @@
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
-#include "mygpiod/lib/sds_extras.h"
 
 #include <errno.h>
 #include <strings.h>
@@ -19,7 +18,7 @@
  */
 void node_data_action_clear(struct t_list_node *node) {
     struct t_action *data = (struct t_action *)node->data;
-    FREE_SDS(data->option);
+    sdsfreesplitres(data->options, data->options_count);
 }
 
 /**
@@ -31,7 +30,7 @@ void node_data_action_clear(struct t_list_node *node) {
 struct t_action *action_node_data_new(enum mygpiod_actions action, sds option) {
     struct t_action *data = malloc_assert(sizeof(struct t_action));
     data->action = action;
-    data->option = sdsdup(option);
+    data->options = sdssplitargs(option, &data->options_count);
     return data;
 }
 
