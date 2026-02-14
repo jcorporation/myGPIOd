@@ -37,7 +37,10 @@ bool libmygpio_send_line(struct t_mygpio_connection *connection, const char *fmt
     }
     va_list args;
     va_start(args, fmt);
-    int written = vsnprintf(connection->buf_out.buffer, BUFFER_SIZE_MAX, fmt, args);
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    int written = vsnprintf(connection->buf_out.buffer, BUFFER_SIZE_MAX, fmt, args);  // NOLINT(clang-diagnostic-format-nonliteral)
+    #pragma GCC diagnostic pop
     va_end(args);
     if (written <= 0 ||
         written >= BUFFER_SIZE_MAX)
