@@ -19,7 +19,9 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
-#include "mygpiod/server_http/httpd.h"
+#ifdef MYGPIOD_ENABLE_HTTPD
+    #include "mygpiod/server_http/httpd.h"
+#endif
 #include "mygpiod/server_socket/socket.h"
 
 #ifdef MYGPIOD_ENABLE_ACTION_LUA
