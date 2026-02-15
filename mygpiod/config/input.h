@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 bool parse_input_ev(struct t_config *config, sds config_value);
-void input_data_clear(struct t_input_device *data);
+void input_data_clear(struct t_input_device *device);
 void input_node_data_clear(struct t_list_node *node);
 
 #endif

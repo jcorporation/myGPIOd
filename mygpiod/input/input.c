@@ -43,16 +43,16 @@ bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
     MYGPIOD_LOG_INFO("Requesting inputs");
     struct t_list_node *current = config->inputs.head;
     while (current != NULL) {
-        struct t_input_device *data = (struct t_input_device *)current->data;
+        struct t_input_device *device = (struct t_input_device *)current->data;
         errno = 0;
-        MYGPIOD_LOG_INFO("Opening input %s", data->device);
-        data->fd = open(data->device, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
-        if (data->fd < 0) {
-            MYGPIOD_LOG_ERROR("Failure opening %s", data->device);
+        MYGPIOD_LOG_INFO("Opening input %s", device->name);
+        device->fd = open(device->name, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
+        if (device->fd < 0) {
+            MYGPIOD_LOG_ERROR("Failure opening %s", device->name);
             MYGPIOD_LOG_ERRNO(errno);
         }
         else {
-            event_poll_fd_add(poll_fds, data->fd, PFD_TYPE_INPUT, POLLIN | POLLPRI);
+            event_poll_fd_add(poll_fds, device->fd, PFD_TYPE_INPUT, POLLIN | POLLPRI);
         }
         current = current->next;
     }
@@ -66,35 +66,35 @@ bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
  * @returns true on success, else false
  */
 bool input_handle_event(struct t_config *config, int *fd) {
-    struct t_input_device *device = get_input_device_by_fd(&config->inputs, fd);
-    if (device == NULL) {
+    struct t_mygpiod_input_event input_event;
+    input_event.device = get_input_device_by_fd(&config->inputs, fd);
+    if (input_event.device == NULL) {
         MYGPIOD_LOG_ERROR("Data for fd not found");
         return false;
     }
     const int input_size = sizeof(struct t_input_event);
-    struct t_input_event input_data;
-    memset(&input_data, 0, input_size);
+    memset(&input_event.data, 0, input_size);
     errno = 0;
-    ssize_t nread = read(*fd, &input_data, input_size);
+    ssize_t nread = read(*fd, &input_event.data, input_size);
     if (nread < 0) {
-        MYGPIOD_LOG_ERROR("Failure reading from input device %s", device->device);
+        MYGPIOD_LOG_ERROR("Failure reading from input device %s", input_event.device->name);
         MYGPIOD_LOG_ERRNO(errno);
         return false;
     }
-    switch (input_data.type) {
+    switch (input_event.data.type) {
         case EV_KEY:
         case EV_REL:
         case EV_ABS:
         case EV_SW:
-            input_action_handle(config, device, &input_data);
+            input_action_handle(config, &input_event);
             break;
         default:
             MYGPIOD_LOG_DEBUG("%s: Ignoring event type %s (%hu) with code=%hu value=%u",
-                device->device,
-                input_event_type_name(input_data.type),
-                input_data.type,
-                input_data.code,
-                input_data.value
+                input_event.device->name,
+                input_event_type_name(input_event.data.type),
+                input_event.data.type,
+                input_event.data.code,
+                input_event.data.value
             );
     }
     return true;

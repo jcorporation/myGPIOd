@@ -14,6 +14,6 @@
 #include "mygpiod/input/input_event.h"
 #include "mygpiod/config/config.h"
 
-void input_action_handle(struct t_config *config, struct t_input_device *device, struct t_input_event *input_data);
+void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event);
 
 #endif

@@ -25,15 +25,12 @@ struct t_event_data {
     enum mygpiod_event_types mygpiod_event_type;  //!< The myGPIOd event type
     uint64_t timestamp_ns;                        //!< Timestamp of the event in nanoseconds
     // Input event
-    sds input_event_device;                       //!< Input device
-    unsigned short input_event_type;              //!< Is for example EV_REL for relative moment, EV_KEY for a keypress or release.
-    unsigned short input_event_code;              //!< Event code, for example REL_X or KEY_BACKSPACE
-    unsigned int input_event_value;               //!< The value the event carries.
+    struct t_mygpiod_input_event input_event;     //!< Input event struct
 };
 
 void event_enqueue_gpio(struct t_config *config, unsigned gpio, enum mygpiod_event_types event_type,
         uint64_t timestamp);
-void event_enqueue_input(struct t_config *config, const char *device, struct t_input_event *input_data);
+void event_enqueue_input(struct t_config *config, struct t_mygpiod_input_event *input_event);
 void event_data_clear(struct t_list_node *node);
 const char *mygpiod_event_name(enum mygpiod_event_types event_type);
 

@@ -110,14 +110,12 @@ void http_connection_resume_gpio(struct t_request_data *request_data,
  * Creates the response message and resumes a suspended connection
  * for the long poll endpoint and an input event
  * @param request_data User data from a MHD connection
- * @param device Input event device
- * @param input_data Input event data
+ * @param input_event Input event
  */
 void http_connection_resume_input(struct t_request_data *request_data,
-                                  const char *device,
-                                  struct t_input_event *input_data)
+                                  struct t_mygpiod_input_event *input_event)
 {
-    uint64_t timestamp_ms = (uint64_t)(input_data->time.tv_sec * 1000) + (uint64_t)(input_data->time.tv_usec);
+    uint64_t timestamp_ms = (uint64_t)(input_event->data.time.tv_sec * 1000) + (uint64_t)(input_event->data.time.tv_usec);
 
     request_data->resume_buffer = sdscatprintf(sdsempty(),
         "{"
@@ -129,11 +127,11 @@ void http_connection_resume_input(struct t_request_data *request_data,
           "\"value\":%u"
         "}",
         mygpiod_event_name(MYGPIOD_EVENT_INPUT),
-        device,
+        input_event->device->name,
         (long long unsigned)(timestamp_ms),
-        input_event_type_name(input_data->type),
-        input_event_code_name(input_data->type, input_data->code),
-        input_data->value
+        input_event_type_name(input_event->data.type),
+        input_event_code_name(input_event->data.type, input_event->data.code),
+        input_event->data.value
     );
     MHD_resume_connection(request_data->connection);
 }

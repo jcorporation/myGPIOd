@@ -51,8 +51,7 @@ void http_connection_resume_gpio(struct t_request_data *request_data,
                                  uint64_t timestamp);
 
 void http_connection_resume_input(struct t_request_data *request_data,
-                                  const char *device,
-                                  struct t_input_event *input_data);
+                                  struct t_mygpiod_input_event *input_event);
 
 void http_connection_done(void *cls,
                            struct MHD_Connection *connection,

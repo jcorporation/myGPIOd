@@ -76,10 +76,10 @@ bool send_idle_events(struct t_list_node *client_node, bool send_ok) {
         server_response_append(client_data, "event:%s", mygpiod_event_name(event_data->mygpiod_event_type));
         server_response_append(client_data, "timestamp_ms:%llu", (long long unsigned)(event_data->timestamp_ns / 1000000));
         if (event_data->mygpiod_event_type == MYGPIOD_EVENT_INPUT) {
-            server_response_append(client_data, "device:%s", event_data->input_event_device);
-            server_response_append(client_data, "type:%s", input_event_type_name(event_data->input_event_type));
-            server_response_append(client_data, "code:%s", input_event_code_name(event_data->input_event_type, event_data->input_event_code));
-            server_response_append(client_data, "value:%u", event_data->input_event_value);
+            server_response_append(client_data, "device:%s", event_data->input_event.device->name);
+            server_response_append(client_data, "type:%s", input_event_type_name(event_data->input_event.data.type));
+            server_response_append(client_data, "code:%s", input_event_code_name(event_data->input_event.data.type, event_data->input_event.data.code));
+            server_response_append(client_data, "value:%u", event_data->input_event.data.value);
         }
         else {
             server_response_append(client_data, "gpio:%u", current->id);

@@ -22,12 +22,13 @@
 #include "mygpiod/server_socket/socket.h"
 
 #include <stdint.h>
+#include <string.h>
 
 // private functions
 
 static struct t_event_data *event_data_new_gpio(enum mygpiod_event_types mygpiod_event_type,
         uint64_t timestamp_ns);
-static struct t_event_data *event_data_new_input(struct t_input_event *input_data, const char *device);
+static struct t_event_data *event_data_new_input(struct t_mygpiod_input_event *input_event);
 
 // public functions
 
@@ -70,16 +71,18 @@ void event_enqueue_gpio(struct t_config *config, unsigned gpio, enum mygpiod_eve
 /**
  * Enqueues an input device event for all client connections - socket and http
  * @param config Pointer to config
- * @param device Input device
- * @param input_data Input event data
+ * @param input_event Input event
  */
-void event_enqueue_input(struct t_config *config, const char *device, struct t_input_event *input_data) {
+void event_enqueue_input(struct t_config *config, struct t_mygpiod_input_event *input_event) {
     // Socket clients
     struct t_list_node *current = config->clients.head;
     while (current != NULL) {
         struct t_client_data *data = (struct t_client_data *)current->data;
-        struct t_event_data *event_data = event_data_new_input(input_data, device);
-        MYGPIOD_LOG_DEBUG("Enqueuing event %s for %s for client#%u", mygpiod_event_name(MYGPIOD_EVENT_INPUT), device, current->id);
+        struct t_event_data *event_data = event_data_new_input(input_event);
+        MYGPIOD_LOG_DEBUG("Enqueuing event %s for %s for client#%u",
+            mygpiod_event_name(MYGPIOD_EVENT_INPUT),
+            input_event->device->name, current->id
+        );
         list_push(&data->waiting_events, 0, event_data);
         if (data->state == CLIENT_SOCKET_STATE_IDLE) {
             send_idle_events(current, false);
@@ -94,7 +97,7 @@ void event_enqueue_input(struct t_config *config, const char *device, struct t_i
     // HTTP long polling
     current = config->http_suspended.head;
     while (current != NULL) {
-        http_connection_resume_input((struct t_request_data *)current->data, device, input_data);
+        http_connection_resume_input((struct t_request_data *)current->data, input_event);
         current = current->next;
     }
     list_clear(&config->http_suspended, NULL);
@@ -106,8 +109,7 @@ void event_enqueue_input(struct t_config *config, const char *device, struct t_i
  */
 void event_data_clear(struct t_list_node *node) {
     struct t_event_data *data = (struct t_event_data *)node->data;
-    sdsfree(data->input_event_device);
-    data->input_event_device = NULL;
+    (void)data;
 }
 
 /**
@@ -145,23 +147,19 @@ static struct t_event_data *event_data_new_gpio(enum mygpiod_event_types mygpiod
     struct t_event_data *event_data = malloc_assert(sizeof(struct t_event_data));
     event_data->mygpiod_event_type = mygpiod_event_type;
     event_data->timestamp_ns = timestamp_ns;
-    event_data->input_event_device = NULL;
     return event_data;
 }
 
 /**
  * Creates the event data for an input device
- * @param input_data Input event data
- * @param device Input device
+ * @param input_event Input event
  * @return Newly allocated struct
  */
-static struct t_event_data *event_data_new_input(struct t_input_event *input_data, const char *device) {
+static struct t_event_data *event_data_new_input(struct t_mygpiod_input_event *input_event) {
     struct t_event_data *event_data = malloc_assert(sizeof(struct t_event_data));
     event_data->mygpiod_event_type = MYGPIOD_EVENT_INPUT;
-    event_data->timestamp_ns = (uint64_t)(input_data->time.tv_sec * 1000000) + (uint64_t)(input_data->time.tv_usec * 1000);
-    event_data->input_event_device = sdsnew(device);
-    event_data->input_event_type = input_data->type;
-    event_data->input_event_code = input_data->code;
-    event_data->input_event_value = input_data->value;
+    event_data->timestamp_ns = (uint64_t)(input_event->data.time.tv_sec * 1000000) + (uint64_t)(input_event->data.time.tv_usec * 1000);
+    event_data->input_event.device = input_event->device;
+    memcpy(&event_data->input_event.data, &input_event->data, sizeof(struct t_input_event));
     return event_data;
 }

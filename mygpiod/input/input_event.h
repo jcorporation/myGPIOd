@@ -11,6 +11,8 @@
 #ifndef MYGPIOD_INPUT_EVENT_H
 #define MYGPIOD_INPUT_EVENT_H
 
+#include "mygpiod/config/config.h"
+
 #include <sys/time.h>
 
 /**
@@ -24,6 +26,14 @@ struct t_input_event {
     unsigned short code;  //!< event code, for example REL_X or KEY_BACKSPACE
     unsigned int value;   //!< the value the event carries. Either a relative change for EV_REL, absolute new 
                           //!< value for EV_ABS (joysticks ...), or 0 for EV_KEY for release, 1 for keypress and 2 for autorepeat.
+};
+
+/**
+ * Container for t_input_event and device
+ */
+struct t_mygpiod_input_event {
+    struct t_input_device *device;  //!< Input device
+    struct t_input_event data;      //!< Input event data
 };
 
 #endif

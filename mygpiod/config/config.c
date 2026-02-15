@@ -313,7 +313,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     if (strcmp(key, "input") == 0) {
         struct t_input_device *data = malloc_assert(sizeof(struct t_input_device));
         data->fd = -1;
-        data->device = sdsdup(value);
+        data->name = sdsdup(value);
         list_init(&data->event_actions);
         list_push(&config->inputs, 0, data);
         MYGPIOD_LOG_DEBUG("Adding input %s", value);

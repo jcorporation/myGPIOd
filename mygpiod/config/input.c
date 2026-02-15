@@ -84,12 +84,12 @@ bool parse_input_ev(struct t_config *config, sds config_value) {
 
 /**
  * Frees pointers and closes file descriptors from this node.
- * @param data input data to clear
+ * @param device input data to clear
  */
-void input_data_clear(struct t_input_device *data) {
-    close_fd(&data->fd);
-    sdsfree(data->device);
-    list_clear(&data->event_actions, node_data_input_event_actions_clear);
+void input_data_clear(struct t_input_device *device) {
+    close_fd(&device->fd);
+    sdsfree(device->name);
+    list_clear(&device->event_actions, node_data_input_event_actions_clear);
 }
 
 /**
@@ -97,8 +97,8 @@ void input_data_clear(struct t_input_device *data) {
  * @param node input config node to clear
  */
 void input_node_data_clear(struct t_list_node *node) {
-    struct t_input_device *data = (struct t_input_device *)node->data;
-    input_data_clear(data);
+    struct t_input_device *device = (struct t_input_device *)node->data;
+    input_data_clear(device);
 }
 
 // Private functions
@@ -113,7 +113,7 @@ struct t_input_device *get_device(struct t_config *config, const char *device) {
     struct t_list_node *current = config->inputs.head;
     while (current != NULL) {
         struct t_input_device *data = (struct t_input_device *)current->data;
-        if (strcmp(data->device, device) == 0) {
+        if (strcmp(data->name, device) == 0) {
             return data;
         }
         current = current->next;
