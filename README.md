@@ -8,6 +8,8 @@ I wrote this tool primarily for [myMPDos](https://github.com/jcorporation/myGPIO
 
 myGPIOd can communicate natively with MPD and also integrates nicely with all HTTP APIs.
 
+Since version 2.0.0 myGPIOd can also read events from generic input devices (`/dev/input/..`).
+
 ## Features
 
 - **mygpiod - the daemon component**
