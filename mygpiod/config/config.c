@@ -22,14 +22,19 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
-#include "mygpiod/server_http/util.h"
+#ifdef MYGPIOD_ENABLE_HTTPD
+    #include "mygpiod/server_http/util.h"
+#endif
 #include "mygpiod/server_socket/socket.h"
+
 
 #include <dirent.h>
 #include <errno.h>
 #include <gpiod.h>
 #include <limits.h>
-#include <microhttpd.h>
+#ifdef MYGPIOD_ENABLE_HTTPD
+    #include <microhttpd.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
