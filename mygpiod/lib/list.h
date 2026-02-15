@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Linked list implementation
+ */
+
 #ifndef MYGPIOD_LIST_H
 #define MYGPIOD_LIST_H
 
@@ -27,6 +31,9 @@ struct t_list {
     unsigned length;           //!< list length
 };
 
+/**
+ * Callback definition for freeing list_node data
+ */
 typedef void (*list_data_clear)(struct t_list_node *node);
 
 void list_init(struct t_list *list);

@@ -435,6 +435,21 @@ run_doxygen() {
   mv contrib/man/man3/t_mygpio_idle_event.3 contrib/man/man3/libmygpio_t_mygpio_idle_event.3 
 }
 
+check_int_api_doc() {
+  if ! check_cmd doxygen
+  then
+    return 1
+  fi
+  TMPDIR=$(mktemp -d)
+  {
+    cat Doxyfile
+    echo "OUTPUT_DIRECTORY = $TMPDIR"
+    echo "GENERATE_MAN = NO"
+    echo "INPUT = mygpio-common mygpioc mygpiod"
+  } | doxygen -
+  rm -rf "$TMPDIR"
+}
+
 create_doc() {
   DOC_DEST=$1
   install -d "$DOC_DEST" || return 1
@@ -527,6 +542,9 @@ case "$ACTION" in
   check)
     check
   ;;
+  check_int_api_doc)
+    check_int_api_doc
+  ;;
   pkgdebian)
     pkgdebian
   ;;
@@ -598,52 +616,55 @@ case "$ACTION" in
     echo "Version: ${VERSION}"
     echo ""
     echo "Build options:"
-    echo "  release:          build release files in directory release (stripped)"
-    echo "  RelWithDebInfo:   build release files in directory release (with debug info)"
-    echo "  install:          installs release files from directory release"
-    echo "                    following environment variables are respected"
-    echo "                      - DESTDIR=\"\""
-    echo "  releaseinstall:   calls release and install afterwards"
-    echo "  debug:            builds debug files in directory debug,"
-    echo "  asan|tsan|ubsan:  builds debug files in directory debug"
-    echo "                    linked with the sanitizer"
-    echo "  check:            runs clang-tidy on source files"
+    echo "  release:            build release files in directory release (stripped)"
+    echo "  RelWithDebInfo:     build release files in directory release (with debug info)"
+    echo "  install:            installs release files from directory release"
+    echo "                      following environment variables are respected"
+    echo "                        - DESTDIR=\"\""
+    echo "  releaseinstall:     calls release and install afterwards"
+    echo "  debug:              builds debug files in directory debug,"
+    echo "  asan|tsan|ubsan:    builds debug files in directory debug"
+    echo "                      linked with the sanitizer"
+    echo ""
+    echo "Check options:"
+    echo "  check:              runs clang-tidy on source files"
+    echo "  check_int_api_doc:  runs doxygen for myygpio-common, mygpioc and mygpiod"
     echo ""
     echo "Cleanup options:"
-    echo "  cleanup:          cleanup source tree"
-    echo "  uninstall:        removes mygpiod files, leaves configuration in place "
-    echo "                    following environment variables are respected"
-    echo "                      - DESTDIR=\"\""
-    echo "  purge:            removes all mygpiod files, also your init scripts and configuration"
-    echo "                    following environment variables are respected"
-    echo "                      - DESTDIR=\"\""
+    echo "  cleanup:            cleanup source tree"
+    echo "  uninstall:          removes mygpiod files, leaves configuration in place "
+    echo "                      following environment variables are respected"
+    echo "                        - DESTDIR=\"\""
+    echo "  purge:              removes all mygpiod files, also your init scripts and configuration"
+    echo "                      following environment variables are respected"
+    echo "                        - DESTDIR=\"\""
     echo ""
     echo "Packaging options:"
-    echo "  pkgalpine:        creates the alpine package"
-    echo "  pkgarch:          creates the arch package"
-    echo "                    following environment variables are respected"
-    echo "                      - SIGN=\"FALSE\""
-    echo "                      - GPGKEYID=\"\""
-    echo "  pkgdebian:        creates the debian package"
-    echo "                    following environment variables are respected"
-    echo "                      - SIGN=\"FALSE\""
-    echo "                      - GPGKEYID=\"\""
-    echo "  pkgrpm:           creates the rpm package"
-    echo "  pkgosc:           updates the open build service repository"
-    echo "                    following environment variables are respected"
-    echo "                      - OSC_REPO=\"home:jcorporation/myGPIOd\""
-    echo "  pkgdocker:        creates the docker image"
+    echo "  pkgalpine:          creates the alpine package"
+    echo "  pkgarch:            creates the arch package"
+    echo "                      following environment variables are respected"
+    echo "                        - SIGN=\"FALSE\""
+    echo "                        - GPGKEYID=\"\""
+    echo "  pkgdebian:          creates the debian package"
+    echo "                      following environment variables are respected"
+    echo "                        - SIGN=\"FALSE\""
+    echo "                        - GPGKEYID=\"\""
+    echo "  pkgrpm:             creates the rpm package"
+    echo "  pkgosc:             updates the open build service repository"
+    echo "                      following environment variables are respected"
+    echo "                        - OSC_REPO=\"home:jcorporation/myGPIOd\""
+    echo "  pkgdocker:          creates the docker image"
     echo ""
     echo "Documentation options"
-    echo "  api_doc|man:      generates the api documentation and manpages for libmygpio"
-    echo "  doc:              generates the html documentation"
-    echo "  serve_doc:        generates the html documentation and runs a development server"
+    echo "  api_doc|man:        generates the api documentation and manpages for libmygpio"
+    echo "  doc:                generates the html documentation"
+    echo "  serve_doc:          generates the html documentation and runs a development server"
     echo ""
     echo "Misc options:"
-    echo "  setversion:       sets version and date in packaging files from CMakeLists.txt"
-    echo "  addmygpioduser:   adds mygpiod group and user"
-    echo "  gpiosim:          creates a simulated gpio device with help of gpiosim"
-    echo "  create_includes:  create required dynamic includes"
+    echo "  setversion:         sets version and date in packaging files from CMakeLists.txt"
+    echo "  addmygpioduser:     adds mygpiod group and user"
+    echo "  gpiosim:            creates a simulated gpio device with help of gpiosim"
+    echo "  create_includes:    create required dynamic includes"
     echo ""
     exit 1
   ;;

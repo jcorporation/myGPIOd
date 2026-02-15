@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Logging
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lib/log.h"
 

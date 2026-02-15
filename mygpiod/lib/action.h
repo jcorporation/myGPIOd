@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief General action functions
+ */
+
 #ifndef MYGPIOD_LIB_ACTION_H
 #define MYGPIOD_LIB_ACTION_H
 

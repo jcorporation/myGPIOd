@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief GPIO commands
+ */
+
 #include "compile_time.h"
 #include "mygpioc/gpio.h"
 

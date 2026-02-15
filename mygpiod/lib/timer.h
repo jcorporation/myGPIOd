@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Timer implementation
+ */
+
 #ifndef MYGPIOD_TIMER_H
 #define MYGPIOD_TIMER_H
 

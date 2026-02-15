@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief vcio commands
+ */
+
 #include "compile_time.h"
 #include "libmygpio/include/libmygpio/libmygpio_connection.h"
 #include "libmygpio/include/libmygpio/libmygpio_protocol.h"

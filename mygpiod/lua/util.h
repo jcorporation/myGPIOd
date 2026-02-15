@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Lua helper functions
+ */
+
 #ifndef MYGPIOD_LUA_UTIL_H
 #define MYGPIOD_LUA_UTIL_H
 

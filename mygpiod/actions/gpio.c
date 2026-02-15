@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief GPIO actions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/actions/gpio.h"
 
@@ -17,6 +21,7 @@
 
 /**
  * Sets an output gpio
+ * @param config Pointer to config
  * @param action Action struct, options must be:
  *            {gpio} {active|inactive}
  * @returns true on success, else false
@@ -42,6 +47,7 @@ bool action_gpioset(struct t_config *config, struct t_action *action) {
 
 /**
  * Toggle the value of an output gpio
+ * @param config Pointer to config
  * @param action Action struct, options must be:
  *            {gpio}
  * @returns true on success, else false
@@ -61,6 +67,7 @@ bool action_gpiotoggle(struct t_config *config, struct t_action *action) {
 
 /**
  * Blink the value of an output gpio
+ * @param config Pointer to config
  * @param action Action struct, options must be:
  *            {gpio} {timeout} {interval}
  * @returns true on success, else false

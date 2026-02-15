@@ -4,8 +4,12 @@
  https://github.com/jcorporation/myGPIOd
 */
 
-#ifndef MYGPIOD_RASPBERRY_H
-#define MYGPIOD_RASPBERRY_H
+/*! \file
+ * \brief Raspberry videocore /dev/vcio
+ */
+
+#ifndef MYGPIOD_VCGENCMD_H
+#define MYGPIOD_VCGENCMD_H
 
 #include "dist/sds/sds.h"
 #include <stdbool.h>

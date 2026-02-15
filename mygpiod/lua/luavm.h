@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Lua VM
+ */
+
 #ifndef MYGPIOD_LUA_LUAVM_H
 #define MYGPIOD_LUA_LUAVM_H
 

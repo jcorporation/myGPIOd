@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Option handling
+ */
+
 #include "compile_time.h"
 #include "mygpioc/options.h"
 
@@ -15,6 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * All options
+ */
 static struct option long_options[] = {
     {"help",    no_argument,       0, 'h'},
     {"socket",  required_argument, 0, 's'},
@@ -24,8 +31,6 @@ static struct option long_options[] = {
 
 /**
  * Prints the command line usage information
- * @param config pointer to config struct
- * @param cmd argv[0] from main function
  */
 void print_usage(void) {
     fprintf(stderr, "\nUsage: mygpioc [options] <command> [<arguments>]\n\n"
@@ -57,9 +62,9 @@ void print_usage(void) {
 
 /**
  * Handles the command line arguments
- * @param config pointer to myGPIOd static configuration
  * @param argc from main function
  * @param argv from main function
+ * @param options Pointer to options struct
  * @return optind
  */
 int handle_options(int argc, char **argv, struct t_options *options) {

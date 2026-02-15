@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input device event type parsing
+ */
+
 #include "compile_time.h"
 #include "mygpiod/input/event_type.h"
 

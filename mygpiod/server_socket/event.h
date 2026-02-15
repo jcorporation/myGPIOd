@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Event command handling (only for debug builds)
+ */
+
 #ifndef MYGPIOD_SERVER_EVENT_H
 #define MYGPIOD_SERVER_EVENT_H
 

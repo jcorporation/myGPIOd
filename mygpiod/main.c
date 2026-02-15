@@ -50,6 +50,12 @@ const char *__asan_default_options(void) {
 }
 #endif
 
+/**
+ * The main function of mygpiod.
+ * @param argc number of command line arguments
+ * @param argv char array of the command line arguments
+ * @return 0 on success
+ */
 int main(int argc, char **argv) {
     // Set initial states
     int rc = EXIT_SUCCESS;

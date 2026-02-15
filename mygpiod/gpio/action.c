@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief GPIO action handling
+ */
+
 #include "compile_time.h"
 #include "mygpiod/gpio/action.h"
 
@@ -31,7 +35,7 @@ static void gpio_action_delay(struct t_gpio_in_data *data);
  * and notifies the clients.
  * @param config pointer to config
  * @param gpio the gpio number
- * @param timestamp timestamp of the event in nanoseconds
+ * @param timestamp_ns timestamp of the event in nanoseconds
  * @param event_type the event type
  * @param data gpio config data
  */
@@ -115,7 +119,7 @@ void gpio_action_execute_delayed(unsigned gpio, struct t_gpio_in_data *data, str
 
 /**
  * Closes a timerfd for a delayed action
- * @param node pointer to node
+ * @param data pointer to t_gpio_in_data
  */
 void gpio_action_delay_abort(struct t_gpio_in_data *data) {
     MYGPIOD_LOG_DEBUG("Removing action delay timer");
@@ -125,9 +129,9 @@ void gpio_action_delay_abort(struct t_gpio_in_data *data) {
 //private functions
 
 /**
- * Creates a timerfd for the long press action
- * @param node gpio config data
- * @param event_type the event type
+ * Creates a timerfd for the long press action.
+ * Removes an existing one before
+ * @param data pointer to t_gpio_in_data
  */
 static void gpio_action_delay(struct t_gpio_in_data *data) {
     if (data->timer_fd > -1) {

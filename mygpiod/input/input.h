@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input device event handling
+ */
+
 #ifndef MYGPIOD_INPUT_H
 #define MYGPIOD_INPUT_H
 

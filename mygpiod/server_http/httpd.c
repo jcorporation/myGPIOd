@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief HTTP server implementation based on libmicrohttpd
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_http/httpd.h"
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief HTTP server GPIO REST API
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_http/rest_api_gpio.h"
 
@@ -173,6 +177,7 @@ sds rest_api_gpio_gpio_options(struct t_config *config,
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
+ * @param connection HTTP connection
  * @param rc pointer to bool to set the result code
  * @return sds pointer to buffer
  */
@@ -211,7 +216,7 @@ sds rest_api_gpio_gpio_blink(struct t_config *config,
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
- * @param upload_data HTTP post data
+ * @param connection HTTP connection
  * @param rc pointer to bool to set the result code
  * @return sds pointer to buffer
  */
@@ -249,7 +254,6 @@ sds rest_api_gpio_gpio_set(struct t_config *config,
  * @param config pointer to config
  * @param buffer already allocated buffer to populate with the response
  * @param gpio_nr gpio number
- * @param action action for the gpio, one of blink, set, toggle
  * @param rc pointer to bool to set the result code
  * @return sds pointer to buffer
  */

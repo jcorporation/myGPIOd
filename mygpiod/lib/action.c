@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief General action functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lib/action.h"
 #include "mygpiod/lib/log.h"

@@ -31,6 +31,10 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*! \file
+ * \brief Raspberry videocore /dev/vcio
+ */
+
 #include "compile_time.h"
 #include "mygpiod/raspberry/vcgencmd.h"
 
@@ -45,9 +49,24 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+/**
+ * Raspberry video core device path
+ */
 #define DEVICE_FILE_NAME "/dev/vcio"
+
+/**
+ * Raspberry video core device major number
+ */
 #define MAJOR_NUM 100
+
+/**
+ * Raspberry video core mbox property
+ */
 #define IOCTL_MBOX_PROPERTY _IOWR(MAJOR_NUM, 0, char *)
+
+/**
+ * Raspberry video core max message length
+ */
 #define MAX_STRING 1024
 
 /**
@@ -89,7 +108,9 @@ static void mbox_close(int file_desc) {
     close(file_desc);
 }
 
-
+/**
+ * the tag id
+ */
 #define GET_GENCMD_RESULT 0x00030080
 
 /**
@@ -105,7 +126,7 @@ static int gencmd(int file_desc, const char *command, sds *buffer) {
     size_t len = strlen(command);
     p[i++] = 0;                 // size
     p[i++] = 0x00000000;        // process request
-    p[i++] = GET_GENCMD_RESULT; // (the tag id)
+    p[i++] = GET_GENCMD_RESULT; // the tag id
     p[i++] = MAX_STRING;        // buffer_len
     p[i++] = 0;                 // request_len (set to response length)
     p[i++] = 0;                 // error response

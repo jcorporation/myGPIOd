@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief HTTP server implementation based on libmicrohttpd
+ */
+
 #ifndef MYGPIOD_SERVER_HTTPD_H
 #define MYGPIOD_SERVER_HTTPD_H
 

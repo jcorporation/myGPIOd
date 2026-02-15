@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input GPIO functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/gpio/input.h"
 
@@ -17,8 +21,9 @@
 #include <string.h>
 
 /**
- * Request the input gpios.
- * @param config pointer to config
+ * Request the input GPIOs.
+ * @param config Pointer to config
+ * @param poll_fds Pointer to poll_fds array 
  * @return true on success, else false
  */
 bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {

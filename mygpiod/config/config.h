@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Global configuration
+ */
+
 #ifndef MYGPIOD_CONFIG_H
 #define MYGPIOD_CONFIG_H
 

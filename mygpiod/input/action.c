@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Input device action handling handling
+ */
+
 #include "compile_time.h"
 #include "mygpiod/input/action.h"
 
@@ -20,9 +24,9 @@ static bool check_event(struct t_input_event_actions *event, struct t_input_even
 // Public functions
 
 /**
- * Handles the configured actions for an input event
- * and notifies the clients.
- * @param config pointer to config
+ * Handles the configured actions for an input event and notifies the clients.
+ * @param config Pointer to config
+ * @param device Pointer do t_input_device
  * @param input_data Input event data
  */
 void input_action_handle(struct t_config *config, struct t_input_device *device, struct t_input_event *input_data) {

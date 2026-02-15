@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief vcio commands
+ */
+
 #ifndef MYGPIOC_RASPBERRY_VCIO_H
 #define MYGPIOC_RASPBERRY_VCIO_H
 

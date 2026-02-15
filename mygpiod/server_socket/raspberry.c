@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Raspberry command handling
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_socket/raspberry.h"
 

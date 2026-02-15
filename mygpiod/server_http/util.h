@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief HTTP server utility functions
+ */
+
 #ifndef MYGPIOD_SERVER_HTTPD_UTIL_H
 #define MYGPIOD_SERVER_HTTPD_UTIL_H
 

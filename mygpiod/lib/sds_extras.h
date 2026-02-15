@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief sds related functions
+ */
+
 #ifndef MYGPIOD_SDS_EXTRAS_H
 #define MYGPIOD_SDS_EXTRAS_H
 
@@ -13,6 +17,9 @@
 #include <stddef.h>
 #include <stdio.h>
 
+/**
+ * Free sds and set it to NULL
+ */
 #define FREE_SDS(SDS_PTR) do { \
     sdsfree(SDS_PTR); \
     SDS_PTR = NULL; \

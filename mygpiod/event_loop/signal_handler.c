@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Signal handler
+ */
+
 #include "compile_time.h"
 #include "mygpiod/event_loop/signal_handler.h"
 

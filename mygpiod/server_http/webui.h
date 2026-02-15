@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief HTTP server webui
+ */
+
 #ifndef MYGPIOD_SERVER_HTTPD_WEBUI_H
 #define MYGPIOD_SERVER_HTTPD_WEBUI_H
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Signal handler
+ */
+
 #ifndef MYGPIOD_SIGNAL_HANDLER_H
 #define MYGPIOD_SIGNAL_HANDLER_H
 

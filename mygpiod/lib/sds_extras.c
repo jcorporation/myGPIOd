@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief sds related functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lib/sds_extras.h"
 

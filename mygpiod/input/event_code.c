@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input device event code parsing
+ */
+
 #include "compile_time.h"
 #include "mygpiod/input/event_code.h"
 
@@ -55,7 +59,8 @@ static const struct t_input_event_code_name input_event_sw_code_names[] = {
 
 /**
  * Returns the name of an input event code
- * @param event_type Input event code
+ * @param event_type Input event type
+ * @param event_code Input event code
  * @return const char* Name of input event code
  */
 const char *input_event_code_name(unsigned short event_type, unsigned short event_code) {

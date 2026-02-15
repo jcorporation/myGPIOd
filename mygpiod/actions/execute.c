@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Actions execute handler
+ */
+
 #include "compile_time.h"
 #include "mygpiod/actions/execute.h"
 

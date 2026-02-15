@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOweb
 */
 
+/*! \file
+ * \brief JSON printing
+ */
+
 #include "mygpiod/lib//json_print.h"
 
 #include "dist/sds/sds.h"

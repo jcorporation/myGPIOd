@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief HTTP actions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/actions/http.h"
 
@@ -38,10 +42,10 @@ const char *http_methods[] = {
  * Arguments for the curl thread
  */
 struct t_curl_arguments {
-    sds method;
-    sds uri;
-    sds content_type;
-    sds postdata;
+    sds method;          //!< HTTP method
+    sds uri;             //!< URI
+    sds content_type;    //!< Content type of post data
+    sds postdata;        //!< Post data
 };
 
 static void free_curl_arguments(struct t_curl_arguments *arg);
@@ -145,11 +149,8 @@ static bool validate_http_method(const char *method) {
 
 /**
  * Makes an HTTP call
- * @param method HTTP method
- * @param uri HTTP Uri
- * @param content_type Content-Type or NULL
- * @param postdata data to post or NULL
- * @return true on success, else false
+ * @param thread_arg Void pointer to struct t_curl_arguments
+ * @returns NULL
  */
 static void *curl_thread(void *thread_arg) {
     // Initialize

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Central event loop
+ */
+
 #include "compile_time.h"
 #include "mygpiod/event_loop/event_loop.h"
 
@@ -56,9 +60,10 @@ const char *lookup_pfd_type(enum pfd_types type) {
 
 /**
  * Adds a fd to the list of fds to poll
- * @param poll_fds struct to add the new fd
- * @param fd fd to add
- * @param pfd_type type of poll fd
+ * @param poll_fds Struct to add the new fd
+ * @param fd File descriptor to add
+ * @param pfd_type Type of poll fd
+ * @param events Events to poll for
  * @return true on success, else false
  */
 bool event_poll_fd_add(struct t_poll_fds *poll_fds, int fd, enum pfd_types pfd_type, short events) {
@@ -143,6 +148,7 @@ void close_fd(int *fd) {
  * Delegates the read events by type
  * @param config pointer to config
  * @param poll_fds t_poll_fds struct to populate
+ * @returns true, false to signal to exit the event loop
  */
 bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
     for (unsigned i = 0; i < poll_fds->len; i++) {

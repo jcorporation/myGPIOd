@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Common mygpio utility functions
+ */
+
 #include "compile_time.h"
 #include "mygpio-common/util.h"
 

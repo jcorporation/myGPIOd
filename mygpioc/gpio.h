@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief GPIO commands
+ */
+
 #ifndef MYGPIOC_GPIO_H
 #define MYGPIOC_GPIO_H
 

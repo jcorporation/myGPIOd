@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief HTTP server Raspberry REST API
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_http/rest_api_raspberry.h"
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Custom Lua functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lua/functions.h"
 

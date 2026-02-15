@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input device configuration
+ */
+
 #include "compile_time.h"
 #include "mygpiod/config/input.h"
 
@@ -29,7 +33,7 @@ static void node_data_input_event_actions_clear(struct t_list_node *node);
 /**
  * Parses an input_ev config line
  * @param config Pointer to config
- * @param value value to parse
+ * @param config_value value to parse
  * @return true on success, else false
  */
 bool parse_input_ev(struct t_config *config, sds config_value) {

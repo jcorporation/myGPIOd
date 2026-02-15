@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief GPIO event handling
+ */
+
 #include "compile_time.h"
 #include "mygpiod/gpio/event.h"
 
@@ -59,9 +63,9 @@ bool gpio_handle_event(struct t_config *config, int *fd) {
 // private functions
 
 /**
- * Gets the client node by gpio fd
- * @param clients list of clients
- * @param fd gpio fd
+ * Gets the GPIO data by GPIO fd
+ * @param gpios_in list of input GPIOs
+ * @param gpio_fd gpio fd
  * @return the list node or NULL on error
  */
 static struct t_list_node *get_node_by_gpio_fd(struct t_list *gpios_in, int *gpio_fd) {

@@ -4,13 +4,17 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Utility functions
+ */
+
 #ifndef MYGPIOC_UTIL_H
 #define MYGPIOC_UTIL_H
 
 #include <stdbool.h>
 #include <stdint.h>
 
-extern bool verbose;
+extern bool verbose; //!< Global verbose flag
 
 void verbose_printf(const char *fmt, ...);
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Socket protocol implementation
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_socket/protocol.h"
 
@@ -24,6 +28,9 @@
 
 // private definitions
 
+/**
+ * Protocol commands
+ */
 static const char *cmd_strs[] = { CMDS(GEN_STR) };
 
 static enum cmd_ids parse_command(sds cmd);
@@ -33,7 +40,7 @@ static enum cmd_ids parse_command(sds cmd);
 /**
  * Handles the client commands
  * @param config pointer to config
- * @param node pointer to node holding the client connection
+ * @param client_node pointer to node holding the client connection
  * @return true on success, else false
  */
 bool server_protocol_handler(struct t_config *config, struct t_list_node *client_node) {

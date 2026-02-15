@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Lua actions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/actions/lua.h"
 
@@ -15,6 +19,7 @@
 
 /**
  * Calls a lua function
+ * @param config Pointer to config
  * @param action Action struct
  * @returns true on success, else false
  */

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input device event handling
+ */
+
 #include "compile_time.h"
 #include "mygpiod/input/input.h"
 
@@ -27,7 +31,8 @@ static struct t_input_device *get_input_device_by_fd(struct t_list *inputs, int 
 
 /**
  * Opens the input devices and add's it to the poll fds array
- * @param config pointer to config
+ * @param config Pointer to config
+ * @param poll_fds Pointer to poll_fds array
  * @return true on success, else false
  */
 bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
@@ -57,7 +62,8 @@ bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
 /**
  * Reads the event data from an input event
  * @param config Pointer to config
- * @param fd fd with data to read
+ * @param fd Pointer to file descriptor with data to read
+ * @returns true on success, else false
  */
 bool input_handle_event(struct t_config *config, int *fd) {
     struct t_input_device *device = get_input_device_by_fd(&config->inputs, fd);

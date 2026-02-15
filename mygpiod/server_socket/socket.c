@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Unix socket server
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_socket/socket.h"
 
@@ -32,8 +36,8 @@
 
 // private definitions
 
-static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd);
-static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd);
+static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *client_fd);
+static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *timeout_fd);
 
 // public functions
 
@@ -245,6 +249,7 @@ bool server_client_disconnect(struct t_list *clients, struct t_list_node *node) 
  * Adds/replaces a socket timeout handler
  * @param timeout_fd socket
  * @param timeout_s timeout in seconds
+ * @returns New or updated file descriptor
  */
 int server_client_connection_set_timeout(int timeout_fd, int timeout_s) {
     // First try to update an existing timer
@@ -268,7 +273,8 @@ void server_client_connection_remove_timeout(struct t_client_data *data) {
 /**
  * Disconnects a client after timeout expired
  * @param clients pointer to client list
- * @param fd timeout timer fd
+ * @param timeout_fd timeout timer fd
+ * @returns true if client was disconnect, false if no client was found
  */
 bool server_client_timeout(struct t_list *clients, int *timeout_fd) {
     timer_log_next_expire(*timeout_fd);
@@ -287,14 +293,14 @@ bool server_client_timeout(struct t_list *clients, int *timeout_fd) {
 /**
  * Gets the client node by timer_fd
  * @param clients list of clients
- * @param fd client fd
+ * @param client_fd Pointer to client file descriptor
  * @return the list node or NULL on error
  */
-static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd) {
+static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *client_fd) {
     struct t_list_node *current = clients->head;
     while (current != NULL) {
         struct t_client_data *data = (struct t_client_data *)current->data;
-        if (data->fd == *fd) {
+        if (data->fd == *client_fd) {
             return current;
         }
         current = current->next;
@@ -305,14 +311,14 @@ static struct t_list_node *get_node_by_clientfd(struct t_list *clients, int *fd)
 /**
  * Gets the client node by timeout_fd
  * @param clients list of clients
- * @param fd timeout_fd
+ * @param timeout_fd Pointer to file descriptor
  * @return the list node or NULL on error
  */
-static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *fd) {
+static struct t_list_node *get_node_by_timeoutfd(struct t_list *clients, int *timeout_fd) {
     struct t_list_node *current = clients->head;
     while (current != NULL) {
         struct t_client_data *data = (struct t_client_data *)current->data;
-        if (data->timeout_fd == *fd) {
+        if (data->timeout_fd == *timeout_fd) {
             return current;
         }
         current = current->next;

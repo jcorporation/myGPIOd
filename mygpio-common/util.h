@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Common mygpio utility functions
+ */
+
 #ifndef MYGPIO_COMMON_UTIL_H
 #define MYGPIO_COMMON_UTIL_H
 

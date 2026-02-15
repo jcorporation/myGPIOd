@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief MPD client actions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/actions/mpc.h"
 
@@ -24,13 +28,14 @@ static bool mpc_check_conn(struct t_config *config);
 
 /**
  * Controls MPD, re-uses the existing connection or creates a new one
+ * @param config Pointer to config
  * @param action Action struct
  * @returns true on success, else false
  */
 bool action_mpc(struct t_config *config, struct t_action *action) {
-    #define MAX_MPC_ARGS 10
+    const int max_mpc_args = 10;  //!< Maximum number of arguments for mpd_send_command
     if (action->options_count < 1 ||
-        action->options_count > MAX_MPC_ARGS)
+        action->options_count > max_mpc_args)
     {
         MYGPIOD_LOG_ERROR("Invalid number of arguments: %d", action->options_count);
         return false;
@@ -43,8 +48,8 @@ bool action_mpc(struct t_config *config, struct t_action *action) {
         return false;
     }
     // We are connected
-    sds *tokens = malloc_assert(sizeof(sds)*MAX_MPC_ARGS);
-    for (int i = 0; i < MAX_MPC_ARGS; i++) {
+    sds *tokens = malloc_assert(sizeof(sds)*max_mpc_args);
+    for (int i = 0; i < max_mpc_args; i++) {
         tokens[i] = i < action->options_count
             ? action->options[i]
             : NULL;
@@ -63,7 +68,7 @@ bool action_mpc(struct t_config *config, struct t_action *action) {
 
 /**
  * Checks if the MPD connection is ready
- * @param config pointer to config struct
+ * @param config Pointer to config struct
  * @return true if it ready, else false
  */
 static bool mpc_check_conn(struct t_config *config) {

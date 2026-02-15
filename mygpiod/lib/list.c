@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Linked list implementation
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lib/list.h"
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief main function
+ */
+
 #include "compile_time.h"
 #include "libmygpio/include/libmygpio/libmygpio.h"
 
@@ -17,17 +21,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool verbose;
+bool verbose; //!< Global verbose flag
 
+/**
+ * Definition for command callback handler
+ */
 typedef int (*command_handler)(int argc, char **argv, int option_index, struct t_mygpio_connection *conn);
 
+/**
+ * Struct holding allowed commands and min/max number of parameters
+ */
 struct t_commands {
-    const char *command;
-    command_handler handler;
-    int min_options;
-    int max_options;
+    const char *command;       //!< The command
+    command_handler handler;   //!< Function pointer
+    int min_options;           //!< Minimum number of parameters
+    int max_options;           //!< Maximum number of parameters
 };
 
+/**
+ * All mygpioc commands
+ */
 static struct t_commands commands[] = {
     { "idle", handle_idle, 0, 1 },
     { "gpioinfo", handle_gpioinfo, 1, 1 },
@@ -43,6 +56,13 @@ static struct t_commands commands[] = {
     { NULL, NULL, 0, 0}
 };
 
+/**
+ * Get the command object
+ * @param command_string Command to search for
+ * @param argc Number of arguments given
+ * @param option_index Index offset
+ * @return const struct t_commands* or NULL on error
+ */
 const struct t_commands *get_command(const char *command_string, int argc, int option_index) {
     const struct t_commands *p = NULL;
     for (p = commands; p->command != NULL; p++) {
@@ -61,6 +81,12 @@ const struct t_commands *get_command(const char *command_string, int argc, int o
     return p;
 }
 
+/**
+ * The main function of mygpioc.
+ * @param argc number of command line arguments
+ * @param argv char array of the command line arguments
+ * @return 0 on success
+ */
 int main(int argc, char **argv) {
     struct t_options options;
     init_options(&options);

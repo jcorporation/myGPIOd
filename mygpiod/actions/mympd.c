@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief myMPD actions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/actions/mympd.h"
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Timer implementation
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lib/timer.h"
 

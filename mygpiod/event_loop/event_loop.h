@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Central event loop
+ */
+
 #ifndef MYGPIOD_EVENT_LOOP_H
 #define MYGPIOD_EVENT_LOOP_H
 

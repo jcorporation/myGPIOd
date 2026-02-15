@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Socket server response functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_socket/response.h"
 
@@ -11,7 +15,7 @@
 
 /**
  * Starts a new response by clearing the output buffer.
- * @param data pointer to client data
+ * @param client_data pointer to client data
  */
 void server_response_start(struct t_client_data *client_data) {
     sdsclear(client_data->buf_out);

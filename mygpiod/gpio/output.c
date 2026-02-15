@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Output GPIO functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/gpio/output.h"
 

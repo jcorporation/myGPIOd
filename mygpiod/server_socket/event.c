@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Event command handling (only for debug builds)
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_socket/event.h"
 

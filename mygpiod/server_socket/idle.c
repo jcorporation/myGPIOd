@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Idle command handling
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_socket/idle.h"
 
@@ -37,7 +41,8 @@ bool handle_idle(struct t_list_node *client_node) {
 
 /**
  * Exits the idle mode and sends the waiting idle events to the client
- * @param client_node list node holding the client data
+ * @param config Pointer to config
+ * @param client_node List node holding the client data
  * @return true on success, else false
  */
 bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
@@ -53,7 +58,8 @@ bool handle_noidle(struct t_config *config, struct t_list_node *client_node) {
 
 /**
  * Sends the waiting idle events to the client
- * @param client_node list node holding the client data
+ * @param client_node List node holding the client data
+ * @param send_ok Send OK before response
  * @return true on success, else false
  */
 bool send_idle_events(struct t_list_node *client_node, bool send_ok) {

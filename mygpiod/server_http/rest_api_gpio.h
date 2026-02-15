@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief HTTP server GPIO REST API
+ */
+
 #ifndef MYGPIOD_SERVER_HTTPD_REST_API_GPIO_H
 #define MYGPIOD_SERVER_HTTPD_REST_API_GPIO_H
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Actions execute handler
+ */
+
 #ifndef MYGPIOD_ACTIONS_EXECUTE_H
 #define MYGPIOD_ACTIONS_EXECUTE_H
 

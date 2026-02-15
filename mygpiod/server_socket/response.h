@@ -4,14 +4,28 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Socket server response functions
+ */
+
 #ifndef MYGPIOD_SERVER_RESPONSE_H
 #define MYGPIOD_SERVER_RESPONSE_H
 
 #include "mygpiod/server_socket/socket.h"
 
-// Socket server default responses
+/** 
+ * Default message prefix for errors
+ */
 #define DEFAULT_MSG_ERROR "ERROR:"
+
+/**
+ * Default OK message
+ */
 #define DEFAULT_MSG_OK "OK"
+
+/**
+ * Default end response
+ */
 #define DEFAULT_MSG_END "END"
 
 void server_response_send(struct t_client_data *client_data, const char *message);

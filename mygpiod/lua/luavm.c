@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Lua VM
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lua/luavm.h"
 

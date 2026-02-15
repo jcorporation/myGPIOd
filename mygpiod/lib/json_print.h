@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOweb
 */
 
+/*! \file
+ * \brief JSON printing
+ */
+
 #ifndef JSON_H
 #define JSON_H
 

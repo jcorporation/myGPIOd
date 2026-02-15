@@ -4,12 +4,14 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Utility functions
+ */
+
 #include "mygpioc/util.h"
 
-#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 /**
  * Prints a message if verbose is true

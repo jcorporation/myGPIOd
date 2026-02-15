@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief GPIO chip handling
+ */
+
 #ifndef MYGPIOD_GPIO_CHIP_H
 #define MYGPIOD_GPIO_CHIP_H
 

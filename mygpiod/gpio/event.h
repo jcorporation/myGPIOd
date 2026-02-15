@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief GPIO event handling
+ */
+
 #ifndef MYGPIOD_GPIO_EVENT_H
 #define MYGPIOD_GPIO_EVENT_H
 

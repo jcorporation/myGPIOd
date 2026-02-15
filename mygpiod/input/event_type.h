@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input device event type parsing
+ */
+
 #ifndef MYGPIOD_INPUT_EVENT_TYPE_H
 #define MYGPIOD_INPUT_EVENT_TYPE_H
 

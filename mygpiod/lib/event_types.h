@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Global event type definitions
+ */
+
 #ifndef MYGPIOD_EVENT_TYPES_H
 #define MYGPIOD_EVENT_TYPES_H
 

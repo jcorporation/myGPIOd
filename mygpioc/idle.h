@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief idle commands
+ */
+
 #ifndef MYGPIOC_IDLE_H
 #define MYGPIOC_IDLE_H
 

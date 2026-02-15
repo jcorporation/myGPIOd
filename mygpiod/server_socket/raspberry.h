@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Raspberry command handling
+ */
+
 #ifndef MYGPIOD_SERVER_RASPBERRY_H
 #define MYGPIOD_SERVER_RASPBERRY_H
 

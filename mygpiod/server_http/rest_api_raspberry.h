@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief HTTP server Raspberry REST API
+ */
+
 #ifndef MYGPIOD_SERVER_HTTPD_REST_API_RASPBERRY_H
 #define MYGPIOD_SERVER_HTTPD_REST_API_RASPBERRY_H
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief Input device action handling handling
+ */
+
 #ifndef MYGPIOD_INPUT_ACTION_H
 #define MYGPIOD_INPUT_ACTION_H
 

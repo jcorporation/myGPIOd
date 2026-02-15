@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input GPIO functions
+ */
+
 #ifndef MYGPIOD_GPIO_INPUT_H
 #define MYGPIOD_GPIO_INPUT_H
 

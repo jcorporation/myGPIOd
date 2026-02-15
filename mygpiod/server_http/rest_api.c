@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief HTTP server REST API
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_http/rest_api.h"
 
@@ -63,9 +67,9 @@ static bool match_url_gpio(const char *url,
 /**
  * Handler for REST API Requests
  * @param connection HTTP connection
+ * @param http_conn_id HTTP connection id
  * @param url URL
- * @param method_str HTTP method
- * @param upload_data POST data
+ * @param method HTTP method
  * @param config Pointer to config
  * @return enum MHD_Result 
  */

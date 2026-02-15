@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Socket protocol implementation
+ */
+
 #ifndef MYGPIOD_SERVER_PROTOCOL_H
 #define MYGPIOD_SERVER_PROTOCOL_H
 
@@ -11,6 +15,9 @@
 
 #include <stdbool.h>
 
+/**
+ * Protocol commands
+ */
 #define CMDS(X) \
     X(CMD_INVALID) \
     X(CMD_CLOSE) \
@@ -33,6 +40,10 @@
  * Helper macros
  */
 #define GEN_ENUM(X) X,
+
+/**
+ * Helper macros
+ */
 #define GEN_STR(X) #X,
 
 /**

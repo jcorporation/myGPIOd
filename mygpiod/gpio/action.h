@@ -4,6 +4,10 @@
  https://github.com/jcorporation/mympd
 */
 
+/*! \file
+ * \brief GPIO action handling
+ */
+
 #ifndef MYGPIOD_GPIO_ACTION_H
 #define MYGPIOD_GPIO_ACTION_H
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief General event (enqueue) functions
+ */
+
 #ifndef MYGPIOD_EVENTS_H
 #define MYGPIOD_EVENTS_H
 

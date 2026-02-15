@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Input device configuration
+ */
+
 #ifndef MYGPIOD_CONFIG_INPUT_H
 #define MYGPIOD_CONFIG_INPUT_H
 

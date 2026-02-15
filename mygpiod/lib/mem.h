@@ -7,7 +7,8 @@
 #ifndef MYGPIOD_MEM_H
 #define MYGPIOD_MEM_H
 
-#undef NDEBUG
+#include "mygpiod/lib/log.h"
+
 #include <assert.h>
 #include <stdlib.h>
 
@@ -19,7 +20,10 @@
 __attribute__((malloc))
 static inline void *malloc_assert(size_t size) {
     void *p = malloc(size);
-    assert(p);
+    if (p == NULL) {
+        MYGPIOD_LOG_EMERG(NULL, "Failure allocating %lu bytes of memory", (unsigned long) size);
+        abort();
+    }
     return p;
 }
 
@@ -27,12 +31,15 @@ static inline void *malloc_assert(size_t size) {
  * Reallocs and asserts if it fails
  * @param ptr pointer to resize
  * @param size bytes to realloc
- * @return realloced pointer
+ * @return reallocated pointer
  */
 __attribute__((malloc))
 static inline void *realloc_assert(void *ptr, size_t size) {
     void *p = realloc(ptr, size);
-    assert(p);
+    if (p == NULL) {
+        MYGPIOD_LOG_EMERG(NULL, "Failure allocating %lu bytes of memory", (unsigned long) size);
+        abort();
+    }
     return p;
 }
 

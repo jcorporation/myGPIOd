@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief Unix socket server
+ */
+
 #ifndef MYGPIOD_SERVER_SOCKET_H
 #define MYGPIOD_SERVER_SOCKET_H
 
@@ -22,7 +26,14 @@ enum client_socket_state {
     CLIENT_SOCKET_STATE_WRITING
 };
 
+/**
+ * Max input buffer size
+ */
 #define BUFFER_SIZE_INPUT_MAX 4096
+
+/**
+ * Initial input buffer size
+ */
 #define BUFFER_SIZE 1024
 
 /**

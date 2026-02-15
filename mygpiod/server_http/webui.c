@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief HTTP server webui
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_http/webui.h"
 

@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief HTTP server utility functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/server_http/util.h"
 
@@ -16,7 +20,7 @@
 #include <string.h>
 
 /**
- * Callback of type #include "dist/sds/sds.h"
+ * Callback to free http response
  * @param cls SDS buffer to free
  */
 void http_response_free(void *cls) {
@@ -79,7 +83,7 @@ const char *http_lookup_method(enum http_method method) {
 /**
  * Creates the response message and resumes a suspended connection
  * for the long poll endpoint and an GPIO event
- * @param connection User data from a MHD connection
+ * @param request_data User data from a MHD connection
  * @param gpio GPIO number
  * @param event_type GPIO event
  * @param timestamp Event timestamp
@@ -105,8 +109,9 @@ void http_connection_resume_gpio(struct t_request_data *request_data,
 /**
  * Creates the response message and resumes a suspended connection
  * for the long poll endpoint and an input event
- * @param connection User data from a MHD connection
- * @param input_data Input data
+ * @param request_data User data from a MHD connection
+ * @param device Input event device
+ * @param input_data Input event data
  */
 void http_connection_resume_input(struct t_request_data *request_data,
                                   const char *device,

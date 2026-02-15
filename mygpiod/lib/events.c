@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief General event (enqueue) functions
+ */
+
 #include "compile_time.h"
 #include "mygpiod/lib/events.h"
 
@@ -64,11 +68,10 @@ void event_enqueue_gpio(struct t_config *config, unsigned gpio, enum mygpiod_eve
 }
 
 /**
- * Enqueues a GPIO event for all client connections - socket and http
- * @param config pointer to config
- * @param gpio gpio number of the event
- * @param event_type the mygpiod event type
- * @param timestamp event timestamp in nanoseconds
+ * Enqueues an input device event for all client connections - socket and http
+ * @param config Pointer to config
+ * @param device Input device
+ * @param input_data Input event data
  */
 void event_enqueue_input(struct t_config *config, const char *device, struct t_input_event *input_data) {
     // Socket clients
@@ -110,7 +113,7 @@ void event_data_clear(struct t_list_node *node) {
 /**
  * Returns the mygpiod event type as string.
  * @param event_type the event type
- * @return Event type name
+ * @return Event type name or empty on error
  */
 const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
     switch(event_type) {
@@ -131,9 +134,9 @@ const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
 // private functions
 
 /**
- * Creates the event data
+ * Creates the event data for a GPIO
  * @param mygpiod_event_type event data type
- * @param timestamp event timestamp in nanoseconds
+ * @param timestamp_ns event timestamp in nanoseconds
  * @return Newly allocated struct
  */
 static struct t_event_data *event_data_new_gpio(enum mygpiod_event_types mygpiod_event_type,
@@ -147,9 +150,9 @@ static struct t_event_data *event_data_new_gpio(enum mygpiod_event_types mygpiod
 }
 
 /**
- * Creates the event data
- * @param mygpiod_event_type event data type
- * @param timestamp event timestamp in nanoseconds
+ * Creates the event data for an input device
+ * @param input_data Input event data
+ * @param device Input device
  * @return Newly allocated struct
  */
 static struct t_event_data *event_data_new_input(struct t_input_event *input_data, const char *device) {

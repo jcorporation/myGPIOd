@@ -4,6 +4,10 @@
  https://github.com/jcorporation/myGPIOd
 */
 
+/*! \file
+ * \brief GPIO configuration
+ */
+
 #include "compile_time.h"
 #include "mygpiod/config/gpio.h"
 
