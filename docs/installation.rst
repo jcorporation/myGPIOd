@@ -15,6 +15,7 @@ Dependencies
 
 - C build environment
 - cmake >= 3.13
+- ninja
 - pkgconf
 - libgpiod >= 2.0.0
 - Optional:
