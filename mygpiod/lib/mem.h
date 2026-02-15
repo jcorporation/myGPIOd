@@ -21,7 +21,7 @@ __attribute__((malloc))
 static inline void *malloc_assert(size_t size) {
     void *p = malloc(size);
     if (p == NULL) {
-        MYGPIOD_LOG_EMERG(NULL, "Failure allocating %lu bytes of memory", (unsigned long) size);
+        MYGPIOD_LOG_EMERG("Failure allocating %lu bytes of memory", (unsigned long) size);
         abort();
     }
     return p;
@@ -37,7 +37,7 @@ __attribute__((malloc))
 static inline void *realloc_assert(void *ptr, size_t size) {
     void *p = realloc(ptr, size);
     if (p == NULL) {
-        MYGPIOD_LOG_EMERG(NULL, "Failure allocating %lu bytes of memory", (unsigned long) size);
+        MYGPIOD_LOG_EMERG("Failure allocating %lu bytes of memory", (unsigned long) size);
         abort();
     }
     return p;

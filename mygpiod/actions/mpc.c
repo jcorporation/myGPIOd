@@ -48,7 +48,7 @@ bool action_mpc(struct t_config *config, struct t_action *action) {
         return false;
     }
     // We are connected
-    sds *tokens = malloc_assert(sizeof(sds)*max_mpc_args);
+    sds *tokens = malloc_assert(sizeof(sds)*(size_t)max_mpc_args);
     for (int i = 0; i < max_mpc_args; i++) {
         tokens[i] = i < action->options_count
             ? action->options[i]
