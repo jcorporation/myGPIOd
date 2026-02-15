@@ -17,9 +17,9 @@ Dependencies
 - cmake >= 3.13
 - pkgconf
 - libgpiod >= 2.0.0
-- libmicrohttpd
 - Optional:
   - libcurl
+  - libmicrohttpd >= 1.0.0
   - libmpdclient2
   - lua >= 5.4.0
 
@@ -36,63 +36,57 @@ for development and the documentation.
 4. Build: ``cmake --build build``
 5. Install (as root): ``cmake --install build``
 
-Run
----
 
-myGPIOd needs read-write access to the gpio chip device (e. g. ``/dev/gpiochip0``).
+myMPD specific cmake options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: sh
++-----------------------------+---------+------------------------------------------------+
+| OPTION                      | DEFAULT | DESCRIPTION                                    |
++=============================+=========+================================================+
+| MYGPIOD_ENABLE_ACTION_MPC   | ON      | Enables the mpc action, requires libmpdclient. |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_ENABLE_ACTION_HTTP  | ON      | Enables the http action, requires libcurl.     |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_ENABLE_ACTION_LUA   | ON      | Enables the lua action, requires lua.          |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_ENABLE_HTTPD        | ON      | Enables the integrated http server.            |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_DOC                 | ON      | Installs documentation.                        |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_MANPAGES            | ON      | Creates and installs manpages.                 |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_STARTUP_SCRIPT      | ON      | Installs the startup script.                   |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_CLIENT              | ON      | Builds the myGPIOd client.                     |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_DAEMON              | ON      | Builds the myGPIOd daemon.                     |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_HEADER              | ON      | Installs the myGPIOd headers.                  |
++-----------------------------+---------+------------------------------------------------+
+| MYGPIOD_LIBRARY             | ON      | Builds the myGPIOd library.                    |
++-----------------------------+---------+------------------------------------------------+
 
-   /usr/bin/mygpiod [/etc/mygpiod.conf]
+cmake build types
+~~~~~~~~~~~~~~~~~
 
-The cmake install script creates a startup script for systemd, openrc or sysVinit.
+- **Release, MinSizeRel**
 
-Systemd
-~~~~~~~
+  - Uses predefined compile and link options for a release build
+  - No debug output
+  - Strips binary
 
-You must enable and start the service manually. Use ``systemctl enable mygpiod`` to enable myGPIOd at startup and ``systemctl start mygpiod`` to start myGPIOd now.
+- **RelWithDebInfo**
 
-myGPIOd logs to STDERR, you can see the live logs with ``journalctl -fu mygpiod``.
+  - Uses predefined compile and link options for a release build
+  - No debug output
+  - Included Debug info
 
-The default myGPIOd service unit uses the ``DynamicUser=`` directive, therefore no static mygpiod user is created. If you want to change the group membership of this dynamic user, you must add an override.
+- **Debug**
 
-**Example: add the mygpiod user to the gpio group**
+  - Uses predefined compile and link options for a debug build
+  - Debug output
+  - Included Debug info
 
-.. code:: sh
+- **None**
 
-   mkdir /etc/systemd/system/mygpiod.service.d
-   echo -e '[Service]\nSupplementaryGroups=gpio input' > /etc/systemd/system/mygpiod.service.d/gpio-group.conf
-
-Docker
-~~~~~~
-
-Example docker compose file to start myGPIOd.
-
-.. code:: yaml
-
-   services:
-     mygpiod:
-       image: ghcr.io/jcorporation/mygpiod/mygpiod
-       container_name: mygpiod
-       restart: unless-stopped
-       environment:
-         TZ: Europe/Berlin
-         MPD_HOST: 192.168.1.1
-       user: 1000:1000
-       group_add:
-         - gpio
-         - video
-         - input
-       devices:
-         - /dev/gpiochip0:/dev/gpiochip0
-         - /dev/vcio:/dev/vcio
-         - /dev/input/event0:/dev/input/event0
-       volumes:
-         - /etc/mygpiod.conf:/etc/mygpiod.conf
-         - /etc/mygpiod.d/:/etc/mygpiod.d/
-
-To run ``mygpioc`` in the already running myGPIOd container:
-
-.. code:: sh
-
-   docker exec -it mygpiod mygpioc gpiolist
+  - Use this option to set your own compile and link options
