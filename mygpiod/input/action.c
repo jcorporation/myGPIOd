@@ -74,23 +74,23 @@ void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *
 // Private functions
 
 /**
- * Checks if configured event is the same as the read input data
+ * Checks if configured event is the same as the read input event data
  * @param event Event configuration
  * @param input_data Read input data
  * @return true if it matches, else false
  */
 static bool check_event(struct t_input_event_actions *event, struct t_input_event *input_data) {
-    if (event->event_type != input_data->type) {
+    if (event->type != input_data->type) {
         return false;
     }
-    if (event->event_code != input_data->code) {
+    if (event->code_match == MATCH_VALUE &&
+        event->code != input_data->code)
+    {
         return false;
     }
-    if (event->event_value == UINT_MAX) {
-        // UINT_MAX means any value
-        return true;
-    }
-    if (event->event_value != input_data->value) {
+    if (event->value_match == MATCH_VALUE &&
+        event->value != input_data->value)
+    {
         return false;
     }
     return true;

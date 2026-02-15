@@ -46,11 +46,21 @@ bool parse_input_ev(struct t_config *config, sds config_value) {
 
     struct t_input_device *device = get_device(config, device_str);
     unsigned short type = input_event_type_parse(type_str);
-    unsigned short code = input_event_code_parse(code_str);
+    unsigned short code;
+    enum input_event_match code_match = MATCH_VALUE;
+    if (strcmp(code_str, "*") == 0) {
+        code = KEY_CNT;
+        code_match = MATCH_ALL;
+    }
+    else {
+        code = input_event_code_parse(code_str);
+    }
     unsigned int value;
     bool value_parsed = true;
-    if (strcmp(value_str, "UINT_MAX") == 0) {
+    enum input_event_match value_match = MATCH_VALUE;
+    if (strcmp(value_str, "*") == 0) {
         value = UINT_MAX;
+        value_match = MATCH_ALL;
     }
     else {
         value_parsed = mygpio_parse_uint(value_str, &value, NULL, 0, UINT_MAX);
@@ -74,9 +84,11 @@ bool parse_input_ev(struct t_config *config, sds config_value) {
     }
 
     struct t_input_event_actions *data = malloc_assert(sizeof(struct t_input_event_actions));
-    data->event_type = type;
-    data->event_code = code;
-    data->event_value = value;
+    data->type = type;
+    data->code = code;
+    data->code_match = code_match;
+    data->value = value;
+    data->value_match = value_match;
     data->action.action = action;
     data->action.options = sdssplitargs(config_value, &data->action.options_count);
     return list_push(&device->event_actions, 0, data);

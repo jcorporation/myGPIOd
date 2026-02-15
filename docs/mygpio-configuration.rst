@@ -65,11 +65,16 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
   #input = /dev/input/event3
 
   #input_ev = device:type:code:value:action:options
-  # To ignore the carried event value use UINT_MAX for the value
-  #input_ev = device:type:code:UINT_MAX:action:options
   input_ev = /dev/input/event0:EV_KEY:KEY_POWER:1:system:/home/juergen/projekte/myGPIOd/etc/command.sh
 
-Supported event types: EV_KEY, EV_REL, EV_ABS, EV_SW
+- Supported event types: ``EV_KEY``, ``EV_REL``, ``EV_ABS``, ``EV_SW``
+- Event code and value can be ``*`` to match all.
+- Multiple actions can be defined per event.
+
+.. hint::
+
+   You can use the ``evtest`` utility to determine the correct device, type, code and value.
+
 
 Actions
 -------
