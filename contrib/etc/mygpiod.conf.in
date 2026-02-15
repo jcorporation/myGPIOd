@@ -1,8 +1,9 @@
 # Example mygpiod.conf
-#
+
 # myGPIOd @PROJECT_VERSION@
 # https://github.com/jcorporation/myGPIOd
-#
+
+###############################################################################
 # Logging
 # Valid values:
 # emerg, alert, crit, error, warn, notice, info, debug
@@ -14,21 +15,44 @@ loglevel = info
 # - true = log to syslog
 syslog = false
 
+###############################################################################
+# Lua configuration
+
+# File with user defined lua functions
+#lua_file = 
+
+###############################################################################
+# Unix socket
+
 # Path to the server socket
 socket = /run/mygpiod/socket
 
 # Timeout for client connections in seconds
 timeout = 60
 
+###############################################################################
 # HTTP REST API
+
+# Listening IP
 http_ip = 127.0.0.1
+
+# Listening port
 http_port = 8081
+
+###############################################################################
+# GPIO configuration
 
 # GPIO chip device
 chip = /dev/gpiochip0
 
-# File with user defined lua functions
-#lua_file = 
-
 # Directory for single gpio configuration files
 gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d
+
+###############################################################################
+# Input event configuration
+
+# Inputs must be defined before input events
+#input = /dev/input/event0
+
+#input_ev = device:type:code:value:action:options
+#input_ev = /dev/input/event0:EV_KEY:KEY_POWER:1:system:/usr/local/bin/shutdown.sh
