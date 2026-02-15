@@ -35,24 +35,22 @@ bool action_mpc(struct t_config *config, struct t_action *action) {
         MYGPIOD_LOG_ERROR("Invalid number of arguments: %d", action->options_count);
         return false;
     }
+
+    if (mpc_check_conn(config) == false &&  // Check connection
+        mpc_connect(config) == false)       // Try to connect
+    {
+        // Failure
+        return false;
+    }
+    // We are connected
     sds *tokens = malloc_assert(sizeof(sds)*MAX_MPC_ARGS);
     for (int i = 0; i < MAX_MPC_ARGS; i++) {
         tokens[i] = i < action->options_count
             ? action->options[i]
             : NULL;
     }
-
-    if (mpc_check_conn(config) == false &&  // Check connection
-        mpc_connect(config) == false)       // Try to connect
-    {
-        // Failure
-        free(tokens);
-        return false;
-    }
-    // We are connected
     mpd_send_command(config->mpd_conn, tokens[0], tokens[1], tokens[2], tokens[3], tokens[4],
         tokens[5], tokens[6], tokens[7], tokens[8], tokens[9], NULL);
-
     free(tokens);
     if (mpd_response_finish(config->mpd_conn) == false) {
         MYGPIOD_LOG_ERROR("MPD error: %s", mpd_connection_get_error_message(config->mpd_conn));
