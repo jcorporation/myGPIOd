@@ -20,7 +20,6 @@
 #include "mygpiod/server_socket/socket.h"
 
 #include <fcntl.h>
-#include <microhttpd.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -50,8 +49,10 @@ const char *lookup_pfd_type(enum pfd_types type) {
             return "client socket";
         case PFD_TYPE_CLIENT_TIMEOUT:
             return "timeout";
+    #ifdef MYGPIOD_ENABLE_HTTPD
         case PFD_TYPE_HTTPD:
             return "httpd";
+    #endif
         case PFD_TYPE_INPUT:
             return "input";
     }
@@ -179,9 +180,11 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
                 case PFD_TYPE_CLIENT_TIMEOUT:
                     server_client_timeout(&config->clients, &poll_fds->fd[i].fd);
                     return true;
+            #ifdef MYGPIOD_ENABLE_HTTPD
                 case PFD_TYPE_HTTPD:
                     // MHD is called in each poll loop iteration, no need to do it here explicitly
                     return true;
+            #endif
                 case PFD_TYPE_INPUT:
                     input_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
