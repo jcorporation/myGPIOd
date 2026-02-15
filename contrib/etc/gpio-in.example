@@ -8,14 +8,14 @@
 #event_request = rising
 
 # Sets the GPIO active state
-# Valid values: true, false
+# Valid values:
 # - true = GPIO considered active, if it is low
 # - false = GPIO considered active, if it is high
 active_low = false
 #active_low = true
 
 # Sets the internal pull-up or pull-down resistor
-# Valid values: as-is, disable, pull-down, pull-up
+# Valid values:
 # - as-is = do not change it
 # - disable = disables the internal resistor
 # - pull-down = pulls the gpio down
@@ -27,7 +27,7 @@ bias = as-is
 
 # Debounce setting
 # Valid values: debounce period in microseconds
-debounce = 0
+debounce = 500
 
 # Event clock
 # Valid values: monotonic, realtime, hte
