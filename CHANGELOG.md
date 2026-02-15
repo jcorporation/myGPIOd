@@ -6,12 +6,13 @@ https://github.com/jcorporation/myGPIOd
 
 ## myGPIOd v2.0.0 (not yet released)
 
-This release adds support for input events. myGPIOd can now read events from /dev/input/* devices.
+This release adds support for input device events. myGPIOd can now read events from /dev/input/* devices.
 
 ### Changelog
 
-- Feat: Support for input events
+- Feat: Support for input device events
 - Upd: Set required Lua version to 5.4+
+- Upd: Add compile options to disable libmicrohttpd dependency
 
 ***
 

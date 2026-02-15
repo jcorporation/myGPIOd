@@ -17,7 +17,9 @@
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
-#include "mygpiod/server_http/util.h"
+#ifdef MYGPIOD_ENABLE_HTTPD
+    #include "mygpiod/server_http/util.h"
+#endif
 #include "mygpiod/server_socket/idle.h"
 #include "mygpiod/server_socket/socket.h"
 
@@ -59,13 +61,15 @@ void event_enqueue_gpio(struct t_config *config, unsigned gpio, enum mygpiod_eve
         current = current->next;
     }
 
-    // HTTP long polling
-    current = config->http_suspended.head;
-    while (current != NULL) {
-        http_connection_resume_gpio((struct t_request_data *)current->data, gpio, event_type, timestamp);
-        current = current->next;
-    }
-    list_clear(&config->http_suspended, NULL);
+    #ifdef MYGPIOD_ENABLE_HTTPD
+        // HTTP long polling
+        current = config->http_suspended.head;
+        while (current != NULL) {
+            http_connection_resume_gpio((struct t_request_data *)current->data, gpio, event_type, timestamp);
+            current = current->next;
+        }
+        list_clear(&config->http_suspended, NULL);
+    #endif
 }
 
 /**
@@ -94,13 +98,15 @@ void event_enqueue_input(struct t_config *config, struct t_mygpiod_input_event *
         current = current->next;
     }
 
-    // HTTP long polling
-    current = config->http_suspended.head;
-    while (current != NULL) {
-        http_connection_resume_input((struct t_request_data *)current->data, input_event);
-        current = current->next;
-    }
-    list_clear(&config->http_suspended, NULL);
+    #ifdef MYGPIOD_ENABLE_HTTPD
+        // HTTP long polling
+        current = config->http_suspended.head;
+        while (current != NULL) {
+            http_connection_resume_input((struct t_request_data *)current->data, input_event);
+            current = current->next;
+        }
+        list_clear(&config->http_suspended, NULL);
+    #endif
 }
 
 /**

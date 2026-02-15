@@ -152,24 +152,26 @@ int main(int argc, char **argv) {
     }
     event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI);
 
-    // create http server
-    if (config->http_port > 0) {
-        config->httpd = httpd_start(config);
-        if (config->httpd == NULL) {
-            MYGPIOD_LOG_EMERG("Failure starting http server.");
-            rc = EXIT_FAILURE;
-            goto out;
+    #ifdef MYGPIOD_ENABLE_HTTPD
+        // create http server
+        if (config->http_port > 0) {
+            config->httpd = httpd_start(config);
+            if (config->httpd == NULL) {
+                MYGPIOD_LOG_EMERG("Failure starting http server.");
+                rc = EXIT_FAILURE;
+                goto out;
+            }
+            const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
+            if (httpd_fd == NULL ||
+                httpd_fd->epoll_fd == -1)
+            {
+                MYGPIOD_LOG_EMERG("Failure getting MHD epoll fd.");
+                rc = EXIT_FAILURE;
+                goto out;
+            }
+            event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
         }
-        const union MHD_DaemonInfo *httpd_fd = MHD_get_daemon_info(config->httpd, MHD_DAEMON_INFO_EPOLL_FD);
-        if (httpd_fd == NULL ||
-            httpd_fd->epoll_fd == -1)
-        {
-            MYGPIOD_LOG_EMERG("Failure getting MHD epoll fd.");
-            rc = EXIT_FAILURE;
-            goto out;
-        }
-        event_poll_fd_add(&poll_fds, httpd_fd->epoll_fd, PFD_TYPE_HTTPD, POLLIN | POLLOUT | POLLPRI);
-    }
+    #endif
 
     // main event handling loop
     MYGPIOD_LOG_INFO("Entering event handling loop");
@@ -189,28 +191,34 @@ int main(int argc, char **argv) {
 
         // Poll
         MYGPIOD_LOG_DEBUG("Polling %u fds", poll_fds.len);
-        // Use timeout from MHD
-        // This is required for MHD connection suspend and resume
-        int timeout;
-        MHD_UNSIGNED_LONG_LONG to;
-        if (MHD_get_timeout (config->httpd, &to) != MHD_YES) {
-            timeout = -1;
-        }
-        else {
-            timeout = (to < INT_MAX - 1) ? (int) to : (INT_MAX - 1);
-        }
+        #ifdef MYGPIOD_ENABLE_HTTPD
+            // Use timeout from MHD
+            // This is required for MHD connection suspend and resume
+            int timeout;
+            MHD_UNSIGNED_LONG_LONG to;
+            if (MHD_get_timeout (config->httpd, &to) != MHD_YES) {
+                timeout = -1;
+            }
+            else {
+                timeout = (to < INT_MAX - 1) ? (int) to : (INT_MAX - 1);
+            }
+        #else
+            int timeout = 1;
+        #endif
         int cnt = poll(poll_fds.fd, poll_fds.len, timeout);
         if (cnt < 0) {
             MYGPIOD_LOG_ERROR("Failure polling fds");
             rc = EXIT_FAILURE;
             goto out;
         }
-        // MHD must be always called, even on poll timeout
-        if (MHD_run(config->httpd) != MHD_YES) {
-            MYGPIOD_LOG_ERROR("Failure running MHD");
-            rc = EXIT_FAILURE;
-            goto out;
-        }
+        #ifdef MYGPIOD_ENABLE_HTTPD
+            // MHD must be always called, even on poll timeout
+            if (MHD_run(config->httpd) != MHD_YES) {
+                MYGPIOD_LOG_ERROR("Failure running MHD");
+                rc = EXIT_FAILURE;
+                goto out;
+            }
+        #endif
         // No waiting events
         if (cnt == 0) {
             MYGPIOD_LOG_DEBUG("Poll timeout");

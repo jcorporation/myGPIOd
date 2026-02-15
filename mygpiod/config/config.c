@@ -84,7 +84,6 @@ void config_clear(struct t_config *config) {
     FREE_SDS(config->chip_path);
     FREE_SDS(config->dir_gpio);
     FREE_SDS(config->socket_path);
-    FREE_SDS(config->http_ip);
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         if (config->mpd_conn != NULL) {
             mpd_connection_free(config->mpd_conn);
@@ -96,16 +95,19 @@ void config_clear(struct t_config *config) {
         }
         FREE_SDS(config->lua_file);
     #endif
-    if (config->httpd != NULL) {
-        struct t_list_node *current = config->http_suspended.head;
-        while (current != NULL) {
-            struct t_request_data *request_data = (struct t_request_data *)current->data;
-            MHD_resume_connection(request_data->connection);
-            current = current->next;
+    #ifdef MYGPIOD_ENABLE_HTTPD
+        FREE_SDS(config->http_ip);
+        if (config->httpd != NULL) {
+            struct t_list_node *current = config->http_suspended.head;
+            while (current != NULL) {
+                struct t_request_data *request_data = (struct t_request_data *)current->data;
+                MHD_resume_connection(request_data->connection);
+                current = current->next;
+            }
+            MHD_stop_daemon(config->httpd);
+            list_clear(&config->http_suspended, NULL);
         }
-        MHD_stop_daemon(config->httpd);
-        list_clear(&config->http_suspended, NULL);
-    }
+    #endif
     list_clear(&config->inputs, input_node_data_clear);
 }
 
@@ -143,11 +145,13 @@ static struct t_config *config_new(void) {
 
     list_init(&config->inputs);
 
-    config->http_ip = sdsnew(CFG_HTTP_IP);
-    config->http_port = CFG_HTTP_PORT;
-    config->httpd = NULL;
-    list_init(&config->http_suspended);
-    config->http_conn_id = 0;
+    #ifdef MYGPIOD_ENABLE_HTTPD
+        config->http_ip = sdsnew(CFG_HTTP_IP);
+        config->http_port = CFG_HTTP_PORT;
+        config->httpd = NULL;
+        list_init(&config->http_suspended);
+        config->http_conn_id = 0;
+    #endif
     return config;
 }
 
@@ -297,19 +301,21 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         }
         return false;
     }
-    if (strcmp(key, "http_ip") == 0) {
-        sdsclear(config->http_ip);
-        config->http_ip = sdscat(config->http_ip, value);
-        MYGPIOD_LOG_DEBUG("Setting http_ip to \"%s\"", config->http_ip);
-        return true;
-    }
-    if (strcmp(key, "http_port") == 0) {
-        if (mygpio_parse_uint(value, &config->http_port, NULL, 1025, 65535) == true) {
-            MYGPIOD_LOG_DEBUG("Setting http port to \"%u\" seconds", config->http_port);
+    #ifdef MYGPIOD_ENABLE_HTTPD
+        if (strcmp(key, "http_ip") == 0) {
+            sdsclear(config->http_ip);
+            config->http_ip = sdscat(config->http_ip, value);
+            MYGPIOD_LOG_DEBUG("Setting http_ip to \"%s\"", config->http_ip);
             return true;
         }
-        return false;
-    }
+        if (strcmp(key, "http_port") == 0) {
+            if (mygpio_parse_uint(value, &config->http_port, NULL, 1025, 65535) == true) {
+                MYGPIOD_LOG_DEBUG("Setting http port to \"%u\" seconds", config->http_port);
+                return true;
+            }
+            return false;
+        }
+    #endif
     if (strcmp(key, "input") == 0) {
         struct t_input_device *data = malloc_assert(sizeof(struct t_input_device));
         data->fd = -1;

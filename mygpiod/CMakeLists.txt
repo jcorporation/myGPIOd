@@ -9,7 +9,6 @@ target_include_directories(mygpiod
     "${PROJECT_BINARY_DIR}"
     "${PROJECT_SOURCE_DIR}"
     "${LIBGPIOD_INCLUDE_DIRS}"
-    "${LIBMHD_INCLUDE_DIRS}"
 )
 
 target_sources(mygpiod
@@ -42,12 +41,6 @@ target_sources(mygpiod
     lib/sds_extras.c
     lib/timer.c
     raspberry/vcgencmd.c
-    server_http/httpd.c
-    server_http/rest_api_gpio.c
-    server_http/rest_api_raspberry.c
-    server_http/rest_api.c
-    server_http/util.c
-    server_http/webui.c
     server_socket/gpio.c
     server_socket/idle.c
     server_socket/protocol.c
@@ -79,10 +72,28 @@ endif()
 
 target_link_libraries(mygpiod
   "${LIBGPIOD_LIBRARIES}"
-  "${LIBMHD_LIBRARIES}"
   sds
   mygpio-common
 )
+
+if(MYGPIOD_ENABLE_HTTPD)
+  target_include_directories(mygpiod
+    PRIVATE 
+      "${LIBMHD_INCLUDE_DIRS}"
+  )
+  target_sources(mygpiod
+    PRIVATE
+      server_http/httpd.c
+      server_http/rest_api_gpio.c
+      server_http/rest_api_raspberry.c
+      server_http/rest_api.c
+      server_http/util.c
+      server_http/webui.c
+  )
+  target_link_libraries(mygpiod
+    "${LIBMHD_LIBRARIES}"
+  )
+endif()
 
 if (MYGPIOD_ENABLE_ACTION_MPC)
   target_include_directories(mygpiod

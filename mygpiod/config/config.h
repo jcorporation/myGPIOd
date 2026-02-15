@@ -106,12 +106,14 @@ struct t_config {
     struct t_list clients;                //!< list of connected socket clients
     unsigned client_id;                   //!< uniq client id
 
-    // HTTP Server
-    struct MHD_Daemon *httpd;             //!< HTTPD object
-    sds http_ip;                          //!< HTTPD listening ip
-    unsigned http_port;                   //!< HTTPD listening port
-    struct t_list http_suspended;         //!< List of suspended HTTP connections
-    unsigned http_conn_id;                //!< Uniq HTTP connection id
+    #ifdef MYGPIOD_ENABLE_HTTPD
+        // HTTP Server
+        struct MHD_Daemon *httpd;             //!< HTTPD object
+        sds http_ip;                          //!< HTTPD listening ip
+        unsigned http_port;                   //!< HTTPD listening port
+        struct t_list http_suspended;         //!< List of suspended HTTP connections
+        unsigned http_conn_id;                //!< Uniq HTTP connection id
+    #endif
 
     // GPIO
     sds dir_gpio;                         //!< directory for the gpio config files
