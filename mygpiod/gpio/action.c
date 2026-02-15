@@ -129,13 +129,16 @@ void gpio_action_delay_abort(struct t_gpio_in_data *data) {
 //private functions
 
 /**
- * Creates a timerfd for the long press action.
- * Removes an existing one before
- * @param data pointer to t_gpio_in_data
+ * Creates or replaces a timerfd for the long press action.
+ * @param data Pointer to t_gpio_in_data
  */
 static void gpio_action_delay(struct t_gpio_in_data *data) {
-    if (data->timer_fd > -1) {
-        gpio_action_delay_abort(data);
+    // First try to update an existing timer
+    if (data->timer_fd > 0 &&
+        timer_set(data->timer_fd, data->long_press_timeout_ms, data->long_press_interval_ms) == true)
+    {
+        return;
     }
+    // Create a new timer
     data->timer_fd = timer_new(data->long_press_timeout_ms, data->long_press_interval_ms);
 }
