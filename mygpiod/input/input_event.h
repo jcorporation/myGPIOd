@@ -11,7 +11,7 @@
 #ifndef MYGPIOD_INPUT_EVENT_H
 #define MYGPIOD_INPUT_EVENT_H
 
-#include "mygpiod/config/config.h"
+#include "mygpiod/config/input.h"
 
 #include <sys/time.h>
 
