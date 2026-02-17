@@ -11,6 +11,7 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/gpio.h"
 
+#include "mygpiod/config/gpio.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 

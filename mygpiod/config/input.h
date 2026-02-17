@@ -11,11 +11,40 @@
 #ifndef MYGPIOD_CONFIG_INPUT_H
 #define MYGPIOD_CONFIG_INPUT_H
 
-#include "mygpiod/config/config.h"
+#include "mygpiod/lib/action.h"
 
 #include <stdbool.h>
 
-bool parse_input_ev(struct t_config *config, sds config_value);
+/**
+ * How to match an input event action
+ */
+enum input_event_match {
+    MATCH_ALL,
+    MATCH_VALUE,
+};
+
+/**
+ * Config data for input event actions
+ */
+struct t_input_event_actions {
+    unsigned short type;                 //!< Input event type
+    enum input_event_match code_match;   //!< Matching for code
+    unsigned short code;                 //!< Input event code
+    enum input_event_match value_match;  //!< Matching for value
+    unsigned int value;                  //!< Input event value
+    struct t_action action;              //!< Action
+};
+
+/**
+ * Config data for inputs
+ */
+struct t_input_device {
+    sds name;                      //!< Device name /dev/input/...
+    int fd;                        //!< File descriptor
+    struct t_list event_actions;   //!< List of events
+};
+
+bool parse_input_ev(struct t_list *input_devices, sds config_value);
 void input_data_clear(struct t_input_device *device);
 void input_node_data_clear(struct t_list_node *node);
 

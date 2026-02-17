@@ -12,6 +12,7 @@
 #include "mygpiod/lib/events.h"
 
 #include "mygpiod/config/config.h"
+#include "mygpiod/config/input.h"
 #include "mygpiod/input/input_event.h"
 #include "mygpiod/lib/event_types.h"
 #include "mygpiod/lib/list.h"

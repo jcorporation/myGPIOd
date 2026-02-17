@@ -331,7 +331,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         return true;
     }
     if (strcmp(key, "input_ev") == 0) {
-        if (parse_input_ev(config, value) == true) {
+        if (parse_input_ev(&config->input_devices, value) == true) {
             return true;
         }
         return false;

@@ -11,6 +11,7 @@
 #include "compile_time.h"
 #include "mygpiod/event_loop/event_loop.h"
 
+#include "mygpiod/config/gpio.h"
 #include "mygpiod/gpio/event.h"
 #include "mygpiod/gpio/timer.h"
 #include "mygpiod/input/input.h"

@@ -12,6 +12,7 @@
 #include "mygpiod/server_http/util.h"
 
 #include "dist/sds/sds.h"
+#include "mygpiod/config/input.h"
 #include "mygpiod/input/event_code.h"
 #include "mygpiod/input/event_type.h"
 #include "mygpiod/lib/events.h"

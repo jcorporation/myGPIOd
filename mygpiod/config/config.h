@@ -12,10 +12,8 @@
 #define MYGPIOD_CONFIG_H
 
 #include "dist/sds/sds.h"
-#include "mygpiod/lib/action.h"
 #include "mygpiod/lib/list.h"
 
-#include <gpiod.h>
 #include <stdbool.h>
 
 #ifdef MYGPIOD_ENABLE_ACTION_MPC
@@ -25,71 +23,6 @@
 #ifdef MYGPIOD_ENABLE_ACTION_LUA
     #include <lua.h>
 #endif
-
-/**
- * Config and state data for an input gpio
- */
-struct t_gpio_in_data {
-    enum gpiod_line_bias bias;                     //!< bias value
-    bool active_low;                               //!< active state is low?
-    unsigned long debounce_period_us;              //!< debounce period in microseconds
-    enum gpiod_line_clock event_clock;             //!< the source clock for event timestamps
-    struct t_list action_rising;                   //!< list of actions for rising event
-    struct t_list action_falling;                  //!< list of actions for falling event
-    enum gpiod_line_edge event_request;            //!< events to request for this gpio
-    int gpio_fd;                                   //!< gpio file descriptor
-    int long_press_timeout_ms;                     //!< timeout for the long press handler in milliseconds
-    int long_press_interval_ms;                    //!< interval for the long press handler in milliseconds
-    struct t_list long_press_action;               //!< list of actions for long press
-    struct t_list long_press_release_action;       //!< list of actions for long press release
-    enum gpiod_line_edge long_press_event;         //!< event for the long press handler
-    enum gpiod_line_value long_press_value;        //!< initial gpio value for the long press event
-    bool ignore_event;                             //!< internal state for long press handler
-    int timer_fd;                                  //!< timer file descriptor for long press handler
-    struct gpiod_edge_event_buffer *event_buffer;  //!< buffer for gpio events
-    struct gpiod_line_request *request;            //!< gpio line request struct
-    sds name;                                      //!< gpio name
-};
-
-/**
- * Config data for an output gpio
- */
-struct t_gpio_out_data {
-    enum gpiod_line_drive drive;         //!< drive value
-    enum gpiod_line_value value;         //!< value to set
-    int timer_fd;                        //!< timer file descriptor for blink handler
-    struct gpiod_line_request *request;  //!< gpio line request struct
-    sds name;                            //!< gpio name
-};
-
-/**
- * How to match an input event action
- */
-enum input_event_match {
-    MATCH_ALL,
-    MATCH_VALUE,
-};
-
-/**
- * Config data for input event actions
- */
-struct t_input_event_actions {
-    unsigned short type;                 //!< Input event type
-    enum input_event_match code_match;   //!< Matching for code
-    unsigned short code;                 //!< Input event code
-    enum input_event_match value_match;  //!< Matching for value
-    unsigned int value;                  //!< Input event value
-    struct t_action action;              //!< Action
-};
-
-/**
- * Config data for inputs
- */
-struct t_input_device {
-    sds name;                      //!< Device name /dev/input/...
-    int fd;                        //!< File descriptor
-    struct t_list event_actions;   //!< List of events
-};
 
 /**
  * Central myGPIOd config and state

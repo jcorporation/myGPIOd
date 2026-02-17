@@ -12,6 +12,7 @@
 #define MYGPIOD_GPIO_ACTION_H
 
 #include "mygpiod/config/config.h"
+#include "mygpiod/config/gpio.h"
 
 #include <stdint.h>
 

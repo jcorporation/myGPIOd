@@ -12,6 +12,7 @@
 #define MYGPIOD_GPIO_INPUT_H
 
 #include "mygpiod/config/config.h"
+#include "mygpiod/config/gpio.h"
 #include "mygpiod/event_loop/event_loop.h"
 
 #include <gpiod.h>

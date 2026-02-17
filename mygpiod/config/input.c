@@ -12,7 +12,6 @@
 #include "mygpiod/config/input.h"
 
 #include "mygpio-common/util.h"
-#include "mygpiod/config/config.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/input/event_code.h"
 #include "mygpiod/input/event_type.h"
@@ -25,7 +24,7 @@
 #include <string.h>
 
 // Private definitions
-struct t_input_device *get_device(struct t_config *config, const char *device);
+static struct t_input_device *get_device(struct t_list *input_devices, const char *device);
 static void node_data_input_event_actions_clear(struct t_list_node *node);
 
 // Public functions
@@ -36,7 +35,7 @@ static void node_data_input_event_actions_clear(struct t_list_node *node);
  * @param config_value value to parse
  * @return true on success, else false
  */
-bool parse_input_ev(struct t_config *config, sds config_value) {
+bool parse_input_ev(struct t_list *input_devices, sds config_value) {
     // Format is: device:type:code:value:action:options
     sds device_str = sds_getvalue(config_value, ':');
     sds type_str = sds_getvalue(config_value, ':');
@@ -44,7 +43,7 @@ bool parse_input_ev(struct t_config *config, sds config_value) {
     sds value_str = sds_getvalue(config_value, ':');
     sds action_str = sds_getvalue(config_value, ':');
 
-    struct t_input_device *device = get_device(config, device_str);
+    struct t_input_device *device = get_device(input_devices, device_str);
     unsigned short type = input_event_type_parse(type_str);
     unsigned short code;
     enum input_event_match code_match = MATCH_VALUE;
@@ -121,8 +120,8 @@ void input_node_data_clear(struct t_list_node *node) {
  * @param device Device name
  * @return struct t_input_data* or NULL if not found
  */
-struct t_input_device *get_device(struct t_config *config, const char *device) {
-    struct t_list_node *current = config->input_devices.head;
+static struct t_input_device *get_device(struct t_list *input_devices, const char *device) {
+    struct t_list_node *current = input_devices->head;
     while (current != NULL) {
         struct t_input_device *data = (struct t_input_device *)current->data;
         if (strcmp(data->name, device) == 0) {
