@@ -36,12 +36,12 @@ static struct t_input_device *get_input_device_by_fd(struct t_list *inputs, int 
  * @return true on success, else false
  */
 bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
-    if (config->inputs.length == 0) {
+    if (config->input_devices.length == 0) {
         MYGPIOD_LOG_INFO("No inputs for monitoring configured");
         return true;
     }
     MYGPIOD_LOG_INFO("Requesting inputs");
-    struct t_list_node *current = config->inputs.head;
+    struct t_list_node *current = config->input_devices.head;
     while (current != NULL) {
         struct t_input_device *device = (struct t_input_device *)current->data;
         errno = 0;
@@ -67,7 +67,7 @@ bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
  */
 bool input_handle_event(struct t_config *config, int *fd) {
     struct t_mygpiod_input_event input_event;
-    input_event.device = get_input_device_by_fd(&config->inputs, fd);
+    input_event.device = get_input_device_by_fd(&config->input_devices, fd);
     if (input_event.device == NULL) {
         MYGPIOD_LOG_ERROR("Data for fd not found");
         return false;

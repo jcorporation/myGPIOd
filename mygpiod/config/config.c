@@ -113,7 +113,7 @@ void config_clear(struct t_config *config) {
             list_clear(&config->http_suspended, NULL);
         }
     #endif
-    list_clear(&config->inputs, input_node_data_clear);
+    list_clear(&config->input_devices, input_node_data_clear);
 }
 
 //private functions
@@ -148,7 +148,7 @@ static struct t_config *config_new(void) {
         config->lua_file = sdsempty();
     #endif
 
-    list_init(&config->inputs);
+    list_init(&config->input_devices);
 
     #ifdef MYGPIOD_ENABLE_HTTPD
         config->http_ip = sdsnew(CFG_HTTP_IP);
@@ -326,7 +326,7 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         data->fd = -1;
         data->name = sdsdup(value);
         list_init(&data->event_actions);
-        list_push(&config->inputs, 0, data);
+        list_push(&config->input_devices, 0, data);
         MYGPIOD_LOG_DEBUG("Adding input %s", value);
         return true;
     }

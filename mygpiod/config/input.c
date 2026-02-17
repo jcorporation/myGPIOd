@@ -122,7 +122,7 @@ void input_node_data_clear(struct t_list_node *node) {
  * @return struct t_input_data* or NULL if not found
  */
 struct t_input_device *get_device(struct t_config *config, const char *device) {
-    struct t_list_node *current = config->inputs.head;
+    struct t_list_node *current = config->input_devices.head;
     while (current != NULL) {
         struct t_input_device *data = (struct t_input_device *)current->data;
         if (strcmp(data->name, device) == 0) {

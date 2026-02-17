@@ -40,8 +40,8 @@ struct t_gpio_in_data {
     int gpio_fd;                                   //!< gpio file descriptor
     int long_press_timeout_ms;                     //!< timeout for the long press handler in milliseconds
     int long_press_interval_ms;                    //!< interval for the long press handler in milliseconds
-    struct t_list long_press_action;               //!< list of action for long press
-    struct t_list long_press_release_action;       //!< list of actioin for long press release
+    struct t_list long_press_action;               //!< list of actions for long press
+    struct t_list long_press_release_action;       //!< list of actions for long press release
     enum gpiod_line_edge long_press_event;         //!< event for the long press handler
     enum gpiod_line_value long_press_value;        //!< initial gpio value for the long press event
     bool ignore_event;                             //!< internal state for long press handler
@@ -123,7 +123,7 @@ struct t_config {
     struct gpiod_chip *chip;              //!< gpiod chip object
 
     // input events
-    struct t_list inputs;                 //!< list of /dev/input/* devices
+    struct t_list input_devices;                 //!< list of /dev/input/* devices
 
     // MPD
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
