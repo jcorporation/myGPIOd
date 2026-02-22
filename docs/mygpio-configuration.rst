@@ -60,12 +60,11 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
 
 .. code:: ini
 
-  # Inputs must be defined before input events
-  input = /dev/input/event0
-  #input = /dev/input/event3
-
   #input_ev = device:type:code:value:action:options
   input_ev = /dev/input/event0:EV_KEY:KEY_POWER:1:system:/home/juergen/projekte/myGPIOd/etc/command.sh
+
+  # Register event without action, only the state is tracked
+  input_ev = /dev/input/event3:EV_KEY:KEY_LEFTSHIFT:*:none
 
 - Supported event types: ``EV_KEY``, ``EV_REL``, ``EV_ABS``, ``EV_SW``
 - Event code and value can be ``*`` to match all.

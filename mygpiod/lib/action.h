@@ -34,6 +34,7 @@ enum mygpiod_actions {
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         MYGPIOD_ACTION_LUA,       //!< Executes a lua function
     #endif
+    MYGPIOD_ACTION_NONE,          //!< None action
 };
 
 /**

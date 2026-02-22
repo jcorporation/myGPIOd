@@ -30,8 +30,9 @@ struct t_input_event_actions {
     unsigned short type;                 //!< Input event type
     enum input_event_match code_match;   //!< Matching for code
     unsigned short code;                 //!< Input event code
-    enum input_event_match value_match;  //!< Matching for value
-    unsigned int value;                  //!< Input event value
+    enum input_event_match value_match;  //!< Matching for input event value
+    unsigned int value;                  //!< Expected input event value
+    unsigned state;                      //!< Current input event value, initial: 0
     struct t_action action;              //!< Action
 };
 

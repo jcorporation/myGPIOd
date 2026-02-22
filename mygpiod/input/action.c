@@ -50,9 +50,13 @@ void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *
     else {
         struct t_list_node *current = input_event->device->event_actions.head;
         while (current != NULL) {
-            struct t_input_event_actions *event = (struct t_input_event_actions *)current->data;
-            if (check_event(event, &input_event->data) == true) {
-                action_execute(config, &event->action);
+            struct t_input_event_actions *event_actions = (struct t_input_event_actions *)current->data;
+            if (check_event(event_actions, &input_event->data) == true) {
+                // Set current value
+                event_actions->state = input_event->data.value;
+                // Execute action
+                action_execute(config, &event_actions->action);
+                // Event should be notified to clients
                 subscribed = true;
             }
             current = current->next;

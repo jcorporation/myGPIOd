@@ -51,8 +51,8 @@ gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d
 ###############################################################################
 # Input event configuration
 
-# Inputs must be defined before input events
-#input = /dev/input/event0
-
 #input_ev = device:type:code:value:action:options
 #input_ev = /dev/input/event0:EV_KEY:KEY_POWER:1:system:/usr/local/bin/shutdown.sh
+
+# Register event without action, only the state is tracked
+input_ev = /dev/input/event3:EV_KEY:KEY_LEFTSHIFT:*:none

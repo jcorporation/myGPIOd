@@ -67,6 +67,8 @@ const char *lookup_action(enum mygpiod_actions action) {
             case MYGPIOD_ACTION_LUA:
                 return "lua";
         #endif
+        case MYGPIOD_ACTION_NONE:
+            return "none";
         case MYGPIOD_ACTION_UNKNOWN:
             return "";
     }
@@ -111,6 +113,9 @@ enum mygpiod_actions parse_action(const char *str) {
             return MYGPIOD_ACTION_LUA;
         }
     #endif
+    if (strcasecmp(str, "none") == 0) {
+        return MYGPIOD_ACTION_NONE;
+    }
     errno = EINVAL;
     MYGPIOD_LOG_WARN("Could not parse action value \"%s\", setting unknown", str);
     return MYGPIOD_ACTION_UNKNOWN;

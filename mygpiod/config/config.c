@@ -321,15 +321,6 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
             return false;
         }
     #endif
-    if (strcmp(key, "input") == 0) {
-        struct t_input_device *data = malloc_assert(sizeof(struct t_input_device));
-        data->fd = -1;
-        data->name = sdsdup(value);
-        list_init(&data->event_actions);
-        list_push(&config->input_devices, 0, data);
-        MYGPIOD_LOG_DEBUG("Adding input %s", value);
-        return true;
-    }
     if (strcmp(key, "input_ev") == 0) {
         if (parse_input_ev(&config->input_devices, value) == true) {
             return true;

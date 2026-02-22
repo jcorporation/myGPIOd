@@ -12,6 +12,7 @@
 #include "mygpiod/actions/execute.h"
 
 #include "dist/sds/sds.h"
+#include "lib/action.h"
 #include "mygpiod/actions/gpio.h"
 #include "mygpiod/actions/system.h"
 #include "mygpiod/lib/log.h"
@@ -50,6 +51,9 @@ void actions_execute(struct t_config *config, struct t_list *actions) {
  * @param action Action to execute
  */
 void action_execute(struct t_config *config, struct t_action *action) {
+    if (action->action == MYGPIOD_ACTION_NONE) {
+        return;
+    }
     sds cmd = sdsjoinsds(action->options, action->options_count, " ", 1);
     MYGPIOD_LOG_INFO("Executing %s: \"%s\"", lookup_action(action->action), cmd);
     FREE_SDS(cmd);
@@ -88,6 +92,9 @@ void action_execute(struct t_config *config, struct t_action *action) {
             action_lua(config, action);
             break;
     #endif
+        case MYGPIOD_ACTION_NONE:
+            // No action, used to track the state of input devices
+            break;
         case MYGPIOD_ACTION_UNKNOWN:
             MYGPIOD_LOG_ERROR("Invalid action");
             break;
