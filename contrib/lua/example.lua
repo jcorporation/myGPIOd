@@ -17,3 +17,13 @@ function testFunc(arg1)
     -- set value of GPIO 5 to high
     gpioSet(5, 1)
 end
+
+-- Check if the left shift key was pressed
+function keyPress(key)
+    local _, value = inputEvGet("/dev/input/event3", "KEY_LEFTSHIFT")
+    if value == 1 then
+        print("Left shift key was pressed with key " .. key)
+    else
+        print("Left shift key was not pressed with key " .. key)
+    end
+end

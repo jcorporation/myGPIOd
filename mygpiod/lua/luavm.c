@@ -13,6 +13,7 @@
 
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lua/functions/gpio.h"
+#include "mygpiod/lua/functions/input_ev.h"
 #include "mygpiod/lua/functions/system.h"
 #include "mygpiod/lua/util.h"
 
@@ -53,6 +54,7 @@ bool luavm_init(struct t_config *config) {
     lua_register(config->lua_vm, "gpioGet", lua_gpio_get);
     lua_register(config->lua_vm, "gpioSet", lua_gpio_set);
     lua_register(config->lua_vm, "gpioToggle", lua_gpio_toggle);
+    lua_register(config->lua_vm, "inputEvGet", lua_input_ev_get);
     lua_register(config->lua_vm, "system", lua_system);
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         lua_register(config->lua_vm, "mpc", lua_mpc);

@@ -134,6 +134,7 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
     PRIVATE
       actions/lua.c
       lua/functions/gpio.c
+      lua/functions/input_ev.c
       lua/functions/system.c
       lua/luavm.c
       lua/util.c

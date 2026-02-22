@@ -4,14 +4,14 @@ Lua scripts
 myGPIOd reads on startup the file defined by the ``lua_file`` configuration setting and starts a Lua VM that compiles the file.
 All lua functions in this file are registered and can be called with the lua action.
 
-.. warning:: Lua scripts are executed in the main thread, therefor lua scripts can block it.
+.. warning:: Lua scripts are executed in the main thread, therefore lua scripts can block and terminate it.
 
 .. note:: The lua functions should not return any value.
 
 Custom lua functions
 --------------------
 
-myGPIOd registers custom lua functions to provide access to the actions. The functions return ``true`` on success, else ``false``.
+myGPIOd registers custom lua functions to provide access to the actions. The functions return ``true`` on success, else ``false`` as first value.
 
 +------------------------------------------------------------------+-----------------------------------------------------+
 | Lua function                                                     | Description                                         |
@@ -32,6 +32,8 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 |                                                                  | and you can not get the HTTP response.              |
 |                                                                  | Valid HTTP methods are: DELETE, GET, HEAD,          |
 |                                                                  | OPTIONS, PATCH, POST, PUT                           |
++------------------------------------------------------------------+-----------------------------------------------------+
+| ``local rc, value = inputEvGet({device}, {code})``               | Returns the current value of tracked input event.   |
 +------------------------------------------------------------------+-----------------------------------------------------+
 | ``local rc = mpc({mpd protocol command})``                       | Runs a mpd protocol command.                        |
 +------------------------------------------------------------------+-----------------------------------------------------+
@@ -92,5 +94,15 @@ This Lua file registers two functions: ``btnPress`` and ``rotaryEncoder``.
         print("counter-clockwise")
     else
         print("clockwise")
+    end
+  end
+
+  -- Check if the left shift key was pressed
+  function keyPress(key)
+    local _, value = inputEvGet("/dev/input/event3", "KEY_LEFTSHIFT")
+    if value == 1 then
+        print("Left shift key was pressed with key " .. key)
+    else
+        print("Left shift key was not pressed with key " .. key)
     end
   end

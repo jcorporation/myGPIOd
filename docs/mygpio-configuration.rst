@@ -66,6 +66,9 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
   # Register event without action, only the state is tracked
   input_ev = /dev/input/event3:EV_KEY:KEY_LEFTSHIFT:*:none
 
+  # Register a simple button press
+  input_ev = /dev/input/event3:EV_KEY:KEY_N:1:lua:keyPressN
+
 - Supported event types: ``EV_KEY``, ``EV_REL``, ``EV_ABS``, ``EV_SW``
 - Event code and value can be ``*`` to match all.
 - Multiple actions can be defined per event.
