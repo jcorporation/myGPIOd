@@ -19,6 +19,8 @@
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 
+#include <stddef.h>
+
 // Private definitions
 static bool check_event(struct t_input_event_actions *event, struct t_input_event *input_data);
 
