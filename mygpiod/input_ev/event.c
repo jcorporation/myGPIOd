@@ -28,7 +28,7 @@
  * @param fd Pointer to file descriptor with data to read
  * @returns true on success, else false
  */
-bool input_handle_event(struct t_config *config, int *fd) {
+bool input_ev_handle_event(struct t_config *config, int *fd) {
     struct t_mygpiod_input_event input_event;
     input_event.device = input_device_get_by_fd(&config->input_devices, fd);
     if (input_event.device == NULL) {
@@ -49,7 +49,7 @@ bool input_handle_event(struct t_config *config, int *fd) {
         case EV_REL:
         case EV_ABS:
         case EV_SW:
-            input_action_handle(config, &input_event);
+            input_ev_action_handle(config, &input_event);
             break;
         default:
             MYGPIOD_LOG_DEBUG("%s: Ignoring event type %s (%hu) with code=%hu value=%u",

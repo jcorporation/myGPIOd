@@ -14,7 +14,7 @@
 #include "mygpiod/input_ev/input_event.h"
 #include "mygpiod/config/config.h"
 
-void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event);
+void input_ev_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event);
 unsigned input_ev_get_state(struct t_input_device *device, unsigned short code);
 
 #endif

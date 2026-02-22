@@ -13,6 +13,6 @@
 
 #include "mygpiod/config/config.h"
 
-bool input_handle_event(struct t_config *config, int *fd);
+bool input_ev_handle_event(struct t_config *config, int *fd);
 
 #endif

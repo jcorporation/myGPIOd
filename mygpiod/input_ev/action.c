@@ -31,7 +31,7 @@ static bool check_event(struct t_input_event_actions *event, struct t_input_even
  * @param config Pointer to config
  * @param input_event Event data
  */
-void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event) {
+void input_ev_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event) {
     MYGPIOD_LOG_INFO("%s: time=%ld.%06lu type=%s (%hu) code=%s (%hu) value=%u",
         input_event->device->name,
         input_event->data.time.tv_sec,

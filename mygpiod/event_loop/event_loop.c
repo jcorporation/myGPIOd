@@ -187,7 +187,7 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
                     return true;
             #endif
                 case PFD_TYPE_INPUT:
-                    input_handle_event(config, &poll_fds->fd[i].fd);
+                    input_ev_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
             }
         }
