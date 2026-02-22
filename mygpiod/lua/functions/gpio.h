@@ -5,13 +5,12 @@
 */
 
 /*! \file
- * \brief Custom Lua functions
+ * \brief Custom Lua GPIO functions
  */
 
-#ifndef MYGPIOD_LUA_FUNCTIONS_H
-#define MYGPIOD_LUA_FUNCTIONS_H
+#ifndef MYGPIOD_LUA_FUNCTIONS_GPIO_H
+#define MYGPIOD_LUA_FUNCTIONS_GPIO_H
 
-#include "compile_time.h"
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
@@ -20,13 +19,5 @@ int lua_gpio_blink(lua_State *lua_vm);
 int lua_gpio_get(lua_State *lua_vm);
 int lua_gpio_set(lua_State *lua_vm);
 int lua_gpio_toggle(lua_State *lua_vm);
-#ifdef MYGPIOD_ENABLE_ACTION_MPC
-    int lua_mpc(lua_State *lua_vm);
-#endif
-#ifdef MYGPIOD_ENABLE_ACTION_HTTP
-    int lua_mympd(lua_State *lua_vm);
-    int lua_http(lua_State *lua_vm);
-#endif
-int lua_system(lua_State *lua_vm);
 
 #endif

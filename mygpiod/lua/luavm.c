@@ -12,8 +12,16 @@
 #include "mygpiod/lua/luavm.h"
 
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lua/functions.h"
+#include "mygpiod/lua/functions/gpio.h"
+#include "mygpiod/lua/functions/system.h"
 #include "mygpiod/lua/util.h"
+
+#ifdef MYGPIOD_ENABLE_ACTION_MPC
+    #include "mygpiod/lua/functions/mpc.h"
+#endif
+#ifdef MYGPIOD_ENABLE_ACTION_HTTP
+    #include "mygpiod/lua/functions/http.h"
+#endif
 
 #include <gpiod.h>
 #include <lauxlib.h>

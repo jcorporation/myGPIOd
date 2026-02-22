@@ -32,7 +32,7 @@ static void node_data_input_event_actions_clear(struct t_list_node *node);
 
 /**
  * Parses an input_ev config line
- * @param config Pointer to config
+ * @param input_devices Pointer to list of input devices
  * @param config_value value to parse
  * @return true on success, else false
  */
@@ -129,6 +129,11 @@ void input_node_data_clear(struct t_list_node *node) {
 
 // Private functions
 
+/**
+ * Mallocs and initializes a new input device struct
+ * @param device_name Input device path
+ * @return struct t_input_device* 
+ */
 static struct t_input_device *new_device(sds device_name) {
     struct t_input_device *device = malloc_assert(sizeof(struct t_input_device));
     device->fd = -1;
@@ -139,7 +144,7 @@ static struct t_input_device *new_device(sds device_name) {
 
 /**
  * Gets the input device struct by device name
- * @param config Pointer to config
+ * @param input_devices Pointer to list of input devices
  * @param device Device name
  * @return struct t_input_data* or NULL if not found
  */

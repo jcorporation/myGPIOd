@@ -131,10 +131,23 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
   target_sources(mygpiod
     PRIVATE
       actions/lua.c
-      lua/functions.c
+      lua/functions/gpio.c
+      lua/functions/system.c
       lua/luavm.c
       lua/util.c
   )
+  if (MYGPIOD_ENABLE_ACTION_MPC)
+    target_sources(mygpiod
+      PRIVATE
+        lua/functions/mpc.c
+    )
+  endif()
+  if(MYGPIOD_ENABLE_HTTPD)
+    target_sources(mygpiod
+      PRIVATE
+        lua/functions/http.c
+    )
+  endif()
   target_link_libraries(mygpiod
     "${LUA_LIBRARIES}"
   )
