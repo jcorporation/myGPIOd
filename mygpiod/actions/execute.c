@@ -12,9 +12,9 @@
 #include "mygpiod/actions/execute.h"
 
 #include "dist/sds/sds.h"
-#include "lib/action.h"
 #include "mygpiod/actions/gpio.h"
 #include "mygpiod/actions/system.h"
+#include "mygpiod/lib/action.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/sds_extras.h"
 
