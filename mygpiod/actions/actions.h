@@ -8,8 +8,8 @@
  * \brief General action functions
  */
 
-#ifndef MYGPIOD_LIB_ACTION_H
-#define MYGPIOD_LIB_ACTION_H
+#ifndef MYGPIOD_ACTIONS_ACTIONS_H
+#define MYGPIOD_ACTIONS_ACTIONS_H
 
 #include "compile_time.h"
 #include "dist/sds/sds.h"

@@ -11,7 +11,7 @@
 #ifndef MYGPIOD_CONFIG_INPUT_H
 #define MYGPIOD_CONFIG_INPUT_H
 
-#include "mygpiod/lib/action.h"
+#include "mygpiod/actions/actions.h"
 
 #include <stdbool.h>
 

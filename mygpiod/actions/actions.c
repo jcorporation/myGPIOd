@@ -9,7 +9,8 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/lib/action.h"
+#include "mygpiod/actions/actions.h"
+
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 

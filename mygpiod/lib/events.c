@@ -12,8 +12,8 @@
 #include "mygpiod/lib/events.h"
 
 #include "mygpiod/config/config.h"
-#include "mygpiod/config/input.h"
-#include "mygpiod/input/input_event.h"
+#include "mygpiod/config/input_ev.h"
+#include "mygpiod/input_ev/input_event.h"
 #include "mygpiod/lib/event_types.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"

@@ -11,7 +11,7 @@
 #ifndef MYGPIOD_ACTIONS_HTTP_H
 #define MYGPIOD_ACTIONS_HTTP_H
 
-#include "mygpiod/lib/action.h"
+#include "mygpiod/actions/actions.h"
 
 #include <stdbool.h>
 

@@ -12,7 +12,7 @@
 #define MYGPIOD_SERVER_HTTPD_UTIL_H
 
 #include "dist/sds/sds.h"
-#include "mygpiod/input/input_event.h"
+#include "mygpiod/input_ev/input_event.h"
 #include "mygpiod/lib/event_types.h"
 
 #include <inttypes.h>

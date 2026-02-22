@@ -12,9 +12,9 @@
 #include "mygpiod/config/gpio.h"
 
 #include "mygpio-common/util.h"
+#include "mygpiod/actions/actions.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/util.h"
-#include "mygpiod/lib/action.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"

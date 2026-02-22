@@ -12,7 +12,7 @@
 #include "mygpiod/lua/functions/mpc.h"
 
 #include "dist/sds/sds.h"
-#include "lib/action.h"
+#include "mygpiod/actions/actions.h"
 #include "mygpiod/actions/mpc.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lua/util.h"

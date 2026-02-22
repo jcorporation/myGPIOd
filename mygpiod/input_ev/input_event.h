@@ -8,10 +8,10 @@
  * \brief Input device event type definition
  */
 
-#ifndef MYGPIOD_INPUT_EVENT_H
-#define MYGPIOD_INPUT_EVENT_H
+#ifndef MYGPIOD_INPUT_INPUT_EVENT_H
+#define MYGPIOD_INPUT_INPUT_EVENT_H
 
-#include "mygpiod/config/input.h"
+#include "mygpiod/config/input_ev.h"
 
 #include <sys/time.h>
 

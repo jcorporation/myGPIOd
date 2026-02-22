@@ -17,7 +17,7 @@
 #include "mygpiod/event_loop/signal_handler.h"
 
 #include "mygpiod/config/gpio.h"
-#include "mygpiod/config/input.h"
+#include "mygpiod/config/input_ev.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"

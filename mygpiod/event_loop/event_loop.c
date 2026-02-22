@@ -14,7 +14,7 @@
 #include "mygpiod/config/gpio.h"
 #include "mygpiod/gpio/event.h"
 #include "mygpiod/gpio/timer.h"
-#include "mygpiod/input/input.h"
+#include "mygpiod/input_ev/event.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"

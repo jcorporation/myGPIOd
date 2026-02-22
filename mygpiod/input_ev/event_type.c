@@ -9,7 +9,7 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/input/event_type.h"
+#include "mygpiod/input_ev/event_type.h"
 
 #include "mygpiod/lib/log.h"
 

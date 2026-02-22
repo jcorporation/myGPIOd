@@ -11,7 +11,7 @@
 #ifndef MYGPIOD_ACTIONS_EXECUTE_H
 #define MYGPIOD_ACTIONS_EXECUTE_H
 
-#include "mygpiod/lib/action.h"
+#include "mygpiod/actions/actions.h"
 #include "mygpiod/config/config.h"
 
 void actions_execute(struct t_config *config, struct t_list *actions);

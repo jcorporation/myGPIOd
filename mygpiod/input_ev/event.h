@@ -8,13 +8,11 @@
  * \brief Input device event handling
  */
 
-#ifndef MYGPIOD_INPUT_H
-#define MYGPIOD_INPUT_H
+#ifndef MYGPIOD_INPUT_EVENT_H
+#define MYGPIOD_INPUT_EVENT_H
 
 #include "mygpiod/config/config.h"
-#include "mygpiod/event_loop/event_loop.h"
 
-bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds);
 bool input_handle_event(struct t_config *config, int *fd);
 
 #endif

@@ -14,12 +14,13 @@ target_include_directories(mygpiod
 target_sources(mygpiod
   PRIVATE
     main.c
+    actions/actions.c
     actions/execute.c
     actions/gpio.c
     actions/system.c
     config/config.c
     config/gpio.c
-    config/input.c
+    config/input_ev.c
     event_loop/event_loop.c
     event_loop/signal_handler.c
     gpio/action.c
@@ -30,10 +31,11 @@ target_sources(mygpiod
     gpio/output.c
     gpio/timer.c
     gpio/util.c
-    input/event_code.c
-    input/event_type.c
-    input/input.c
-    lib/action.c
+    input_ev/action.c
+    input_ev/device.c
+    input_ev/event_code.c
+    input_ev/event_type.c
+    input_ev/event.c
     lib/events.c
     lib/json_print.c
     lib/list.c

@@ -12,7 +12,7 @@
 #define MYGPIOD_ACTIONS_MPC_H
 
 #include "mygpiod/config/config.h"
-#include "mygpiod/lib/action.h"
+#include "mygpiod/actions/actions.h"
 
 #include <stdbool.h>
 

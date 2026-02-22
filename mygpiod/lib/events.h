@@ -14,7 +14,7 @@
 #include "mygpiod/config/config.h"
 #include "mygpiod/lib/event_types.h"
 
-#include "mygpiod/input/input_event.h"
+#include "mygpiod/input_ev/input_event.h"
 
 #include <inttypes.h>
 

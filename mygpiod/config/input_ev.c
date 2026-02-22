@@ -9,12 +9,12 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/config/input.h"
+#include "mygpiod/config/input_ev.h"
 
 #include "mygpio-common/util.h"
 #include "mygpiod/event_loop/event_loop.h"
-#include "mygpiod/input/event_code.h"
-#include "mygpiod/input/event_type.h"
+#include "mygpiod/input_ev/event_code.h"
+#include "mygpiod/input_ev/event_type.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"

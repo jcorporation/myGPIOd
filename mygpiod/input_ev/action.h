@@ -11,7 +11,7 @@
 #ifndef MYGPIOD_INPUT_ACTION_H
 #define MYGPIOD_INPUT_ACTION_H
 
-#include "mygpiod/input/input_event.h"
+#include "mygpiod/input_ev/input_event.h"
 #include "mygpiod/config/config.h"
 
 void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event);
