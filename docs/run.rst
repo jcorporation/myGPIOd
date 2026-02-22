@@ -1,13 +1,18 @@
 Run
 ===
 
-myGPIOd needs read-write access to the gpio chip device (e. g. ``/dev/gpiochip0``).
-
 .. code:: sh
 
    /usr/bin/mygpiod [/etc/mygpiod.conf]
 
 The cmake install script creates a startup script for systemd, openrc or sysVinit.
+
+Permissions
+------------
+
+- myGPIOd needs read-write access to the gpio chip device (e. g. ``/dev/gpiochip0``) to manage GPIO's.
+- To query the Raspberry state read-write access to ``/dev/vcio`` is required.
+- Input event handling only requires read access to ``/dev/input/..`` devices.
 
 Systemd
 -------

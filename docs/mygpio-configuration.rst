@@ -67,7 +67,7 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
   input_ev = /dev/input/event3:EV_KEY:KEY_LEFTSHIFT:*:none
 
   # Register a simple button press
-  input_ev = /dev/input/event3:EV_KEY:KEY_N:1:lua:keyPressN
+  input_ev = /dev/input/event3:EV_KEY:KEY_N:1:lua:keyPress N
 
 - Supported event types: ``EV_KEY``, ``EV_REL``, ``EV_ABS``, ``EV_SW``
 - Event code and value can be ``*`` to match all.
@@ -77,6 +77,10 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
 
    You can use the ``evtest`` utility to determine the correct device, type, code and value.
 
+
+.. note::
+
+   To handle key modifiers like Shift or Ctrl simply register the modifier keys without an action and use a Lua script to determine the state.
 
 Actions
 -------
