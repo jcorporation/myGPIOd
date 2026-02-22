@@ -5,7 +5,7 @@
 */
 
 /*! \file
- * \brief Input device action handling handling
+ * \brief Input device action handling
  */
 
 #ifndef MYGPIOD_INPUT_ACTION_H
@@ -15,5 +15,6 @@
 #include "mygpiod/config/config.h"
 
 void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event);
+unsigned input_ev_get_state(struct t_input_device *device, unsigned short code);
 
 #endif

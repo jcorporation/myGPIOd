@@ -18,6 +18,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 
 /**
  * Opens the input devices and add's it to the poll fds array
@@ -25,7 +26,7 @@
  * @param poll_fds Pointer to poll_fds array
  * @return true on success, else false
  */
-bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
+bool input_device_open(struct t_config *config, struct t_poll_fds *poll_fds) {
     if (config->input_devices.length == 0) {
         MYGPIOD_LOG_INFO("No inputs for monitoring configured");
         return true;
@@ -47,4 +48,41 @@ bool inputs_open(struct t_config *config, struct t_poll_fds *poll_fds) {
         current = current->next;
     }
     return true;
+}
+
+/**
+ * Get the input data by fd object
+ * @param inputs Pointer to inputs list
+ * @param fd fd to find
+ * @return struct t_input_device* or NULL if not found
+ */
+struct t_input_device *input_device_get_by_fd(struct t_list *inputs, int *fd) {
+    struct t_list_node *current = inputs->head;
+    while (current != NULL) {
+        struct t_input_device *data = (struct t_input_device *)current->data;
+        if (data->fd == *fd) {
+            return data;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+/**
+ * Gets the input device struct by device name
+ * @param input_devices Pointer to list of input devices
+ * @param device Device name
+ * @return struct t_input_data* or NULL if not found
+ */
+struct t_input_device *input_device_get_by_name(struct t_list *input_devices, const char *device) {
+    struct t_list_node *current = input_devices->head;
+    while (current != NULL) {
+        struct t_input_device *data = (struct t_input_device *)current->data;
+        if (strcmp(data->name, device) == 0) {
+            return data;
+        }
+        current = current->next;
+    }
+    MYGPIOD_LOG_WARN("Device \"%s\" not configured", device);
+    return NULL;
 }

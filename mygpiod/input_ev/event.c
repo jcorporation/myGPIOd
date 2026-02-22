@@ -13,20 +13,14 @@
 
 #include "mygpiod/config/config.h"
 #include "mygpiod/input_ev/action.h"
+#include "mygpiod/input_ev/device.h"
 #include "mygpiod/input_ev/event_type.h"
-#include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 
 #include <errno.h>
 #include <linux/input-event-codes.h>
 #include <string.h>
 #include <unistd.h>
-
-// Private definitions
-
-static struct t_input_device *get_input_device_by_fd(struct t_list *inputs, int *fd);
-
-// Public functions
 
 /**
  * Reads the event data from an input event
@@ -36,7 +30,7 @@ static struct t_input_device *get_input_device_by_fd(struct t_list *inputs, int 
  */
 bool input_handle_event(struct t_config *config, int *fd) {
     struct t_mygpiod_input_event input_event;
-    input_event.device = get_input_device_by_fd(&config->input_devices, fd);
+    input_event.device = input_device_get_by_fd(&config->input_devices, fd);
     if (input_event.device == NULL) {
         MYGPIOD_LOG_ERROR("Data for fd not found");
         return false;
@@ -67,24 +61,4 @@ bool input_handle_event(struct t_config *config, int *fd) {
             );
     }
     return true;
-}
-
-// Private functions
-
-/**
- * Get the input data by fd object
- * @param inputs Pointer to inputs list
- * @param fd fd to find
- * @return struct t_input_device* or NULL if not found
- */
-static struct t_input_device *get_input_device_by_fd(struct t_list *inputs, int *fd) {
-    struct t_list_node *current = inputs->head;
-    while (current != NULL) {
-        struct t_input_device *data = (struct t_input_device *)current->data;
-        if (data->fd == *fd) {
-            return data;
-        }
-        current = current->next;
-    }
-    return NULL;
 }

@@ -5,7 +5,7 @@
 */
 
 /*! \file
- * \brief Input device action handling handling
+ * \brief Input device action handling
  */
 
 #include "compile_time.h"
@@ -76,6 +76,24 @@ void input_action_handle(struct t_config *config, struct t_mygpiod_input_event *
             input_event->data.value
         );
     }
+}
+
+/**
+ * Gets the current state of an input event
+ * @param device Input device
+ * @param code Key code
+ * @return unsigned value or UINT_MAX if not found
+ */
+unsigned input_ev_get_state(struct t_input_device *device, unsigned short code) {
+    struct t_list_node *current = device->event_actions.head;
+    while (current != NULL) {
+        struct t_input_event_actions *event_actions = (struct t_input_event_actions *)current->data;
+        if (event_actions->code == code) {
+            return event_actions->state;
+        }
+        current = current->next;
+    }
+    return UINT_MAX;
 }
 
 // Private functions

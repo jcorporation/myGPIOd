@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
     }
 
     // add input fds
-    inputs_open(config, &poll_fds);
+    input_device_open(config, &poll_fds);
 
     // add signal fd
     event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL, POLLIN | POLLPRI);

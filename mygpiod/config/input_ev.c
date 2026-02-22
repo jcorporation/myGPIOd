@@ -13,6 +13,7 @@
 
 #include "mygpio-common/util.h"
 #include "mygpiod/event_loop/event_loop.h"
+#include "mygpiod/input_ev/device.h"
 #include "mygpiod/input_ev/event_code.h"
 #include "mygpiod/input_ev/event_type.h"
 #include "mygpiod/lib/list.h"
@@ -25,7 +26,6 @@
 
 // Private definitions
 static struct t_input_device *new_device(sds device_name);
-static struct t_input_device *get_device(struct t_list *input_devices, const char *device);
 static void node_data_input_event_actions_clear(struct t_list_node *node);
 
 // Public functions
@@ -70,7 +70,7 @@ bool parse_input_ev(struct t_list *input_devices, sds config_value) {
     enum mygpiod_actions action = parse_action(action_str);
 
     // Check if device is already added, else add if
-    struct t_input_device *device = get_device(input_devices, device_str);
+    struct t_input_device *device = input_device_get_by_name(input_devices, device_str);
     if (device == NULL) {
         device = new_device(device_str);
         list_push(input_devices, 0, device);
@@ -140,25 +140,6 @@ static struct t_input_device *new_device(sds device_name) {
     device->name = sdsdup(device_name);
     list_init(&device->event_actions);
     return device;
-}
-
-/**
- * Gets the input device struct by device name
- * @param input_devices Pointer to list of input devices
- * @param device Device name
- * @return struct t_input_data* or NULL if not found
- */
-static struct t_input_device *get_device(struct t_list *input_devices, const char *device) {
-    struct t_list_node *current = input_devices->head;
-    while (current != NULL) {
-        struct t_input_device *data = (struct t_input_device *)current->data;
-        if (strcmp(data->name, device) == 0) {
-            return data;
-        }
-        current = current->next;
-    }
-    MYGPIOD_LOG_WARN("Device \"%s\" not configured", device);
-    return NULL;
 }
 
 /**
