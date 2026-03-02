@@ -8,8 +8,8 @@
  * \brief Input device configuration
  */
 
-#ifndef MYGPIOD_CONFIG_INPUT_H
-#define MYGPIOD_CONFIG_INPUT_H
+#ifndef MYGPIOD_CONFIG_INPUT_EV_H
+#define MYGPIOD_CONFIG_INPUT_EV_H
 
 #include "mygpiod/actions/actions.h"
 
