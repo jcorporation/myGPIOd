@@ -14,7 +14,7 @@ endif()
 # myGPIO is written in C
 # supported compilers: gcc, clang
 project (mygpiod
-  VERSION 2.0.0
+  VERSION 3.0.0
   LANGUAGES C
 )
 
