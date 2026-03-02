@@ -34,6 +34,7 @@ enum pfd_types {
         PFD_TYPE_HTTPD,
     #endif
     PFD_TYPE_INPUT,
+    PFD_TYPE_TIMER_EV,
 };
 
 /**

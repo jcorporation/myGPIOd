@@ -21,6 +21,7 @@ target_sources(mygpiod
     config/config.c
     config/gpio.c
     config/input_ev.c
+    config/timer_ev.c
     event_loop/event_loop.c
     event_loop/signal_handler.c
     gpio/action.c
@@ -49,6 +50,9 @@ target_sources(mygpiod
     server_socket/raspberry.c
     server_socket/response.c
     server_socket/socket.c
+    timer_ev/action.c
+    timer_ev/event.c
+    timer_ev/timer_ev.c
 )
 
 set(ENV{MYGPIOD_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")

@@ -17,5 +17,6 @@ int timer_new(int timeout_ms, int interval_ms);
 bool timer_set(int timer_fd, int timeout_ms, int interval_ms);
 void timer_log_next_expire(int timer_fd);
 bool timer_repeat(int timer_fd);
+bool timerfd_read_value(int *fd);
 
 #endif

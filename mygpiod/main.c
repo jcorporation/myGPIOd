@@ -19,6 +19,7 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
+#include "mygpiod/timer_ev/timer_ev.h"
 #ifdef MYGPIOD_ENABLE_HTTPD
     #include "mygpiod/server_http/httpd.h"
 #endif
@@ -142,6 +143,9 @@ int main(int argc, char **argv) {
 
     // add input fds
     input_device_open(config, &poll_fds);
+
+    // add timer_ev fds
+    timer_ev_open(config, &poll_fds);
 
     // add signal fd
     event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL, POLLIN | POLLPRI);

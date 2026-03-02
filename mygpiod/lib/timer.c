@@ -28,7 +28,8 @@
 int timer_new(int timeout_ms, int interval_ms) {
     int timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
     if (timer_fd == -1) {
-        MYGPIOD_LOG_ERROR("Can not create timer: \"%s\"", strerror(errno));
+        MYGPIOD_LOG_ERROR("Can not create timer");
+        MYGPIOD_LOG_ERRNO(errno);
         return -1;
     }
     if (timer_set(timer_fd, timeout_ms, interval_ms) == false) {
@@ -97,6 +98,21 @@ bool timer_repeat(int timer_fd) {
     if (its.it_value.tv_sec == 0 &&
         its.it_value.tv_nsec == 0)
     {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Reads the uint64_t value from a timer fd
+ * @param fd fd to read from
+ * @return true on success, else false
+ */
+bool timerfd_read_value(int *fd) {
+    uint64_t exp;
+    ssize_t s = read(*fd, &exp, sizeof(uint64_t));
+    if (s != sizeof(uint64_t)) {
+        MYGPIOD_LOG_ERROR("Unable reading from timer_fd");
         return false;
     }
     return true;

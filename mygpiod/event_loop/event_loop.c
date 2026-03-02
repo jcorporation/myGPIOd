@@ -19,6 +19,7 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
 #include "mygpiod/server_socket/socket.h"
+#include "mygpiod/timer_ev/event.h"
 
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -56,6 +57,8 @@ const char *lookup_pfd_type(enum pfd_types type) {
     #endif
         case PFD_TYPE_INPUT:
             return "input";
+        case PFD_TYPE_TIMER_EV:
+            return "timer_ev";
     }
     return "unknown";
 }
@@ -188,6 +191,9 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
             #endif
                 case PFD_TYPE_INPUT:
                     input_ev_handle_event(config, &poll_fds->fd[i].fd);
+                    return true;
+                case PFD_TYPE_TIMER_EV:
+                    timer_ev_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
             }
         }

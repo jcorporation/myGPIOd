@@ -18,6 +18,7 @@
 
 #include "mygpiod/config/gpio.h"
 #include "mygpiod/config/input_ev.h"
+#include "mygpiod/config/timer_ev.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
@@ -114,6 +115,7 @@ void config_clear(struct t_config *config) {
         }
     #endif
     list_clear(&config->input_devices, input_node_data_clear);
+    list_clear(&config->timer_definitions, timer_node_definition_data_clear);
 }
 
 //private functions
@@ -149,6 +151,7 @@ static struct t_config *config_new(void) {
     #endif
 
     list_init(&config->input_devices);
+    list_init(&config->timer_definitions);
 
     #ifdef MYGPIOD_ENABLE_HTTPD
         config->http_ip = sdsnew(CFG_HTTP_IP);
@@ -323,6 +326,12 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     #endif
     if (strcmp(key, "input_ev") == 0) {
         if (parse_input_ev(&config->input_devices, value) == true) {
+            return true;
+        }
+        return false;
+    }
+    if (strcmp(key, "timer_ev") == 0) {
+        if (parse_timer_ev(&config->timer_definitions, value) == true) {
             return true;
         }
         return false;

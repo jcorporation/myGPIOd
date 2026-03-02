@@ -55,8 +55,11 @@ struct t_config {
     sds chip_path;                        //!< path of the gpio chip device
     struct gpiod_chip *chip;              //!< gpiod chip object
 
-    // input events
-    struct t_list input_devices;                 //!< list of /dev/input/* devices
+    // Input events
+    struct t_list input_devices;          //!< list of /dev/input/* devices
+
+    // Timer events
+    struct t_list timer_definitions;      //!< list of /dev/input/* devices
 
     // MPD
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
