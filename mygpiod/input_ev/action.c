@@ -32,10 +32,10 @@ static bool check_event(struct t_input_event_actions *event, struct t_input_even
  * @param input_event Event data
  */
 void input_ev_action_handle(struct t_config *config, struct t_mygpiod_input_event *input_event) {
-    MYGPIOD_LOG_INFO("%s: time=%ld.%06lu type=%s (%hu) code=%s (%hu) value=%u",
+    MYGPIOD_LOG_INFO("%s: time=%lld.%06lld type=%s (%hu) code=%s (%hu) value=%u",
         input_event->device->name,
-        input_event->data.time.tv_sec,
-        input_event->data.time.tv_usec,
+        (long long)input_event->data.time.tv_sec,
+        (long long)input_event->data.time.tv_usec,
         input_event_type_name(input_event->data.type),
         input_event->data.type,
         input_event_code_name(input_event->data.type, input_event->data.code),
