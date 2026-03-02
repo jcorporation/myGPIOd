@@ -17,6 +17,7 @@ makedepends="cmake
 	libgpiod-dev
 	libmicrohttpd-dev
 	libmpdclient-dev
+	linux-headers
 	lua5.4-dev
 	samurai
 	"
