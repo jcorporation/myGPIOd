@@ -4,7 +4,7 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
-## myGPIOd v2.0.0 (not yet released)
+## myGPIOd v2.0.0 (2026-03-02)
 
 This release adds support for input device events. myGPIOd can now read events from /dev/input/* devices.
 
