@@ -38,7 +38,9 @@ Events are triggered through changes of input GPIO values.
 | ``gpio_long_press_release`` || GPIO changing it's state after a long press event.                         |
 |                             || ``long_press_release_action``: Action executed when button was released.   |
 +-----------------------------+-----------------------------------------------------------------------------+
-| ``input``                   || An input event has occurred.                                               |
+| ``input``                   | An input event has occurred.                                                |
++-----------------------------+-----------------------------------------------------------------------------+
+| ``timer_ev``                | An timer event has occurred.                                                |
 +-----------------------------+-----------------------------------------------------------------------------+
 
 GPIO events
@@ -69,9 +71,21 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
   # Register a simple button press
   input_ev = /dev/input/event3:EV_KEY:KEY_N:1:lua:keyPress N
 
-- Supported event types: ``EV_KEY``, ``EV_REL``, ``EV_ABS``, ``EV_SW``
-- Event code and value can be ``*`` to match all.
-- Multiple actions can be defined per event.
++--------------+-----------------------------------------------------------------------------+
+| Field        | Description                                                                 |
++==============+=============================================================================+
+| ``device``   | Input device                                                                |
++--------------+-----------------------------------------------------------------------------+
+| ``type``     | Input event type, one of: ``EV_KEY``, ``EV_REL``, ``EV_ABS``, ``EV_SW``     |
++--------------+-----------------------------------------------------------------------------+
+| ``code``     | Input event code, ``*`` to match all.                                       |
++--------------+-----------------------------------------------------------------------------+
+| ``value``    | ``*`` for each weekday else comma separated list of days.                   |
++--------------+-----------------------------------------------------------------------------+
+| ``action``   | Action to execute. Multiple actions can be defined per event.               |
++--------------+-----------------------------------------------------------------------------+
+| ``options``  | Options for action.                                                         |
++--------------+-----------------------------------------------------------------------------+
 
 .. hint::
 
@@ -81,6 +95,34 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
 .. note::
 
    To handle key modifiers like Shift or Ctrl simply register the modifier keys without an action and use a Lua script to determine the state.
+
+Timer events
+------------
+
+myGPIOd has an integrated timer to execute time based recurring actions.
+
+.. code:: ini
+
+  #timer_ev = hour:minute:interval:weekdays:action:options
+  timer_ev = 19:15:2m:*:lua:timerTrigger
+
++--------------+-----------------------------------------------------------------------------+
+| Field        | Description                                                                 |
++==============+=============================================================================+
+| ``hour``     | Start hour, 2 digits.                                                       |
++--------------+-----------------------------------------------------------------------------+
+| ``minute``   | Start minute, 2 digits.                                                     |
++--------------+-----------------------------------------------------------------------------+
+| ``interval`` || Recurring interval, allowed quantifiers:                                   |
+|              || s = second, m = minute, h = hour, d = day, w = week                        |
++--------------+-----------------------------------------------------------------------------+
+| ``weekdays`` || ``*`` for each weekday else comma separated list of days.                  |
+|              || 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat, 7 = Sun     |
++--------------+-----------------------------------------------------------------------------+
+| ``action``   | Action to execute.                                                          |
++--------------+-----------------------------------------------------------------------------+
+| ``options``  | Options for action.                                                         |
++--------------+-----------------------------------------------------------------------------+
 
 Actions
 -------

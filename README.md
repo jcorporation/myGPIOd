@@ -19,6 +19,7 @@ Since version 2.0.0 myGPIOd can also read events from generic input devices (`/d
     - long press (with optional interval)
     - long press release
   - Call actions on input events (`/dev/input/..`)
+  - Timer based events
   - Integrated actions
     - GPIO settings
     - HTTP requests
