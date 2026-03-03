@@ -17,7 +17,7 @@
 
 
 /**
- * Config data for inputs
+ * Config data for timer event
  */
 struct t_timer_definition {
     sds name;                      //!< Timer event name
