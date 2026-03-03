@@ -83,6 +83,5 @@ struct t_input_device *input_device_get_by_name(struct t_list *input_devices, co
         }
         current = current->next;
     }
-    MYGPIOD_LOG_WARN("Device \"%s\" not configured", device);
     return NULL;
 }
