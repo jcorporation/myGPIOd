@@ -27,3 +27,8 @@ function keyPress(key)
         print("Left shift key was not pressed with key " .. key)
     end
 end
+
+-- Simple Lua function for timer event
+function timerTrigger()
+    print("Timer triggered")
+end

@@ -59,3 +59,8 @@ gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d
 
 # Key Press
 #input_ev = /dev/input/event3:EV_KEY:KEY_N:*:lua:keyPress N
+
+###############################################################################
+# Timer event configuration
+#timer_ev = hour:minute:interval:weekdays:action:options
+#timer_ev = 19:15:2m:*:lua:timerTrigger

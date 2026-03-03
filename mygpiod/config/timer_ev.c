@@ -86,6 +86,9 @@ bool parse_timer_ev(struct t_list *timer_definitions, sds config_value) {
     definition->start_hour = hour;
     definition->start_minute = minute;
     definition->interval = interval;
+    for (size_t i = 0; i < 7; i++) {
+        definition->weekdays[i] = weekdays[i];
+    }
     if (action != MYGPIOD_ACTION_NONE) {
         definition->action.options = sdssplitargs(config_value, &definition->action.options_count);
     }
@@ -150,7 +153,7 @@ bool parse_interval(sds interval_str, int *interval_sec) {
             return false;
     }
 
-    if (INT_MAX / quantifier > interval) {
+    if (INT_MAX / quantifier < interval) {
         // Prevent overflow
         return false;
     }
