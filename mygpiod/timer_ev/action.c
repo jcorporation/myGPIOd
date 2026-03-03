@@ -20,7 +20,7 @@
 /**
  * Handles the configured actions for an timer event.
  * @param config Pointer to config
- * @param input_event Event data
+ * @param timer_definition Timer event configuration
  */
 void timer_ev_action_handle(struct t_config *config, struct t_timer_definition *timer_definition) {
     // Weekday check

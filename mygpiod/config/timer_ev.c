@@ -104,7 +104,7 @@ bool parse_timer_ev(struct t_list *timer_definitions, sds config_value) {
 
 /**
  * Frees pointers and closes file descriptors from this node.
- * @param device input data to clear
+ * @param definition Timer event configuration to clear
  */
 void timer_definition_data_clear(struct t_timer_definition *definition) {
     close_fd(&definition->fd);
@@ -124,8 +124,7 @@ void timer_node_definition_data_clear(struct t_list_node *node) {
 
 /**
  * Mallocs and initializes a new input device struct
- * @param device_name Input device path
- * @return struct t_input_device* 
+ * @return struct t_input_device*
  */
 static struct t_timer_definition *new_definition(void) {
     struct t_timer_definition *definition = malloc_assert(sizeof(struct t_timer_definition));

@@ -64,7 +64,7 @@ bool timer_ev_open(struct t_config *config, struct t_poll_fds *poll_fds) {
 
 /**
  * Get the timer definition by fd object
- * @param inputs Pointer to inputs list
+ * @param timer_definitions Pointer to timer event configuration
  * @param fd fd to find
  * @return struct t_input_device* or NULL if not found
  */
