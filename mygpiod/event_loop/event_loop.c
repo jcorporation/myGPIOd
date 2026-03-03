@@ -130,7 +130,7 @@ void event_add_client_fds(struct t_config *config, struct t_poll_fds *poll_fds) 
         }
         if (data->timeout_fd > 0) {
             event_poll_fd_add(poll_fds, data->timeout_fd, PFD_TYPE_CLIENT_TIMEOUT, POLLIN | POLLPRI);
-            timer_log_next_expire(data->timeout_fd);
+            timer_log_next_expire("Client timeout", data->timeout_fd);
         }
         current = current->next;
     }

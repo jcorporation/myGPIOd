@@ -33,9 +33,10 @@ void timer_ev_action_handle(struct t_config *config, struct t_timer_definition *
     int wday = now.tm_wday;
     wday = wday > 0 ? wday - 1 : 6;
     if (timer_definition->weekdays[wday] == false) {
-        MYGPIOD_LOG_DEBUG("Skipping timer it is not enabled on this weekday.");
+        MYGPIOD_LOG_DEBUG("Skipping timer \"%s\" it is not enabled on this weekday.", timer_definition->name);
         return;
     }
+    MYGPIOD_LOG_INFO("Timer \"%s\" triggered.", timer_definition->name);
     // Execute action
     action_execute(config, &timer_definition->action);
 }

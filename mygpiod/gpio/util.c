@@ -28,13 +28,15 @@ uint64_t get_timestamp_ns(enum gpiod_line_clock event_clock) {
             //TODO: howto handle this?
         case GPIOD_LINE_CLOCK_REALTIME:
             if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
-                MYGPIOD_LOG_ERROR("Unable to get timestamp: %s", strerror(errno));
+                MYGPIOD_LOG_ERROR("Unable to get timestamp.");
+                MYGPIOD_LOG_ERRNO(errno);
                 return 0;
             }
             break;
         case GPIOD_LINE_CLOCK_MONOTONIC:
             if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1) {
-                MYGPIOD_LOG_ERROR("Unable to get timestamp: %s", strerror(errno));
+                MYGPIOD_LOG_ERROR("Unable to get timestamp.");
+                MYGPIOD_LOG_ERRNO(errno);
                 return 0;
             }
             break;

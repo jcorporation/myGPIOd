@@ -32,7 +32,8 @@ bool parse_weekdays(sds weekdays_str, bool weekdays[7]);
  * @return true on success, else false
  */
 bool parse_timer_ev(struct t_list *timer_definitions, sds config_value) {
-    // Format is: hour:minute:interval:weekdays:action:options
+    // Format is: name:hour:minute:interval:weekdays:action:options
+    sds name = sds_getvalue(config_value, ':');
     sds hour_str = sds_getvalue(config_value, ':');
     sds min_str = sds_getvalue(config_value, ':');
     sds interval_str = sds_getvalue(config_value, ':');
@@ -77,11 +78,13 @@ bool parse_timer_ev(struct t_list *timer_definitions, sds config_value) {
     if (parsed == false ||
         action == MYGPIOD_ACTION_UNKNOWN)
     {
+        FREE_SDS(name);
         return false;
     }
 
     // Add it to the timer event list
     struct t_timer_definition *definition = new_definition();
+    definition->name = name;
     definition->action.action = action;
     definition->start_hour = hour;
     definition->start_minute = minute;
@@ -172,16 +175,15 @@ bool parse_interval(sds interval_str, int *interval_sec) {
  */
 bool parse_weekdays(sds weekdays_str, bool weekdays[7]) {
     if (weekdays_str[0] == '*') {
-        weekdays[0] = true;
-        weekdays[1] = true;
-        weekdays[2] = true;
-        weekdays[3] = true;
-        weekdays[4] = true;
-        weekdays[5] = true;
-        weekdays[6] = true;
+        for (size_t i = 0; i < 7; i++) {
+            weekdays[i] = true;
+        }
         return true;
     }
 
+    for (size_t i = 0; i < 7; i++) {
+        weekdays[i] = false;
+    }
     size_t len = sdslen(weekdays_str);
     for (size_t i = 0; i < len; i++) {
         switch (weekdays_str[i]) {

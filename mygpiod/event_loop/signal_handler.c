@@ -31,14 +31,16 @@ int make_signalfd(void) {
     errno = 0;
     int rv = sigprocmask(SIG_BLOCK, &sigmask, NULL);
     if (rv < 0) {
-        MYGPIOD_LOG_ERROR("Error masking signals: \"%s\"", strerror(errno));
+        MYGPIOD_LOG_ERROR("Error masking signals.");
+        MYGPIOD_LOG_ERRNO(errno);
         return -1;
     }
 
     errno = 0;
     int sigfd = signalfd(-1, &sigmask, SFD_NONBLOCK | SFD_CLOEXEC);
     if (sigfd < 0) {
-        MYGPIOD_LOG_ERROR("Error creating signalfd: \"%s\"", strerror(errno));
+        MYGPIOD_LOG_ERROR("Error creating signalfd.");
+        MYGPIOD_LOG_ERRNO(errno);
         return -1;
     }
 

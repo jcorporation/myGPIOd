@@ -33,7 +33,7 @@ bool gpio_in_timer_handle_event(struct t_config *config, int *fd) {
     if (timerfd_read_value(fd) == false) {
         return false;
     }
-    timer_log_next_expire(*fd);
+    timer_log_next_expire("GPIO in timer", *fd);
     struct t_list_node *node = get_node_by_gpio_in_timerfd(&config->gpios_in, fd);
     if (node == NULL) {
         MYGPIOD_LOG_ERROR("Error getting node for timer_fd");
@@ -56,7 +56,7 @@ bool gpio_out_timer_handle_event(struct t_config *config, int *fd) {
     if (timerfd_read_value(fd) == false) {
         return false;
     }
-    timer_log_next_expire(*fd);
+    timer_log_next_expire("GPIO out timer", *fd);
     struct t_list_node *node = get_node_by_gpio_out_timerfd(&config->gpios_out, fd);
     if (node == NULL) {
         MYGPIOD_LOG_ERROR("Error getting node for timer_fd");

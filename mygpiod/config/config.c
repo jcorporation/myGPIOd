@@ -172,7 +172,8 @@ static struct t_config *config_new(void) {
 static bool config_read(struct t_config *config, sds config_file) {
     FILE *fp = fopen(config_file, OPEN_FLAGS_READ);
     if (fp == NULL) {
-        MYGPIOD_LOG_ERROR("Can not open \"%s\": %s", config_file, strerror(errno));
+        MYGPIOD_LOG_ERROR("Can not open \"%s\".", config_file);
+        MYGPIOD_LOG_ERRNO(errno);
         return false;
     }
     bool rc = true;

@@ -103,12 +103,14 @@ myGPIOd has an integrated timer to execute time based recurring actions.
 
 .. code:: ini
 
-  #timer_ev = hour:minute:interval:weekdays:action:options
-  timer_ev = 19:15:2m:*:lua:timerTrigger
+  #timer_ev = name:hour:minute:interval:weekdays:action:options
+  timer_ev = test:19:15:2m:*:lua:timerTrigger
 
 +--------------+-----------------------------------------------------------------------------+
 | Field        | Description                                                                 |
 +==============+=============================================================================+
+| ``name``     | Timer event name.                                                           |
++--------------+-----------------------------------------------------------------------------+
 | ``hour``     | Start hour, 2 digits.                                                       |
 +--------------+-----------------------------------------------------------------------------+
 | ``minute``   | Start minute, 2 digits.                                                     |

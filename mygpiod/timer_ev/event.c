@@ -30,6 +30,6 @@ bool timer_ev_handle_event(struct t_config *config, int *fd) {
         return false;
     }
     timer_ev_action_handle(config, timer_definition);
-    timer_log_next_expire(timer_definition->fd);
+    timer_log_next_expire(timer_definition->name, timer_definition->fd);
     return true;
 }

@@ -46,7 +46,7 @@ bool timer_ev_open(struct t_config *config, struct t_poll_fds *poll_fds) {
         errno = 0;
         definition->fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
         if (definition->fd < 0) {
-            MYGPIOD_LOG_ERROR("Failure opening timer fd");
+            MYGPIOD_LOG_ERROR("Failure opening timer fd for \"%s\"", definition->name);
             MYGPIOD_LOG_ERRNO(errno);
             return false;
         }
@@ -55,7 +55,7 @@ bool timer_ev_open(struct t_config *config, struct t_poll_fds *poll_fds) {
         if (timer_set(definition->fd, start_in * 1000, definition->interval * 1000) == false) {
             return false;
         }
-        timer_log_next_expire(definition->fd);
+        timer_log_next_expire(definition->name, definition->fd);
         event_poll_fd_add(poll_fds, definition->fd, PFD_TYPE_TIMER_EV, POLLIN | POLLPRI);
         current = current->next;
     }

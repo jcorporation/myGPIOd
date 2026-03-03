@@ -61,7 +61,8 @@ bool timer_set(int timer_fd, int timeout_ms, int interval_ms) {
     }
     errno = 0;
     if (timerfd_settime(timer_fd, 0, &its, NULL) == -1) {
-        MYGPIOD_LOG_ERROR("Can not set expiration for timer: \"%s\"", strerror(errno));
+        MYGPIOD_LOG_ERROR("Can not set expiration for timer.");
+        MYGPIOD_LOG_ERRNO(errno);
         close_fd(&timer_fd);
         return false;
     }
@@ -70,17 +71,19 @@ bool timer_set(int timer_fd, int timeout_ms, int interval_ms) {
 
 /**
  * Logs the next timer expiration.
- * @param timer_fd timer fd
+ * @param name Timer name
+ * @param timer_fd Timer fd
  */
-void timer_log_next_expire(int timer_fd) {
+void timer_log_next_expire(const char *name, int timer_fd) {
     struct itimerspec its;
     errno = 0;
     if (timerfd_gettime(timer_fd, &its) == -1) {
-        MYGPIOD_LOG_ERROR("Can not get expiration for timer: \"%s\"", strerror(errno));
+        MYGPIOD_LOG_ERROR("Can not get expiration for timer \"%s\".", name);
+        MYGPIOD_LOG_ERRNO(errno);
         return;
     }
     int64_t timestamp = (its.it_value.tv_sec * 1000) + (its.it_value.tv_nsec / 1000000);
-    MYGPIOD_LOG_DEBUG("Timer expires in %lld ms", (long long)timestamp);
+    MYGPIOD_LOG_DEBUG("Timer \"%s\" expires in %lld ms", name, (long long)timestamp);
 }
 
 /**
@@ -92,7 +95,8 @@ bool timer_repeat(int timer_fd) {
     struct itimerspec its;
     errno = 0;
     if (timerfd_gettime(timer_fd, &its) == -1) {
-        MYGPIOD_LOG_ERROR("Can not get expiration for timer: \"%s\"", strerror(errno));
+        MYGPIOD_LOG_ERROR("Can not get expiration for timer.");
+        MYGPIOD_LOG_ERRNO(errno);
         return false;
     }
     if (its.it_value.tv_sec == 0 &&

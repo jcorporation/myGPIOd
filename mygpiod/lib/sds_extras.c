@@ -67,7 +67,8 @@ sds sds_getfile(sds s, const char *file_path, int *nread) {
     FILE *fp = fopen(file_path, OPEN_FLAGS_READ);
     if (fp == NULL) {
         *nread = -1;
-        MYGPIOD_LOG_ERROR("Unable to open file \"%s\": %s", file_path, strerror(errno));
+        MYGPIOD_LOG_ERROR("Unable to open file \"%s\".", file_path);
+        MYGPIOD_LOG_ERRNO(errno);
         return s;
     }
     const size_t buffer_size = 10240;

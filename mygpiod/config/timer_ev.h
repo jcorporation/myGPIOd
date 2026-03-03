@@ -20,6 +20,7 @@
  * Config data for inputs
  */
 struct t_timer_definition {
+    sds name;                      //!< Timer event name
     int fd;                        //!< File descriptor
     int start_hour;                //!< Start hour
     int start_minute;              //!< Start minute
