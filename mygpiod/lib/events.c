@@ -136,6 +136,10 @@ const char *mygpiod_event_name(enum mygpiod_event_types event_type) {
             return "gpio_long_press_release";
         case MYGPIOD_EVENT_INPUT:
             return "input";
+        case MYGPIOD_EVENT_TIMER_EV:
+            return "timer_ev";
+        case MYGPIOD_EVENT_HOOK:
+            return "hook";
     }
     return "";
 }
