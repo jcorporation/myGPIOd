@@ -47,6 +47,7 @@ target_sources(mygpiod
     lib/timer.c
     raspberry/vcgencmd.c
     server_socket/gpio.c
+    server_socket/hook.c
     server_socket/idle.c
     server_socket/protocol.c
     server_socket/raspberry.c

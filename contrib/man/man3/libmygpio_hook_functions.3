@@ -1,0 +1,44 @@
+.TH "libmygpio_hook_functions" 3 "libmygpio" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libmygpio_hook_functions \- Hook functions
+.PP
+ \- This module provides functions to trigger hooks\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBmygpio_hook\fP (struct \fBt_mygpio_connection\fP *connection, const char *name)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This module provides functions to trigger hooks\&. 
+
+
+.SH "Function Documentation"
+.PP 
+.SS "bool mygpio_hook (struct \fBt_mygpio_connection\fP * connection, const char * name)"
+Triggers a hook 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconnection\fP connection struct 
+.br
+\fIname\fP Hook name 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true on success, else false 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libmygpio from the source code\&.

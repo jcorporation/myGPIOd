@@ -126,6 +126,29 @@ myGPIOd has an integrated timer to execute time based recurring actions.
 | ``options``  | Options for action.                                                         |
 +--------------+-----------------------------------------------------------------------------+
 
+Hooks
+-----
+
+External programs can trigger myGPIOd actions via hooks. A hook can be called through HTTP or the unix socket.
+
+- HTTP: ``/hook/<name>``
+- Unix socket protocol: ``hook <name>``
+
+.. code:: ini
+
+  #hook = name:action:options
+  #hook = test:lua:hookTrigger
+
++--------------+-----------------------------------------------------------------------------+
+| Field        | Description                                                                 |
++==============+=============================================================================+
+| ``name``     | Hook name.                                                                  |
++--------------+-----------------------------------------------------------------------------+
+| ``action``   | Action to execute.                                                          |
++--------------+-----------------------------------------------------------------------------+
+| ``options``  | Options for action.                                                         |
++--------------+-----------------------------------------------------------------------------+
+
 Actions
 -------
 

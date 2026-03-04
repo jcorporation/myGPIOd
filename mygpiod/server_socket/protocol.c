@@ -14,6 +14,7 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_socket/gpio.h"
+#include "mygpiod/server_socket/hook.h"
 #include "mygpiod/server_socket/idle.h"
 #include "mygpiod/server_socket/raspberry.h"
 #include "mygpiod/server_socket/response.h"
@@ -116,6 +117,9 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
             break;
         case CMD_VCIOTHROTTLED:
             rc = handle_raspberry_vcio(client_node, "get_throttled");
+            break;
+        case CMD_HOOK:
+            rc = handle_hook(&options, config, client_node);
             break;
         case CMD_INVALID:
         case CMD_COUNT:

@@ -26,6 +26,7 @@
 #include "libmygpio_gpio.h"
 #include "libmygpio_gpioinfo.h"
 #include "libmygpio_gpiolist.h"
+#include "libmygpio_hook.h"
 #include "libmygpio_idle.h"
 #include "libmygpio_parser.h"
 #include "libmygpio_protocol.h"

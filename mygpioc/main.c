@@ -12,6 +12,7 @@
 #include "libmygpio/include/libmygpio/libmygpio.h"
 
 #include "mygpioc/gpio.h"
+#include "mygpioc/hook.h"
 #include "mygpioc/idle.h"
 #include "mygpioc/options.h"
 #include "mygpioc/raspberry_vcio.h"
@@ -53,6 +54,7 @@ static struct t_commands commands[] = {
     { "vciovolts", handle_vciovolts, 0, 0},
     { "vcioclock", handle_vcioclock, 0, 0},
     { "vciothrottled", handle_vciothrottled, 0, 0},
+    { "hook", handle_hook, 1, 1},
     { NULL, NULL, 0, 0}
 };
 

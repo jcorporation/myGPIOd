@@ -258,3 +258,11 @@ Gets the throttled mask from ``/dev/vcio``.
    OK
    Value: 0x0
    END
+
+Hook commands
+-------------
+
+hook <name>
+~~~~~~~~~~~
+
+Triggers a hook.

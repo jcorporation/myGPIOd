@@ -18,6 +18,7 @@ target_sources(mygpio
     src/gpio.c
     src/gpioinfo.c
     src/gpiolist.c
+    src/hook.c
     src/idle.c
     src/parser.c
     src/pair.c

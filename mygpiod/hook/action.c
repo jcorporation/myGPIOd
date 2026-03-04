@@ -20,7 +20,7 @@
 /**
  * Handles the configured actions for an timer event.
  * @param config Pointer to config
- * @param timer_definition Timer event configuration
+ * @param hook_name Hook name
  */
 bool hook_action_handler(struct t_config *config, const char *hook_name) {
     MYGPIOD_LOG_DEBUG("Hook \"%s\" received", hook_name);

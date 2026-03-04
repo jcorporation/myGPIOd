@@ -34,6 +34,7 @@
     X(CMD_VCIOVOLTS) \
     X(CMD_VCIOCLOCK) \
     X(CMD_VCIOTHROTTLED) \
+    X(CMD_HOOK) \
     X(CMD_COUNT)
 
 /**
