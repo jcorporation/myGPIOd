@@ -8,15 +8,14 @@
  * \brief Input device event handling
  */
 
-#include "config/timer_ev.h"
 #include "compile_time.h"
+#include "mygpiod/timer_ev/timer_ev.h"
 
 #include "mygpiod/config/config.h"
 #include "mygpiod/config/timer_ev.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
-#include "mygpiod/timer_ev/timer_ev.h"
 
 #include <errno.h>
 #include <fcntl.h>
