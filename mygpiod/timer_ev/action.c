@@ -16,6 +16,7 @@
 #include "mygpiod/lib/log.h"
 
 #include <stddef.h>
+#include <time.h>
 
 /**
  * Handles the configured actions for an timer event.
