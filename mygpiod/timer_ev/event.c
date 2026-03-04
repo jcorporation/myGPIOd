@@ -11,8 +11,8 @@
 #include "compile_time.h"
 #include "mygpiod/timer_ev/event.h"
 
-#include "config/timer_ev.h"
 #include "mygpiod/config/config.h"
+#include "mygpiod/config/timer_ev.h"
 #include "mygpiod/lib/timer.h"
 #include "mygpiod/timer_ev/action.h"
 #include "mygpiod/timer_ev/timer_ev.h"
