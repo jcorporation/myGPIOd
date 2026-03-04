@@ -12,6 +12,7 @@
 #include "mygpiod/actions/lua.h"
 
 #include "mygpiod/lib/log.h"
+#include "mygpiod/lua/util.h"
 
 #include <lauxlib.h>
 #include <lua.h>
@@ -32,7 +33,12 @@ bool action_lua(struct t_config *config, struct t_action *action) {
         return false;
     }
     // Push the function on the top of the lua stack
-    lua_getglobal(config->lua_vm, action->options[0]);
+    int rv = lua_getglobal(config->lua_vm, action->options[0]);
+    if (rv != 6) {
+        clean_up_lua_stack(config->lua_vm);
+        MYGPIOD_LOG_ERROR("\"%s\" is not a valid Lua function", action->options[0]);
+        return false;
+    }
     // Push the arguments on the top of the lua stack
     for (int i = 1; i < action->options_count; i++) {
         lua_pushstring(config->lua_vm, action->options[i]);
