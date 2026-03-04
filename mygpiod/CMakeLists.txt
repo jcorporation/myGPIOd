@@ -20,6 +20,7 @@ target_sources(mygpiod
     actions/system.c
     config/config.c
     config/gpio.c
+    config/hook.c
     config/input_ev.c
     config/timer_ev.c
     event_loop/event_loop.c

@@ -61,6 +61,9 @@ struct t_config {
     // Timer events
     struct t_list timer_definitions;      //!< List of timer configurations
 
+    // Timer events
+    struct t_list hooks;                 //!< List of hooks
+
     // MPD
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         struct mpd_connection *mpd_conn;  //!< MPD connection

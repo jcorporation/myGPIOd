@@ -32,3 +32,8 @@ end
 function timerTrigger()
     print("Timer triggered")
 end
+
+-- Simple Lua function for hook event
+function hookTrigger()
+    print("Hook triggered")
+end

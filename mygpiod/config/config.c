@@ -17,6 +17,7 @@
 #include "mygpiod/event_loop/signal_handler.h"
 
 #include "mygpiod/config/gpio.h"
+#include "mygpiod/config/hook.h"
 #include "mygpiod/config/input_ev.h"
 #include "mygpiod/config/timer_ev.h"
 #include "mygpiod/lib/list.h"
@@ -107,6 +108,7 @@ void config_clear(struct t_config *config) {
     #endif
     list_clear(&config->input_devices, input_node_data_clear);
     list_clear(&config->timer_definitions, timer_node_definition_data_clear);
+    list_clear(&config->hooks, hook_node_data_clear);
 }
 
 //private functions
@@ -143,6 +145,7 @@ static struct t_config *config_new(void) {
 
     list_init(&config->input_devices);
     list_init(&config->timer_definitions);
+    list_init(&config->hooks);
 
     #ifdef MYGPIOD_ENABLE_HTTPD
         config->http_ip = sdsnew(CFG_HTTP_IP);
@@ -316,6 +319,12 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
             return false;
         }
     #endif
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        if (strcmp(key, "lua_file") == 0) {
+            config->lua_file = sdscatsds(config->lua_file, value);
+            return true;
+        }
+    #endif
     if (strcmp(key, "input_ev") == 0) {
         if (parse_input_ev(&config->input_devices, value) == true) {
             return true;
@@ -328,11 +337,11 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
         }
         return false;
     }
-    #ifdef MYGPIOD_ENABLE_ACTION_LUA
-        if (strcmp(key, "lua_file") == 0) {
-            config->lua_file = sdscatsds(config->lua_file, value);
+    if (strcmp(key, "hook") == 0) {
+        if (parse_hook(&config->hooks, value) == true) {
             return true;
         }
-    #endif
+        return false;
+    }
     return false;
 }

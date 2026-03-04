@@ -64,3 +64,8 @@ gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d
 # Timer event configuration
 #timer_ev = name:hour:minute:interval:weekdays:action:options
 #timer_ev = test:19:15:2m:*:lua:timerTrigger
+
+###############################################################################
+# Hook configuration
+#hook = name:action:options
+#hook = test:lua:hookTrigger
