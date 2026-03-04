@@ -29,7 +29,7 @@ struct t_timer_definition {
     struct t_action action;        //!< Action
 };
 
-bool parse_timer_ev(struct t_list *input_devices, sds config_value);
+bool parse_timer_ev(struct t_list *timer_definitions, sds config_value);
 void timer_definition_data_clear(struct t_timer_definition *timer_definition);
 void timer_node_definition_data_clear(struct t_list_node *node);
 

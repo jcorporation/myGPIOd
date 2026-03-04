@@ -26,7 +26,7 @@ bool parse_weekdays(sds weekdays_str, bool weekdays[7]);
 // Public functions
 
 /**
- * Parses an timer_ev config line
+ * Parses a timer_ev config line
  * @param timer_definitions Pointer to list of timer definitions
  * @param config_value value to parse
  * @return true on success, else false
