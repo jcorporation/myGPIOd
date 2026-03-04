@@ -33,6 +33,7 @@ target_sources(mygpiod
     gpio/output.c
     gpio/timer.c
     gpio/util.c
+    hook/action.c
     input_ev/action.c
     input_ev/device.c
     input_ev/event_code.c
@@ -90,6 +91,7 @@ if(MYGPIOD_ENABLE_HTTPD)
   )
   target_sources(mygpiod
     PRIVATE
+      server_http/hook.c
       server_http/httpd.c
       server_http/rest_api_gpio.c
       server_http/rest_api_raspberry.c

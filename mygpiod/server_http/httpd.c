@@ -14,6 +14,7 @@
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
+#include "mygpiod/server_http/hook.h"
 #include "mygpiod/server_http/rest_api.h"
 #include "mygpiod/server_http/util.h"
 #include "mygpiod/server_http/webui.h"
@@ -107,6 +108,11 @@ static enum MHD_Result request_handler(void *cls,
         MHD_suspend_connection(connection);
         list_push(&config->http_suspended, 0, request_data);
         return MHD_YES;
+    }
+    // Hooks
+    if (strncmp(url, "/hook/", 6) == 0) {
+        MYGPIOD_LOG_DEBUG("HTTP connection %u: Calling hook handler for %s %s", request_data->conn_id, method_str, url);
+        return hook_handler(connection, request_data->conn_id, url, config);
     }
     // Serve embedded files
     MYGPIOD_LOG_DEBUG("HTTP connection %u: Serve embedded files for %s %s", request_data->conn_id, method_str, url);
