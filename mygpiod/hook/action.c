@@ -18,9 +18,10 @@
 #include <string.h>
 
 /**
- * Handles the configured actions for an timer event.
+ * Handles the configured actions for a hook.
  * @param config Pointer to config
  * @param hook_name Hook name
+ * @return true if hook was found, else false
  */
 bool hook_action_handler(struct t_config *config, const char *hook_name) {
     MYGPIOD_LOG_DEBUG("Hook \"%s\" received", hook_name);

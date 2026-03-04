@@ -266,7 +266,8 @@ void gpio_node_out_clear(struct t_list_node *node) {
 
 /**
  * Clears the gpio part of the config
- * @param config pointer to config
+ * @param gpios_in Pointer to list of input GPIOs
+ * @param gpios_out Pointer to list of output GPIOs
  */
 void gpios_config_clear(struct t_list *gpios_in, struct t_list *gpios_out) {
     list_clear(gpios_in, gpio_node_in_clear);
