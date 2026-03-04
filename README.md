@@ -1,14 +1,12 @@
 # myGPIOd
 
-myGPIOd is a lightweight GPIO controlling framework. It is written in C and depends on [libgpiod version 2.x.x](https://libgpiod.readthedocs.io/).
+myGPIOd is a lightweight GPIO controlling framework and hotkey daemon written in C.
 
-It consists of a daemon, a client library and a command line tool. It is designed to run on Raspberry PIs and similar devices.
+It consists of a daemon with an integrated HTTP server, a client library and a command line tool. It is designed to run on Raspberry PIs and similar devices.
 
 I wrote this tool primarily for [myMPDos](https://github.com/jcorporation/myGPIOdos) and [myMPD](https://github.com/jcorporation/myMPD).
 
-myGPIOd can communicate natively with MPD and also integrates nicely with all HTTP APIs.
-
-Since version 2.0.0 myGPIOd can also read events from generic input devices (`/dev/input/..`).
+You can use myGPIOd to execute various actions based on events emitted by GPIOs (`/dev/gpiochip*`), input devices (`/dev/input/*`), timers and hooks (webhooks and hooks initiated by a socket client).
 
 ## Features
 
