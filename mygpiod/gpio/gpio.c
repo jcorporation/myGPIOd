@@ -12,8 +12,33 @@
 #include "mygpiod/gpio/gpio.h"
 
 #include "mygpiod/config/gpio.h"
+#include "mygpiod/gpio/chip.h"
+#include "mygpiod/gpio/input.h"
+#include "mygpiod/gpio/output.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
+
+/**
+ * Initializes the GPIO chip and lines
+ * @param config Pointer to config
+ * @param poll_fds Pointer to poll_fds array
+ * @return true on success, else false
+ */
+bool gpio_init(struct t_config *config, struct t_poll_fds *poll_fds) {
+    if (sdslen(config->chip_path) > 0) {
+        if (gpio_open_chip(config) == false ||
+            gpio_set_outputs(config) == false ||
+            gpio_request_inputs(config, poll_fds) == false)
+        {
+            return false;
+        }
+    }
+    else {
+        MYGPIOD_LOG_INFO("No GPIO chip configured");
+        gpios_config_clear(&config->gpios_in, &config->gpios_out);
+    }
+    return true;
+}
 
 /**
  * Gets the current line value of a gpio

@@ -12,6 +12,7 @@
 #include "mygpiod/server_socket/gpio.h"
 
 #include "mygpio-common/util.h"
+#include "mygpiod/config/gpio.h"
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/output.h"
 #include "mygpiod/gpio/util.h"

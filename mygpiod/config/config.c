@@ -68,20 +68,11 @@ struct t_config *get_config(sds config_file) {
 }
 
 /**
- * Clears the gpio part of the config
- * @param config pointer to config
- */
-void config_gpios_clear(struct t_config *config) {
-    list_clear(&config->gpios_in, gpio_node_in_clear);
-    list_clear(&config->gpios_out, gpio_node_out_clear);
-}
-
-/**
  * Clears the config struct.
  * @param config pointer to config to free
  */
 void config_clear(struct t_config *config) {
-    config_gpios_clear(config);
+    gpios_config_clear(&config->gpios_in, &config->gpios_out);
     list_clear(&config->clients, server_client_connection_clear);
     if (config->chip != NULL) {
         gpiod_chip_close(config->chip);

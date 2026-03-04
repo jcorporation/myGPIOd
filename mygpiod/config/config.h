@@ -29,37 +29,37 @@
  */
 struct t_config {
     // Configuration
-    int loglevel;                         //!< the loglevel
-    bool syslog;                          //!< enable syslog?
-    int signal_fd;                        //!< file descriptor for the signal handler
+    int loglevel;                         //!< The loglevel
+    bool syslog;                          //!< Enable syslog?
+    int signal_fd;                        //!< File descriptor for the signal handler
 
     // Socket Server
-    sds socket_path;                      //!< server socket filepath
-    int socket_timeout_s;                 //!< socket timeout in seconds
-    struct t_list clients;                //!< list of connected socket clients
-    unsigned client_id;                   //!< uniq client id
+    sds socket_path;                      //!< Server socket filepath
+    int socket_timeout_s;                 //!< Socket timeout in seconds
+    struct t_list clients;                //!< List of connected socket clients
+    unsigned client_id;                   //!< Uniq client id
 
     #ifdef MYGPIOD_ENABLE_HTTPD
         // HTTP Server
-        struct MHD_Daemon *httpd;             //!< HTTPD object
-        sds http_ip;                          //!< HTTPD listening ip
-        unsigned http_port;                   //!< HTTPD listening port
-        struct t_list http_suspended;         //!< List of suspended HTTP connections
-        unsigned http_conn_id;                //!< Uniq HTTP connection id
+        struct MHD_Daemon *httpd;         //!< HTTPD object
+        sds http_ip;                      //!< HTTPD listening ip
+        unsigned http_port;               //!< HTTPD listening port
+        struct t_list http_suspended;     //!< List of suspended HTTP connections
+        unsigned http_conn_id;            //!< Uniq HTTP connection id
     #endif
 
     // GPIO
-    sds dir_gpio;                         //!< directory for the gpio config files
-    struct t_list gpios_in;               //!< holds the list of GPIOs to monitor
-    struct t_list gpios_out;              //!< holds the list of GPIOs to set
-    sds chip_path;                        //!< path of the gpio chip device
-    struct gpiod_chip *chip;              //!< gpiod chip object
+    sds dir_gpio;                         //!< Directory for the gpio config files
+    struct t_list gpios_in;               //!< List of GPIOs to monitor
+    struct t_list gpios_out;              //!< List of GPIOs to set
+    sds chip_path;                        //!< Path of the gpio chip device
+    struct gpiod_chip *chip;              //!< Gpiod chip object
 
     // Input events
-    struct t_list input_devices;          //!< list of /dev/input/* devices
+    struct t_list input_devices;          //!< List of /dev/input/* devices
 
     // Timer events
-    struct t_list timer_definitions;      //!< list of /dev/input/* devices
+    struct t_list timer_definitions;      //!< List of timer configurations
 
     // MPD
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
@@ -73,7 +73,6 @@ struct t_config {
     #endif
 };
 
-void config_gpios_clear(struct t_config *config);
 void config_clear(struct t_config *config);
 struct t_config *get_config(sds config_file);
 

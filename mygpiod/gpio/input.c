@@ -11,6 +11,7 @@
 #include "compile_time.h"
 #include "mygpiod/gpio/input.h"
 
+#include "mygpiod/config/gpio.h"
 #include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
@@ -18,6 +19,11 @@
 #include <assert.h>
 #include <gpiod.h>
 #include <string.h>
+
+// Private definitions
+static bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in_data *data);
+
+// Public functions
 
 /**
  * Request the input GPIOs.
@@ -43,6 +49,8 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
     return true;
 }
 
+// Private functions
+
 /**
  * Requests an input gpio
  * @param chip gpio chip
@@ -50,7 +58,7 @@ bool gpio_request_inputs(struct t_config *config, struct t_poll_fds *poll_fds) {
  * @param data gpio configuration data
  * @return true on success, else false
  */
-bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in_data *data) {
+static bool gpio_request_input(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_in_data *data) {
     MYGPIOD_LOG_INFO("Setting gpio \"%u\" as input, monitoring event: %s",
             gpio, lookup_event_request(data->event_request));
     struct gpiod_line_settings *settings = gpiod_line_settings_new();

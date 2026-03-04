@@ -12,6 +12,7 @@
 #include "mygpiod/gpio/output.h"
 
 #include "mygpiod/config/config.h"
+#include "mygpiod/config/gpio.h"
 #include "mygpiod/event_loop/event_loop.h"
 #include "mygpiod/gpio/util.h"
 #include "mygpiod/lib/events.h"
@@ -22,6 +23,11 @@
 #include <assert.h>
 #include <gpiod.h>
 #include <string.h>
+
+// Private definitions
+static bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_data *data);
+
+// Public functions
 
 /**
  * Sets the output gpios in bulk.
@@ -43,79 +49,6 @@ bool gpio_set_outputs(struct t_config *config) {
         current = current->next;
     }
     return true;
-}
-
-/**
- * Configures a gpio as output
- * @param chip gpio chip
- * @param gpio gpio number
- * @param data gpio configuration data
- * @return true on success, else false
- */
-bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_data *data) {
-    MYGPIOD_LOG_INFO("Setting gpio \"%u\" as output to value \"%s\"",
-        gpio, lookup_gpio_value(data->value));
-    struct gpiod_line_settings *settings = gpiod_line_settings_new();
-    if (settings == NULL) {
-        MYGPIOD_LOG_ERROR("Unable to allocate line settings");
-        assert(settings);
-    }
-    if (gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set direction for gpio %u to output", gpio);
-    }
-    if (gpiod_line_settings_set_drive(settings, data->drive) == -1) {
-        MYGPIOD_LOG_WARN("Unable to set drive for gpio %u to %s", gpio, lookup_drive(data->drive));
-    }
-
-    struct gpiod_request_config *req_cfg = gpiod_request_config_new();
-    if (req_cfg == NULL) {
-        MYGPIOD_LOG_ERROR("Unable to allocate the request config structure");
-        assert(req_cfg);
-    }
-    gpiod_request_config_set_consumer(req_cfg, MYGPIOD_NAME);
-
-    struct gpiod_line_config *line_cfg = gpiod_line_config_new();
-    if (line_cfg == NULL) {
-        MYGPIOD_LOG_ERROR("Unable to allocate the line config structure");
-        assert(line_cfg);
-    }
-    gpiod_line_config_reset(line_cfg);
-    unsigned offsets[1];
-    offsets[0] = gpio;
-    enum gpiod_line_value values[1];
-    values[0] = data->value;
-
-    bool rc = true;
-    if (gpiod_line_config_add_line_settings(line_cfg, offsets, 1, settings) == -1 ||
-        gpiod_line_config_set_output_values(line_cfg, values, 1) == -1)
-    {
-        MYGPIOD_LOG_ERROR("Unable to add line setting and value");
-        rc = false;
-    }
-    else {
-        data->request = gpiod_chip_request_lines(chip, req_cfg, line_cfg);
-        if (data->request == NULL) {
-            MYGPIOD_LOG_ERROR("Unable to request line %u", gpio);
-            rc = false;
-        }
-    }
-
-    struct gpiod_line_info *info = gpiod_chip_get_line_info(chip, gpio);
-    if (info == NULL) {
-        rc = false;
-    }
-    else {
-        const char *name = gpiod_line_info_get_name(info);
-        if (name != NULL) {
-            data->name = sdscat(data->name, name);
-        }
-        gpiod_line_info_free(info);
-    }
-
-    gpiod_request_config_free(req_cfg);
-    gpiod_line_config_free(line_cfg);
-    gpiod_line_settings_free(settings);
-    return rc;
 }
 
 /**
@@ -213,4 +146,79 @@ bool gpio_blink(struct t_config *config, unsigned gpio, int timeout_ms, int inte
     return data->timer_fd == -1
         ? false
         : true;
+}
+
+// Private functions
+
+/**
+ * Configures a gpio as output
+ * @param chip gpio chip
+ * @param gpio gpio number
+ * @param data gpio configuration data
+ * @return true on success, else false
+ */
+static bool gpio_set_output(struct gpiod_chip *chip, unsigned gpio, struct t_gpio_out_data *data) {
+    MYGPIOD_LOG_INFO("Setting gpio \"%u\" as output to value \"%s\"",
+        gpio, lookup_gpio_value(data->value));
+    struct gpiod_line_settings *settings = gpiod_line_settings_new();
+    if (settings == NULL) {
+        MYGPIOD_LOG_ERROR("Unable to allocate line settings");
+        assert(settings);
+    }
+    if (gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT) == -1) {
+        MYGPIOD_LOG_WARN("Unable to set direction for gpio %u to output", gpio);
+    }
+    if (gpiod_line_settings_set_drive(settings, data->drive) == -1) {
+        MYGPIOD_LOG_WARN("Unable to set drive for gpio %u to %s", gpio, lookup_drive(data->drive));
+    }
+
+    struct gpiod_request_config *req_cfg = gpiod_request_config_new();
+    if (req_cfg == NULL) {
+        MYGPIOD_LOG_ERROR("Unable to allocate the request config structure");
+        assert(req_cfg);
+    }
+    gpiod_request_config_set_consumer(req_cfg, MYGPIOD_NAME);
+
+    struct gpiod_line_config *line_cfg = gpiod_line_config_new();
+    if (line_cfg == NULL) {
+        MYGPIOD_LOG_ERROR("Unable to allocate the line config structure");
+        assert(line_cfg);
+    }
+    gpiod_line_config_reset(line_cfg);
+    unsigned offsets[1];
+    offsets[0] = gpio;
+    enum gpiod_line_value values[1];
+    values[0] = data->value;
+
+    bool rc = true;
+    if (gpiod_line_config_add_line_settings(line_cfg, offsets, 1, settings) == -1 ||
+        gpiod_line_config_set_output_values(line_cfg, values, 1) == -1)
+    {
+        MYGPIOD_LOG_ERROR("Unable to add line setting and value");
+        rc = false;
+    }
+    else {
+        data->request = gpiod_chip_request_lines(chip, req_cfg, line_cfg);
+        if (data->request == NULL) {
+            MYGPIOD_LOG_ERROR("Unable to request line %u", gpio);
+            rc = false;
+        }
+    }
+
+    struct gpiod_line_info *info = gpiod_chip_get_line_info(chip, gpio);
+    if (info == NULL) {
+        rc = false;
+    }
+    else {
+        const char *name = gpiod_line_info_get_name(info);
+        if (name != NULL) {
+            data->name = sdscat(data->name, name);
+        }
+        gpiod_line_info_free(info);
+    }
+
+    gpiod_request_config_free(req_cfg);
+    gpiod_line_config_free(line_cfg);
+    gpiod_line_settings_free(settings);
+    return rc;
 }

@@ -2,24 +2,20 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  * myGPIOd (c) 2020-2026 Juergen Mang <mail@jcgames.de>
  * https://github.com/jcorporation/myGPIOd
- *
- * myGPIOd is based on the gpiomon tool from
- * https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/about/
  */
 
 #include "compile_time.h"
 #include "dist/sds/sds.h"
+#include "gpio/gpio.h"
 #include "mygpiod/config/config.h"
 #include "mygpiod/event_loop/event_loop.h"
-#include "mygpiod/gpio/chip.h"
-#include "mygpiod/gpio/input.h"
-#include "mygpiod/gpio/output.h"
 #include "mygpiod/input_ev/device.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/timer_ev/timer_ev.h"
+
 #ifdef MYGPIOD_ENABLE_HTTPD
     #include "mygpiod/server_http/httpd.h"
 #endif
@@ -127,28 +123,28 @@ int main(int argc, char **argv) {
     update_pollfds = true;
 
     // open the chip, set output gpios and request input gpios
-    if (sdslen(config->chip_path) > 0) {
-        if (gpio_open_chip(config) == false ||
-            gpio_set_outputs(config) == false ||
-            gpio_request_inputs(config, &poll_fds) == false)
-        {
-            rc = EXIT_FAILURE;
-            goto out;
-        }
-    }
-    else {
-        MYGPIOD_LOG_INFO("No GPIO chip configured");
-        config_gpios_clear(config);
+    if (gpio_init(config, &poll_fds) == false) {
+        rc = EXIT_FAILURE;
+        goto out;
     }
 
     // add input fds
-    input_device_open(config, &poll_fds);
+    if (input_device_open(config, &poll_fds) == false) {
+        rc = EXIT_FAILURE;
+        goto out;
+    }
 
     // add timer_ev fds
-    timer_ev_open(config, &poll_fds);
+    if (timer_ev_open(config, &poll_fds) == false) {
+        rc = EXIT_FAILURE;
+        goto out;
+    }
 
     // add signal fd
-    event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL, POLLIN | POLLPRI);
+    if (event_poll_fd_add(&poll_fds, config->signal_fd, PFD_TYPE_SIGNAL, POLLIN | POLLPRI) == false) {
+        rc = EXIT_FAILURE;
+        goto out;
+    }
 
     // create server socket
     int server_fd = server_socket_create(config);
@@ -156,7 +152,10 @@ int main(int argc, char **argv) {
         rc = EXIT_FAILURE;
         goto out;
     }
-    event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI);
+    if (event_poll_fd_add(&poll_fds, server_fd, PFD_TYPE_CONNECT, POLLIN | POLLPRI) == false) {
+        rc = EXIT_FAILURE;
+        goto out;
+    }
 
     #ifdef MYGPIOD_ENABLE_HTTPD
         // create http server
