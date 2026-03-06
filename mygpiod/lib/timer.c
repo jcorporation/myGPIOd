@@ -15,7 +15,7 @@
 #include "mygpiod/lib/log.h"
 
 #include <errno.h>
-#include <string.h>
+#include <sys/syslog.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
 
@@ -75,6 +75,9 @@ bool timer_set(int timer_fd, int timeout_ms, int interval_ms) {
  * @param timer_fd Timer fd
  */
 void timer_log_next_expire(const char *name, int timer_fd) {
+    if (loglevel < LOG_DEBUG) {
+        return;
+    }
     struct itimerspec its;
     errno = 0;
     if (timerfd_gettime(timer_fd, &its) == -1) {
@@ -82,8 +85,19 @@ void timer_log_next_expire(const char *name, int timer_fd) {
         MYGPIOD_LOG_ERRNO(errno);
         return;
     }
-    int64_t timestamp = (its.it_value.tv_sec * 1000) + (its.it_value.tv_nsec / 1000000);
-    MYGPIOD_LOG_DEBUG("Timer \"%s\" expires in %lld ms", name, (long long)timestamp);
+    int64_t offset_ms = (its.it_value.tv_sec * 1000) + (its.it_value.tv_nsec / 1000000);
+
+    int64_t timestamp = time(NULL) + (offset_ms / 1000);
+    struct tm tms;
+    (void)localtime_r(&timestamp, &tms);
+
+    MYGPIOD_LOG_DEBUG("Timer \"%s\" expires in %lld ms, at %d:%d:%d",
+        name,
+        (long long)offset_ms,
+        tms.tm_hour,
+        tms.tm_min,
+        tms.tm_sec
+    );
 }
 
 /**
