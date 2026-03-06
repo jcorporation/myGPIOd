@@ -83,10 +83,10 @@ struct t_timer_definition *timer_ev_get_by_fd(struct t_list *timer_definitions, 
 
 /**
  * Calculates the offset from now for next start time for a timer in seconds
- * @param start_hour start hour
- * @param start_minute start minute
- * @param interval reschedule interval
- * @return unix timestamp of next start
+ * @param start_hour Start hour
+ * @param start_minute Start minute
+ * @param interval Reschedule interval
+ * @return Offset for next start
  */
 static int calc_starttime(int start_hour, int start_minute, int interval) {
     time_t now = time(NULL);
@@ -97,8 +97,8 @@ static int calc_starttime(int start_hour, int start_minute, int interval) {
     tms.tm_sec = 0;
     time_t start = mktime(&tms);
 
-    if (interval <= 0) {
-        interval = 86400;
+    while (start > now) {
+        start -= interval;
     }
 
     while (start < now) {
