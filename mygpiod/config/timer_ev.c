@@ -141,7 +141,7 @@ static struct t_timer_definition *new_definition(void) {
 bool parse_interval(sds interval_str, int *interval_sec) {
     int interval;
     char *unit;
-    if (mygpio_parse_int(interval_str, &interval, &unit, 0, 604800) == false) {
+    if (mygpio_parse_int(interval_str, &interval, &unit, 1, 604800) == false) {
         return false;
     }
     int quantifier;
