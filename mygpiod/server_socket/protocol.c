@@ -19,6 +19,7 @@
 #include "mygpiod/server_socket/raspberry.h"
 #include "mygpiod/server_socket/response.h"
 #include "mygpiod/server_socket/socket.h"
+#include "mygpiod/server_socket/timerev.h"
 #include "protocol.h"
 
 #ifdef MYGPIOD_DEBUG
@@ -120,6 +121,9 @@ bool server_protocol_handler(struct t_config *config, struct t_list_node *client
             break;
         case CMD_HOOK:
             rc = handle_hook(&options, config, client_node);
+            break;
+        case CMD_TIMEREVLIST:
+            rc = handle_timerevlist(config, client_node);
             break;
         case CMD_INVALID:
         case CMD_COUNT:

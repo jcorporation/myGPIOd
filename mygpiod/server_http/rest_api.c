@@ -17,6 +17,7 @@
 #include "mygpiod/lib/sds_extras.h"
 #include "mygpiod/server_http/rest_api_gpio.h"
 #include "mygpiod/server_http/rest_api_raspberry.h"
+#include "mygpiod/server_http/rest_api_timerev.h"
 
 #include <microhttpd.h>
 #include <string.h>
@@ -114,6 +115,9 @@ enum MHD_Result rest_api_handler(struct MHD_Connection *connection,
     }
     else if (method == HTTP_GET && strcmp(url, "/api/v1/vcio/throttled") == 0) {
         buffer = rest_api_raspberry_vcio(buffer, "get_throttled", &rc);
+    }
+    else if (method == HTTP_GET && strcmp(url, "/api/v1/timerev") == 0) {
+        buffer = rest_api_timerev_list(config, buffer, &rc);
     }
     else {
         // Request was not handled

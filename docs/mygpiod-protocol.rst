@@ -266,3 +266,20 @@ hook <name>
 ~~~~~~~~~~~
 
 Triggers a hook.
+
+Timer event comands
+-------------------
+
+timerevlist
+~~~~~~~~~~~
+
+Lists all timers with next triggering unix timestamp.
+
+**Response**
+
+::
+
+   OK
+   name:test
+   next:1772988599
+   END

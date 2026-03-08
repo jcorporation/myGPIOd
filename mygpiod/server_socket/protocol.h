@@ -35,6 +35,7 @@
     X(CMD_VCIOCLOCK) \
     X(CMD_VCIOTHROTTLED) \
     X(CMD_HOOK) \
+    X(CMD_TIMEREVLIST) \
     X(CMD_COUNT)
 
 /**

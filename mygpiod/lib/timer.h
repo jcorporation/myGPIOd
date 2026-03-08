@@ -12,9 +12,11 @@
 #define MYGPIOD_TIMER_H
 
 #include <stdbool.h>
+#include <time.h>
 
 int timer_new(int timeout_ms, int interval_ms);
 bool timer_set(int timer_fd, int timeout_ms, int interval_ms);
+time_t timer_get_next_expire_ts(const char *name, int timer_fd);
 void timer_log_next_expire(const char *name, int timer_fd);
 bool timer_repeat(int timer_fd);
 bool timerfd_read_value(int *fd);

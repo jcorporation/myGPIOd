@@ -290,6 +290,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/resp_error'
 
+  /timerev:
+    get:
+      tags:
+        - timerv
+      description: Lists all timers with next triggering unix timestamp.
+      operationId: timerev_get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_timerev_get'
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resp_error'
+
 components:
   schemas:
     gpio_value:
@@ -437,3 +457,21 @@ components:
           description: The drive value. Only for output GPIOs.
           oneOf:
             - $ref: '#/components/schemas/gpio_drive'
+
+    resp_timerev_get:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Timer event name.
+              next:
+                type: number
+                description: Next triggering unix timestamp.
+        entries:
+          type: number
+          description: Timerev count

@@ -70,6 +70,22 @@ bool timer_set(int timer_fd, int timeout_ms, int interval_ms) {
 }
 
 /**
+ * Gets the next timer expiration unix timestamp.
+ * @param name Timer name
+ * @param timer_fd Timer fd
+ */
+time_t timer_get_next_expire_ts(const char *name, int timer_fd) {
+    struct itimerspec its;
+    errno = 0;
+    if (timerfd_gettime(timer_fd, &its) == -1) {
+        MYGPIOD_LOG_ERROR("Can not get expiration for timer \"%s\".", name);
+        MYGPIOD_LOG_ERRNO(errno);
+        return -1;
+    }
+    return time(NULL) + its.it_value.tv_sec + (its.it_value.tv_nsec / 1000000000);
+}
+
+/**
  * Logs the next timer expiration.
  * @param name Timer name
  * @param timer_fd Timer fd
@@ -85,9 +101,9 @@ void timer_log_next_expire(const char *name, int timer_fd) {
         MYGPIOD_LOG_ERRNO(errno);
         return;
     }
-    int64_t offset_ms = (its.it_value.tv_sec * 1000) + (its.it_value.tv_nsec / 1000000);
+    time_t offset_ms = (its.it_value.tv_sec * 1000) + (its.it_value.tv_nsec / 1000000);
 
-    int64_t timestamp = time(NULL) + (offset_ms / 1000);
+    time_t timestamp = time(NULL) + (offset_ms / 1000);
     struct tm tms;
     (void)localtime_r(&timestamp, &tms);
 

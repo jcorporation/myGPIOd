@@ -53,6 +53,7 @@ target_sources(mygpiod
     server_socket/raspberry.c
     server_socket/response.c
     server_socket/socket.c
+    server_socket/timerev.c
     timer_ev/action.c
     timer_ev/event.c
     timer_ev/timer_ev.c
@@ -96,6 +97,7 @@ if(MYGPIOD_ENABLE_HTTPD)
       server_http/httpd.c
       server_http/rest_api_gpio.c
       server_http/rest_api_raspberry.c
+      server_http/rest_api_timerev.c
       server_http/rest_api.c
       server_http/util.c
       server_http/webui.c
