@@ -49,6 +49,7 @@ void print_usage(void) {
                     "  gpioinfo <number>                        Gets the settings of a gpio\n"
                     "  gpiolist                                 Lists all configured gpios with its mode and value\n"
                     "  gpioset <number> <active|inactive>       Sets the value of an output gpio\n"
+                    "  hook <name>                              Trigger a hook\n"
                     "  gpiotoggle <number>                      Toggles the value of an output gpio\n"
                     "  idle [<timeout>]                         Waits for idle events, timeout is in milliseconds\n"
                     "  vciotemp                                 Gets the temperature from /dev/vcio\n"

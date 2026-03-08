@@ -24,6 +24,7 @@ The ``mygpioc`` command line client connects to the socket ``/run/mygpiod/socket
     gpiolist                                 Lists all configured gpios with its mode and value
     gpioset <number> <active|inactive>       Sets the value of an output gpio
     gpiotoggle <number>                      Toggles the value of an output gpio
+    hook <name>                              Trigger a hook
     idle [<timeout>]                         Waits for idle events, timeout is in milliseconds
     vciotemp                                 Gets the temperature from /dev/vcio
     vciovolts                                Gets the core voltage from /dev/vcio
