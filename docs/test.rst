@@ -1,7 +1,7 @@
 Testing
 =======
 
-Simulate gpios
+Simulate GPIOs
 --------------
 
 A GPIO chip can be simulated with the gpio-sim kernel module.
@@ -20,10 +20,10 @@ References:
 - https://github.com/warthog618/gpiosim-rs/blob/master/examples/basic_sim.sh
 - https://www.kernel.org/doc/html/latest/admin-guide/gpio/gpio-sim.html
 
-Simulate events
----------------
+Simulate GPIO events
+--------------------
 
-The debug build of myGPIOd provides an extra protocol command for simulating events: ``event {gpio} {falling,rising}``
+The debug build of myGPIOd provides an extra protocol command for simulating GPIO events: ``event {gpio} {falling,rising}``
 
 .. code:: sh
 
