@@ -19,6 +19,7 @@ Dependencies
 - pkgconf
 - libgpiod >= 2.0.0
 - Optional:
+
   - libcurl
   - libmicrohttpd >= 1.0.0
   - libmpdclient2
