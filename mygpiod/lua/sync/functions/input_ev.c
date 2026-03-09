@@ -9,7 +9,7 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/lua/functions/input_ev.h"
+#include "mygpiod/lua/sync/functions/input_ev.h"
 
 #include "mygpiod/input_ev/action.h"
 #include "mygpiod/input_ev/device.h"

@@ -22,7 +22,7 @@
 #include "mygpiod/server_socket/socket.h"
 
 #ifdef MYGPIOD_ENABLE_ACTION_LUA
-    #include "mygpiod/lua/luavm.h"
+    #include "mygpiod/lua/sync/luavm.h"
 #endif
 
 #include <poll.h>
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
     }
 
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
-        if (luavm_init(config) == false) {
+        if (luavm_sync_init(config) == false) {
             rc = EXIT_FAILURE;
             goto out;
         }

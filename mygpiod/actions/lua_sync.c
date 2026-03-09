@@ -9,7 +9,7 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/actions/lua.h"
+#include "mygpiod/actions/lua_sync.h"
 
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lua/util.h"
@@ -24,7 +24,7 @@
  * @param action Action struct
  * @returns true on success, else false
  */
-bool action_lua(struct t_config *config, struct t_action *action) {
+bool action_lua_sync(struct t_config *config, struct t_action *action) {
     if (config->lua_vm == NULL) {
         MYGPIOD_LOG_ERROR("Lua not initialized");
         return false;

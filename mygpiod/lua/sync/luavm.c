@@ -9,19 +9,19 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/lua/luavm.h"
+#include "mygpiod/lua/sync/luavm.h"
 
 #include "mygpiod/lib/log.h"
-#include "mygpiod/lua/functions/gpio.h"
-#include "mygpiod/lua/functions/input_ev.h"
-#include "mygpiod/lua/functions/system.h"
+#include "mygpiod/lua/sync/functions/gpio.h"
+#include "mygpiod/lua/sync/functions/input_ev.h"
+#include "mygpiod/lua/sync/functions/system.h"
 #include "mygpiod/lua/util.h"
 
 #ifdef MYGPIOD_ENABLE_ACTION_MPC
-    #include "mygpiod/lua/functions/mpc.h"
+    #include "mygpiod/lua/sync/functions/mpc.h"
 #endif
 #ifdef MYGPIOD_ENABLE_ACTION_HTTP
-    #include "mygpiod/lua/functions/http.h"
+    #include "mygpiod/lua/sync/functions/http.h"
 #endif
 
 #include <gpiod.h>
@@ -34,7 +34,7 @@
  * @param config pointer to config
  * @return true on success, else false
  */
-bool luavm_init(struct t_config *config) {
+bool luavm_sync_init(struct t_config *config) {
     if (sdslen(config->lua_file) == 0) {
         MYGPIOD_LOG_INFO("No lua file configured");
         return true;

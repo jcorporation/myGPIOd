@@ -9,7 +9,7 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/lua/functions/system.h"
+#include "mygpiod/lua/sync/functions/system.h"
 
 #include "mygpiod/actions/system.h"
 #include "mygpiod/lib/log.h"

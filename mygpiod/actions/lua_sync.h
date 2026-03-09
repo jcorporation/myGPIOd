@@ -16,6 +16,6 @@
 
 #include <stdbool.h>
 
-bool action_lua(struct t_config *config, struct t_action *action);
+bool action_lua_sync(struct t_config *config, struct t_action *action);
 
 #endif

@@ -142,23 +142,23 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
   )
   target_sources(mygpiod
     PRIVATE
-      actions/lua.c
-      lua/functions/gpio.c
-      lua/functions/input_ev.c
-      lua/functions/system.c
-      lua/luavm.c
+      actions/lua_sync.c
+      lua/sync/functions/gpio.c
+      lua/sync/functions/input_ev.c
+      lua/sync/functions/system.c
+      lua/sync/luavm.c
       lua/util.c
   )
   if (MYGPIOD_ENABLE_ACTION_MPC)
     target_sources(mygpiod
       PRIVATE
-        lua/functions/mpc.c
+        lua/sync/functions/mpc.c
     )
   endif()
   if(MYGPIOD_ENABLE_HTTPD)
     target_sources(mygpiod
       PRIVATE
-        lua/functions/http.c
+        lua/sync/functions/http.c
     )
   endif()
   target_link_libraries(mygpiod

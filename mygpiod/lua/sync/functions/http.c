@@ -9,7 +9,7 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/lua/functions/http.h"
+#include "mygpiod/lua/sync/functions/http.h"
 
 #include "mygpiod/actions/http.h"
 #include "mygpiod/actions/mympd.h"

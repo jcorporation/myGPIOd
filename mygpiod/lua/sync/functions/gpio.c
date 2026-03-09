@@ -9,7 +9,7 @@
  */
 
 #include "compile_time.h"
-#include "mygpiod/lua/functions/gpio.h"
+#include "mygpiod/lua/sync/functions/gpio.h"
 
 #include "mygpiod/gpio/gpio.h"
 #include "mygpiod/gpio/output.h"

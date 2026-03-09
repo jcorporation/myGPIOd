@@ -15,6 +15,6 @@
 
 #include <stdbool.h>
 
-bool luavm_init(struct t_config *config);
+bool luavm_sync_init(struct t_config *config);
 
 #endif
