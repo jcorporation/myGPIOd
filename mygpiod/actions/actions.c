@@ -67,6 +67,8 @@ const char *lookup_action(enum mygpiod_actions action) {
         #ifdef MYGPIOD_ENABLE_ACTION_LUA
             case MYGPIOD_ACTION_LUA:
                 return "lua";
+            case MYGPIOD_ACTION_LUA_ASYNC:
+                return "lua_async";
         #endif
         case MYGPIOD_ACTION_NONE:
             return "none";
@@ -112,6 +114,9 @@ enum mygpiod_actions parse_action(const char *str) {
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         if (strcasecmp(str, "lua") == 0) {
             return MYGPIOD_ACTION_LUA;
+        }
+        if (strcasecmp(str, "lua_async") == 0) {
+            return MYGPIOD_ACTION_LUA_ASYNC;
         }
     #endif
     if (strcasecmp(str, "none") == 0) {

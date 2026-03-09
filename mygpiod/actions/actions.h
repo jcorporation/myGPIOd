@@ -32,7 +32,8 @@ enum mygpiod_actions {
         MYGPIOD_ACTION_MYMPD,     //!< Executes a myGPIOd script
     #endif
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
-        MYGPIOD_ACTION_LUA,       //!< Executes a lua function
+        MYGPIOD_ACTION_LUA,       //!< Executes a lua function in main thread
+        MYGPIOD_ACTION_LUA_ASYNC, //!< Executes a lua function in a new thread
     #endif
     MYGPIOD_ACTION_NONE,          //!< None action
 };

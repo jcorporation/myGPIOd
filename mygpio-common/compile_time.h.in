@@ -30,7 +30,8 @@
 // Default configuration
 #define CFG_LOGLEVEL LOG_NOTICE
 #define CFG_SYSLOG false
-#define CFG_GPIO_DIR "/etc/mygpiod.d"
+#define CFG_GPIO_DIR "/etc/mygpiod.d/gpio.d"
+#define CFG_LUA_ASYNC_DIR "/etc/mygpiod.d/lua_async.d"
 #define CFG_SOCKET_PATH "/run/mygpiod/socket"
 #define CFG_SOCKET_TIMEOUT 60 //seconds
 #define CFG_HTTP_IP "127.0.0.1"

@@ -66,12 +66,7 @@ bool luavm_sync_init(struct t_config *config) {
     // Load user defined lua file
     int rc = luaL_dofile(config->lua_vm, config->lua_file);
     if (rc != 0) {
-        const char *err_str = lua_err_to_str(rc);
-        MYGPIOD_LOG_ERROR("Failure loading lua file: \"%s\"", err_str);
-        if (lua_gettop(config->lua_vm) == 1) {
-            //return value on stack
-            MYGPIOD_LOG_ERROR("%s", lua_tostring(config->lua_vm, 1));
-        }
+        lua_log_result(config->lua_vm, rc, config->lua_file);
         lua_close(config->lua_vm);
         config->lua_vm = NULL;
         return false;

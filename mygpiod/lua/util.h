@@ -21,5 +21,6 @@ int set_lua_rc(lua_State *lua_vm, bool rc);
 void clean_up_lua_stack(lua_State *lua_vm);
 bool check_lua_arg_count(lua_State *lua_vm, const char *cmd, int required);
 const char *lua_err_to_str(int rc);
+void lua_log_result(lua_State *lua_vm, int rc, const char *script_name);
 
 #endif

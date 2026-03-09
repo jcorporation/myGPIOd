@@ -19,6 +19,9 @@
 #include "mygpiod/config/gpio.h"
 #include "mygpiod/config/hook.h"
 #include "mygpiod/config/input_ev.h"
+#ifdef MYGPIOD_ENABLE_ACTION_LUA
+    #include "mygpiod/config/lua_async.h"
+#endif
 #include "mygpiod/config/timer_ev.h"
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
@@ -29,8 +32,6 @@
 #endif
 #include "mygpiod/server_socket/socket.h"
 
-
-#include <dirent.h>
 #include <errno.h>
 #include <gpiod.h>
 #include <limits.h>
@@ -92,6 +93,9 @@ void config_clear(struct t_config *config) {
             lua_close(config->lua_vm);
         }
         FREE_SDS(config->lua_file);
+        // Async Lua scripts
+        FREE_SDS(config->lua_async_dir);
+        list_clear(&config->lua_async_scripts, lua_async_node_data_clear);
     #endif
     #ifdef MYGPIOD_ENABLE_HTTPD
         FREE_SDS(config->http_ip);
@@ -141,6 +145,9 @@ static struct t_config *config_new(void) {
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         config->lua_vm = NULL;
         config->lua_file = sdsempty();
+        // Async Lua scripts
+        config->lua_async_dir = sdsnew(CFG_LUA_ASYNC_DIR);
+        list_init(&config->lua_async_scripts);
     #endif
 
     list_init(&config->input_devices);
@@ -198,61 +205,23 @@ static bool config_read(struct t_config *config, sds config_file) {
     FREE_SDS(line);
     (void)fclose(fp);
 
-    // exit on on invalid config
+    // Exit on on invalid config
     if (rc == false) {
         return false;
     }
 
-    //gpio config
-    errno = 0;
-    DIR *dir = opendir(config->dir_gpio);
-    if (dir == NULL) {
-        MYGPIOD_LOG_ERROR("Error opening directory \"%s\"", config->dir_gpio);
+    // GPIO config
+    if (gpio_read_dir(&config->gpios_in, &config->gpios_out, config->dir_gpio) == false) {
         return false;
     }
-    unsigned i = 0;
-    struct dirent *next_file;
-    while ((next_file = readdir(dir)) != NULL ) {
-        if (next_file->d_type != DT_REG) {
-            continue;
+
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        // Lua async scripts
+        if (lua_async_read_scripts(&config->lua_async_scripts, config->lua_async_dir) == false) {
+            return false;
         }
-        unsigned gpio;
-        char *rest;
-        if (mygpio_parse_uint(next_file->d_name, &gpio, &rest, 0, 99) == true) {
-            if (rest[0] == '.') {
-                rest++;
-                if (strcmp(rest, "in") == 0) {
-                    MYGPIOD_LOG_DEBUG("Parsing %s/%s", config->dir_gpio, next_file->d_name);
-                    struct t_gpio_in_data *data = gpio_in_data_new();
-                    rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_INPUT, data, config->dir_gpio, next_file->d_name);
-                    if (rc == true && list_push(&config->gpios_in, gpio, data) == true) {
-                        i++;
-                        continue;
-                    }
-                    gpio_in_data_clear(data);
-                    FREE_PTR(data);
-                }
-                else if (strcmp(rest, "out") == 0) {
-                    MYGPIOD_LOG_DEBUG("Parsing %s/%s", config->dir_gpio, next_file->d_name);
-                    struct t_gpio_out_data *data = gpio_out_data_new();
-                    rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_OUTPUT, data, config->dir_gpio, next_file->d_name);
-                    if (rc == true && list_push(&config->gpios_out, gpio, data) == true) {
-                        i++;
-                        continue;
-                    }
-                    gpio_out_data_clear(data);
-                    FREE_PTR(data);
-                }
-            }
-        }
-        MYGPIOD_LOG_WARN("Skipping file %s/%s", config->dir_gpio, next_file->d_name);
-        if (i == GPIOS_MAX) {
-            MYGPIOD_LOG_WARN("Too many gpios configured");
-            break;
-        }
-    }
-    closedir(dir);
-    MYGPIOD_LOG_INFO("Parsed %u gpio config files", i);
+    #endif
+
     return true;
 }
 
@@ -322,6 +291,12 @@ static bool parse_config_file_kv(sds key, sds value, struct t_config *config) {
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         if (strcmp(key, "lua_file") == 0) {
             config->lua_file = sdscatsds(config->lua_file, value);
+            return true;
+        }
+        if (strcmp(key, "lua_async_dir") == 0) {
+            sdsclear(config->lua_async_dir);
+            config->lua_async_dir = sdscat(config->lua_async_dir, value);
+            MYGPIOD_LOG_DEBUG("Setting lua_async_dir to \"%s\"", config->lua_async_dir);
             return true;
         }
     #endif

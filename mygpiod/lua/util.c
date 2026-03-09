@@ -84,3 +84,23 @@ const char *lua_err_to_str(int rc) {
             return "Unknown error";
     }
 }
+
+/**
+ * Gets the result from script loading or execution
+ * @param lua_vm lua instance
+ * @param rc return code
+ * @param script_name Lua script name
+ * @return newly allocated sds string with script return value or error string
+ */
+void lua_log_result(lua_State *lua_vm, int rc, const char *script_name) {
+    if (rc == 0) {
+        return;
+    }
+    //error
+    const char *err_str = lua_err_to_str(rc);
+    MYGPIOD_LOG_ERROR("Failure loading lua file \"%s\": \"%s\"", script_name, err_str);
+    if (lua_gettop(lua_vm) == 1) {
+        // Return value on stack is the error
+        MYGPIOD_LOG_ERROR("%s", lua_tostring(lua_vm, 1));
+    }
+}

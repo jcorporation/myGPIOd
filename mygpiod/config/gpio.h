@@ -53,6 +53,7 @@ struct t_gpio_out_data {
     sds name;                            //!< gpio name
 };
 
+bool gpio_read_dir(struct t_list *gpios_in, struct t_list *gpios_out, sds gpio_dir);
 bool parse_gpio_config_file(int direction, void *data, const char *dirname, const char *filename);
 bool parse_gpio_config_file_in_kv(sds key, sds value, struct t_gpio_in_data *data);
 bool parse_gpio_config_file_out_kv(sds key, sds value, struct t_gpio_out_data *data);

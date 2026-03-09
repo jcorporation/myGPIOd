@@ -19,6 +19,7 @@
 #include "mygpiod/lib/mem.h"
 #include "mygpiod/lib/sds_extras.h"
 
+#include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,6 +28,67 @@
 static struct t_action *action_node_data_from_value(sds value);
 
 // Public functions
+
+/**
+ * 
+ * @param gpios_in Pointer to list of input GPIOs
+ * @param gpios_out  Pointer to list of output GPIOs
+ * @param gpio_dir GPIO config folder
+ * @return true on success, else false
+ */
+bool gpio_read_dir(struct t_list *gpios_in, struct t_list *gpios_out, sds gpio_dir) {
+        errno = 0;
+    DIR *dir = opendir(gpio_dir);
+    if (dir == NULL) {
+        MYGPIOD_LOG_ERROR("Error opening directory \"%s\"", gpio_dir);
+        return false;
+    }
+    unsigned i = 0;
+    struct dirent *next_file;
+    while ((next_file = readdir(dir)) != NULL ) {
+        if (next_file->d_type != DT_REG) {
+            continue;
+        }
+        unsigned gpio;
+        char *rest;
+        if (mygpio_parse_uint(next_file->d_name, &gpio, &rest, 0, 99) == true) {
+            if (rest[0] == '.') {
+                rest++;
+                if (strcmp(rest, "in") == 0) {
+                    MYGPIOD_LOG_DEBUG("Parsing %s/%s", gpio_dir, next_file->d_name);
+                    struct t_gpio_in_data *data = gpio_in_data_new();
+                    bool rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_INPUT, data, gpio_dir, next_file->d_name);
+                    if (rc == true && list_push(gpios_in, gpio, data) == true) {
+                        i++;
+                        continue;
+                    }
+                    gpio_in_data_clear(data);
+                    FREE_PTR(data);
+                }
+                else if (strcmp(rest, "out") == 0) {
+                    MYGPIOD_LOG_DEBUG("Parsing %s/%s", gpio_dir, next_file->d_name);
+                    struct t_gpio_out_data *data = gpio_out_data_new();
+                    bool rc = parse_gpio_config_file(GPIOD_LINE_DIRECTION_OUTPUT, data, gpio_dir, next_file->d_name);
+                    if (rc == true && list_push(gpios_out, gpio, data) == true) {
+                        i++;
+                        continue;
+                    }
+                    gpio_out_data_clear(data);
+                    FREE_PTR(data);
+                }
+            }
+        }
+        MYGPIOD_LOG_WARN("Skipping file %s/%s", gpio_dir, next_file->d_name);
+        if (i == GPIOS_MAX) {
+            MYGPIOD_LOG_WARN("Too many gpios configured");
+            break;
+        }
+    }
+    closedir(dir);
+    MYGPIOD_LOG_INFO("Parsed %u gpio config files", i);
+    return true;
+}
+
 
 /**
  * Parses a gpio configuration file

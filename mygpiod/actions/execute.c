@@ -28,6 +28,7 @@
 #endif
 
 #ifdef MYGPIOD_ENABLE_ACTION_LUA
+    #include "mygpiod/actions/lua_async.h"
     #include "mygpiod/actions/lua_sync.h"
 #endif
 
@@ -90,6 +91,9 @@ void action_execute(struct t_config *config, struct t_action *action) {
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
         case MYGPIOD_ACTION_LUA:
             action_lua_sync(config, action);
+            break;
+        case MYGPIOD_ACTION_LUA_ASYNC:
+            action_lua_async(config, action);
             break;
     #endif
         case MYGPIOD_ACTION_NONE:

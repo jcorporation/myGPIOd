@@ -62,7 +62,7 @@ struct t_config {
     struct t_list timer_definitions;      //!< List of timer configurations
 
     // Timer events
-    struct t_list hooks;                 //!< List of hooks
+    struct t_list hooks;                  //!< List of hooks
 
     // MPD
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
@@ -71,8 +71,13 @@ struct t_config {
 
     // Lua
     #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        // Lua in the main thread
         sds lua_file;                     //!< Lua file to load
         lua_State* lua_vm;                //!< Lua VM
+
+        // Async Lua scripts
+        sds lua_async_dir;                //!< Folder for async Lua scripts
+        struct t_list lua_async_scripts;  //!< List of async Lua scripts
     #endif
 };
 

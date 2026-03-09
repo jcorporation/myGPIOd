@@ -142,7 +142,10 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
   )
   target_sources(mygpiod
     PRIVATE
+      actions/lua_async.c
       actions/lua_sync.c
+      config/lua_async.c
+      lua/async/bytecode.c
       lua/sync/functions/gpio.c
       lua/sync/functions/input_ev.c
       lua/sync/functions/system.c
