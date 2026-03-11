@@ -15,7 +15,7 @@
 
 #include <stdbool.h>
 
-bool action_http(struct t_action *action);
-bool action_http2(const char *method, const char *uri, const char *content_type, const char *postdata);
+bool action_http_async(struct t_action *action);
+bool action_http2_async(const char *method, const char *uri, const char *content_type, const char *postdata);
 
 #endif

@@ -48,7 +48,7 @@ int lua_mympd(lua_State *lua_vm) {
         clean_up_lua_stack(lua_vm);
         return set_lua_rc(lua_vm, false);
     }
-    bool rc = action_mympd2(uri, partition, script);
+    bool rc = action_mympd2_async(uri, partition, script);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }
@@ -76,7 +76,7 @@ int lua_http(lua_State *lua_vm) {
     }
     const char *content_type = lua_tostring(lua_vm, 3);
     const char *postdata = lua_tostring(lua_vm, 4);
-    bool rc = action_http2(method, uri, content_type, postdata);
+    bool rc = action_http2_async(method, uri, content_type, postdata);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }

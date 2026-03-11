@@ -64,7 +64,7 @@ void action_execute(struct t_config *config, struct t_action *action) {
                 MYGPIOD_LOG_ERROR("Invalid number of arguments: %d", action->options_count);
                 return;
             }
-            action_system(action->options[0]);
+            action_system_async(action->options[0]);
             break;
         case MYGPIOD_ACTION_GPIO_SET:
             action_gpioset(config, action);
@@ -82,10 +82,10 @@ void action_execute(struct t_config *config, struct t_action *action) {
     #endif
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
         case MYGPIOD_ACTION_HTTP:
-            action_http(action);
+            action_http_async(action);
             break;
         case MYGPIOD_ACTION_MYMPD:
-            action_mympd(action);
+            action_mympd_async(action);
             break;
     #endif
     #ifdef MYGPIOD_ENABLE_ACTION_LUA

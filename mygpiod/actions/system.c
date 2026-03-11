@@ -22,7 +22,7 @@
  * @param cmd command to execute
  * @returns true on success, else false
  */
-bool action_system(const char *cmd) {
+bool action_system_async(const char *cmd) {
     errno = 0;
     int pid = fork();
     if (pid == 0) {

@@ -34,7 +34,7 @@ int lua_system(lua_State *lua_vm) {
         clean_up_lua_stack(lua_vm);
         return set_lua_rc(lua_vm, false);
     }
-    bool rc = action_system(cmd);
+    bool rc = action_system_async(cmd);
     clean_up_lua_stack(lua_vm);
     return set_lua_rc(lua_vm, rc);
 }

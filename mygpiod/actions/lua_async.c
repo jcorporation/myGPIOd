@@ -89,9 +89,9 @@ static void *script_run(void *script_thread_arg) {
     logline = sdsempty();
     struct t_script_run_arg *script = (struct t_script_run_arg *) script_thread_arg;
 
-    MYGPIOD_LOG_DEBUG("Start script \"%s\"", script->script_name);
+    MYGPIOD_LOG_DEBUG("Start async Lua script \"%s\"", script->script_name);
     bool rc = lua_pcall(script->lua_vm, 0, 1, 0);
-    MYGPIOD_LOG_DEBUG("End script \"%s\"", script->script_name);
+    MYGPIOD_LOG_DEBUG("End async Lua script \"%s\"", script->script_name);
     if (rc == 1) {
         lua_log_result(script->lua_vm, rc, script->script_name);
     }

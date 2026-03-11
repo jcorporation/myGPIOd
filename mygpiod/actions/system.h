@@ -13,6 +13,6 @@
 
 #include <stdbool.h>
 
-bool action_system(const char *cmd);
+bool action_system_async(const char *cmd);
 
 #endif

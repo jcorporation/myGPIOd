@@ -129,6 +129,7 @@ if (MYGPIOD_ENABLE_ACTION_HTTP)
     PRIVATE
       actions/http.c
       actions/mympd.c
+      lib/http_client.c
   )
   target_link_libraries(mygpiod
     "${CURL_LIBRARIES}"

@@ -15,7 +15,7 @@
 
 #include <stdbool.h>
 
-bool action_mympd(struct t_action *action);
-bool action_mympd2(const char *uri, const char *partition, const char *script);
+bool action_mympd_async(struct t_action *action);
+bool action_mympd2_async(const char *uri, const char *partition, const char *script);
 
 #endif
