@@ -1,8 +1,8 @@
-Lua scripts
-===========
+Synchronous Lua scripts
+=======================
 
 myGPIOd reads on startup the file defined by the ``lua_file`` configuration setting and starts a Lua VM that compiles the file.
-All lua functions in this file are registered and can be called with the lua action.
+All lua functions in this file are registered and can be called with the ``lua`` action.
 
 .. warning:: Lua scripts are executed in the main thread, therefore lua scripts can block and terminate it.
 

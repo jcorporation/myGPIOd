@@ -20,7 +20,8 @@ myGPIOd can communicate natively with MPD and also integrates nicely with all HT
    installation.rst
    run.rst
    mygpiod-configuration.rst
-   lua-scripts.rst
+   lua-async-scripts.rst
+   lua-sync-scripts.rst
    mygpiod-http-api.rst
    mygpiod-protocol.rst
    mygpio-client.rst

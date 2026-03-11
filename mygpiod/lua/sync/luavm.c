@@ -55,13 +55,13 @@ bool luavm_sync_init(struct t_config *config) {
     lua_register(config->lua_vm, "gpioSet", lua_gpio_set);
     lua_register(config->lua_vm, "gpioToggle", lua_gpio_toggle);
     lua_register(config->lua_vm, "inputEvGet", lua_input_ev_get);
-    lua_register(config->lua_vm, "system", lua_system);
+    lua_register(config->lua_vm, "system", lua_system_async);
     #ifdef MYGPIOD_ENABLE_ACTION_MPC
         lua_register(config->lua_vm, "mpc", lua_mpc);
     #endif
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
-        lua_register(config->lua_vm, "mympd", lua_mympd);
-        lua_register(config->lua_vm, "http", lua_http);
+        lua_register(config->lua_vm, "mympd", lua_mympd_async);
+        lua_register(config->lua_vm, "http", lua_http_async);
     #endif
     // Load user defined lua file
     int rc = luaL_dofile(config->lua_vm, config->lua_file);

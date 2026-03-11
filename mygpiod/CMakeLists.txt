@@ -162,6 +162,7 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
   if(MYGPIOD_ENABLE_HTTPD)
     target_sources(mygpiod
       PRIVATE
+        lua/async/functions/http.c
         lua/sync/functions/http.c
     )
   endif()

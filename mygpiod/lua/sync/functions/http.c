@@ -26,7 +26,7 @@
  * @param lua_vm pointer to lua vm
  * @return Number of values on the stack
  */
-int lua_mympd(lua_State *lua_vm) {
+int lua_mympd_async(lua_State *lua_vm) {
     if (check_lua_arg_count(lua_vm, "mympd", 3) == false) {
         return set_lua_rc(lua_vm, false);
     }
@@ -58,7 +58,7 @@ int lua_mympd(lua_State *lua_vm) {
  * @param lua_vm pointer to lua vm
  * @return Number of values on the stack
  */
-int lua_http(lua_State *lua_vm) {
+int lua_http_async(lua_State *lua_vm) {
     if (check_lua_arg_count(lua_vm, "http", 4) == false) {
         return set_lua_rc(lua_vm, false);
     }

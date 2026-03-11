@@ -11,9 +11,10 @@
 #include "compile_time.h"
 #include "mygpiod/lua/async/bytecode.h"
 
-#include "lua/util.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/sds_extras.h"
+#include "mygpiod/lua/async/functions/http.h"
+#include "mygpiod/lua/util.h"
 
 // Private definitions
 static int save_bytecode(lua_State *lua_vm, struct t_lua_script *script);
@@ -64,7 +65,7 @@ lua_State *lua_async_load_bytecode(struct t_lua_script *script) {
 // Private functions
 
 /**
- * Creates the lua instance and opens the standard and myMPD libraries
+ * Creates the lua instance and opens the standard libraries and registers custom functions.
  * @param script_arg 
  * @return lua_State* or NULL on error
  */
@@ -75,6 +76,10 @@ static lua_State *create_lua_vm(void) {
         return false;
     }
     luaL_openlibs(lua_vm);
+    // Register functions
+    #ifdef MYGPIOD_ENABLE_ACTION_HTTP
+        lua_register(lua_vm, "http", lua_http_sync);
+    #endif
     return lua_vm;
 }
 

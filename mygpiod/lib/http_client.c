@@ -48,8 +48,8 @@ bool http_client(const char *method, const char *uri, const char *content_type, 
     }
     curl_easy_setopt(curl, CURLOPT_URL, uri);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, (curl_write_callback)catch_output);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_body);
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_body);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, response_header);
     struct curl_slist *slist = NULL;
     if (postdata != NULL) {
         sds header = sdscatfmt(sdsempty(), "Content-type: %s", content_type);

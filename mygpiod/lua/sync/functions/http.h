@@ -16,7 +16,7 @@
 #include <lualib.h>
 
 
-int lua_mympd(lua_State *lua_vm);
-int lua_http(lua_State *lua_vm);
+int lua_mympd_async(lua_State *lua_vm);
+int lua_http_async(lua_State *lua_vm);
 
 #endif

@@ -5,16 +5,17 @@
 */
 
 /*! \file
- * \brief Custom Lua system functions
+ * \brief Custom Lua HTTP functions
  */
 
-#ifndef MYGPIOD_LUA_FUNCTIONS_SYSTEM_H
-#define MYGPIOD_LUA_FUNCTIONS_SYSTEM_H
+#ifndef MYGPIOD_LUA_FUNCTIONS_HTTP_H
+#define MYGPIOD_LUA_FUNCTIONS_HTTP_H
 
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
 
-int lua_system_async(lua_State *lua_vm);
+
+int lua_http_sync(lua_State *lua_vm);
 
 #endif

@@ -21,6 +21,9 @@ syslog = false
 # File with user defined lua functions
 #lua_file = 
 
+# Directory for async Lua scripts
+lua_async_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d/lua_async.d
+
 ###############################################################################
 # Unix socket
 
@@ -46,7 +49,7 @@ http_port = 8081
 chip = /dev/gpiochip0
 
 # Directory for single gpio configuration files
-gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d
+gpio_dir = @CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d/gpio.d
 
 ###############################################################################
 # Input event configuration

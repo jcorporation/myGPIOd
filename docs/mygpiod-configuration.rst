@@ -6,13 +6,22 @@ Configuration steps
 
 - Adapt the configuration file ``/etc/mygpiod.conf`` to your needs. All
   options are documented in the file.
-- Create GPIO configuration files in the directory ``/etc/mygpiod.d``.
+- Create GPIO configuration files in the directory ``/etc/mygpiod.d/gpio.d/``.
   There are documented example configuration files for input and output
   configuration. myGPIOd only accesses GPIOs configured in this files.
 - GPIO configuration file names: ``<gpio number>.<direction>``
 
   - ``<gpio number>``: This is the line number of the GPIO.
   - ``<direction>``: Configures the GPIO line direction, ``in`` for input and ``out`` for output.
+
+================================ ==========================================
+File / Directory                 Description
+================================ ==========================================
+``/etc/mygpiod.conf``            Central configuration file.
+``/etc/mygpiod.d/functions.lua`` Good place for user defined Lua functions.
+``/etc/mygpiod.d/gpio.d``        Directory for GPIO configuration files.
+``/etc/mygpiod.d/lua_async.d``   Directory for async Lua scripts.
+================================ ==========================================
 
 Events
 ------
@@ -80,7 +89,7 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
 +--------------+-----------------------------------------------------------------------------+
 | ``code``     | Input event code, ``*`` to match all.                                       |
 +--------------+-----------------------------------------------------------------------------+
-| ``value``    | ``*`` for each weekday else comma separated list of days.                   |
+| ``value``    | Input event value, ``*`` to match all values, ``1`` for key is pressed.     |
 +--------------+-----------------------------------------------------------------------------+
 | ``action``   | Action to execute. Multiple actions can be defined per event.               |
 +--------------+-----------------------------------------------------------------------------+
@@ -90,7 +99,6 @@ myGPIOd read events from `/dev/input/...` devices and execute configured actions
 .. hint::
 
    You can use the ``evtest`` utility to determine the correct device, type, code and value.
-
 
 .. note::
 
@@ -180,8 +188,11 @@ Each event can have multiple actions. Actions and its arguments are delimited by
 |                |                       | Valid HTTP methods are: DELETE, GET, HEAD, OPTIONS,     |
 |                |                       | PATCH, POST, PUT                                        |
 +----------------+-----------------------+---------------------------------------------------------+
-| ``lua``        | ``{lua function}``    | Calls a user defined :doc:`lua function <lua-scripts>`. |
-|                | [``{option}`` ...]    |                                                         |
+| ``lua``        | ``{lua function}``    | Calls a user defined                                    |
+|                | [``{option}`` ...]    | :doc:`Lua function <lua-sync-scripts>`.                 |
++----------------+-----------------------+---------------------------------------------------------+
+| ``lua_async``  | ``{lua file}``        | Executes a Lua file in a new thread:                    |
+|                | [``{option}`` ...]    | :doc:`Lua async <lua-async-scripts>`.                   |
 +----------------+-----------------------+---------------------------------------------------------+
 | ``mpc``        | ``{mpd command}``     | Connects to MPD and issues the command with options.    |
 |                | [``{option}`` ...]    | It uses the default connection settings from            |
@@ -263,7 +274,7 @@ GPIO configuration
   - Toggles the value of GPIO 6 on release event of the long press event
   - Calls ``/usr/local/bin/poweroff.sh`` on a short press (rising)
 
-  **/etc/mygpiod.d/3.in**
+  **/etc/mygpiod.d/gpio.d/3.in**
 
   .. code:: ini
 
@@ -306,7 +317,7 @@ GPIO configuration
   - Enables the pull-up resistor on start
   - Runs the mpd ``next`` command on a short press (falling)
   
-  **/etc/mygpiod.d/4.in**
+  **/etc/mygpiod.d/gpio.d/4.in**
 
   .. code:: ini
 
@@ -324,7 +335,7 @@ GPIO configuration
 
   - Sets the value to active on start
   
-  **/etc/mygpiod.d/5.out**
+  **/etc/mygpiod.d/gpio.d/5.out**
 
   .. code:: ini
 
@@ -336,7 +347,7 @@ GPIO configuration
 
   - Sets the value to inactive on start
 
-  **/etc/mygpiod.d/6.out**
+  **/etc/mygpiod.d/gpio.d/6.out**
 
   .. code:: ini
 
@@ -350,7 +361,7 @@ GPIO configuration
   - Enabled the long press action for falling event
   - Increases the mpd volume by 5 % after 100 ms and each 500 ms as long the button is pressed
 
-  **/etc/mygpiod.d/7.in**
+  **/etc/mygpiod.d/gpio.d/7.in**
 
   .. code:: ini
 
@@ -382,7 +393,7 @@ GPIO configuration
     - Set GPIO 6 for 1000 ms to active
     - Execute the Jukebox script through the myGPIOd API
 
-  **/etc/mygpiod.d/8.in**
+  **/etc/mygpiod.d/gpio.d/8.in**
 
   .. code:: ini
 
@@ -404,7 +415,7 @@ GPIO configuration
   - Disable internal resistors
   - On rising event of GPIO 5 execute a Lua script that reads the value of GPIO 6
 
-  **/etc/mygpiod.d/5.in**
+  **/etc/mygpiod.d/gpio.d/5.in**
 
   .. code:: ini
 
@@ -413,7 +424,7 @@ GPIO configuration
     debounce = 5000
     action_rising = lua:rotaryEncoder
 
-  **/etc/mygpiod.d/5.in**
+  **/etc/mygpiod.d/gpio.d/5.in**
 
   .. code:: ini
 

@@ -21,7 +21,7 @@ You can use myGPIOd to execute various actions based on events emitted by GPIOs 
   - Integrated actions
     - GPIO settings
     - HTTP requests
-    - Lua scripting
+    - Lua scripting (synchronous and asynchronous)
     - MPD client
     - myMPD client
     - System commands

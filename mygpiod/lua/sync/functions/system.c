@@ -24,7 +24,7 @@
  * @param lua_vm pointer to lua vm
  * @return Number of values on the stack
  */
-int lua_system(lua_State *lua_vm) {
+int lua_system_async(lua_State *lua_vm) {
     if (check_lua_arg_count(lua_vm, "system", 1) == false) {
         return set_lua_rc(lua_vm, false);
     }
