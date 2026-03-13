@@ -15,6 +15,11 @@
 #include "mygpiod/event_loop/msg_queue.h"
 #include "mygpiod/lib/mem.h"
 
+#include <pthread.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 /**
  * Reads the message from the main_queue and executes the requested Lua function.
  * Pushes the number of values on the Lua stack back to the script_queue.
@@ -45,7 +50,7 @@ bool lua_async_handle_msg(int *fd) {
  */
 int lua_async_send_msg(lua_State *lua_vm, t_lua_func lua_func) {
     struct t_lua_async_request *req = lua_async_request_new(lua_vm, lua_func);
-    unsigned request_id = (unsigned)rand();
+    unsigned request_id = (unsigned)syscall(SYS_gettid);
     mygpiod_queue_push(main_queue, req, lua_async_request_free, request_id);
     struct t_mygpiod_msg *msg = mygpiod_queue_shift(script_queue, 0, request_id);
     if (msg == NULL) {
