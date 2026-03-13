@@ -47,6 +47,9 @@ void clean_up_lua_stack(lua_State *lua_vm) {
 struct t_config *get_lua_global_config(lua_State *lua_vm) {
     lua_getglobal(lua_vm, "mygpiodConfig");
     struct t_config *config = (struct t_config *)lua_touserdata(lua_vm, -1);
+    if (config == NULL) {
+        MYGPIOD_LOG_ERROR("Failure receiving config from Lua global");
+    }
     lua_pop(lua_vm, 1);
     return config;
 }
@@ -86,11 +89,10 @@ const char *lua_err_to_str(int rc) {
 }
 
 /**
- * Gets the result from script loading or execution
+ * Logs the result from script loading or execution
  * @param lua_vm lua instance
  * @param rc return code
  * @param script_name Lua script name
- * @return newly allocated sds string with script return value or error string
  */
 void lua_log_result(lua_State *lua_vm, int rc, const char *script_name) {
     if (rc == 0) {

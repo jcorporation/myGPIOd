@@ -35,6 +35,9 @@ enum pfd_types {
     #endif
     PFD_TYPE_INPUT,
     PFD_TYPE_TIMER_EV,
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        PFD_TYPE_LUA_ASYNC,
+    #endif
 };
 
 /**

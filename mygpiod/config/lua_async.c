@@ -26,8 +26,8 @@ static struct t_lua_script *new_script(void);
 
 /**
  * Reads all Lua files from the lua_async_dir
- * @param hooks Pointer to list of timer hooks
- * @param config_value value to parse
+ * @param lua_async_scripts Pointer to list to populate with found Lua scripts
+ * @param lua_async_dir Folder to scan for Lua files
  * @return true on success, else false
  */
 bool lua_async_read_scripts(struct t_list *lua_async_scripts, sds lua_async_dir) {
@@ -75,7 +75,7 @@ bool lua_async_read_scripts(struct t_list *lua_async_scripts, sds lua_async_dir)
 
 /**
  * Frees pointers and closes file descriptors from this node.
- * @param hook Timer event configuration to clear
+ * @param data Lua async data to clear
  */
 void lua_async_data_clear(struct t_lua_script *data) {
     sdsfree(data->bytecode);

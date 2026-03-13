@@ -107,6 +107,7 @@ bool parse_timer_ev(struct t_list *timer_definitions, sds config_value) {
  * @param definition Timer event configuration to clear
  */
 void timer_definition_data_clear(struct t_timer_definition *definition) {
+    FREE_SDS(definition->name);
     close_fd(&definition->fd);
     sdsfreesplitres(definition->action.options, definition->action.options_count);
 }

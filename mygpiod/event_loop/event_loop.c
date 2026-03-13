@@ -18,6 +18,9 @@
 #include "mygpiod/lib/list.h"
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/timer.h"
+#ifdef MYGPIOD_ENABLE_ACTION_LUA
+    #include "mygpiod/lua/async/queue_msg.h"
+#endif
 #include "mygpiod/server_socket/socket.h"
 #include "mygpiod/timer_ev/event.h"
 
@@ -59,6 +62,10 @@ const char *lookup_pfd_type(enum pfd_types type) {
             return "input";
         case PFD_TYPE_TIMER_EV:
             return "timer_ev";
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        case PFD_TYPE_LUA_ASYNC:
+            return "lua_async";
+    #endif
     }
     return "unknown";
 }
@@ -195,6 +202,11 @@ bool event_read_delegate(struct t_config *config, struct t_poll_fds *poll_fds) {
                 case PFD_TYPE_TIMER_EV:
                     timer_ev_handle_event(config, &poll_fds->fd[i].fd);
                     return true;
+            #ifdef MYGPIOD_ENABLE_ACTION_LUA
+                case PFD_TYPE_LUA_ASYNC:
+                    lua_async_handle_msg(&poll_fds->fd[i].fd);
+                    return true;
+            #endif
             }
         }
     }

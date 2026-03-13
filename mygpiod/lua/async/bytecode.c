@@ -5,7 +5,7 @@
 */
 
 /*! \file
- * \brief Lua helper functions
+ * \brief Async Lua VM and bytecode functions
  */
 
 #include "compile_time.h"
@@ -13,22 +13,25 @@
 
 #include "mygpiod/lib/log.h"
 #include "mygpiod/lib/sds_extras.h"
+#include "mygpiod/lua/async/functions/gpio.h"
 #include "mygpiod/lua/async/functions/http.h"
+#include "mygpiod/lua/async/functions/input_ev.h"
 #include "mygpiod/lua/util.h"
 
 // Private definitions
 static int save_bytecode(lua_State *lua_vm, struct t_lua_script *script);
-static lua_State *create_lua_vm(void);
+static lua_State *create_lua_vm(struct t_config *config);
 
 // Public functions
 
 /**
  * Loads the script from a string
+ * @param config Pointer to config
  * @param script Pointer to t_lua_script
  * @return lua_State* or NULL on error
  */
-lua_State *lua_async_load_source(struct t_lua_script *script) {
-    lua_State *lua_vm = create_lua_vm();
+lua_State *lua_async_load_source(struct t_config *config, struct t_lua_script *script) {
+    lua_State *lua_vm = create_lua_vm(config);
     if (lua_vm == NULL) {
         return NULL;
     }
@@ -45,11 +48,12 @@ lua_State *lua_async_load_source(struct t_lua_script *script) {
 /**
  * Loads the cached bytecode
  * This should be faster than compiling the script on each execution.
+ * @param config Pointer to config
  * @param script Pointer to t_lua_script
  * @return lua_State* or NULL on error
  */
-lua_State *lua_async_load_bytecode(struct t_lua_script *script) {
-    lua_State *lua_vm = create_lua_vm();
+lua_State *lua_async_load_bytecode(struct t_config *config, struct t_lua_script *script) {
+    lua_State *lua_vm = create_lua_vm(config);
     if (lua_vm == NULL) {
         return NULL;
     }
@@ -66,21 +70,29 @@ lua_State *lua_async_load_bytecode(struct t_lua_script *script) {
 
 /**
  * Creates the lua instance and opens the standard libraries and registers custom functions.
- * @param script_arg 
+ * @param config Pointer to config
  * @return lua_State* or NULL on error
  */
-static lua_State *create_lua_vm(void) {
+static lua_State *create_lua_vm(struct t_config *config) {
     lua_State *lua_vm = luaL_newstate();
     if (lua_vm == NULL) {
         MYGPIOD_LOG_ERROR("Memory allocation error in luaL_newstate");
         return false;
     }
     luaL_openlibs(lua_vm);
+    // Set config as a global
+    lua_pushlightuserdata(lua_vm, config);
+    lua_setglobal(lua_vm, "mygpiodConfig");
     // Register functions
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
         lua_register(lua_vm, "http", lua_mympd_sync);
         lua_register(lua_vm, "http", lua_http_sync);
     #endif
+    lua_register(config->lua_vm, "gpioBlink", lua_gpio_blink_async);
+    lua_register(config->lua_vm, "gpioGet", lua_gpio_get_async);
+    lua_register(config->lua_vm, "gpioSet", lua_gpio_set_async);
+    lua_register(config->lua_vm, "gpioToggle", lua_gpio_toggle_async);
+    lua_register(lua_vm, "inputEvGet", lua_input_ev_get_async);
     return lua_vm;
 }
 
@@ -102,7 +114,7 @@ static int dump_cb(lua_State *lua_vm, const void* p, size_t sz, void* ud) {
 /**
  * Saves the lua bytecode
  * @param lua_vm Lua state
- * @param data Pointer to t_lua_script
+ * @param script Pointer to t_lua_script
  * @return 0 on success
  */
 static int save_bytecode(lua_State *lua_vm, struct t_lua_script *script) {

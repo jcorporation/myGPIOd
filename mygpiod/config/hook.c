@@ -61,6 +61,7 @@ bool parse_hook(struct t_list *hooks, sds config_value) {
  * @param hook Timer event configuration to clear
  */
 void hook_data_clear(struct t_hook *hook) {
+    FREE_SDS(hook->name);
     sdsfreesplitres(hook->action.options, hook->action.options_count);
 }
 

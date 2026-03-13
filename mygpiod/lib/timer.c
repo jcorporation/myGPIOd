@@ -73,6 +73,7 @@ bool timer_set(int timer_fd, int timeout_ms, int interval_ms) {
  * Gets the next timer expiration unix timestamp.
  * @param name Timer name
  * @param timer_fd Timer fd
+ * @return Next expiration timestamp
  */
 time_t timer_get_next_expire_ts(const char *name, int timer_fd) {
     struct itimerspec its;

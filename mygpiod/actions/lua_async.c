@@ -55,8 +55,8 @@ bool action_lua_async(struct t_config *config, struct t_action *action) {
 
     struct t_script_run_arg *script_thread_arg = malloc_assert(sizeof(struct t_script_run_arg));
     script_thread_arg->lua_vm = script->bytecode == NULL
-        ? lua_async_load_source(script)
-        : lua_async_load_bytecode(script);
+        ? lua_async_load_source(config, script)
+        : lua_async_load_bytecode(config, script);
     if (script_thread_arg->lua_vm == NULL) {
         free(script_thread_arg);
         return false;

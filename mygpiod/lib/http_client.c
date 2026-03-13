@@ -31,6 +31,8 @@ static size_t catch_output(void *ptr, size_t size, size_t nmemb, sds *output);
  * @param uri HTTP Uri
  * @param content_type Content-Type or NULL
  * @param postdata data to post or NULL
+ * @param response_header Already allocated sds string to populate with the response header
+ * @param response_body Already allocated sds string to populate with the response body
  * @returns true on success, else false
  */
 bool http_client(const char *method, const char *uri, const char *content_type, const char *postdata,

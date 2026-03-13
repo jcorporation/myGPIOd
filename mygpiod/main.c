@@ -22,6 +22,7 @@
 #include "mygpiod/server_socket/socket.h"
 
 #ifdef MYGPIOD_ENABLE_ACTION_LUA
+    #include "mygpiod/event_loop/msg_queue.h"
     #include "mygpiod/lua/sync/luavm.h"
 #endif
 
@@ -57,6 +58,10 @@ const char *__asan_default_options(void) {
  */
 int main(int argc, char **argv) {
     // Set initial states
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        main_queue = NULL;
+        script_queue = NULL;
+    #endif
     int rc = EXIT_SUCCESS;
     logline = sdsempty();
     log_init();
@@ -110,13 +115,6 @@ int main(int argc, char **argv) {
         goto out;
     }
 
-    #ifdef MYGPIOD_ENABLE_ACTION_LUA
-        if (luavm_sync_init(config) == false) {
-            rc = EXIT_FAILURE;
-            goto out;
-        }
-    #endif
-
     // init struct for event polling
     struct t_poll_fds poll_fds;
     memset(&poll_fds, 0, sizeof(poll_fds));
@@ -145,6 +143,19 @@ int main(int argc, char **argv) {
         rc = EXIT_FAILURE;
         goto out;
     }
+
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        if (luavm_sync_init(config) == false) {
+            rc = EXIT_FAILURE;
+            goto out;
+        }
+        main_queue = mygpiod_queue_create("main", true);
+        script_queue = mygpiod_queue_create("lua_async", false);
+        if (event_poll_fd_add(&poll_fds, main_queue->event_fd, PFD_TYPE_LUA_ASYNC, POLLIN | POLLPRI) == false) {
+            rc = EXIT_FAILURE;
+            goto out;
+        }
+    #endif
 
     // create server socket
     int server_fd = server_socket_create(config);
@@ -240,6 +251,14 @@ out:
         config_clear(config);
         FREE_PTR(config);
     }
+    #ifdef MYGPIOD_ENABLE_ACTION_LUA
+        if (main_queue != NULL) {
+            mygpiod_queue_free(main_queue);
+        }
+        if (script_queue != NULL) {
+            mygpiod_queue_free(script_queue);
+        }
+    #endif
     if (rc == EXIT_SUCCESS) {
         MYGPIOD_LOG_INFO("Exiting gracefully, thank you for using myGPIOd");
     }

@@ -17,12 +17,23 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 +------------------------------------------------------------------+-----------------------------------------------------+
 | Lua function                                                     | Description                                         |
 +==================================================================+=====================================================+
+| ``local rc = gpioBlink({GPIO}, {timeout_ms}, {interval_ms})``    | Toggle the value of the GPIO in given timeout       |
+|                                                                  | and interval.                                       |
++------------------------------------------------------------------+-----------------------------------------------------+
+| ``local rc, value = gpioGet({GPIO})``                            | Returns the GPIO state:                             |
+|                                                                  | ``active``, ``inactive`` or ``error``               |
++------------------------------------------------------------------+-----------------------------------------------------+
+| ``local rc = gpioSet({GPIO}, {active|inactive})``                | Sets the state of an output GPIO.                   |
++------------------------------------------------------------------+-----------------------------------------------------+
+| ``local rc = gpioToggle({GPIO})``                                | Toggles the state of an output GPIO.                |
 +------------------------------------------------------------------+-----------------------------------------------------+
 | ``local rc, resp_header, resp_body =``                           | Submits a HTTP request and waits for the response.  |
 | ``http({method}, {uri}, {content-type}, {postdata})``            | Set ``content-type`` and ``postdata`` to ``nil`` if |
 |                                                                  | no body should be sent.                             |
 |                                                                  | Valid HTTP methods are: DELETE, GET, HEAD,          |
 |                                                                  | OPTIONS, PATCH, POST, PUT                           |
++------------------------------------------------------------------+-----------------------------------------------------+
+| ``local rc, value = inputEvGet({device}, {code})``               | Returns the current value of tracked input event.   |
 +------------------------------------------------------------------+-----------------------------------------------------+
 | ``local rc, resp_header, resp_body =``                           | Calls the myGPIOd api to execute a script and waits |
 | ``mympd({uri}, {partition}, {script})``                          | for the response.                                   |

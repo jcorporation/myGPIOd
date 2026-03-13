@@ -5,17 +5,16 @@
 */
 
 /*! \file
- * \brief Custom Lua HTTP functions
+ * \brief Custom Lua input event functions
  */
 
-#ifndef MYGPIOD_LUA_ASYNC_FUNCTIONS_HTTP_H
-#define MYGPIOD_LUA_ASYNC_FUNCTIONS_HTTP_H
+#ifndef MYGPIOD_LUA_ASYNC_FUNCTIONS_INPUT_EV_H
+#define MYGPIOD_LUA_ASYNC_FUNCTIONS_INPUT_EV_H
 
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
 
-int lua_mympd_sync(lua_State *lua_vm);
-int lua_http_sync(lua_State *lua_vm);
+int lua_input_ev_get_async(lua_State *lua_vm);
 
 #endif
