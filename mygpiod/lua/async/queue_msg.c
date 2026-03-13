@@ -23,7 +23,7 @@
 /**
  * Reads the message from the main_queue and executes the requested Lua function.
  * Pushes the number of values on the Lua stack back to the script_queue.
- * @param fd Pointer to evenfd to read from
+ * @param fd Pointer to eventfd to read from
  * @return true on success, else false
  */
 bool lua_async_handle_msg(int *fd) {
