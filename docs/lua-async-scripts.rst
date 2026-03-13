@@ -24,6 +24,9 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 |                                                                  | Valid HTTP methods are: DELETE, GET, HEAD,          |
 |                                                                  | OPTIONS, PATCH, POST, PUT                           |
 +------------------------------------------------------------------+-----------------------------------------------------+
+| ``local rc, resp_header, resp_body =``                           | Calls the myGPIOd api to execute a script and waits |
+| ``mympd({uri}, {partition}, {script})``                          | for the response.                                   |
++------------------------------------------------------------------+-----------------------------------------------------+
 
 Example lua file
 ----------------

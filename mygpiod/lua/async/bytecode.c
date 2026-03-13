@@ -78,6 +78,7 @@ static lua_State *create_lua_vm(void) {
     luaL_openlibs(lua_vm);
     // Register functions
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
+        lua_register(lua_vm, "http", lua_mympd_sync);
         lua_register(lua_vm, "http", lua_http_sync);
     #endif
     return lua_vm;

@@ -15,7 +15,7 @@
 #include <lua.h>
 #include <lualib.h>
 
-
+int lua_mympd_sync(lua_State *lua_vm);
 int lua_http_sync(lua_State *lua_vm);
 
 #endif

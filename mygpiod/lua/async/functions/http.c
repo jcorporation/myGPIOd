@@ -22,6 +22,52 @@
 #include <lualib.h>
 
 /**
+ * Calls the myGPIOd api to execute a script and returns the result.
+ * This functions blocks.
+ * @param lua_vm pointer to lua vm
+ * @return Number of values on the stack
+ */
+int lua_mympd_sync(lua_State *lua_vm) {
+    if (check_lua_arg_count(lua_vm, "mympd", 3) == false) {
+        return set_lua_rc(lua_vm, false);
+    }
+    const char *uri = lua_tostring(lua_vm, 1);
+    if (uri == NULL) {
+        MYGPIOD_LOG_ERROR("Invalid URI");
+        clean_up_lua_stack(lua_vm);
+        return set_lua_rc(lua_vm, false);
+    }
+    const char *partition = lua_tostring(lua_vm, 2);
+    if (partition == NULL) {
+        MYGPIOD_LOG_ERROR("Invalid partition");
+        clean_up_lua_stack(lua_vm);
+        return set_lua_rc(lua_vm, false);
+    }
+    const char *script = lua_tostring(lua_vm, 3);
+    if (script == NULL) {
+        MYGPIOD_LOG_ERROR("Invalid script");
+        clean_up_lua_stack(lua_vm);
+        return set_lua_rc(lua_vm, false);
+    }
+    sds full_uri = sdscatfmt(sdsempty(), "%s/api/%s", uri, partition);
+    sds postdata = sdscatfmt(sdsempty(),
+        "{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"MYMPD_API_SCRIPT_EXECUTE\","
+        "\"params\":{\"event\":\"user\",\"script\":\"%s\",\"arguments\":{}}}",
+        script);
+    sds resp_header = sdsempty();
+    sds resp_body = sdsempty();
+    bool rc = http_client("POST", full_uri, "application/json", postdata,
+        &resp_header, &resp_body);
+    clean_up_lua_stack(lua_vm);
+    lua_pushboolean(lua_vm, rc);
+    lua_pushstring(lua_vm, resp_header);
+    lua_pushstring(lua_vm, resp_body);
+    sdsfree(resp_header);
+    sdsfree(resp_body);
+    return 3;
+}
+
+/**
  * Submits a HTTP request and returns the result.
  * This functions blocks.
  * @param lua_vm pointer to lua vm
