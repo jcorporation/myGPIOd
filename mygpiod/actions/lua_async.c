@@ -70,7 +70,7 @@ bool action_lua_async(struct t_config *config, struct t_action *action) {
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) != 0 ||
         pthread_create(&scripts_worker_thread, &attr, script_run, script_thread_arg) != 0)
     {
-        MYGPIOD_LOG_ERROR("Can not create script worker thread");
+        MYGPIOD_LOG_ERROR("Failure creating Lua thread.");
         lua_close(script_thread_arg->lua_vm);
         free(script_thread_arg);
         return false;
