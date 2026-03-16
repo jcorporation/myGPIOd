@@ -16,6 +16,7 @@
 #include "mygpiod/lua/async/functions/gpio.h"
 #include "mygpiod/lua/async/functions/http.h"
 #include "mygpiod/lua/async/functions/input_ev.h"
+#include "mygpiod/lua/async/functions/system.h"
 #include "mygpiod/lua/util.h"
 
 // Private definitions
@@ -93,6 +94,7 @@ static lua_State *create_lua_vm(struct t_config *config) {
     lua_register(config->lua_vm, "gpioSet", lua_gpio_set_async);
     lua_register(config->lua_vm, "gpioToggle", lua_gpio_toggle_async);
     lua_register(lua_vm, "inputEvGet", lua_input_ev_get_async);
+    lua_register(lua_vm, "system", lua_system_sync);
     return lua_vm;
 }
 

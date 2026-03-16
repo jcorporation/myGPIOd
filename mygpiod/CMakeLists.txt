@@ -150,6 +150,7 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
       event_loop/msg_queue.c
       lua/async/functions/gpio.c
       lua/async/functions/input_ev.c
+      lua/async/functions/system.c
       lua/async/bytecode.c
       lua/async/queue_msg.c
       lua/sync/functions/gpio.c

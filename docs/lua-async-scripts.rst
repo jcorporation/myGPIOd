@@ -38,6 +38,9 @@ myGPIOd registers custom lua functions to provide access to the actions. The fun
 | ``local rc, resp_header, resp_body =``                           | Calls the myGPIOd api to execute a script and waits |
 | ``mympd({uri}, {partition}, {script})``                          | for the response.                                   |
 +------------------------------------------------------------------+-----------------------------------------------------+
+| ``local rc, output = system({command})``                         | Executes an executable or script and returns the    |
+|                                                                  | output.                                             |
++------------------------------------------------------------------+-----------------------------------------------------+
 
 Example lua file
 ----------------
