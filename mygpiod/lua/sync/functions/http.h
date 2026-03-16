@@ -8,8 +8,8 @@
  * \brief Custom Lua HTTP functions
  */
 
-#ifndef MYGPIOD_LUA_FUNCTIONS_HTTP_H
-#define MYGPIOD_LUA_FUNCTIONS_HTTP_H
+#ifndef MYGPIOD_LUA_SYNC_FUNCTIONS_HTTP_H
+#define MYGPIOD_LUA_SYNC_FUNCTIONS_HTTP_H
 
 #include <lauxlib.h>
 #include <lua.h>

@@ -8,8 +8,8 @@
  * \brief Custom Lua MPD client functions
  */
 
-#ifndef MYGPIOD_LUA_FUNCTIONS_MPC_H
-#define MYGPIOD_LUA_FUNCTIONS_MPC_H
+#ifndef MYGPIOD_LUA_SYNC_FUNCTIONS_MPC_H
+#define MYGPIOD_LUA_SYNC_FUNCTIONS_MPC_H
 
 #include <lauxlib.h>
 #include <lua.h>

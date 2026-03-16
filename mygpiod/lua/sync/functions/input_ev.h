@@ -8,8 +8,8 @@
  * \brief Custom Lua input event functions
  */
 
-#ifndef MYGPIOD_LUA_FUNCTIONS_INPUT_EV_H
-#define MYGPIOD_LUA_FUNCTIONS_INPUT_EV_H
+#ifndef MYGPIOD_LUA_SYNC_FUNCTIONS_INPUT_EV_H
+#define MYGPIOD_LUA_SYNC_FUNCTIONS_INPUT_EV_H
 
 #include <lauxlib.h>
 #include <lua.h>

@@ -8,8 +8,8 @@
  * \brief Custom Lua GPIO functions
  */
 
-#ifndef MYGPIOD_LUA_FUNCTIONS_GPIO_H
-#define MYGPIOD_LUA_FUNCTIONS_GPIO_H
+#ifndef MYGPIOD_LUA_SYNC_FUNCTIONS_GPIO_H
+#define MYGPIOD_LUA_SYNC_FUNCTIONS_GPIO_H
 
 #include <lauxlib.h>
 #include <lua.h>

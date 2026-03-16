@@ -8,8 +8,8 @@
  * \brief Custom Lua system functions
  */
 
-#ifndef MYGPIOD_LUA_FUNCTIONS_SYSTEM_H
-#define MYGPIOD_LUA_FUNCTIONS_SYSTEM_H
+#ifndef MYGPIOD_LUA_SYNC_FUNCTIONS_SYSTEM_H
+#define MYGPIOD_LUA_SYNC_FUNCTIONS_SYSTEM_H
 
 #include <lauxlib.h>
 #include <lua.h>
