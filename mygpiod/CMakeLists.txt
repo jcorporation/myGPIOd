@@ -162,6 +162,7 @@ if(MYGPIOD_ENABLE_ACTION_LUA)
   if (MYGPIOD_ENABLE_ACTION_MPC)
     target_sources(mygpiod
       PRIVATE
+        lua/async/functions/mpc.c
         lua/sync/functions/mpc.c
     )
   endif()

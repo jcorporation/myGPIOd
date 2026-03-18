@@ -16,6 +16,7 @@
 #include "mygpiod/lua/async/functions/gpio.h"
 #include "mygpiod/lua/async/functions/http.h"
 #include "mygpiod/lua/async/functions/input_ev.h"
+#include "mygpiod/lua/async/functions/mpc.h"
 #include "mygpiod/lua/async/functions/system.h"
 #include "mygpiod/lua/util.h"
 
@@ -85,16 +86,19 @@ static lua_State *create_lua_vm(struct t_config *config) {
     lua_pushlightuserdata(lua_vm, config);
     lua_setglobal(lua_vm, "mygpiodConfig");
     // Register functions
+    lua_register(lua_vm, "gpioBlink", lua_gpio_blink_async);
+    lua_register(lua_vm, "gpioGet", lua_gpio_get_async);
+    lua_register(lua_vm, "gpioSet", lua_gpio_set_async);
+    lua_register(lua_vm, "gpioToggle", lua_gpio_toggle_async);
+    lua_register(lua_vm, "inputEvGet", lua_input_ev_get_async);
+    lua_register(lua_vm, "system", lua_system_sync);
+    #ifdef MYGPIOD_ENABLE_ACTION_MPC
+        lua_register(lua_vm, "mpc", lua_mpc_async);
+    #endif
     #ifdef MYGPIOD_ENABLE_ACTION_HTTP
         lua_register(lua_vm, "http", lua_mympd_sync);
         lua_register(lua_vm, "http", lua_http_sync);
     #endif
-    lua_register(config->lua_vm, "gpioBlink", lua_gpio_blink_async);
-    lua_register(config->lua_vm, "gpioGet", lua_gpio_get_async);
-    lua_register(config->lua_vm, "gpioSet", lua_gpio_set_async);
-    lua_register(config->lua_vm, "gpioToggle", lua_gpio_toggle_async);
-    lua_register(lua_vm, "inputEvGet", lua_input_ev_get_async);
-    lua_register(lua_vm, "system", lua_system_sync);
     return lua_vm;
 }
 
