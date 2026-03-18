@@ -20,8 +20,8 @@
 #include <lua.h>
 #include <lualib.h>
 #include <mpd/client.h>
+#include <poll.h>
 #include <string.h>
-#include <sys/poll.h>
 #include <unistd.h>
 
 /**
