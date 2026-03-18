@@ -43,9 +43,9 @@ int lua_system_sync(lua_State *lua_vm) {
     bool rc = true;
     const size_t buffer_size = 10240;
     output = sdsMakeRoomFor(output, buffer_size);
-    size_t read;
-    while ((read = fread(output + sdslen(output), sizeof(char), buffer_size, fp)) > 0) {
-        sdsIncrLen(output, (ssize_t)read);
+    size_t nread;
+    while ((nread = fread(output + sdslen(output), sizeof(char), buffer_size, fp)) > 0) {
+        sdsIncrLen(output, (ssize_t)nread);
         output = sdsMakeRoomFor(output, buffer_size);
     }
     if (ferror(fp)) {
