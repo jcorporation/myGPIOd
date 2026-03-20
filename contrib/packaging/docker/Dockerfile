@@ -6,7 +6,7 @@ FROM alpine:latest AS build
 COPY . /myGPIOd/
 WORKDIR /
 RUN <<EOF
-set +ex
+set -ex
 apk add --no-cache lua5.4-dev libmpdclient-dev curl-dev linux-headers alpine-sdk cmake libgpiod-dev linux-headers samurai libmicrohttpd-dev
 cmake -B "myGPIOd/release" -G Ninja -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_BUILD_TYPE=Release "myGPIOd"
 cmake --build "myGPIOd/release"
