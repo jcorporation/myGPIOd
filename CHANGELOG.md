@@ -4,6 +4,14 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v3.0.1 (2026-03-22)
+
+This is a small bug fix release.
+
+- Fix: Install example configuration
+
+***
+
 ## myGPIOd v3.0.0 (2026-03-22)
 
 This release adds support for simple timer events and asynchronous executed Lua scripts.
@@ -12,8 +20,6 @@ This release adds support for simple timer events and asynchronous executed Lua 
 
 - Feat: Support async Lua scripts
 - Feat: Add timer based events
-
-### Changelog
 
 ***
 

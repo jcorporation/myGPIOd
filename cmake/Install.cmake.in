@@ -59,15 +59,15 @@ if("@MYGPIOD_DAEMON@" STREQUAL "ON")
   endif()
 
   # Install example gpio configuration files
-  file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio-in.example"
-      DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d/gpio.d"
-      FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
-  file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio-out.example"
+  file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/gpio.d/gpio-in.example"
+               "@CMAKE_SOURCE_DIR@/contrib/etc/gpio.d/gpio-out.example"
       DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d/gpio.d"
       FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
   
-  # Create directory for async Lua scripts
-  file(MAKE_DIRECTORY "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d/lua_async.d")
+  # Install example async Lua scripts
+  file(INSTALL "@CMAKE_SOURCE_DIR@/contrib/etc/lua_async.d/script.lua.example"
+      DESTINATION "@CMAKE_INSTALL_FULL_SYSCONFDIR@/mygpiod.d/lua_async.d"
+      FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 endif()
 
 # Install and compress manpages
