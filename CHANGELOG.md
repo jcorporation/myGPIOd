@@ -8,6 +8,8 @@ https://github.com/jcorporation/myGPIOd
 
 This release adds support for simple timer events and asynchronous executed Lua scripts.
 
+### Changelog
+
 - Feat: Support async Lua scripts
 - Feat: Add timer based events
 
