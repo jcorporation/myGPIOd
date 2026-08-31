@@ -18,7 +18,7 @@ makedepends="cmake
 	libmicrohttpd-dev
 	libmpdclient-dev
 	linux-headers
-	lua5.5-dev
+	lua5.4-dev
 	samurai
 	"
 install="$pkgname.pre-install $pkgname.post-install"
