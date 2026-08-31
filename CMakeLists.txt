@@ -112,7 +112,12 @@ endif()
 
 if(MYGPIOD_ENABLE_ACTION_LUA)
   if(EXISTS "/etc/alpine-release")
-    set(ENV{LUA_DIR} "/usr/lib/lua5.4")
+    if(EXISTS "/usr/lib/lua5.4"
+      set(ENV{LUA_DIR} "/usr/lib/lua5.4")
+    endif()
+    if(EXISTS "/usr/lib/lua5.5"
+      set(ENV{LUA_DIR} "/usr/lib/lua5.5")
+    endif()
   endif()
   message("Searching for lua")
   find_package(Lua)
