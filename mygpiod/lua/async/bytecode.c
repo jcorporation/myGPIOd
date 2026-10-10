@@ -112,6 +112,10 @@ static lua_State *create_lua_vm(struct t_config *config) {
  */
 static int dump_cb(lua_State *lua_vm, const void* p, size_t sz, void* ud) {
     (void)lua_vm;
+    // Lua 5.5 signals the end of a dump with a NULL, zero-length block.
+    if (p == NULL) {
+        return 0;
+    }
     struct t_lua_script *script = (struct t_lua_script *)ud;
     script->bytecode = sdscatlen(script->bytecode, p, sz);
     return 0;
