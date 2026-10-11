@@ -4,9 +4,21 @@ https://github.com/jcorporation/myGPIOd
 
 ***
 
+## myGPIOd v3.0.2 (not yet released)
+
+This is a small bug fix release.
+
+### Changelog
+
+- Upd: Improve search for Lua package
+
+***
+
 ## myGPIOd v3.0.1 (2026-03-22)
 
 This is a small bug fix release.
+
+### Changelog
 
 - Fix: Install example configuration
 

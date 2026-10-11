@@ -14,7 +14,7 @@ endif()
 # myGPIO is written in C
 # supported compilers: gcc, clang
 project (mygpiod
-  VERSION 3.0.1
+  VERSION 3.0.2
   LANGUAGES C
 )
 
@@ -111,16 +111,19 @@ else()
 endif()
 
 if(MYGPIOD_ENABLE_ACTION_LUA)
-  if(EXISTS "/etc/alpine-release")
-    if(EXISTS "/usr/lib/lua5.4")
-      set(ENV{LUA_DIR} "/usr/lib/lua5.4")
-    endif()
-    if(EXISTS "/usr/lib/lua5.5")
-      set(ENV{LUA_DIR} "/usr/lib/lua5.5")
-    endif()
+  set(LUA_VERSIONS "lua")
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "4.3.0") 
+    list(APPEND LUA_VERSIONS "lua5.5")
   endif()
-  message("Searching for lua")
-  find_package(Lua)
+  list(APPEND LUA_VERSIONS "lua5.4")
+  foreach(LUA_VER IN LISTS LUA_VERSIONS)
+    message("Searching for ${LUA_VER}")
+    set(ENV{LUA_DIR} "/usr/lib/${LUA_VER}")
+    find_package(Lua)
+    if(LUA_FOUND AND LUA_VERSION_STRING VERSION_GREATER_EQUAL "${LUA_MIN_VERSION}")
+      break()
+    endif()
+  endforeach()
   if(LUA_FOUND)
     if(NOT LUA_VERSION_STRING VERSION_GREATER_EQUAL "5.4.0")
       message(WARNING "Lua is disabled because a version lower than 5.4.0 was found")
